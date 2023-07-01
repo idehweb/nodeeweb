@@ -1,0 +1,12 @@
+
+
+#Core
+
+## Node packages
+core/node_modules
+
+## Compiled files
+core/dist
+
+## Env
+core/.env.local
