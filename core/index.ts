@@ -3,6 +3,7 @@ import store from "./store";
 import { dbConnect } from "./src/common/db";
 import buildApp from "./app";
 import { log } from "./utils/log";
+import gracefullyShutdown from "./src/common/gracefullyShutdown";
 
 async function main() {
   // start connect db
@@ -12,9 +13,11 @@ async function main() {
   const app = await buildApp();
 
   //   listen app
-  app.listen(store.env.PORT, () => {
+  const server = app.listen(store.env.PORT, () => {
     log(`Server Listening at http://127.0.0.1:${store.env.PORT}`);
   });
-}
 
+  // set gracefully shutdown , health path
+  gracefullyShutdown(server);
+}
 main();
