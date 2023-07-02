@@ -6,6 +6,7 @@ import {
   getSharedPath,
   getStaticDir,
 } from "../../utils/path";
+import _ from "lodash";
 import { USE_ENV } from "../../types/global";
 import store from "../../store";
 import { log } from "../../utils/log";
@@ -13,26 +14,39 @@ import { isExistsSync } from "../../utils/helpers";
 import exec from "../../utils/exec";
 
 export default async function prepare() {
-  // set use env
-  setUseEnv();
+  // set custom env
+  setCustomEnv();
 
   // create directories
   createSharedDir();
   createPublicMediaFolder();
-  createPluginFolder();
-  createSchemaFolder();
-  await createThemeFolder();
-  await createAdminFolder();
+
+  const staticDirs = ["plugins"];
+  // run this command only if npm i nodeeweb server
+  if (store.env.USE_ENV !== USE_ENV.NPM)
+    staticDirs.push("schema", "theme", "admin");
+  await Promise.all(staticDirs.map(createAndCopyStaticDir));
 }
 
-function setUseEnv() {
+function setCustomEnv() {
   const appDirectory = fs.realpathSync(process.cwd());
   const resolveApp = (relativePath: string) =>
     path.resolve(appDirectory, relativePath);
 
+  // use env
   const node_modules_ns = resolveApp(PACKAGE_PREFIX);
   if (fs.existsSync(node_modules_ns)) store.env.USE_ENV = USE_ENV.NPM;
   else store.env.USE_ENV = USE_ENV.GIT;
+
+  // dirs
+  const env_dirs = (store.env.APP_DIRS ?? "").split(",").map((d) => d.trim());
+  store.dirs = _.uniq(
+    [
+      appDirectory,
+      ...env_dirs,
+      store.env.USE_ENV === USE_ENV.NPM ? PACKAGE_PREFIX : "",
+    ].filter((d) => d)
+  );
 }
 
 function createSharedDir() {
@@ -40,7 +54,7 @@ function createSharedDir() {
 }
 
 function createPublicMediaFolder() {
-  const public_mediaPath = getStaticDir("public_media");
+  const [public_mediaPath] = getStaticDir("public_media", true);
   const public_media_customerPath = path.join(public_mediaPath, "customer");
   const public_media_siteSettingPath = path.join(
     public_mediaPath,
@@ -77,49 +91,22 @@ function createPublicMediaFolder() {
   }
 }
 
-async function createAdminFolder() {
-  // run this command only if npm i nodeeweb server
-  if (store.env.USE_ENV !== USE_ENV.NPM) return;
-
-  const adminLocalPath = getStaticDir("admin");
-  const adminModulePath = getStaticDir("admin", true);
+async function createAndCopyStaticDir(name: string) {
+  const [dirLocalPath] = getStaticDir(name, true);
+  const dirModulePath = getStaticDir(name, false).slice(1).filter(isExistsSync);
 
   // check if directory exist before
-  if (isExistsSync(adminLocalPath)) {
-    log(adminLocalPath, " exists before");
-    return;
-  }
-  const cmd = `${getScriptFile("mkdir")} ${adminLocalPath} && ${getScriptFile(
-    "cp"
-  )} ${adminModulePath} ${adminLocalPath} `;
-
-  await exec(cmd);
-}
-
-async function createThemeFolder() {
-  // run this command only if npm i nodeeweb server
-  if (store.env.USE_ENV !== USE_ENV.NPM) return;
-
-  const themeLocalPath = getStaticDir("theme");
-  const themeModulePath = getStaticDir("theme", true);
-
-  // check if directory exist before
-  if (isExistsSync(themeLocalPath)) {
-    log(themeLocalPath, " exists before");
+  if (isExistsSync(dirLocalPath)) {
+    log(dirLocalPath, " exists before");
     return;
   }
 
-  await exec(
-    `${getScriptFile("mkdir")} ${themeLocalPath} && ${getScriptFile(
-      "cp"
-    )} ${themeModulePath} ${themeLocalPath} `
-  );
-}
-function createPluginFolder() {
-  const pluginPath = getStaticDir("plugins");
-  if (!isExistsSync(pluginPath)) fs.mkdirSync(pluginPath);
-}
-function createSchemaFolder() {
-  const schemaPath = getStaticDir("schema");
-  if (!isExistsSync(schemaPath)) fs.mkdirSync(schemaPath);
+  for (const dirM of dirModulePath.reverse()) {
+    log(`Copy ${dirM} to ${dirLocalPath}`);
+    await exec(
+      `${getScriptFile("mkdir")} ${dirLocalPath} && ${getScriptFile(
+        "cp"
+      )} ${dirM} ${dirLocalPath} `
+    );
+  }
 }

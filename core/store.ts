@@ -15,8 +15,10 @@ export class Store {
     ADMIN_EMAIL: string;
     ADMIN_USERNAME: string;
     ADMIN_PASSWORD: string;
+    APP_DIRS: string;
   } & { [k: string]: string };
   db: typeof mongoose;
+  dirs: string[];
 
   constructor() {
     this.env = process.env as any;

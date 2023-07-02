@@ -40,11 +40,10 @@ export async function dbInit() {
 
 export async function dbRegisterModels() {
   // read dir
-  const schemaFiles = getSchemaDir().flatMap((p) =>
-    fs
-      .readdirSync(p)
-      .map((sp) => [sp.split(".").slice(0, -1).join("."), join(p, sp)])
-  );
+  const schemaDir = getSchemaDir();
+  const schemaFiles = fs
+    .readdirSync(schemaDir)
+    .map((sp) => [sp.split(".").slice(0, -1).join("."), join(schemaDir, sp)]);
   // import
   for (const [name, schemaFile] of schemaFiles) {
     const { default: schema } = await import(schemaFile);

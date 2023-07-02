@@ -29,17 +29,10 @@ export function getScriptFile(
 }
 
 export function getSchemaDir() {
-  const dir: string[] = [];
-  // local
-  dir.push(getStaticDir("schema"));
-
-  // package
-  if (store.env.USE_ENV === USE_ENV.NPM) {
-    dir.push(getStaticDir("schema", true));
-  }
-
-  return dir;
+  return getStaticDir("schema", true)[0];
 }
-export function getStaticDir(dirName: string, from_node_modules = false) {
-  return join(resolve(), from_node_modules ? PACKAGE_PREFIX : ".", dirName);
+export function getStaticDir(dirName: string, only_app_dir = true) {
+  return (only_app_dir ? [store.dirs[0]] : store.dirs).map((dir) =>
+    join(dir, dirName)
+  );
 }
