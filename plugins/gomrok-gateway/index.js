@@ -1,3 +1,4 @@
+// @ts-check
 import { update_prices, getExchangeRate, getTscForm } from "./actions";
 
 let json = {};

@@ -1,3 +1,4 @@
+// @ts-check
 import axios from "axios";
 import * as cheerio from "cheerio";
 import { writeFile, readFile, stat as statFile } from "fs";
@@ -28,7 +29,7 @@ export function update_prices(req, res, next, x = false) {
       listItems.each((idx, el) => {
         const temp = {
           currency: $(el).children("td:first-child").text(),
-          price: (temp.price = $(el).children("td:nth-child(2)").text()),
+          price: $(el).children("td:nth-child(2)").text(),
         };
 
         items.push(temp);
