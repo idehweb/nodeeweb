@@ -1,6 +1,5 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import busboy from "connect-busboy";
 import { MiddleWare } from "../../types/global";
 import bodyParser from "body-parser";
 import path from "path";
@@ -12,7 +11,7 @@ const public_mediaFolder = path.join(__dirname, "./public_media");
 const adminFolder = path.join(__dirname, "./admin");
 const themeFolder = path.join(__dirname, "./theme");
 
-export const defaultMiddleware: MiddleWare = (req, res, next) => {
+export const headerMiddleware: MiddleWare = (req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -40,13 +39,11 @@ export const defaultMiddleware: MiddleWare = (req, res, next) => {
 export function commonMiddleware(): (MiddleWare | [string, MiddleWare])[] {
   const mw: (MiddleWare | [string, MiddleWare])[] = [];
 
-  mw.push(bodyParser.json({ limit: "50mb" }));
+  mw.push(bodyParser.json({ limit: "10kb" }));
 
   mw.push(bodyParser.urlencoded({ extended: false }));
 
   mw.push(cookieParser());
-
-  mw.push(busboy());
 
   if (
     store.env.isLoc ||

@@ -1,6 +1,6 @@
 import express from "express";
 import { expressLogger } from "./utils/log";
-import { commonMiddleware, defaultMiddleware } from "./src/common/middleware";
+import { commonMiddleware, headerMiddleware } from "./src/common/middleware";
 import handlePlugin from "./src/common/handlePlugin";
 import prepare from "./src/common/prepare";
 import "./src/common/_d";
@@ -23,7 +23,7 @@ export default async function buildApp() {
   app.use(expressLogger);
 
   // middleware
-  app.use(defaultMiddleware);
+  app.use(headerMiddleware);
   const mw = commonMiddleware();
   mw.forEach((w) => {
     if (Array.isArray(w)) {

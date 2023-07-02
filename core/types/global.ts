@@ -13,6 +13,7 @@ export enum USE_ENV {
 
 export type Req = Request & {
   props: any;
+  file_path?: string;
 };
 
 export type MiddleWare = (req: Req, res: Response, next: NextFunction) => any;
