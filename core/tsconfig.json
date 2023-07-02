@@ -23,6 +23,6 @@
     "moduleResolution" : "Node",
     "resolveJsonModule":true
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "src/common/routeHandle.js"],
   "exclude": ["node_modules","**/node_modules/*","dist"]
 }

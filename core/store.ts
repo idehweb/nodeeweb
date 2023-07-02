@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { ENV, USE_ENV } from "./types/global";
-
+import { Application } from "express";
 export class Store {
   env: {
     MONGO_URL: string;
@@ -16,9 +16,11 @@ export class Store {
     ADMIN_USERNAME: string;
     ADMIN_PASSWORD: string;
     APP_DIRS: string;
+    AUTH_SECRET: string;
   } & { [k: string]: string };
   db: typeof mongoose;
   dirs: string[];
+  app: Application;
 
   constructor() {
     this.env = process.env as any;

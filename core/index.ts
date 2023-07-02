@@ -1,6 +1,6 @@
 import "./src/common/loadEnv";
 import store from "./store";
-import { dbConnect } from "./src/common/db";
+import { dbConnect } from "./src/common/dbHandler";
 import buildApp from "./app";
 import { log } from "./utils/log";
 import gracefullyShutdown from "./src/common/gracefullyShutdown";

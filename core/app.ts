@@ -4,8 +4,11 @@ import { commonMiddleware, headerMiddleware } from "./src/common/middleware";
 import handlePlugin from "./src/common/handlePlugin";
 import prepare from "./src/common/prepare";
 import "./src/common/_d";
-import { dbInit, dbRegisterModels } from "./src/common/db";
+import { dbInit, dbRegisterModels } from "./src/common/dbHandler";
+import store from "./store";
 const app = express();
+
+store.app = app;
 
 export default async function buildApp() {
   // prepare , create dirs

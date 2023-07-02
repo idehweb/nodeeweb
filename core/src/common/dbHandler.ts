@@ -43,7 +43,8 @@ export async function dbRegisterModels() {
   const schemaDir = getSchemaDir();
   const schemaFiles = fs
     .readdirSync(schemaDir)
-    .map((sp) => [sp.split(".").slice(0, -1).join("."), join(schemaDir, sp)]);
+    .sort()
+    .map((sp) => [sp.split(".")[0].split("-").pop(), join(schemaDir, sp)]);
   // import
   for (const [name, schemaFile] of schemaFiles) {
     const { default: schema } = await import(schemaFile);
