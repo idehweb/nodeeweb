@@ -10,3 +10,6 @@ dist
 
 ## public
 public_media
+
+## logs
+logs/*

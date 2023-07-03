@@ -10,6 +10,7 @@ import AdminSchema from "../../schema/admin.schema";
 import CustomerSchema from "../../schema/customer.schema";
 import { MiddleWare } from "../../types/global";
 import { Query } from "mongoose";
+import { CookieOptions } from "express";
 const strategyMap = new Map<string, Strategy>();
 
 export type UserPassStrategyOpt = {
@@ -22,6 +23,7 @@ export type JwtStrategyOpt = {
   model: string;
   notThrow?: boolean;
   name: string;
+  cookieName?: string;
 };
 
 function jwtStrategyBuilder(opt: JwtStrategyOpt) {
@@ -31,7 +33,8 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
   strategy = new JwtStrategy(
     {
       jwtFromRequest: (req) =>
-        ExtractJwt.fromAuthHeaderAsBearerToken()(req) || req.cookies.auth,
+        ExtractJwt.fromAuthHeaderAsBearerToken()(req) ||
+        (opt.cookieName && req.cookies[opt.cookieName]),
       secretOrKey: store.env.AUTH_SECRET,
       passReqToCallback: true,
     },
@@ -148,4 +151,21 @@ export function signToken(id: string) {
 }
 export function verifyToken(token: string) {
   return jwt.verify(token, store.env.AUTH_SECRET);
+}
+
+export function tokenSetToCookie(
+  tokenName: string,
+  cookieOpt: CookieOptions & { name: string }
+): MiddleWare {
+  return (req, res, next) => {
+    const exp = new Date();
+    exp.setDate(exp.getDate() + 30);
+    res.cookie(cookieOpt.name, req[tokenName], {
+      secure: !store.env.isLoc,
+      httpOnly: !store.env.isLoc,
+      sameSite: "none",
+      expires: exp,
+    });
+    next();
+  };
 }

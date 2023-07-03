@@ -9,6 +9,8 @@ import { setErrorPackage } from "./error";
 
 const app = express();
 
+app.disable("x-powered-by");
+
 store.app = app;
 
 export default async function buildApp() {
@@ -20,8 +22,6 @@ export default async function buildApp() {
 
   // initial first records in db
   await dbInit();
-
-  app.disable("x-powered-by");
 
   // error
   setErrorPackage();

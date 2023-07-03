@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import fs from "fs";
 import store from "../../store";
-import { log } from "../handlers/log.handler";
+import logger from "../handlers/log.handler";
 import global from "../global";
 import { SingleJobProcess } from "../handlers/singleJob.handler";
 import { getSchemaDir } from "../../utils/path";
@@ -12,7 +12,7 @@ export async function dbConnect() {
     dbName: store.env.DB_NAME,
   });
   store.db = db;
-  log("DB connected");
+  logger.log("DB connected");
 }
 export async function dbDisconnect() {
   if (!store.db) return;
@@ -24,7 +24,7 @@ export async function dbInit() {
     const adminModel = store.db.model("admin");
     const admin = await adminModel.findOne();
     if (!admin) {
-      log("db is empty, let us import sample data...");
+      logger.log("db is empty, let us import sample data...");
       await adminModel.create({
         email: store.env.ADMIN_EMAIL ?? "admin@example.com",
         username: store.env.ADMIN_USERNAME ?? "admin",
@@ -32,7 +32,7 @@ export async function dbInit() {
         password: store.env.ADMIN_PASSWORD ?? "admin",
         role: "owner",
       });
-      log("admin created");
+      logger.log("admin created");
     }
   })();
 }

@@ -9,7 +9,7 @@ import {
 import _ from "lodash";
 import { USE_ENV } from "../../types/global";
 import store from "../../store";
-import { log, warn } from "../handlers/log.handler";
+import logger from "../handlers/log.handler";
 import { isExistsSync } from "../../utils/helpers";
 import exec from "../../utils/exec";
 
@@ -61,31 +61,31 @@ function createPublicMediaFolder() {
     "site_setting"
   );
   if (fs.existsSync(public_mediaPath)) {
-    log("public_mediaPath exist...");
+    logger.log("public_mediaPath exist...");
     if (fs.existsSync(public_media_customerPath)) {
-      log("public_media_customerPath exist...");
+      logger.log("public_media_customerPath exist...");
     } else {
       fs.mkdir(public_media_customerPath, () => {
-        log("we created public_media_customerPath");
+        logger.log("we created public_media_customerPath");
       });
     }
     if (fs.existsSync(public_media_siteSettingPath)) {
-      log("public_media_siteSettingPath exist...");
+      logger.log("public_media_siteSettingPath exist...");
     } else {
       fs.mkdir(public_media_siteSettingPath, () => {
-        log("we created public_media_siteSettingPath");
+        logger.log("we created public_media_siteSettingPath");
       });
     }
   } else {
-    log("we should create public_mediaPath");
+    logger.log("we should create public_mediaPath");
 
     fs.mkdir(public_mediaPath, () => {
-      log("we created public_mediaPath");
+      logger.log("we created public_mediaPath");
       fs.mkdir(public_media_customerPath, () => {
-        log("we created public_media_customerPath");
+        logger.log("we created public_media_customerPath");
       });
       fs.mkdir(public_media_siteSettingPath, () => {
-        log("we created public_media_siteSettingPath");
+        logger.log("we created public_media_siteSettingPath");
       });
     });
   }
@@ -97,18 +97,18 @@ async function createAndCopyStaticDir(name: string) {
 
   // check if directory exist before
   if (isExistsSync(dirLocalPath)) {
-    log(dirLocalPath, "exists before");
+    logger.log(dirLocalPath, "exists before");
     return;
   }
 
   // check if there is not any module path exists
   if (!dirModulePath.length) {
-    warn(dirLocalPath, "not exist any where , create just empty dir");
+    logger.warn(dirLocalPath, "not exist any where , create just empty dir");
     fs.mkdirSync(dirLocalPath);
   }
 
   for (const dirM of dirModulePath.reverse()) {
-    log(`Copy ${dirM} to ${dirLocalPath}`);
+    logger.log(`Copy ${dirM} to ${dirLocalPath}`);
     await exec(
       `${getScriptFile("mkdir")} ${dirLocalPath} && ${getScriptFile(
         "cp"

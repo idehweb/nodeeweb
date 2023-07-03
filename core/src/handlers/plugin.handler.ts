@@ -1,9 +1,8 @@
 import _ from "lodash";
 import path, { join } from "path";
 import fs from "fs";
-import { log } from "./log.handler";
+import logger from "./log.handler";
 import { isAsyncFunction } from "util/types";
-import { isExistsSync } from "../../utils/helpers";
 
 export default async function handlePlugin() {
   const __dirname = path.resolve();
@@ -17,7 +16,7 @@ export default async function handlePlugin() {
     const pluginImport = await import(plugin);
     if (!pluginImport?.default) continue;
     // execute plugin
-    log("Execute Plugin : ", plugin);
+    logger.log("Execute Plugin : ", plugin);
     if (isAsyncFunction(pluginImport.default)) {
       await pluginImport.default();
     } else pluginImport.default();
