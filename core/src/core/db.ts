@@ -4,6 +4,8 @@ import store from "../../store";
 import { log } from "../handlers/log.handler";
 import global from "../global";
 import { SingleJobProcess } from "../handlers/singleJob.handler";
+import { getSchemaDir } from "../../utils/path";
+import { join } from "path";
 
 export async function dbConnect() {
   const db = await mongoose.connect(store.env.MONGO_URL, {
@@ -19,7 +21,7 @@ export async function dbDisconnect() {
 export async function dbInit() {
   await SingleJobProcess.builderAsync("initial-db", async () => {
     // check admin
-    const adminModel = store.db.model("Admin");
+    const adminModel = store.db.model("admin");
     const admin = await adminModel.findOne();
     if (!admin) {
       log("db is empty, let us import sample data...");
@@ -33,4 +35,18 @@ export async function dbInit() {
       log("admin created");
     }
   })();
+}
+
+export async function dbRegisterModels() {
+  // read dir
+  const schemaDir = getSchemaDir();
+  const schemaFiles = fs
+    .readdirSync(schemaDir)
+    .sort()
+    .map((sp) => [sp.split(".")[0].split("-").pop(), join(schemaDir, sp)]);
+  // import
+  for (const [name, schemaFile] of schemaFiles) {
+    const { default: schema } = await import(schemaFile);
+    store.db.model(name, schema);
+  }
 }

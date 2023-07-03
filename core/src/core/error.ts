@@ -1,4 +1,6 @@
+import store from "../../store";
 import { ErrorType } from "../../types/error";
+import { MiddleWare, MiddleWareError } from "../../types/global";
 
 export class GeneralError extends Error {
   isGeneral = true;
@@ -50,4 +52,19 @@ export class LimitError extends GeneralError {
   constructor(message: string) {
     super(message, 429, ErrorType.Limitation);
   }
+}
+
+export const errorHandler: MiddleWareError = (error, req, res, next) => {
+  console.log("#Error", error);
+  return res
+    .status(500)
+    .json({ status: "error", message: error.message, error });
+};
+
+export const notFoundHandler: MiddleWare = (req, res, next) => {
+  return res.status(404).json({ status: "error", message: "path not found" });
+};
+
+export function setErrorPackage() {
+  store.errorPackage = { general: errorHandler, notFound: notFoundHandler };
 }

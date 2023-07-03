@@ -1,15 +1,12 @@
 import express from "express";
-import {
-  commonMiddleware,
-  headerMiddleware,
-} from "../handlers/middleware.handler";
+import { commonMiddleware, headerMiddleware } from "./middleware";
 import handlePlugin from "../handlers/plugin.handler";
-import prepare from "../handlers/prepare.handler";
-import "./src/handlers/_d";
-import { dbRegisterModels } from "../handlers/db.handler";
+import prepare from "./prepare";
+import { dbRegisterModels } from "./db";
 import store from "../../store";
 import { dbInit } from "./db";
-import { expressLogger } from "../handlers/log.handler";
+import { setErrorPackage } from "./error";
+
 const app = express();
 
 store.app = app;
@@ -26,8 +23,8 @@ export default async function buildApp() {
 
   app.disable("x-powered-by");
 
-  // logger
-  app.use(expressLogger);
+  // error
+  setErrorPackage();
 
   // middleware
   app.use(headerMiddleware);

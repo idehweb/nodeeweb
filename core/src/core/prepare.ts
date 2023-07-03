@@ -9,7 +9,7 @@ import {
 import _ from "lodash";
 import { USE_ENV } from "../../types/global";
 import store from "../../store";
-import { log } from "../handlers/log.handler";
+import { log, warn } from "../handlers/log.handler";
 import { isExistsSync } from "../../utils/helpers";
 import exec from "../../utils/exec";
 
@@ -97,8 +97,14 @@ async function createAndCopyStaticDir(name: string) {
 
   // check if directory exist before
   if (isExistsSync(dirLocalPath)) {
-    log(dirLocalPath, " exists before");
+    log(dirLocalPath, "exists before");
     return;
+  }
+
+  // check if there is not any module path exists
+  if (!dirModulePath.length) {
+    warn(dirLocalPath, "not exist any where , create just empty dir");
+    fs.mkdirSync(dirLocalPath);
   }
 
   for (const dirM of dirModulePath.reverse()) {

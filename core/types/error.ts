@@ -1,3 +1,5 @@
+import { MiddleWare, MiddleWareError } from "./global";
+
 export enum ErrorType {
   Duplication = "DUPLICATE",
   Validation = "VALIDATION",
@@ -15,3 +17,8 @@ export enum ErrorType {
   Forbidden = "FORBIDDEN",
   Unauthorized = "UNAUTHORIZED",
 }
+
+export type ErrorPackageFn = {
+  general: MiddleWareError;
+  notFound: MiddleWare;
+};

@@ -24,4 +24,4 @@ export type MiddleWareError = (
   req: Req,
   res: Response,
   next: NextFunction
-) => string;
+) => any;

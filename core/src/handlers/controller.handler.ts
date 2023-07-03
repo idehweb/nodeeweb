@@ -2,7 +2,7 @@ import _ from "lodash";
 import store from "../../store";
 import { ControllerAccess, ControllerSchema } from "../../types/controller";
 import { MiddleWare } from "../../types/global";
-import { authenticate, authorize } from "../auth/auth";
+import { authenticate, authorizeWithToken } from "./auth.handler";
 
 export type ControllerRegisterOptions = {
   base_url?: string;
@@ -25,7 +25,7 @@ export function controllerRegister(
 
 function translateAccess(accesses: ControllerAccess[]): MiddleWare[] {
   return [
-    authorize(_.uniq(accesses.map((a) => a.modelName))),
+    ...authorizeWithToken(_.uniq(accesses.map((a) => a.modelName))),
     authenticate(...accesses),
   ];
 }

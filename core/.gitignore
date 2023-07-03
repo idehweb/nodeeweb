@@ -7,3 +7,6 @@ dist
 
 ## Env
 .env.local
+
+## public
+public_media

@@ -1,15 +1,16 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import { MiddleWare } from "../../types/global";
+import { MiddleWare, MiddleWareError } from "../../types/global";
 import bodyParser from "body-parser";
 import path from "path";
 import store from "../../store";
+import { expressLogger } from "../handlers/log.handler";
 
-const __dirname = path.resolve();
+const dirname = path.resolve();
 
-const public_mediaFolder = path.join(__dirname, "./public_media");
-const adminFolder = path.join(__dirname, "./admin");
-const themeFolder = path.join(__dirname, "./theme");
+const public_mediaFolder = path.join(dirname, "./public_media");
+const adminFolder = path.join(dirname, "./admin");
+const themeFolder = path.join(dirname, "./theme");
 
 export const headerMiddleware: MiddleWare = (req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -36,8 +37,19 @@ export const headerMiddleware: MiddleWare = (req, res, next) => {
   }
 };
 
-export function commonMiddleware(): (MiddleWare | [string, MiddleWare])[] {
-  const mw: (MiddleWare | [string, MiddleWare])[] = [];
+export function commonMiddleware(): (
+  | MiddleWare
+  | MiddleWareError
+  | [string, MiddleWare | MiddleWareError]
+)[] {
+  const mw: (
+    | MiddleWare
+    | MiddleWareError
+    | [string, MiddleWare | MiddleWareError]
+  )[] = [];
+
+  // logger
+  mw.push(expressLogger);
 
   mw.push(bodyParser.json({ limit: "10kb" }));
 
@@ -54,6 +66,9 @@ export function commonMiddleware(): (MiddleWare | [string, MiddleWare])[] {
     mw.push(["/static", express.static(themeFolder + "/static")]);
     mw.push(["/admin", express.static(adminFolder)]);
   }
+
+  // error
+  mw.push(store.errorPackage.general);
 
   return mw;
 }
