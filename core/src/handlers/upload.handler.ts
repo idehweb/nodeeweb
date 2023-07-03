@@ -1,8 +1,8 @@
 import multer from "multer";
 import { join } from "path";
+import sharp from "sharp";
 import { getStaticDir } from "../../utils/path";
 import { MiddleWare } from "../../types/global";
-import sharp from "sharp";
 
 export type UploadOptions = {
   file_key?: string;

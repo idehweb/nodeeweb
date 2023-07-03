@@ -1,7 +1,7 @@
 import _ from "lodash";
 import path, { join } from "path";
 import fs from "fs";
-import { log } from "../../utils/log";
+import { log } from "./log.handler";
 import { isAsyncFunction } from "util/types";
 import { isExistsSync } from "../../utils/helpers";
 

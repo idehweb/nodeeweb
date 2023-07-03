@@ -1,7 +1,7 @@
 import fs from "fs";
+import { isAsyncFunction } from "util/types";
 import { wait } from "../../utils/helpers";
 import { getSharedPath } from "../../utils/path";
-import { isAsyncFunction } from "util/types";
 
 export type SingleJob = () => void | Promise<void>;
 

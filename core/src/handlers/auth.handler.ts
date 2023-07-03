@@ -5,12 +5,11 @@ import bcrypt from "bcrypt";
 import { Strategy as LocalStrategy } from "passport-local";
 import { ControllerAccess } from "../../types/controller";
 import store from "../../store";
-import { ForbiddenError, UnauthorizedError } from "../common/errorHandler";
+import { ForbiddenError, UnauthorizedError } from "../handlers/error.handler";
 import AdminSchema from "../../schema/admin.schema";
 import CustomerSchema from "../../schema/customer.schema";
 import { MiddleWare } from "../../types/global";
 const strategyMap = new Map<string, Strategy>();
-const rolesMap = new Map<string, number>();
 
 function jwtStrategyBuilder(modelName: string) {
   let strategy = strategyMap.get(`jwt-${modelName}`);
@@ -75,13 +74,14 @@ export function loginWithToken(modelName: string) {
 
 export function authWithGoogle() {}
 
-export function authorize(modelName: string): any {}
-export function authenticate(access: ControllerAccess): MiddleWare {
+export function authorize(modelNames: string[]): any {}
+export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
   return (req, res, next) => {
-    if (
-      rolesMap.get(req.user.role) === null ||
-      rolesMap.get(req.user.role) > rolesMap.get(access.role)
-    )
+    const modelName = req.user["constructor"].name;
+    const allowedRoles = accesses
+      .filter((access) => access.modelName === modelName)
+      .map((access) => access.role);
+    if (!allowedRoles.includes(req.user.role))
       return next(new ForbiddenError("user can not access"));
     return next();
   };
@@ -94,7 +94,4 @@ export function signToken(id: string) {
 }
 export function verifyToken(token: string) {
   return jwt.verify(token, store.env.AUTH_SECRET);
-}
-export function registerRole(role: string, level: number) {
-  rolesMap.set(role, level);
 }

@@ -1,11 +1,15 @@
 import express from "express";
-import { expressLogger } from "./utils/log";
-import { commonMiddleware, headerMiddleware } from "./src/common/middleware";
-import handlePlugin from "./src/common/handlePlugin";
-import prepare from "./src/common/prepare";
-import "./src/common/_d";
-import { dbInit, dbRegisterModels } from "./src/common/dbHandler";
-import store from "./store";
+import {
+  commonMiddleware,
+  headerMiddleware,
+} from "../handlers/middleware.handler";
+import handlePlugin from "../handlers/plugin.handler";
+import prepare from "../handlers/prepare.handler";
+import "./src/handlers/_d";
+import { dbRegisterModels } from "../handlers/db.handler";
+import store from "../../store";
+import { dbInit } from "./db";
+import { expressLogger } from "../handlers/log.handler";
 const app = express();
 
 store.app = app;

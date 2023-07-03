@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { MiddleWare, MiddleWareError, Req } from "../types/global";
 import { isAsyncFunction } from "util/types";
-import { log } from "./log";
+import { log } from "../src/handlers/log.handler";
 
 export function catchFn<F extends () => Promise<any>>(
   fn: F,

@@ -1,9 +1,9 @@
-import "./src/common/loadEnv";
+import "./src/core/loadEnv";
 import store from "./store";
-import { dbConnect } from "./src/common/dbHandler";
-import buildApp from "./app";
-import { log } from "./utils/log";
-import gracefullyShutdown from "./src/common/gracefullyShutdown";
+import buildApp from "./src/core/app";
+import { log } from "./src/handlers/log.handler";
+import { dbConnect } from "./src/core/db";
+import gracefullyShutdown from "./src/core/shutdown";
 
 async function main() {
   // start connect db

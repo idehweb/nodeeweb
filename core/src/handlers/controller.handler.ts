@@ -1,3 +1,4 @@
+import _ from "lodash";
 import store from "../../store";
 import { ControllerAccess, ControllerSchema } from "../../types/controller";
 import { MiddleWare } from "../../types/global";
@@ -17,21 +18,14 @@ export function controllerRegister(
     schema.access = [schema.access];
 
   if (schema.access) {
-    for (const [index, access] of (
-      schema.access as ControllerAccess[]
-    ).entries()) {
-      mw.push(...translateAccess(access, index === 0));
-    }
+    mw.push(...translateAccess(schema.access as []));
   }
   store.app[schema.method](`${base_url ? base_url : ""}${schema.url}`, ...mw);
 }
 
-function translateAccess(
-  access: ControllerAccess,
-  withAuth = true
-): MiddleWare[] {
+function translateAccess(accesses: ControllerAccess[]): MiddleWare[] {
   return [
-    withAuth ? authorize(access.modelName) : null,
-    authenticate(access),
-  ].filter((m) => m);
+    authorize(_.uniq(accesses.map((a) => a.modelName))),
+    authenticate(...accesses),
+  ];
 }

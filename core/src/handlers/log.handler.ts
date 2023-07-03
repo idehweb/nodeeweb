@@ -1,4 +1,4 @@
-import { MiddleWare } from "../types/global";
+import { MiddleWare } from "../../types/global";
 
 export function debug(...args: any) {
   console.log(...args);

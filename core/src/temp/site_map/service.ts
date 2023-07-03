@@ -1,8 +1,8 @@
 import js2xmlparser from "js2xmlparser";
 import moment from "moment";
 import { Response } from "express";
-import { Req } from "../../types/global";
-import { classCatchBuilder } from "../../utils/catchAsync";
+import { Req } from "../../../types/global";
+import { classCatchBuilder } from "../../../utils/catchAsync";
 
 export class SiteMapService {
   static async post(req: any, res: Response) {

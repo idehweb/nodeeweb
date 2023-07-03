@@ -23,15 +23,6 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    type: {
-      type: String,
-      required: false,
-      default: "user",
-    },
-    token: {
-      type: String,
-      required: false,
-    },
     role: { type: String, default: "user" },
     active: { type: Boolean, default: true },
   },

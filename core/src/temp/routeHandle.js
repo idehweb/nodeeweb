@@ -17,7 +17,7 @@ import {
 
 // createDefaultRoute();
 let routeHandle = (app, props = {}) => {
-  if (props && props.front && props.front.routes) {
+  if (props?.front?.routes?.[2]) {
     let PR = createPublicRoute("", props.front.routes);
     app.use("/", PR);
   }

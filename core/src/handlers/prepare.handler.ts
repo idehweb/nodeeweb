@@ -9,7 +9,7 @@ import {
 import _ from "lodash";
 import { USE_ENV } from "../../types/global";
 import store from "../../store";
-import { log } from "../../utils/log";
+import { log } from "./log.handler";
 import { isExistsSync } from "../../utils/helpers";
 import exec from "../../utils/exec";
 
