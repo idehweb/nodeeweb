@@ -64,26 +64,22 @@ const morganStream = {
 
     // method
     let method_color: keyof typeof Colors;
-    if (store.env.isLoc) {
-      switch (method.toUpperCase()) {
-        case "GET":
-          method_color = "Green";
-          break;
-        case "POST":
-          method_color = "Yellow";
-          break;
-        case "PUT":
-        case "PATCH":
-          method_color = "Blue";
-          break;
-        case "DELETE":
-          method_color = "Red";
-          break;
-        default:
-          method_color = "White";
-      }
-    } else {
-      method_color = "White";
+    switch (method.toUpperCase()) {
+      case "GET":
+        method_color = "Green";
+        break;
+      case "POST":
+        method_color = "Yellow";
+        break;
+      case "PUT":
+      case "PATCH":
+        method_color = "Blue";
+        break;
+      case "DELETE":
+        method_color = "Red";
+        break;
+      default:
+        method_color = "White";
     }
     final_msg += " " + color(method_color, method.toUpperCase());
 
@@ -92,27 +88,23 @@ const morganStream = {
 
     // code
     let status_color: keyof typeof Colors;
-    if (store.env.isLoc) {
-      switch (Math.floor(status / 100)) {
-        case 1:
-          status_color = "Cyan";
-          break;
-        case 2:
-          status_color = "Green";
-          break;
-        case 3:
-          status_color = "Blue";
-          break;
-        case 4:
-          status_color = "Red";
-          break;
-        case 5:
-        default:
-          status_color = "Magenta";
-          break;
-      }
-    } else {
-      status_color = "White";
+    switch (Math.floor(status / 100)) {
+      case 1:
+        status_color = "Cyan";
+        break;
+      case 2:
+        status_color = "Green";
+        break;
+      case 3:
+        status_color = "Blue";
+        break;
+      case 4:
+        status_color = "Red";
+        break;
+      case 5:
+      default:
+        status_color = "Magenta";
+        break;
     }
     final_msg += " " + color(status_color, String(status));
 

@@ -6,6 +6,7 @@ import { dbRegisterModels } from "./db";
 import store from "../../store";
 import { dbInit } from "./db";
 import { setErrorPackage } from "./error";
+import { registerDefaultControllers } from "./controller";
 
 const app = express();
 
@@ -37,6 +38,9 @@ export default async function buildApp() {
 
   // plugins
   await handlePlugin();
+
+  // default controller
+  registerDefaultControllers();
 
   return app;
 }

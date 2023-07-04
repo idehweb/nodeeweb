@@ -4,6 +4,7 @@ import buildApp from "./src/core/app";
 import logger from "./src/handlers/log.handler";
 import { dbConnect } from "./src/core/db";
 import gracefullyShutdown from "./src/core/shutdown";
+import { color } from "./utils/color";
 
 async function main() {
   // start connect db
@@ -14,7 +15,9 @@ async function main() {
 
   //   listen app
   const server = app.listen(store.env.PORT, () => {
-    logger.log(`Server Listening at http://127.0.0.1:${store.env.PORT}`);
+    const address = `http://127.0.0.1:${store.env.PORT}`;
+    const msg = `Server Listening at ${color("Green", address)}`;
+    logger.log(msg);
   });
 
   // set gracefully shutdown , health path

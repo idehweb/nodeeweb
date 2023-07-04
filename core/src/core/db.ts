@@ -6,6 +6,8 @@ import global from "../global";
 import { SingleJobProcess } from "../handlers/singleJob.handler";
 import { getSchemaDir } from "../../utils/path";
 import { join } from "path";
+import { color } from "../../utils/color";
+import _ from "lodash";
 
 export async function dbConnect() {
   const db = await mongoose.connect(store.env.MONGO_URL, {
@@ -48,5 +50,6 @@ export async function dbRegisterModels() {
   for (const [name, schemaFile] of schemaFiles) {
     const { default: schema } = await import(schemaFile);
     store.db.model(name, schema);
+    logger.log(color("Green", `## Register ${_.startCase(name)} Model ##`));
   }
 }

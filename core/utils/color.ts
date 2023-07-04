@@ -1,3 +1,5 @@
+import store from "../store";
+
 export const Colors = {
   Black: "\u001b[30m",
   Red: "\u001b[31m",
@@ -11,6 +13,7 @@ export const Colors = {
 };
 
 export function color(colorCode: keyof typeof Colors, str: string) {
+  if (!store.env.isLoc) return str;
   return `${Colors[colorCode]}${str}${Colors.Reset}`;
 }
 
