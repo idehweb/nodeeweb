@@ -2,6 +2,7 @@ import winston from "winston";
 import morgan from "morgan";
 import { MiddleWare } from "../../types/global";
 import { createCustomLogger } from "../core/log";
+import store from "../../store";
 
 export class Logger {
   constructor(private logger: winston.Logger, private label?: string) {}
@@ -42,11 +43,15 @@ export function createLogger(name: string, maxFiles = 1) {
 
 const morganLogger = createLogger("core.server", 5);
 const morganStream = {
-  write: (msg: string) => morganLogger.log(msg),
+  write: (msg: string) => {
+    return morganLogger.log(msg.replace(/\n$/, ""));
+  },
 };
 
 export const expressLogger: MiddleWare = morgan(
-  ":remote-addr :method :url :status :res[content-length] - :response-time ms",
+  `${
+    store.env.isLoc ? "" : ":remote-addr "
+  }:method :url :status :res[content-length] - :response-time ms`,
   {
     stream: morganStream,
   }

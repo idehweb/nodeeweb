@@ -102,14 +102,20 @@ async function createAndCopyStaticDir(name: string) {
 
   // check if directory exist before
   if (isExistsSync(dirLocalPath)) {
-    logger.log(dirLocalPath, "exists before");
+    logger.log(name, "folder:", dirLocalPath, ", existed");
     return;
   }
 
   // check if there is not any module path exists
   if (!dirModulePath.length) {
-    logger.warn(dirLocalPath, "not exist any where , create just empty dir");
+    logger.warn(
+      name,
+      "folder:",
+      dirLocalPath,
+      "not exist any where , create just empty dir"
+    );
     fs.mkdirSync(dirLocalPath);
+    return;
   }
 
   for (const dirM of dirModulePath.reverse()) {
@@ -120,4 +126,5 @@ async function createAndCopyStaticDir(name: string) {
       )} ${dirM} ${dirLocalPath} `
     );
   }
+  logger.log(name, "folder:", dirLocalPath);
 }
