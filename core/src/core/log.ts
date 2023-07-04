@@ -50,10 +50,16 @@ export function createCustomLogger({
     transports: [
       new transports.Console({
         level: "info",
-        format: format.colorize({
-          all: true,
-          colors: { info: "white", error: "red", warn: "yellow" },
-        }),
+        format: format.combine(
+          format.printf((info) => {
+            const msg = info[Symbol.for("message")] as string;
+            return msg.replace(/\[\S+ \S+\] /, "");
+          }),
+          format.colorize({
+            all: true,
+            colors: { info: "white", error: "red", warn: "yellow" },
+          })
+        ),
       }),
       new transports.File({
         dirname: logsPath,
