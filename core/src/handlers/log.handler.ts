@@ -36,12 +36,13 @@ const logger = new Logger(
 );
 export default logger;
 
-export function createLogger(name: string) {
-  return new Logger(createCustomLogger({ name, maxFiles: 1 }));
+export function createLogger(name: string, maxFiles = 1) {
+  return new Logger(createCustomLogger({ name, maxFiles }));
 }
 
+const morganLogger = createLogger("core.server", 5);
 const morganStream = {
-  write: (msg: string) => logger.log(msg),
+  write: (msg: string) => morganLogger.log(msg),
 };
 
 export const expressLogger: MiddleWare = morgan(

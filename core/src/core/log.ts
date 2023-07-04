@@ -9,7 +9,7 @@ const logFormats = [
   format.printf(
     ({ level, message, time, label }) =>
       `[${time}] ${level === "info" ? "" : `[${level.toUpperCase()}] `}${
-        label ? `${label}: ` : ""
+        label && !(label as string).includes("notShow") ? `${label}: ` : ""
       }${message}`
   ),
 ];
