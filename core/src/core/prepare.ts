@@ -47,6 +47,11 @@ function setCustomEnv() {
       store.env.USE_ENV === USE_ENV.NPM ? PACKAGE_PREFIX : "",
     ].filter((d) => d)
   );
+
+  // log file
+  store.env.logIntoFile =
+    (store.env.LOG_TO_FILE && store.env.LOG_TO_FILE) !== "false" ||
+    !store.env.isLoc;
 }
 
 function createSharedDir() {

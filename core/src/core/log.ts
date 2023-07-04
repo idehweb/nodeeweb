@@ -1,5 +1,6 @@
 import { join, resolve } from "path";
 import winston, { format, transports } from "winston";
+import store from "../../store";
 
 const logFormats = [
   format.timestamp({
@@ -16,6 +17,52 @@ const logFormats = [
 
 const logsPath = join(resolve(), "logs");
 
+const consoleTransport = new transports.Console({
+  level: "info",
+  format: format.combine(
+    format.printf((info) => {
+      const msg = info[Symbol.for("message")] as string;
+      return msg.replace(/\[\S+ \S+\] /, "");
+    }),
+    format.colorize({
+      all: true,
+      colors: { info: "white", error: "red", warn: "yellow" },
+    })
+  ),
+});
+
+const exceptionTransportCreator = () =>
+  new transports.File({
+    dirname: logsPath,
+    filename: "exceptions.log",
+    maxFiles: 1,
+    maxsize: 1024 ** 2,
+  });
+
+const rejectionTransportCreator = () =>
+  new transports.File({
+    dirname: logsPath,
+    filename: "rejections.log",
+    maxsize: 1024 ** 2,
+  });
+
+const fileTransportCreator = (name: string, maxFiles: number) => [
+  new transports.File({
+    dirname: logsPath,
+    filename: `${name}.all.log`,
+    level: "info",
+    maxFiles,
+    maxsize: 50 * 1024 ** 2,
+  }),
+  new transports.File({
+    dirname: logsPath,
+    filename: `${name}.error.log`,
+    level: "error",
+    maxFiles,
+    maxsize: 50 * 1024 ** 2,
+  }),
+];
+
 export function createCustomLogger({
   name,
   maxFiles = 5,
@@ -27,54 +74,16 @@ export function createCustomLogger({
 }) {
   const Logger = winston.createLogger({
     level: "info",
-    ...(handleExceptions
+    ...(handleExceptions && store.env.logIntoFile
       ? {
-          exceptionHandlers: [
-            new transports.File({
-              dirname: logsPath,
-              filename: "exceptions.log",
-              maxFiles: 1,
-              maxsize: 1024 ** 2,
-            }),
-          ],
-          rejectionHandlers: [
-            new transports.File({
-              dirname: logsPath,
-              filename: "rejections.log",
-              maxsize: 1024 ** 2,
-            }),
-          ],
+          exceptionHandlers: [exceptionTransportCreator()],
+          rejectionHandlers: [rejectionTransportCreator()],
         }
       : {}),
     format: format.combine(...logFormats),
     transports: [
-      new transports.Console({
-        level: "info",
-        format: format.combine(
-          format.printf((info) => {
-            const msg = info[Symbol.for("message")] as string;
-            return msg.replace(/\[\S+ \S+\] /, "");
-          }),
-          format.colorize({
-            all: true,
-            colors: { info: "white", error: "red", warn: "yellow" },
-          })
-        ),
-      }),
-      new transports.File({
-        dirname: logsPath,
-        filename: `${name}.all.log`,
-        level: "info",
-        maxFiles,
-        maxsize: 50 * 1024 ** 2,
-      }),
-      new transports.File({
-        dirname: logsPath,
-        filename: `${name}.error.log`,
-        level: "error",
-        maxFiles,
-        maxsize: 50 * 1024 ** 2,
-      }),
+      consoleTransport,
+      ...(store.env.logIntoFile ? fileTransportCreator(name, maxFiles) : []),
     ],
   });
   return Logger;

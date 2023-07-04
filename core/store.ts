@@ -11,6 +11,7 @@ export class Store {
     isLoc: boolean;
     isPro: boolean;
     isDev: boolean;
+    logIntoFile: boolean;
     STATIC_SERVER: string;
     USE_ENV: USE_ENV;
     ADMIN_EMAIL: string;
@@ -18,6 +19,7 @@ export class Store {
     ADMIN_PASSWORD: string;
     APP_DIRS: string;
     AUTH_SECRET: string;
+    LOG_TO_FILE: string;
   } & { [k: string]: string };
   db: typeof mongoose;
   dirs: string[];
