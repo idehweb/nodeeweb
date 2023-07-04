@@ -11,5 +11,8 @@ dist
 ## public
 public_media
 
+## shared
+shared/*
+
 ## logs
 logs/*
