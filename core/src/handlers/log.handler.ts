@@ -3,7 +3,7 @@ import morgan from "morgan";
 import { MiddleWare } from "../../types/global";
 import { createCustomLogger } from "../core/log";
 import store from "../../store";
-import { Colors, color } from "../../utils/color";
+import { Colors, color, yellow } from "../../utils/color";
 
 export class Logger {
   constructor(private logger: winston.Logger, private label?: string) {}
@@ -117,7 +117,7 @@ const morganStream = {
     final_msg += " " + color(status_color, String(status));
 
     // time
-    final_msg += " - " + response_time + "ms";
+    final_msg += " - " + response_time.toFixed(2) + "ms";
 
     // content length
     if (content_length) final_msg += " - " + content_length;
