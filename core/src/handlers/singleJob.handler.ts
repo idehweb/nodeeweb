@@ -17,9 +17,13 @@ export class SingleJobProcess {
     return jp.runTask.bind(jp);
   }
 
+  get file_name() {
+    return getSharedPath(`single-job-${this.id}.lock`);
+  }
+
   #block() {
     try {
-      fs.writeFileSync(getSharedPath(`single-job-${this.id}`), "", {
+      fs.writeFileSync(this.file_name, "", {
         flag: "wx",
       });
       return true;
@@ -29,7 +33,7 @@ export class SingleJobProcess {
   }
   #free() {
     try {
-      fs.rmSync(getSharedPath(`single-job-${this.id}`));
+      fs.rmSync(this.file_name);
     } catch (err) {
       console.log("single job free error", err);
     }
