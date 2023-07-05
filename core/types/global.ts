@@ -54,3 +54,5 @@ export enum CRUD {
   UPDATE_ONE = "updateOne",
   DELETE_ONE = "deleteOne",
 }
+
+export const PUBLIC_ACCESS = "public_access";

@@ -8,7 +8,7 @@ import store from "../../store";
 import { ForbiddenError, UnauthorizedError } from "../core/error";
 import AdminSchema from "../../schema/admin.schema";
 import CustomerSchema from "../../schema/customer.schema";
-import { MiddleWare } from "../../types/global";
+import { MiddleWare, PUBLIC_ACCESS } from "../../types/global";
 import { Query } from "mongoose";
 import { CookieOptions } from "express";
 const strategyMap = new Map<string, Strategy>();
@@ -138,7 +138,10 @@ export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
     const allowedRoles = accesses
       .filter((access) => access.modelName === modelName)
       .map((access) => access.role);
-    if (!allowedRoles.includes(req.user.role))
+    if (
+      !allowedRoles.includes(PUBLIC_ACCESS) &&
+      !allowedRoles.includes(req.user.role)
+    )
       return next(new ForbiddenError("user can not access"));
     return next();
   };
