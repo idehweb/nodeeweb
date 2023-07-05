@@ -8,9 +8,10 @@ import store from "../../store";
 import { ForbiddenError, UnauthorizedError } from "../core/error";
 import AdminSchema from "../../schema/admin.schema";
 import CustomerSchema from "../../schema/customer.schema";
-import { MiddleWare, PUBLIC_ACCESS } from "../../types/global";
+import { MiddleWare } from "../../types/global";
 import { Query } from "mongoose";
 import { CookieOptions } from "express";
+import { PUBLIC_ACCESS } from "../constants/String";
 const strategyMap = new Map<string, Strategy>();
 
 export type UserPassStrategyOpt = {
