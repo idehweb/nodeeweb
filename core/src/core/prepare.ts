@@ -12,46 +12,34 @@ import store from "../../store";
 import logger from "../handlers/log.handler";
 import { isExistsSync } from "../../utils/helpers";
 import exec from "../../utils/exec";
+import { color } from "../../utils/color";
 
 export default async function prepare() {
-  // set custom env
-  setCustomEnv();
+  // install requirements
+  await installRequirements();
 
   // create directories
   createSharedDir();
   createPublicMediaFolder();
 
   const staticDirs = ["plugins"];
-  // run this command only if npm i nodeeweb server
-  if (store.env.USE_ENV !== USE_ENV.NPM)
+  // run this command only if npm i @nodeeweb/core
+  if (store.env.USE_ENV === USE_ENV.NPM)
     staticDirs.push("schema", "theme", "admin");
   await Promise.all(staticDirs.map(createAndCopyStaticDir));
 }
 
-function setCustomEnv() {
-  const appDirectory = fs.realpathSync(process.cwd());
-  const resolveApp = (relativePath: string) =>
-    path.resolve(appDirectory, relativePath);
+async function installRequirements() {
+  if (store.env.NOT_INSTALL_REQUIREMENTS || store.env.USE_ENV !== USE_ENV.NPM)
+    return;
 
-  // use env
-  const node_modules_ns = resolveApp(PACKAGE_PREFIX);
-  if (fs.existsSync(node_modules_ns)) store.env.USE_ENV = USE_ENV.NPM;
-  else store.env.USE_ENV = USE_ENV.GIT;
-
-  // dirs
-  const env_dirs = (store.env.APP_DIRS ?? "").split(",").map((d) => d.trim());
-  store.dirs = _.uniq(
-    [
-      appDirectory,
-      ...env_dirs,
-      store.env.USE_ENV === USE_ENV.NPM ? PACKAGE_PREFIX : "",
-    ].filter((d) => d)
+  const packageInfo = await import(path.join(path.resolve(), "package.json"));
+  const requirements = ["mongoose", "bcrypt"].filter(
+    (pack) => !packageInfo.dependencies[pack]
   );
-
-  // log file
-  store.env.logIntoFile =
-    (store.env.LOG_TO_FILE && store.env.LOG_TO_FILE) !== "false" ||
-    !store.env.isLoc;
+  if (!requirements.length) return;
+  logger.log(color("Green", `## Install ${requirements.join(", ")} ##`));
+  await exec(`npm i ${requirements.join(" ")}`);
 }
 
 function createSharedDir() {

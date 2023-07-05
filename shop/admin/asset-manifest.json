@@ -1,0 +1,34 @@
+{
+  "files": {
+    "main.css": "./static/css/main.936c10fc.css",
+    "main.js": "./static/js/main.5fc26f0a.js",
+    "static/media/IRANSansWebLight.ttf": "./static/media/IRANSansWebLight.3e99a4d54d76ef687a4f.ttf",
+    "static/media/IRANSansWeb.eot": "./static/media/IRANSansWeb.96c836c332e8f8d83979.eot",
+    "static/media/IRANSansWeb.ttf": "./static/media/IRANSansWeb.cfda181b49ac22fb9f4a.ttf",
+    "static/media/IRANSansWebMedium.ttf": "./static/media/IRANSansWebMedium.ba77cad06e41efd16bf0.ttf",
+    "static/media/IRANSansWebBold.ttf": "./static/media/IRANSansWebBold.40ce5860f4b35793bc06.ttf",
+    "static/media/IRANSansWebUltraLight.ttf": "./static/media/IRANSansWebUltraLight.debced95498e985cf493.ttf",
+    "static/media/IRANSansWebLight.woff": "./static/media/IRANSansWebLight.a7dd6af7cc7aa2373e7e.woff",
+    "static/media/IRANSansWeb.woff": "./static/media/IRANSansWeb.4f3bc2683ce6d8e34dd7.woff",
+    "static/media/IRANSansWebUltraLight.woff": "./static/media/IRANSansWebUltraLight.ce3ba9c0ab261bd6268c.woff",
+    "static/media/IRANSansWebMedium.woff": "./static/media/IRANSansWebMedium.737df96406e873cb9714.woff",
+    "static/media/IRANSansWebBold.woff": "./static/media/IRANSansWebBold.55d4fd7c5d91b4a4f816.woff",
+    "static/media/IRANSansWebLight.eot": "./static/media/IRANSansWebLight.0803b08a6df98ce5da53.eot",
+    "static/media/IRANSansWebUltraLight.eot": "./static/media/IRANSansWebUltraLight.5f353db457ecad939fa7.eot",
+    "static/media/IRANSansWebLight.woff2": "./static/media/IRANSansWebLight.3243887ae490a47d399b.woff2",
+    "static/media/IRANSansWebMedium.eot": "./static/media/IRANSansWebMedium.d89a63f6ef399967c601.eot",
+    "static/media/IRANSansWebBold.eot": "./static/media/IRANSansWebBold.ee21f665eacdcdfe20b3.eot",
+    "static/media/IRANSansWeb.woff2": "./static/media/IRANSansWeb.e2b0436903df14b8a8c2.woff2",
+    "static/media/IRANSansWebUltraLight.woff2": "./static/media/IRANSansWebUltraLight.f781adf3ac1352b3bffa.woff2",
+    "static/media/IRANSansWebMedium.woff2": "./static/media/IRANSansWebMedium.c400362906c0fefcc862.woff2",
+    "static/media/IRANSansWebBold.woff2": "./static/media/IRANSansWebBold.62df0689da0baf986fba.woff2",
+    "static/media/welcome_illustration.svg": "./static/media/welcome_illustration.cd84d2be0e7683dface66dfee9959989.svg",
+    "index.html": "./index.html",
+    "main.936c10fc.css.map": "./static/css/main.936c10fc.css.map",
+    "main.5fc26f0a.js.map": "./static/js/main.5fc26f0a.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.936c10fc.css",
+    "static/js/main.5fc26f0a.js"
+  ]
+}

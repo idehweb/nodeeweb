@@ -1,6 +1,7 @@
 import { join, resolve } from "path";
 import winston, { format, transports } from "winston";
 import store from "../../store";
+import { color } from "../../utils/color";
 
 const logFormats = [
   format.timestamp({
@@ -10,7 +11,9 @@ const logFormats = [
   format.printf(
     ({ level, message, time, label }) =>
       `[${time}] ${level === "info" ? "" : `[${level.toUpperCase()}] `}${
-        label && !(label as string).includes("notShow") ? `${label}: ` : ""
+        label && !(label as string).includes("notShow")
+          ? color("Yellow", `${label}: `)
+          : ""
       }${message}`
   ),
 ];

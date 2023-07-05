@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { ENV, USE_ENV } from "./types/global";
 import { Application } from "express";
 import { ErrorPackageFn } from "./types/error";
+import { Server } from "http";
 export class Store {
   env: {
     MONGO_URL: string;
@@ -25,6 +26,7 @@ export class Store {
   dirs: string[];
   app: Application;
   errorPackage: ErrorPackageFn;
+  server: Server;
 
   constructor() {
     this.env = process.env as any;

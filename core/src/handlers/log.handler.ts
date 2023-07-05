@@ -1,6 +1,6 @@
 import winston from "winston";
 import morgan from "morgan";
-import { MiddleWare } from "../../types/global";
+import { MiddleWare, USE_ENV } from "../../types/global";
 import { createCustomLogger } from "../core/log";
 import store from "../../store";
 import { Colors, color, yellow } from "../../utils/color";
@@ -34,15 +34,20 @@ export class Logger {
   }
 }
 const logger = new Logger(
-  createCustomLogger({ name: "core", handleExceptions: true })
+  createCustomLogger({ name: "core", handleExceptions: true }),
+  store.env.USE_ENV !== USE_ENV.NPM ? undefined : "CORE"
 );
 export default logger;
 
-export function createLogger(name: string, maxFiles = 1) {
-  return new Logger(createCustomLogger({ name, maxFiles }));
+export function createLogger(name: string, label?: string, maxFiles = 1) {
+  return new Logger(createCustomLogger({ name, maxFiles }), label);
 }
 
-const morganLogger = createLogger("core.server", 5);
+const morganLogger = createLogger(
+  "core.server",
+  store.env.USE_ENV !== USE_ENV.NPM ? undefined : "CORE_SERVER",
+  5
+);
 const morganStream = {
   write: (msg: string) => {
     const {

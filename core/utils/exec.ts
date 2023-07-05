@@ -4,6 +4,7 @@ export default function exec(cmd: string) {
   const sp = spawn(cmd, {
     shell: true,
     stdio: [process.stdin, process.stdout, process.stderr],
+    windowsHide: true,
   });
   return new Promise((resolve, reject) => {
     sp.on("close", (code) => {
