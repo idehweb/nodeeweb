@@ -70,9 +70,17 @@ export class EntityCreator {
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
-  getOneCreator({ filter, parseFilter, ...opt }: CRUDCreatorOpt): MiddleWare {
+  getOneCreator({
+    filter,
+    parseFilter,
+    paramIdField = "id",
+    ...opt
+  }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = filter ?? parseFilter(req) ?? {};
+      const f = filter ??
+        parseFilter(req) ?? {
+          _id: new mongoose.Types.ObjectId(req.params[paramIdField]),
+        };
       const query = this.model.findOne(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
@@ -82,10 +90,13 @@ export class EntityCreator {
     parseFilter,
     update,
     parseUpdate,
+    paramIdField = "id",
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = filter ?? parseFilter(req) ?? {};
+      const f = filter ??
+        parseFilter(req) ??
+        {} ?? { _id: new mongoose.Types.ObjectId(req.params[paramIdField]) };
       const u = update ?? parseUpdate(req) ?? {};
       const query = this.model.findOneAndUpdate(f, u, { new: true });
       return await this.baseCreator(query, req, res, next, opt);
@@ -95,10 +106,14 @@ export class EntityCreator {
     filter,
     parseFilter,
     forceDelete,
+    paramIdField = "id",
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = filter ?? parseFilter(req);
+      const f = filter ??
+        parseFilter(req) ?? {
+          _id: new mongoose.Types.ObjectId(req.params[paramIdField]),
+        };
       const query = forceDelete
         ? this.model.deleteOne(f)
         : this.model.findOneAndUpdate(f, { $set: { active: false } });
@@ -132,7 +147,7 @@ export function getEntityCRUD(
     const cName = name as CRUD;
     schemas.push({
       method: opt.controller.method ?? translateCRUD2Method(cName),
-      url: opt.controller.url,
+      url: opt.controller.url ?? translateCRUD2Url(cName, opt.crud),
       access: opt.controller.access,
       service: [
         creator[translateCRUD2Creator(cName)](opt.crud),
@@ -172,6 +187,22 @@ function translateCRUD2Method(name: CRUD): ControllerSchema["method"] {
       return "put";
     case CRUD.DELETE_ONE:
       return "delete";
+    default:
+      throw new Error(`Invalid CRUD name : ${name}`);
+  }
+}
+function translateCRUD2Url(
+  name: CRUD,
+  opt: CRUDCreatorOpt
+): ControllerSchema["url"] {
+  switch (name) {
+    case CRUD.CREATE:
+    case CRUD.GET_ALL:
+      return "/";
+    case CRUD.GET_ONE:
+    case CRUD.UPDATE_ONE:
+    case CRUD.DELETE_ONE:
+      return `/:${opt.paramIdField ?? "id"}`;
     default:
       throw new Error(`Invalid CRUD name : ${name}`);
   }

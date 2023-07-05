@@ -34,6 +34,7 @@ export type CRUDCreatorOpt = {
     req: Req
   ) => mongoose.UpdateQuery<any> | mongoose.UpdateWithAggregationPipeline;
   parseBody?: (req: Req) => any;
+  paramIdField?: string;
   paginate?: {
     limit?: number;
     skip?: number;
