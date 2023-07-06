@@ -11,7 +11,7 @@ export class Logger {
   private convert(a: any) {
     if (["number", "string", "boolean", "undefined"].includes(typeof a))
       return String(a);
-    return JSON.stringify(a, null, "  ");
+    return a.toString();
   }
 
   log(...args: any[]) {

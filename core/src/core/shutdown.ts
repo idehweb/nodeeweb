@@ -9,7 +9,6 @@ export function handleUncaughtException() {
     shutdown();
   });
   process.once("unhandledRejection", (err) => {
-    console.log(err);
     logger.error("#unhandledRejection:", err);
     shutdown();
   });
