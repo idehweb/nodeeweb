@@ -4,10 +4,16 @@ import "./src/core/setCustomEnv";
 import buildApp from "./src/core/app";
 import logger from "./src/handlers/log.handler";
 import { dbConnect } from "./src/core/db";
-import gracefullyShutdown from "./src/core/shutdown";
+import {
+  gracefullyShutdown,
+  handleUncaughtException,
+} from "./src/core/shutdown";
 import { color } from "./utils/color";
 
 export default async function deployCore() {
+  // handle errors
+  handleUncaughtException();
+
   // start connect db
   await dbConnect();
 
@@ -20,11 +26,10 @@ export default async function deployCore() {
     const msg = `Server Listening at ${color("Green", address)}`;
     logger.log(msg);
   });
+  store.server = server;
 
   // set gracefully shutdown , health path
-  gracefullyShutdown(server);
-
-  store.server = server;
+  gracefullyShutdown();
 
   return store;
 }
