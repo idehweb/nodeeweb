@@ -85,4 +85,5 @@ export type Header = {
   type: string;
   edit?: boolean;
   delete?: boolean;
+  pageBuilder?: boolean;
 };

@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { MiddleWare, MiddleWareError, Req } from "../types/global";
 import { isAsyncFunction } from "util/types";
-import { log } from "../src/handlers/log.handler";
+import logger from "../src/handlers/log.handler";
 
 export function catchFn<F extends () => Promise<any>>(
   fn: F,
@@ -12,7 +12,7 @@ export function catchFn<F extends () => Promise<any>>(
       return await fn.call(self ?? this);
     } catch (err) {
       if (onError) {
-        log("#CatchError", err);
+        logger.error("#CatchError", err);
         return onError.call(self ?? this, err);
       }
     }
@@ -35,7 +35,7 @@ export function catchMiddleware<F extends MiddleWare>(
       else return fn.call(self ?? this, req, res, next);
     } catch (err) {
       if (onError) {
-        log("#CatchError", err);
+        logger.error("#CatchError", err);
         return onError(err, req, res, next);
       }
       return next(err);

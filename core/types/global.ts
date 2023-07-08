@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose, { Document, Model, ObjectId } from "mongoose";
+import { CRUD_DEFAULT_REQ_KEY } from "../src/constants/String";
 
 export enum ENV {
   PRO = "production",
@@ -16,7 +17,10 @@ export type Req = Request & {
   props: any;
   file_path?: string;
   user?: Document & any;
+  [CRUD_DEFAULT_REQ_KEY]: any;
 };
+
+export type Res = Response;
 
 export type MiddleWare = (req: Req, res: Response, next: NextFunction) => any;
 export type MiddleWareError = (
