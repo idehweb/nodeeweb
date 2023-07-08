@@ -2,6 +2,7 @@ import deployCore from "@nodeeweb/core/deploy";
 import { createLogger } from "@nodeeweb/core/src/handlers/log.handler";
 import store from "@nodeeweb/core/store";
 import registerAttribute from "./src/attributes";
+import registerCategory from "./src/category";
 
 async function deployShop() {
   await deployCore();
@@ -9,6 +10,7 @@ async function deployShop() {
 
   // register entity
   registerAttribute();
+  registerCategory();
 }
 
 deployShop();

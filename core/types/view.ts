@@ -24,6 +24,9 @@ export type CreateField = {
   options?: Option[];
   child?: Child[];
   initialChild?: InitialChild;
+  optionName?: string;
+  optionValue?: string;
+  defaultValue?: any;
 };
 
 export type Child = {
@@ -58,7 +61,7 @@ export type Edit = {
   fields: EditField[];
 };
 
-export type EditField = {
+export type EditField = CreateField & {
   name: string;
   type: string;
   disabled?: boolean;
@@ -70,6 +73,7 @@ export type EditField = {
   options?: Option[];
   child?: Child[];
   initialChild?: InitialChild;
+  optionName?: string;
 };
 
 export type List = {
