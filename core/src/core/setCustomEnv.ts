@@ -26,9 +26,9 @@ export default function setCustomEnv() {
   );
 
   // log file
-  store.env.logIntoFile =
-    (store.env.LOG_TO_FILE && store.env.LOG_TO_FILE) !== "false" ||
-    !store.env.isLoc;
+  store.env.logIntoFile = store.env.LOG_TO_FILE
+    ? store.env.LOG_TO_FILE !== "false"
+    : !store.env.isLoc;
 }
 
 setCustomEnv();
