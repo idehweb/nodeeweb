@@ -3,12 +3,63 @@ import store from "../../store";
 import { CRUD, CRUDCreatorOpt, MiddleWare, Req } from "../../types/global";
 import { NextFunction, Response } from "express";
 import { ControllerSchema } from "../../types/controller";
-import { controllerRegister } from "./controller.handler";
+import {
+  ControllerRegisterOptions,
+  controllerRegister,
+} from "./controller.handler";
+import { CRUD_DEFAULT_REQ_KEY } from "../constants/String";
+import { isAsyncFunction } from "util/types";
 
 export class EntityCreator {
   constructor(private modelName: string) {}
   private get model() {
     return store.db.model(this.modelName);
+  }
+
+  private async handleResult(
+    req: Req,
+    res: Response,
+    next: NextFunction,
+    {
+      result,
+      saveToReq,
+      sendResponse,
+      httpCode = 200,
+    }: {
+      result: any;
+      saveToReq: CRUDCreatorOpt["saveToReq"];
+      sendResponse: CRUDCreatorOpt["sendResponse"];
+      httpCode: number;
+    }
+  ) {
+    if (sendResponse && !saveToReq) {
+      const data =
+        typeof sendResponse === "boolean"
+          ? result
+          : isAsyncFunction(sendResponse)
+          ? await sendResponse(result)
+          : sendResponse(result);
+      return res.status(httpCode).json({ data });
+    }
+
+    // save to req
+    req[
+      !saveToReq || typeof saveToReq === "boolean"
+        ? CRUD_DEFAULT_REQ_KEY
+        : saveToReq
+    ] = result;
+    return next();
+  }
+  private getFrom(
+    req: Req,
+    objs: { reqKey: string; objKey: any }[],
+    key: string,
+    def: any
+  ) {
+    for (const { reqKey, objKey } of objs) {
+      if (objKey?.[key]) return req[reqKey][objKey[key]];
+    }
+    return def;
   }
   private async baseCreator(
     query: mongoose.Query<any, any>,
@@ -16,38 +67,69 @@ export class EntityCreator {
     res: Response,
     next: NextFunction,
     {
-      execute,
-      paginate,
+      executeQuery,
       project,
       sort,
-      reqParamField,
-      code = 200,
+      saveToReq,
+      sendResponse,
+      paramFields,
+      httpCode = 200,
+      autoSetCount,
+      queryFields,
     }: Partial<CRUDCreatorOpt>
   ) {
     let result: any = query;
-
-    if (sort) query.sort(sort);
+    let mySort: any =
+      sort ?? queryFields?.sort ? req.query[queryFields?.sort] : undefined;
+    if (mySort) query.sort(mySort);
     if (project) query.projection(project);
-    if (paginate) query.skip(paginate.skip ?? 0).limit(paginate.limit ?? 12);
-    if (execute) result = await query.exec();
 
-    if (reqParamField) {
-      req[reqParamField] = result;
-      return next();
-    }
+    const offset = +this.getFrom(
+      req,
+      [
+        { reqKey: "query", objKey: queryFields },
+        { reqKey: "params", objKey: paramFields },
+      ],
+      "offset",
+      0
+    );
 
-    return res.status(code).json({ data: result });
+    const limit = +this.getFrom(
+      req,
+      [
+        { reqKey: "query", objKey: queryFields },
+        { reqKey: "params", objKey: paramFields },
+      ],
+      "limit",
+      12
+    );
+
+    if (offset) query.skip(offset);
+    if (limit) query.limit(limit);
+
+    if (executeQuery) result = await query.exec();
+    if (autoSetCount)
+      res.setHeader("X-Total-Count", await query.countDocuments());
+
+    // handle result and output
+    this.handleResult(req, res, next, {
+      result,
+      saveToReq,
+      sendResponse,
+      httpCode,
+    });
   }
   createOneCreator({
     parseBody,
-    execute,
-    reqParamField,
+    executeQuery,
+    saveToReq,
+    sendResponse,
     project,
   }: CRUDCreatorOpt) {
     return async (req: Req, res: Response, next: NextFunction) => {
-      const body = parseBody(req) ?? req.body;
+      const body = parseBody ? parseBody(req) : req.body;
       let doc = this.model.create(body);
-      if (execute) {
+      if (executeQuery) {
         doc = (await doc)._doc;
         if (project) {
           Object.entries(project)
@@ -55,16 +137,24 @@ export class EntityCreator {
             .map(([k]) => delete doc[k]);
         }
       }
-      if (reqParamField) {
-        req[reqParamField] = doc;
-        return next();
-      }
-      return res.status(201).json({ data: doc });
+
+      // handle result and output
+      this.handleResult(req, res, next, {
+        result: doc,
+        saveToReq,
+        sendResponse,
+        httpCode: 201,
+      });
     };
   }
-  getAllCreator({ filter, parseFilter, ...opt }: CRUDCreatorOpt): MiddleWare {
+  getAllCreator({
+    filter,
+    parseFilter,
+    paramFields,
+    ...opt
+  }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = filter ?? parseFilter(req) ?? {};
+      const f = filter ?? parseFilter ? parseFilter(req) : {};
       if (!opt.sort) opt.sort = { createdAt: -1 };
       const query = this.model.find(f);
       return await this.baseCreator(query, req, res, next, opt);
@@ -73,15 +163,24 @@ export class EntityCreator {
   getOneCreator({
     filter,
     parseFilter,
-    paramIdField = "id",
+    paramFields = { id: "id" },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = filter ??
-        parseFilter(req) ?? {
-          _id: new mongoose.Types.ObjectId(req.params[paramIdField]),
-        };
+      const f =
+        filter ?? parseFilter
+          ? parseFilter(req)
+          : {
+              _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+            };
       const query = this.model.findOne(f);
+      return await this.baseCreator(query, req, res, next, opt);
+    };
+  }
+  getCountCreator({ filter, parseFilter, ...opt }: CRUDCreatorOpt): MiddleWare {
+    return async (req, res, next) => {
+      const f = filter ?? parseFilter ? parseFilter(req) : {};
+      const query = this.model.countDocuments(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
@@ -90,14 +189,17 @@ export class EntityCreator {
     parseFilter,
     update,
     parseUpdate,
-    paramIdField = "id",
+    paramFields = { id: "id" },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = filter ??
-        parseFilter(req) ??
-        {} ?? { _id: new mongoose.Types.ObjectId(req.params[paramIdField]) };
-      const u = update ?? parseUpdate(req) ?? {};
+      const f =
+        filter ?? parseFilter
+          ? parseFilter(req)
+          : {
+              _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+            };
+      const u = update ?? parseUpdate ? parseUpdate(req) : req.body;
       const query = this.model.findOneAndUpdate(f, u, { new: true });
       return await this.baseCreator(query, req, res, next, opt);
     };
@@ -106,30 +208,30 @@ export class EntityCreator {
     filter,
     parseFilter,
     forceDelete,
-    paramIdField = "id",
+    paramFields = { id: "id" },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = filter ??
         parseFilter(req) ?? {
-          _id: new mongoose.Types.ObjectId(req.params[paramIdField]),
+          _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
         };
       const query = forceDelete
         ? this.model.deleteOne(f)
         : this.model.findOneAndUpdate(f, { $set: { active: false } });
       return await this.baseCreator(query, req, res, next, {
         ...opt,
-        code: 204,
+        httpCode: 204,
       });
     };
   }
 }
 
 export type EntityCRUDOpt = {
-  crud: CRUDCreatorOpt;
+  crud: Omit<CRUDCreatorOpt, "httpCode">;
   controller: Partial<ControllerSchema>;
 };
-export function getEntityCRUD(
+export function registerEntityCRUD(
   modelName: string,
   opts: {
     [CRUD.CREATE]?: EntityCRUDOpt;
@@ -137,8 +239,9 @@ export function getEntityCRUD(
     [CRUD.GET_ONE]?: EntityCRUDOpt;
     [CRUD.UPDATE_ONE]?: EntityCRUDOpt;
     [CRUD.DELETE_ONE]?: EntityCRUDOpt;
+    [CRUD.GET_COUNT]?: EntityCRUDOpt;
   },
-  base_url?: string
+  registerOpt: ControllerRegisterOptions
 ) {
   const schemas: ControllerSchema[] = [];
   const creator = new EntityCreator(modelName);
@@ -156,7 +259,7 @@ export function getEntityCRUD(
     });
   }
 
-  schemas.forEach((s) => controllerRegister(s, { base_url }));
+  schemas.forEach((s) => controllerRegister(s, registerOpt));
 }
 
 function translateCRUD2Creator(name: CRUD): keyof EntityCreator {
@@ -171,6 +274,8 @@ function translateCRUD2Creator(name: CRUD): keyof EntityCreator {
       return "updateOneCreator";
     case CRUD.DELETE_ONE:
       return "deleteOneCreator";
+    case CRUD.GET_COUNT:
+      return "getCountCreator";
     default:
       throw new Error(`Invalid CRUD name : ${name}`);
   }
@@ -180,8 +285,8 @@ function translateCRUD2Method(name: CRUD): ControllerSchema["method"] {
     case CRUD.CREATE:
       return "post";
     case CRUD.GET_ALL:
-      return "get";
     case CRUD.GET_ONE:
+    case CRUD.GET_COUNT:
       return "get";
     case CRUD.UPDATE_ONE:
       return "put";
@@ -196,13 +301,19 @@ function translateCRUD2Url(
   opt: CRUDCreatorOpt
 ): ControllerSchema["url"] {
   switch (name) {
+    case CRUD.GET_COUNT:
+      return "/count";
     case CRUD.CREATE:
-    case CRUD.GET_ALL:
       return "/";
+    case CRUD.GET_ALL:
+      let extra = "";
+      if (opt.paramFields?.offset) extra += `/?:${opt.paramFields.offset}`;
+      if (opt.paramFields?.limit) extra += `/?:${opt.paramFields.limit}`;
+      return `/${extra}`;
     case CRUD.GET_ONE:
     case CRUD.UPDATE_ONE:
     case CRUD.DELETE_ONE:
-      return `/:${opt.paramIdField ?? "id"}`;
+      return `/:${opt.paramFields?.id ?? "id"}`;
     default:
       throw new Error(`Invalid CRUD name : ${name}`);
   }

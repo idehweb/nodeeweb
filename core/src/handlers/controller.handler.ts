@@ -3,9 +3,10 @@ import store from "../../store";
 import { ControllerAccess, ControllerSchema } from "../../types/controller";
 import { MiddleWare } from "../../types/global";
 import { authenticate, authorizeWithToken } from "./auth.handler";
-import logger from "./log.handler";
+import { Logger } from "./log.handler";
 import { join } from "path";
 import { color } from "../../utils/color";
+import { RegisterOptions } from "../../types/register";
 
 export function getUrlFromBaseUrl(url: string, base_url?: string) {
   return join(base_url ?? "", url).replace(/\\/g, "/");
@@ -13,10 +14,14 @@ export function getUrlFromBaseUrl(url: string, base_url?: string) {
 
 export type ControllerRegisterOptions = {
   base_url?: string;
-};
+} & RegisterOptions;
 export function controllerRegister(
   schema: ControllerSchema,
-  { base_url }: ControllerRegisterOptions = {}
+  {
+    base_url,
+    from,
+    logger = store.systemLogger,
+  }: ControllerRegisterOptions = {}
 ) {
   const url = getUrlFromBaseUrl(schema.url, base_url);
   const mw: MiddleWare[] = [];
@@ -32,7 +37,12 @@ export function controllerRegister(
   mw.push(...schema.service);
 
   store.app[schema.method.toLowerCase()](url, ...mw);
-  logger.log(color("Blue", `## ${schema.method.toUpperCase()} ${url} ##`));
+  logger.log(
+    color(
+      "Blue",
+      `## ${from ? `${from} ` : ""}${schema.method.toUpperCase()} ${url} ##`
+    )
+  );
 }
 
 function translateAccess(accesses: ControllerAccess[]): MiddleWare[] {

@@ -14,6 +14,9 @@ export default async function deployCore() {
   // handle errors
   handleUncaughtException();
 
+  // set system logger
+  store.systemLogger = logger;
+
   // start connect db
   await dbConnect();
 
