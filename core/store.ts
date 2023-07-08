@@ -3,6 +3,7 @@ import { ENV, USE_ENV } from "./types/global";
 import { Application } from "express";
 import { ErrorPackageFn } from "./types/error";
 import { Server } from "http";
+import { AdminViewSchema } from "./types/view";
 export class Store {
   env: {
     MONGO_URL: string;
@@ -27,6 +28,8 @@ export class Store {
   app: Application;
   errorPackage: ErrorPackageFn;
   server: Server;
+  systemLogger: any;
+  adminViews: AdminViewSchema[] = [];
 
   constructor() {
     this.env = process.env as any;

@@ -34,22 +34,30 @@ export type CRUDCreatorOpt = {
     req: Req
   ) => mongoose.UpdateQuery<any> | mongoose.UpdateWithAggregationPipeline;
   parseBody?: (req: Req) => any;
-  paramIdField?: string;
-  paginate?: {
-    limit?: number;
-    skip?: number;
+  paramFields?: {
+    id?: string;
+    offset?: string;
+    limit?: string;
+  };
+  queryFields?: {
+    offset?: string;
+    limit?: string;
+    sort?: string;
   };
   sort?: { [k: string]: mongoose.SortValues };
   project?: mongoose.ProjectionType<any>;
-  execute?: boolean;
-  reqParamField?: string;
-  code?: number;
+  executeQuery?: boolean;
+  sendResponse?: boolean | ((result: any) => any | Promise<any>);
+  saveToReq?: boolean | string;
+  httpCode?: number;
   forceDelete?: boolean;
+  autoSetCount?: boolean;
 };
 
 export enum CRUD {
   GET_ALL = "getAll",
   GET_ONE = "getOne",
+  GET_COUNT = "getCount",
   CREATE = "create",
   UPDATE_ONE = "updateOne",
   DELETE_ONE = "deleteOne",
