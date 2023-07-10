@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@nodeeweb/core": "file:../core",
+    "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "mongoose": "^7.3.1"
   },
