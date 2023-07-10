@@ -47,9 +47,16 @@ export async function dbRegisterModels() {
     .sort()
     .map((sp) => [sp.split(".")[0].split("-").pop(), join(schemaDir, sp)]);
   // import
-  for (const [name, schemaFile] of schemaFiles) {
-    const { default: schema } = await import(schemaFile);
-    store.db.model(name, schema);
-    logger.log(color("Green", `## Register ${_.startCase(name)} Model ##`));
-  }
+  await Promise.all(
+    schemaFiles.map(async ([name, schemaFile]) => {
+      const { default: schema } = await import(schemaFile);
+      store.db.model(name, schema);
+      logger.log(color("Green", `## Register ${_.startCase(name)} Model ##`));
+    })
+  );
+  // for (const [name, schemaFile] of schemaFiles) {
+  //   const { default: schema } = await import(schemaFile);
+  //   store.db.model(name, schema);
+  //   logger.log(color("Green", `## Register ${_.startCase(name)} Model ##`));
+  // }
 }
