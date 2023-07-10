@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { PopulateOptions } from "mongoose";
 import store from "../../store";
 import { CRUD, CRUDCreatorOpt, MiddleWare, Req } from "../../types/global";
 import { NextFunction, Response } from "express";
@@ -76,6 +76,7 @@ export class EntityCreator {
       httpCode = 200,
       autoSetCount,
       queryFields,
+      populate,
     }: Partial<CRUDCreatorOpt>
   ) {
     let result: any = query;
@@ -106,6 +107,12 @@ export class EntityCreator {
 
     if (offset) query.skip(offset);
     if (limit) query.limit(limit);
+
+    // populate
+    if (populate) {
+      if (!Array.isArray(populate)) populate = [populate];
+      populate.forEach((p) => query.populate(p));
+    }
 
     if (executeQuery) result = await query.exec();
     if (autoSetCount)
