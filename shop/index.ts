@@ -6,6 +6,7 @@ import registerCategory from "./src/category";
 import registerCustomer from "./src/customer";
 import registerDiscount from "./src/discount";
 import registerDocument from "./src/document";
+import registerEntry from "./src/entry";
 
 async function deployShop() {
   await deployCore();
@@ -17,6 +18,7 @@ async function deployShop() {
   registerCustomer();
   registerDiscount();
   registerDocument();
+  registerEntry();
 }
 
 deployShop();
