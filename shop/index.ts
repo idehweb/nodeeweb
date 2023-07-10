@@ -4,6 +4,7 @@ import store from "@nodeeweb/core/store";
 import registerAttribute from "./src/attributes";
 import registerCategory from "./src/category";
 import registerCustomer from "./src/customer";
+import registerDiscount from "./src/discount";
 
 async function deployShop() {
   await deployCore();
@@ -13,6 +14,7 @@ async function deployShop() {
   registerAttribute();
   registerCategory();
   registerCustomer();
+  registerDiscount();
 }
 
 deployShop();

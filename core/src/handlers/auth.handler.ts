@@ -14,6 +14,17 @@ import { CookieOptions } from "express";
 import { PUBLIC_ACCESS } from "../constants/String";
 const strategyMap = new Map<string, Strategy>();
 
+export const AuthUserAccess: ControllerAccess[] = [
+  {
+    role: PUBLIC_ACCESS,
+    modelName: "customer",
+  },
+  {
+    role: PUBLIC_ACCESS,
+    modelName: "admin",
+  },
+];
+
 export type UserPassStrategyOpt = {
   model: string;
   query?: (body: any) => Query<any, any>;
