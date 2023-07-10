@@ -13,7 +13,7 @@ export function getUrlFromBaseUrl(url: string, base_url?: string) {
 }
 
 export type ControllerRegisterOptions = {
-  base_url?: string;
+  base_url?: string | string[];
 } & RegisterOptions;
 export function controllerRegister(
   schema: ControllerSchema,
@@ -23,7 +23,8 @@ export function controllerRegister(
     logger = store.systemLogger,
   }: ControllerRegisterOptions = {}
 ) {
-  const url = getUrlFromBaseUrl(schema.url, base_url);
+  if (!Array.isArray(base_url)) base_url = [base_url ?? ""];
+  const urls = base_url.map((url) => getUrlFromBaseUrl(schema.url, url));
   const mw: MiddleWare[] = [];
 
   if (schema.access && !Array.isArray(schema.access))
@@ -36,13 +37,15 @@ export function controllerRegister(
   if (!Array.isArray(schema.service)) schema.service = [schema.service];
   mw.push(...schema.service);
 
-  store.app[schema.method.toLowerCase()](url, ...mw);
-  logger.log(
-    color(
-      "Blue",
-      `## ${from ? `${from} ` : ""}${schema.method.toUpperCase()} ${url} ##`
-    )
-  );
+  for (const url of urls) {
+    store.app[schema.method.toLowerCase()](url, ...mw);
+    logger.log(
+      color(
+        "Blue",
+        `## ${from ? `${from} ` : ""}${schema.method.toUpperCase()} ${url} ##`
+      )
+    );
+  }
 }
 
 function translateAccess(accesses: ControllerAccess[]): MiddleWare[] {
