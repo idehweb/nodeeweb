@@ -46,6 +46,8 @@ export async function dbRegisterModels() {
     .readdirSync(schemaDir)
     .sort()
     .map((sp) => [sp.split(".")[0].split("-").pop(), join(schemaDir, sp)]);
+
+  logger.log(color("Green", `## Start Register Models... ##`));
   // import
   await Promise.all(
     schemaFiles.map(async ([name, schemaFile]) => {
