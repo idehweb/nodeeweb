@@ -8,6 +8,7 @@ import registerDiscount from "./src/discount";
 import registerDocument from "./src/document";
 import registerEntry from "./src/entry";
 import registerForm from "./src/form";
+import registerGateway from "./src/gateways";
 
 async function deployShop() {
   await deployCore();
@@ -21,6 +22,7 @@ async function deployShop() {
   registerDocument();
   registerEntry();
   registerForm();
+  registerGateway();
 }
 
 deployShop();
