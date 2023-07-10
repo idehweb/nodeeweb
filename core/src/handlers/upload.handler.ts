@@ -84,7 +84,7 @@ export function uploadSingle(opt: UploadOptions) {
           },
         }),
   });
-  const mw = [upload.single(opt.file_key ?? "file")];
+  const mw: MiddleWare[] = [upload.single(opt.file_key ?? "file")];
   if (opt.reduce && opt.type === "image") mw.push(reduceSingle(opt));
 
   return mw;
