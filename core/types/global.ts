@@ -16,6 +16,7 @@ export enum USE_ENV {
 export type Req = Request & {
   props: any;
   file_path?: string;
+  old_file_path?: string;
   user?: Document & any;
   [CRUD_DEFAULT_REQ_KEY]: any;
 };

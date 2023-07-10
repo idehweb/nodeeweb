@@ -1,8 +1,10 @@
 import multer from "multer";
 import { join } from "path";
+import fs from "fs";
 import sharp from "sharp";
 import { getStaticDir } from "../../utils/path";
-import { MiddleWare } from "../../types/global";
+import { MiddleWare, Req } from "../../types/global";
+import { isExist } from "../../utils/helpers";
 
 export type UploadOptions = {
   file_key?: string;
@@ -12,16 +14,28 @@ export type UploadOptions = {
     format?: keyof sharp.FormatEnum;
     quality?: number;
   };
-  type: "image" | "video" | "audio" | "other";
+  type: "image" | "video" | "audio" | "other" | "all";
   max_size_mb?: number;
   dir_path?: string;
   out_name?: string;
 };
 
+const IMAGE_FORMATS = [];
+
+function isReducibleFormat(format = "") {
+  return ["jpeg", "png", "webp", "avif", "tiff", "svg"].includes(
+    format.toLowerCase()
+  );
+}
+
+function getFormat(name = "") {
+  return name.split(".")?.pop();
+}
+
 function getFileName(file: Express.Multer.File, custom_format?: string) {
   const format =
     custom_format ??
-    file.originalname.split(".")?.pop() ??
+    getFormat(file.originalname) ??
     file.mimetype.split("/").pop() ??
     "file";
 
@@ -37,6 +51,8 @@ function getDir(opt: UploadOptions) {
 
 export function uploadSingle(opt: UploadOptions) {
   const dir_path = getDir(opt);
+  const saveToMemory = opt.reduce && opt.type === "image";
+
   const upload = multer({
     limits: {
       fileSize: opt.max_size_mb
@@ -44,7 +60,11 @@ export function uploadSingle(opt: UploadOptions) {
         : Number.POSITIVE_INFINITY,
     },
     fileFilter(req, file, cb) {
-      if (opt.type === "other" || file.mimetype.startsWith(opt.type))
+      if (
+        opt.type === "other" ||
+        opt.type === "all" ||
+        file.mimetype.startsWith(opt.type)
+      )
         return cb(null, true);
 
       return cb(
@@ -53,7 +73,7 @@ export function uploadSingle(opt: UploadOptions) {
         )
       );
     },
-    storage: opt.reduce
+    storage: saveToMemory
       ? multer.memoryStorage()
       : multer.diskStorage({
           destination: dir_path,
@@ -65,20 +85,41 @@ export function uploadSingle(opt: UploadOptions) {
         }),
   });
   const mw = [upload.single(opt.file_key ?? "file")];
-  if (opt.reduce) mw.push(reduceSingle(opt));
+  if (opt.reduce && opt.type === "image") mw.push(reduceSingle(opt));
 
   return mw;
 }
 
+async function getFileBuffer(req: Req) {
+  if (req.file?.buffer) return req.file.buffer;
+
+  // read from local
+  const buffer = await fs.promises.readFile(req.file_path);
+  return buffer;
+}
+
+async function removeTempFile(req: Req) {
+  if (
+    req.old_file_path &&
+    req.file_path !== req.old_file_path &&
+    (await isExist(req.old_file_path))
+  )
+    await fs.promises.rm(req.old_file_path);
+}
+
 function reduceSingle(opt: UploadOptions): MiddleWare {
   return async (req, res, next) => {
-    const format = opt.reduce.format ?? "webp";
+    // file saved before and format is not reducible
+    if (req.file_path && !isReducibleFormat(getFormat(req.file_path)))
+      return next();
+
+    let format = opt.reduce.format ?? "webp";
     const file_path = join(
       getDir(opt),
       opt.out_name ?? getFileName(req.file, format)
     );
 
-    let s = sharp(req.file.buffer);
+    let s = sharp(await getFileBuffer(req));
 
     if (opt.reduce.width || opt.reduce.height) {
       s = s.resize({
@@ -94,7 +135,10 @@ function reduceSingle(opt: UploadOptions): MiddleWare {
     });
     await s.toFile(file_path);
 
+    req.old_file_path = req.file_path;
     req.file_path = file_path;
+
+    await removeTempFile(req);
 
     next();
   };

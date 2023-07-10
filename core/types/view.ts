@@ -6,7 +6,7 @@ export type AdminViewSchema = {
 export type ViewContent = {
   list: List;
   create: Create;
-  edit: Edit;
+  edit?: Edit;
 };
 
 export type Create = {
