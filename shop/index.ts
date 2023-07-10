@@ -9,6 +9,8 @@ import registerDocument from "./src/document";
 import registerEntry from "./src/entry";
 import registerForm from "./src/form";
 import registerGateway from "./src/gateways";
+import registerMedia from "./src/media";
+import registerNotification from "./src/notification";
 
 async function deployShop() {
   await deployCore();
@@ -23,6 +25,8 @@ async function deployShop() {
   registerEntry();
   registerForm();
   registerGateway();
+  registerMedia();
+  registerNotification();
 }
 
 deployShop();
