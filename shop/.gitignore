@@ -16,3 +16,6 @@ shared/*
 
 ## logs
 logs/*
+
+## admin
+admin/*
