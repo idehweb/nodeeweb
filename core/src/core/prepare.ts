@@ -1,7 +1,8 @@
 import * as fs from "fs";
-import path from "path";
+import path, { join } from "path";
 import {
   PACKAGE_PREFIX,
+  getBuildDir,
   getScriptFile,
   getSharedPath,
   getStaticDir,
@@ -22,10 +23,12 @@ export default async function prepare() {
   createSharedDir();
   createPublicMediaFolder();
 
+  // link
+  await createAndCopyBuildDir("admin");
+
   const staticDirs = ["plugins"];
   // run this command only if npm i @nodeeweb/core
-  if (store.env.USE_ENV === USE_ENV.NPM)
-    staticDirs.push("schema", "theme", "admin");
+  if (store.env.USE_ENV === USE_ENV.NPM) staticDirs.push("schema", "theme");
   await Promise.all(staticDirs.map(createAndCopyStaticDir));
 }
 
@@ -114,5 +117,24 @@ async function createAndCopyStaticDir(name: string) {
       )} ${dirM} ${dirLocalPath} `
     );
   }
+  logger.log(name, "folder:", dirLocalPath);
+}
+
+async function createAndCopyBuildDir(name: string) {
+  const [dirLocalPath] = getStaticDir(name, true);
+  const dirModulePath = getBuildDir(name);
+
+  // check if directory exist before
+  if (isExistsSync(dirLocalPath)) {
+    logger.log(name, "folder:", dirLocalPath, ", existed");
+    return;
+  }
+
+  logger.log(`Copy ${dirModulePath} to ${dirLocalPath}`);
+  await exec(
+    `${getScriptFile("mkdir")} ${dirLocalPath} && ${getScriptFile(
+      "cp"
+    )} ${dirModulePath} ${dirLocalPath} `
+  );
   logger.log(name, "folder:", dirLocalPath);
 }

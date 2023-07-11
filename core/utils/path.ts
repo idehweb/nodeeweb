@@ -36,3 +36,8 @@ export function getStaticDir(dirName: string, only_app_dir = true) {
     join(dir, dirName)
   );
 }
+
+export function getBuildDir(name: string) {
+  const core_dir = store.dirs[store.dirs.length - 1];
+  return join(core_dir, "node_modules", "@nodeeweb", `${name}-build`);
+}
