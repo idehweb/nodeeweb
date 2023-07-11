@@ -1,0 +1,2 @@
+export const
+  boxRef = 'box';
