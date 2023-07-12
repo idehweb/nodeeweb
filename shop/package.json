@@ -1,0 +1,25 @@
+{
+  "name": "@nodeeweb/shop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc --build",
+    "dev": "nodemon index.ts",
+    "log": "nodemon src/core/log.ts",
+    "start": "node dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@nodeeweb/core": "file:../core",
+    "axios": "^1.4.0",
+    "bcrypt": "^5.1.0",
+    "mongoose": "^7.3.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "nodemon": "^2.0.22",
+    "typescript": "^5.1.6"
+  }
+}
