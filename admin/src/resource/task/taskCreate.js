@@ -1,7 +1,12 @@
-import { Create, required } from "react-admin";
+import { Create, required } from 'react-admin';
 
-import { CustomFileField, GridList, List, SimpleForm, UploaderField } from "@/components";
-
+import {
+  CustomFileField,
+  GridList,
+  List,
+  SimpleForm,
+  UploaderField,
+} from '@/components';
 
 const create = (props) => (
   <Create {...props}>

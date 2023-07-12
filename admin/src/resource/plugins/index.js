@@ -2,8 +2,8 @@
 // import PrivateConfiguration from "./PrivateConfiguration";
 
 // export const Configuration;
-const configuration={
+const configuration = {
   // Configuration: Plugins,
   // PrivateConfiguration
-}
+};
 export default configuration;

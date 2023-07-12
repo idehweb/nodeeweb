@@ -1,5 +1,5 @@
-import React from "react";
-import {useTranslate} from 'react-admin';
+import React from 'react';
+import { useTranslate } from 'react-admin';
 
 export default (props) => {
   // const
@@ -7,19 +7,17 @@ export default (props) => {
     {
       id: 'notpaid',
       name: 'notpaid',
-      color: 'warn'
-
+      color: 'warn',
     },
     {
       id: 'unsuccessful',
       name: 'unsuccessful',
-      color: 'erro'
-
+      color: 'erro',
     },
     {
       id: 'paid',
       name: 'paid',
-      color: 'succ'
-    }
+      color: 'succ',
+    },
   ];
 };

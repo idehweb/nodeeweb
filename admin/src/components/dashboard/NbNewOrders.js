@@ -5,18 +5,17 @@ import DollarIcon from '@mui/icons-material/AttachMoney';
 
 import CardWithIcon from './CardWithIcon';
 
-
 const NbNewOrders = (props) => {
-    const { value,title } = props;
-    const translate = useTranslate();
-    return (
-        <CardWithIcon
-            to="/order"
-            icon={DollarIcon}
-            title={title}
-            subtitle={value}
-        />
-    );
+  const { value, title } = props;
+  const translate = useTranslate();
+  return (
+    <CardWithIcon
+      to="/order"
+      icon={DollarIcon}
+      title={title}
+      subtitle={value}
+    />
+  );
 };
 
 export default NbNewOrders;

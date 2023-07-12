@@ -1,3 +1,5 @@
+import Swiper from 'swiper';
+
 const prefix = 'swiper-';
 const containerName = `${prefix}container`;
 const wrapperName = `${prefix}wrapper`;
@@ -6,7 +8,6 @@ const prevName = `${prefix}prev`;
 const nextName = `${prefix}next`;
 const paginationName = `${prefix}pagination`;
 const scrollbarName = `${prefix}scrollbar`;
-import Swiper from 'swiper';
 
 export default {
   containerName,
@@ -34,4 +35,4 @@ export default {
   nextId: `data-${nextName}`,
   paginationId: `data-${paginationName}`,
   scrollbarId: `data-${scrollbarName}`,
-}
+};

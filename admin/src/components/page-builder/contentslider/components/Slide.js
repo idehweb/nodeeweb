@@ -8,20 +8,22 @@ export default (dc, config = {}) => {
   const { slideName, wrapperSelector } = constants;
 
   dc.addType(slideName, {
-
-    model: defaultModel.extend({
-      defaults: {
-        ...defaultModel.prototype.defaults,
-        name: 'Slide',
-        draggable: wrapperSelector,
-        ...config.slideProps
+    model: defaultModel.extend(
+      {
+        defaults: {
+          ...defaultModel.prototype.defaults,
+          name: 'Slide',
+          draggable: wrapperSelector,
+          ...config.slideProps,
+        },
       },
-    }, {
-      isComponent(el) {
-        if (elHasClass(el, config.classSlide)) return { type: slideName };
-      },
-    }),
+      {
+        isComponent(el) {
+          if (elHasClass(el, config.classSlide)) return { type: slideName };
+        },
+      }
+    ),
 
-    view: defaultView
+    view: defaultView,
   });
-}
+};

@@ -1,7 +1,8 @@
-import notificationList from "./notificationList";
-import notificationCreate from "./notificationCreate";
-import notificationEdit from "./notificationEdit";
-import { Send,Textsms } from "@mui/icons-material";
+import { Send, Textsms } from '@mui/icons-material';
+
+import notificationList from './notificationList';
+import notificationCreate from './notificationCreate';
+import notificationEdit from './notificationEdit';
 
 const Notification = {
   list: notificationList,

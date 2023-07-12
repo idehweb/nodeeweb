@@ -11,24 +11,45 @@ import {
   TextInput,
   PasswordInput,
   BooleanInput,
-  useTranslate
+  useTranslate,
 } from 'react-admin';
+
 import { List, SimpleForm } from '@/components';
 
 export const userCreate = (props) => {
-  const translate=useTranslate();
+  const translate = useTranslate();
 
-  return(
+  return (
     <Create {...props}>
       <SimpleForm>
-        <TextInput disabled source="id" label={translate("resources.user._id")} />
-        <TextInput source="nickname" label={translate("resources.user.nickname")} />
-        <TextInput source="email" type="email" label={translate("resources.user.email")} />
-        <TextInput source="username" label={translate("resources.user.username")} />
-        <PasswordInput source="password" label={translate("resources.user.password")} />
-        <BooleanInput source="active" label={translate("resources.user.active")} />
+        <TextInput
+          disabled
+          source="id"
+          label={translate('resources.user._id')}
+        />
+        <TextInput
+          source="nickname"
+          label={translate('resources.user.nickname')}
+        />
+        <TextInput
+          source="email"
+          type="email"
+          label={translate('resources.user.email')}
+        />
+        <TextInput
+          source="username"
+          label={translate('resources.user.username')}
+        />
+        <PasswordInput
+          source="password"
+          label={translate('resources.user.password')}
+        />
+        <BooleanInput
+          source="active"
+          label={translate('resources.user.active')}
+        />
       </SimpleForm>
     </Create>
   );
-}
+};
 export default userCreate;

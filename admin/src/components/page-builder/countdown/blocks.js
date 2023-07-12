@@ -1,12 +1,11 @@
-import {
-  countdownRef
-} from './consts';
+import { countdownRef } from './consts';
 
-export default function(editor, opt = {}) {
+export default function (editor, opt = {}) {
   const c = opt;
   const bm = editor.BlockManager;
   const pfx = c.countdownClsPfx;
-  const style = c.defaultStyle ? `<style>
+  const style = c.defaultStyle
+    ? `<style>
     .${pfx} {
       text-align: center;
       font-family: Helvetica, serif;
@@ -30,17 +29,18 @@ export default function(editor, opt = {}) {
     .${pfx}-block {
       display: inline-block;
     }
-  </style>` : '';
+  </style>`
+    : '';
 
   if (c.blocks.indexOf(countdownRef) >= 0) {
     bm.add(countdownRef, {
       label: c.labelCountdown,
       category: c.labelCountdownCategory,
-      attributes: {class:'fa fa-clock-o'},
+      attributes: { class: 'fa fa-clock-o' },
       content: `
         <div class="${pfx}" data-gjs-type="countdown"></div>
         ${style}
-      `
+      `,
     });
   }
 }

@@ -1,4 +1,9 @@
-import { CHANGE_LOCALE, CHANGE_THEME, CHANGE_THEMEDATA, changeTheme } from "@/functions";
+import {
+  CHANGE_LOCALE,
+  CHANGE_THEME,
+  CHANGE_THEMEDATA,
+  changeTheme,
+} from '@/functions';
 // import { useContext} from 'react';
 // import store from 'store';
 // import { ThemeName } from '../types';
@@ -7,7 +12,7 @@ import { CHANGE_LOCALE, CHANGE_THEME, CHANGE_THEMEDATA, changeTheme } from "@/fu
 // type Action =
 // | ReturnType<typeof changeTheme>
 // | { type: 'OTHER_ACTION'; payload?: any };
-let them = (localStorage.getItem("theme"));
+let them = localStorage.getItem('theme');
 // const themeReducer = (
 //     previousState = them || 'light',
 //     action
@@ -31,9 +36,9 @@ export default function themeReducer(state = { theme: { them } }, action) {
   switch (action.type) {
     case CHANGE_THEME:
       // console.log("themeReducer",state, {theme: action.payload });
-      return (action.payload=='dark' ? 'light' : 'dark');
+      return action.payload == 'dark' ? 'light' : 'dark';
     default: {
-      console.log('here',state)
+      console.log('here', state);
       return state;
     }
   }

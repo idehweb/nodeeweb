@@ -1,8 +1,9 @@
-import customerGroupCreate from "./customerGroupCreate";
-import customerGroupEdit from "./customerGroupEdit";
-import customerGroupList from "./customerGroupList";
-import customerGroupShow from "./customerGroupShow";
-import { LibraryAdd,CategoryRounded } from "@mui/icons-material";
+import { LibraryAdd, CategoryRounded } from '@mui/icons-material';
+
+import customerGroupCreate from './customerGroupCreate';
+import customerGroupEdit from './customerGroupEdit';
+import customerGroupList from './customerGroupList';
+import customerGroupShow from './customerGroupShow';
 
 const CustomerGroup = {
   list: customerGroupList,

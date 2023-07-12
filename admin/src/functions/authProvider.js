@@ -1,4 +1,4 @@
-const url = window.ADMIN_ROUTE ;
+const url = window.ADMIN_ROUTE;
 
 export default {
   // called when the user attempts to log in
@@ -27,7 +27,6 @@ export default {
         localStorage.setItem('token', obj.user.token);
         localStorage.setItem('user_id', obj.user._id);
         return Promise.resolve();
-
       });
   },
   // called when the user clicks on the logout button

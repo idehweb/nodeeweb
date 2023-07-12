@@ -1,7 +1,5 @@
-import React from "react";
-import {
-  useTranslate
-} from 'react-admin';
+import React from 'react';
+import { useTranslate } from 'react-admin';
 
 export default () => {
   const translate = useTranslate();
@@ -14,7 +12,6 @@ export default () => {
     {
       id: 'color',
       name: translate('resources.attributes.color'),
-
-    }
+    },
   ];
 };

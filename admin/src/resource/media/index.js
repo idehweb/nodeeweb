@@ -1,6 +1,7 @@
-import mediaCreate from "./mediaCreate";
-import mediaList from "./mediaList";
-import { PermMediaRounded,AddAPhoto } from "@mui/icons-material";
+import { PermMediaRounded, AddAPhoto } from '@mui/icons-material';
+
+import mediaCreate from './mediaCreate';
+import mediaList from './mediaList';
 
 const Media = {
   list: mediaList,

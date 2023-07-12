@@ -9,25 +9,28 @@ export default (dc, config = {}) => {
   const type = prevName;
 
   dc.addType(type, {
+    model: defaultModel.extend(
+      {
+        defaults: {
+          ...defaultModel.prototype.defaults,
+          name: 'Nav Previous',
+          copyable: 0,
+          draggable: containerSelector,
+          ...config.prevProps,
+        },
 
-    model: defaultModel.extend({
-      defaults: {
-        ...defaultModel.prototype.defaults,
-        name: 'Nav Previous',
-        copyable: 0,
-        draggable: containerSelector,
-        ...config.prevProps
+        init() {
+          this.get('classes').pluck('name').indexOf(classId) < 0 &&
+            this.addClass(classId);
+        },
       },
-
-      init() {
-        this.get('classes').pluck('name').indexOf(classId) < 0 && this.addClass(classId);
+      {
+        isComponent(el) {
+          if (elHasClass(el, classId)) return { type };
+        },
       }
-    }, {
-      isComponent(el) {
-        if (elHasClass(el, classId)) return { type };
-      },
-    }),
+    ),
 
-    view: defaultType.view
+    view: defaultType.view,
   });
-}
+};

@@ -1,45 +1,50 @@
 // in LatLongInput.js
-import React from "react";
+import React from 'react';
 
-import TextField from "@mui/material/TextField";
-import AdapterJalali from "@date-io/date-fns-jalali";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { useInput } from "react-admin";
+import TextField from '@mui/material/TextField';
+import AdapterJalali from '@date-io/date-fns-jalali';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { useInput } from 'react-admin';
 
 const ReactAdminJalaliDateInput = (props) => {
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = React.useState('');
   const { onChange, onBlur, ...rest } = props;
   const {
     field,
     fieldState: { isTouched, invalid, error },
     formState: { isSubmitted },
-    isRequired
+    isRequired,
   } = useInput({
     // Pass the event handlers to the hook but not the component as the field property already has them.
     // useInput will call the provided onChange and onBlur in addition to the default needed by react-hook-form.
     onChange,
     onBlur,
-    ...props
+    ...props,
   });
 
   return (
     <LocalizationProvider dateAdapter={AdapterJalali}>
       {/*<TextField*/}
-        {/*{...field}*/}
-        {/*label={props.label}*/}
-        {/*error={(isTouched || isSubmitted) && invalid}*/}
-        {/*helperText={(isTouched || isSubmitted) && invalid ? error : ""}*/}
-        {/*required={isRequired}*/}
-        {/*{...rest}*/}
+      {/*{...field}*/}
+      {/*label={props.label}*/}
+      {/*error={(isTouched || isSubmitted) && invalid}*/}
+      {/*helperText={(isTouched || isSubmitted) && invalid ? error : ""}*/}
+      {/*required={isRequired}*/}
+      {/*{...rest}*/}
       {/*/>*/}
       <DatePicker
         mask="____/__/__"
         value={value}
         onChange={(newValue) => setValue(newValue)}
-        renderInput={(params) => <TextField onChange={(newValue) => setValue(newValue)}
-                                                    {...field} {...params} {...rest}
-        />}
+        renderInput={(params) => (
+          <TextField
+            onChange={(newValue) => setValue(newValue)}
+            {...field}
+            {...params}
+            {...rest}
+          />
+        )}
       />
     </LocalizationProvider>
   );

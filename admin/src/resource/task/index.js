@@ -1,8 +1,11 @@
-import taskCreate from "./taskCreate";
-import taskList from "./taskList";
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
-// import FolderIcon from '@mui/icons-material/Folder';
+
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
+
+import taskCreate from './taskCreate';
+import taskList from './taskList';
+// import FolderIcon from '@mui/icons-material/Folder';
+
 const Task = {
   list: taskList,
   create: taskCreate,

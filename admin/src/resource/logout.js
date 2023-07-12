@@ -12,15 +12,21 @@ import {
   CircularProgress,
   TextField,
 } from '@mui/material';
-import {  makeStyles } from '@mui/styles';
-import { createTheme} from '@mui/material/styles';
+import { makeStyles } from '@mui/styles';
+import { createTheme } from '@mui/material/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import LockIcon from '@mui/icons-material/Lock';
-import { Notification, useTranslate, useLogin,useLogout, useNotify } from 'react-admin';
+import {
+  Notification,
+  useTranslate,
+  useLogin,
+  useLogout,
+  useNotify,
+} from 'react-admin';
 
 import { lightTheme } from './../layout/themes';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   main: {
     display: 'flex',
     flexDirection: 'column',
@@ -61,10 +67,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const renderInput = ({
-                       meta: { touched, error } = { touched: false, error: undefined },
-                       input: { ...inputProps },
-                       ...props
-                     }) => (
+  meta: { touched, error } = { touched: false, error: undefined },
+  input: { ...inputProps },
+  ...props
+}) => (
   <TextField
     error={!!(touched && error)}
     helperText={touched && error}
@@ -86,7 +92,7 @@ const Logout = () => {
 
   const handleSubmit = (auth) => {
     setLoading(true);
-    logout()
+    logout();
   };
   //
   // const validate = (values) => {
@@ -113,26 +119,16 @@ const Logout = () => {
                   <LockIcon />
                 </Avatar>
               </div>
-              <div className={classes.hint}>
-                {translate('logoutMessage')}
-              </div>
-              <div className={classes.form}>
-
-              </div>
+              <div className={classes.hint}>{translate('logoutMessage')}</div>
+              <div className={classes.form}></div>
               <CardActions className={classes.actions}>
                 <Button
                   variant="contained"
                   type="submit"
                   color="primary"
                   disabled={loading}
-                  fullWidth
-                >
-                  {loading && (
-                    <CircularProgress
-                      size={25}
-                      thickness={2}
-                    />
-                  )}
+                  fullWidth>
+                  {loading && <CircularProgress size={25} thickness={2} />}
                   {translate('sign_out')}
                 </Button>
               </CardActions>

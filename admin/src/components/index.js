@@ -24,7 +24,7 @@ export { default as ShowLink } from './ShowLink';
 export { default as ShowPictures } from './ShowPictures';
 export { default as SimpleImageField } from './SimpleImageField';
 export { default as PrintOrder } from './PrintOrder';
-export { default as PrintPack } from './PrintPack'; 
+export { default as PrintPack } from './PrintPack';
 export { default as CustomResetViewsButton } from './CustomResetViewsButton';
 export { default as ToggleThemeButton } from './ToggleThemeButton';
 export { default as DollarPrice } from './DollarPrice';
