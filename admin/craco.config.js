@@ -1,6 +1,13 @@
 // @ts-check
 const path = require('path');
 
+const gitHash = require('child_process')
+  .execSync('git rev-parse HEAD')
+  .toString()
+  .trim();
+
+const now = new Date().toISOString();
+process.env.REACT_APP_VERSION = now + ', ' + gitHash;
 
 const isDev = process.env.NODE_ENV === 'development';
 
