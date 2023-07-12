@@ -13,6 +13,7 @@ import registerMedia from "./src/media";
 import registerNotification from "./src/notification";
 import registerOrder from "./src/order";
 import registerModification from "./src/modification";
+import registerPage from "./src/page";
 
 async function deployShop() {
   await deployCore();
@@ -31,6 +32,7 @@ async function deployShop() {
   registerNotification();
   registerOrder();
   registerModification();
+  registerPage();
 }
 
 deployShop();

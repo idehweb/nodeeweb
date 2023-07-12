@@ -8,5 +8,8 @@ export function submitAction(action: {
   user: any;
   title: string;
   history: any;
-  order: any;
+  order?: any;
+  data?: any;
 }) {}
+
+export function updateThemeConfig(object: any) {}
