@@ -3,10 +3,21 @@
   "version": "1.0.1",
   "private": true,
   "homepage": ".",
+  "scripts": {
+    "dev": "craco start",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "react-scripts eject",
+    "deploy": "node deploy",
+    "build:d": "yarn build && yarn deploy",
+    "anal": "export ANALYZE=true && set ANALYZE=true && yarn build"
+  },
   "dependencies": {
     "@date-io/date-fns-jalali": "^2.16.0",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
+    "@material-ui/core": "^4.12.4",
     "@mui/material": "^5.7.0",
     "@mui/styles": "^5.7.0",
     "@mui/x-data-grid": "^5.17.16",
@@ -18,113 +29,54 @@
     "chart.js": "^3.7.1",
     "date-fns": "^2.28.0",
     "date-fns-jalali": "^2.29.3-0",
-    "deep-equal": "^2.0.5",
-    "faker": "^6.6.6",
     "final-form": "^4.20.7",
-    "fs": "^0.0.1-security",
     "grapesjs": "^0.19.5",
     "grapesjs-preset-webpage": "^0.1.11",
     "immutability-helper": "^3.1.1",
     "jalali-moment": "^3.3.11",
-    "json-diff": "^0.7.4",
     "lodash": "^4.17.21",
     "notiflix": "^3.2.6",
-    "prettier": "^2.6.2",
-    "pure-react-carousel": "^1.28.1",
-    "qrcode": "^1.5.0",
     "ra-i18n-polyglot": "^4.0.3",
     "ra-input-rich-text": "^4.1.0",
     "ra-language-farsi": "^4.0.0",
-    "react": "^18.1.0",
+    "react": "^18.2.0",
     "react-admin": "^4.0.3",
-    "react-admin-color-input": "^3.0.0-beta.0",
     "react-admin-import-csv": "^4.0.0",
     "react-advance-jalaali-datepicker": "^1.4.0",
     "react-chartjs-2": "^4.1.0",
     "react-color": "^2.19.3",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
-    "react-dom": "^18.1.0",
-    "react-email-editor": "^1.6.1",
+    "react-dom": "^18.2.0",
     "react-final-form": "^6.5.9",
-    "react-input-color": "^4.0.0",
-    "react-json-view": "^1.21.3",
-    "react-page-maker": "^1.1.31",
     "react-redux": "^8.0.1",
     "react-router-dom": "^6.3.0",
-    "react-router-redux": "^4.0.8",
     "react-scripts": "^5.0.1",
     "react-select": "^5.3.2",
-    "reactstrap": "^9.1.1",
     "recharts": "^2.1.9",
     "redux": "^4.2.0",
-    "redux-devtools-extension": "^2.13.9",
-    "redux-form": "^8.3.9",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.1",
     "shards-react": "^1.0.3",
-    "swiper": "^8.3.2",
-    "typescript": "^4.6.4"
+    "swiper": "^8.3.2"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@craco/craco": "^6.4.3",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "dotenv": "^16.0.1",
-    "eslint": "^8.15.0",
+    "duplicate-package-checker-webpack-plugin": "^3.0.0",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-react": "^7.29.4",
-    "ftp-deploy": "^2.4.2"
-  },
-  "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
-    "eject": "react-scripts eject",
-    "deploy": "node deploy",
-    "build:d": "yarn build && yarn deploy"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "prettier"
-    ],
-    "root": true,
-    "env": {
-      "node": true,
-      "es6": true
-    },
-    "plugins": [
-      "prettier",
-      "react"
-    ],
-    "rules": {
-      "import/no-anonymous-default-export": 0,
-      "prettier/prettier": 0,
-      "comma-dangle": [
-        "error",
-        {
-          "arrays": "always-multiline",
-          "objects": "always-multiline",
-          "imports": "always-multiline",
-          "exports": "always-multiline",
-          "functions": "never"
-        }
-      ]
-    }
+    "ftp-deploy": "^2.4.4",
+    "prettier": "^2.8.8",
+    "typescript": "^5.1.6",
+    "webpack-bundle-analyzer": "^4.9.0"
   },
   "imports": {
     "#json/*": "./*.json",
     "#assets/*": "./src/assets/*",
     "#c/*": "./src/*.js"
-  },
-  "prettier": {
-    "bracketSpacing": true,
-    "singleQuote": true,
-    "jsxBracketSameLine": true,
-    "trailingComma": "es5",
-    "printWidth": 80,
-    "semi": true
   },
   "browserslist": [
     ">0.2%",
