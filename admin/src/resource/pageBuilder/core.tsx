@@ -42,7 +42,6 @@ const Core = (props) => {
 
   const [tabValue, setTabValue] = useState(0);
 
-  const [c, setC] = useState(0);
   const [data, setData] = useState<any>({});
 
   const [state, setState] = useState({
@@ -72,9 +71,7 @@ const Core = (props) => {
     GetBuilder(model, _id).then((r) => {
       if (r) setData(r);
       if (r && r.elements) {
-        setC(r.elements.length);
         setState((s) => ({ ...s, components: r.elements }));
-        return r.elements;
       }
     });
   }, [_id, model, dispatch]);
@@ -285,7 +282,6 @@ const Core = (props) => {
 
       if (mainAddress[0] === 'new') {
         theNewComponents.push({ ...element, id: 'component_' + generateID() });
-        setC((p) => p + 1);
         setState((s) => ({ ...s, components: theNewComponents, ...extra }));
       } else {
         console.log('addToComponentaddToComponent: ', theNewComponents);
