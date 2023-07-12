@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { Button, Col, Container, Row } from 'shards-react';
 import { useSelector } from 'react-redux';
-import { changeThemeData, MainUrl, uploadMedia } from '@/functions/index';
+
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import SaveIcon from '@mui/icons-material/Save';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+
+import { changeThemeData, MainUrl, uploadMedia } from '@/functions/index';
 import {
   EveryFields,
   FieldArray,

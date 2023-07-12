@@ -1,6 +1,7 @@
 import React from 'react';
 import { LinearProgress } from '@mui/material';
 import { FileField, FileInput, useInput } from 'react-admin';
+
 import { API, BASE_URL } from '@/functions/API';
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';

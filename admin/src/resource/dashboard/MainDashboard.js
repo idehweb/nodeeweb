@@ -1,4 +1,3 @@
-import Welcome from '#c/components/dashboard/Welcome';
 import React, { useState } from 'react';
 import {
   Chart as ChartJS,
@@ -10,6 +9,8 @@ import {
   Tooltip,
 } from 'chart.js';
 import { useDataProvider, useTranslate } from 'react-admin';
+
+import Welcome from '#c/components/dashboard/Welcome';
 import { BASE_URL } from '#c/functions/API';
 import CustomerChart from '#c/components/dashboard/CustomerChart';
 import ProductOrdersTable from '#c/components/dashboard/ProductOrdersTable';

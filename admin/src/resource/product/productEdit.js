@@ -5,9 +5,12 @@ import {
   useEditController,
 } from 'react-admin';
 import CardActions from '@mui/material/CardActions';
-import Form from './productForm';
+
 import { TextInput, useTranslate } from 'react-admin';
+
 import TelegramPushPostButton from '@/components/TelegramPushPostButton';
+
+import Form from './productForm';
 
 const PostEditActions = ({ basePath, data, resource }) => (
   <CardActions>

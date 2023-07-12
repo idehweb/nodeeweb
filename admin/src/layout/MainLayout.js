@@ -1,9 +1,11 @@
 // import * as React from 'react';
 // import {useSelector} from 'react-redux';
 import { Layout, LayoutProps, useTranslate } from 'react-admin';
+
+import { ReactQueryDevtools } from 'react-query/devtools';
+
 import AppBar from './AppBar';
 import Menu from './Menu';
-import { ReactQueryDevtools } from 'react-query/devtools';
 
 // import {darkTheme, lightTheme} from './themes';
 // // import {AppState} from '../types';

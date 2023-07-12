@@ -7,6 +7,8 @@ import {
   AutocompleteInput,
 } from 'react-admin';
 
+import { RichTextInput } from 'ra-input-rich-text';
+
 import {
   CustomFileField,
   GridList,
@@ -15,7 +17,6 @@ import {
   UploaderField,
 } from '@/components';
 
-import { RichTextInput } from 'ra-input-rich-text';
 import { Val } from '@/Utils';
 
 const create = (props) => {

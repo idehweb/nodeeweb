@@ -11,9 +11,10 @@ import {
   useTranslate,
 } from 'react-admin';
 
+import React from 'react';
+
 import { dateFormat } from '@/functions';
 import { List } from '@/components';
-import React from 'react';
 
 const PostPagination = (props) => (
   <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />

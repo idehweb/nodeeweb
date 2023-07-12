@@ -2,9 +2,9 @@ import * as React from 'react';
 import { useState } from 'react';
 // import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import API, { BASE_URL } from '@/functions/API';
-import { ColorPicker, ShowImageField } from '@/components';
+
 import { Box, Card, CardActions, CircularProgress } from '@mui/material';
+
 import {
   useRefresh,
   Form,
@@ -17,6 +17,9 @@ import {
   SelectInput,
   ReferenceInput,
 } from 'react-admin';
+
+import API, { BASE_URL } from '@/functions/API';
+import { ColorPicker, ShowImageField } from '@/components';
 // import {  } from 'react-hook-form';
 const Configuration = (props) => {
   const refresh = useRefresh();

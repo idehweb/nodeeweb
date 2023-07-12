@@ -1,3 +1,5 @@
+import { useTranslate } from 'react-admin';
+
 import FieldObject from './FieldObject';
 import FieldArray from './FieldArray';
 import FieldBoolean from './FieldBoolean';
@@ -16,6 +18,7 @@ import FieldUploadMedia from './FieldUploadMedia';
 import FieldUploadDocument from './FieldUploadDocument';
 import ConditionRow from './ConditionRow';
 import ChatBase from './ChatBase';
+
 
 export {
   FieldObject,
@@ -37,8 +40,6 @@ export {
   ChatBase,
   ConditionRow,
 };
-
-import { useTranslate } from 'react-admin';
 
 export const getField = (type) => {
   switch (type) {

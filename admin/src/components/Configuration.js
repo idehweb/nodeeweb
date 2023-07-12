@@ -5,10 +5,12 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import { useLocale, useSetLocale, useTranslate } from 'react-admin';
+
 // import {AppState} from '../types';
+import LanguageIcon from '@mui/icons-material/Language';
+
 import { DollarPrice } from '@/components';
 import { changeLocale } from '@/functions';
-import LanguageIcon from '@mui/icons-material/Language';
 //
 // const useStyles = makeStyles({
 //     label: {width: '10em', display: 'inline-block'},

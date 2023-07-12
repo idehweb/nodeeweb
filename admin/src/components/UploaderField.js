@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { LinearProgress } from '@mui/material';
 import { ImageField, ImageInput, useInput } from 'react-admin';
+
+import { useWatch } from 'react-hook-form';
+
 import API, { BASE_URL } from '@/functions/API';
 import { TheImages, showFiles } from '@/components';
-import { useWatch } from 'react-hook-form';
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 

@@ -1,5 +1,6 @@
-import constants from '../constants';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
+
+import constants from '../constants';
 
 export default (domComponents, config = {}) => {
   const defaultType = domComponents.getType('default');

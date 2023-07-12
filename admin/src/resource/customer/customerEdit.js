@@ -9,9 +9,10 @@ import {
   TextInput,
 } from 'react-admin';
 
+import { useTranslate } from 'react-admin/dist/index';
+
 import { dateFormat } from '@/functions';
 import { List, ReactAdminJalaliDateInput, SimpleForm } from '@/components';
-import { useTranslate } from 'react-admin/dist/index';
 
 const validateUserCreation = (values) => {
   const errors = {};

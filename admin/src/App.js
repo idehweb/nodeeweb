@@ -1,20 +1,30 @@
 import React, { useEffect } from 'react';
 
 import { Admin, CustomRoutes, Resource, useTranslate } from 'react-admin';
+
+import { Route } from 'react-router-dom';
+
+import { useDispatch, useSelector } from 'react-redux';
+
+import polyglotI18nProvider from 'ra-i18n-polyglot';
+
 import resources from '@/resource';
 import { authProvider, dataProvider, theme } from '@/functions';
 import englishMessages from '@/i18n/en';
 import farsiMessages from '@/i18n/fa';
+
+import Types from '@/functions/types';
+
 import themeDataReducer from './themeDataReducer';
 import themeReducer from './themeReducer';
 import languageReducer from './languageReducer';
-import Types from '@/functions/types';
 
-import { Route } from 'react-router-dom';
 import Login from './layout/Login';
-import { useDispatch, useSelector } from 'react-redux';
+
+
 import { changeThemeData, changeThemeDataFunc } from './functions/index';
-import polyglotI18nProvider from 'ra-i18n-polyglot';
+
+
 import '@/assets/global.css';
 import { MainLayout } from './layout';
 import '@/assets/rtl.css';

@@ -1,4 +1,11 @@
 import React, { useEffect, useState } from 'react';
+
+import Xarrow, { useXarrow, Xwrapper } from 'react-xarrows';
+
+import Draggable from 'react-draggable'; // Both at the same time
+
+import { withTranslation } from 'react-i18next';
+
 import {
   eid,
   slide1Img,
@@ -16,7 +23,6 @@ import {
   slideOffer8Img,
   valentineDays,
 } from '#c/assets/index';
-import Xarrow, { useXarrow, Xwrapper } from 'react-xarrows';
 import {
   enableAdmin,
   enableAgent,
@@ -34,8 +40,7 @@ import {
 } from '#c/functions/index';
 import { ProductsSliderServer } from '#c/components/components-overview/ProductsSlider';
 import { PostSliderServer } from '#c/components/components-overview/PostSlider';
-import Draggable from 'react-draggable'; // Both at the same time
-import { withTranslation } from 'react-i18next';
+
 
 const boxStyle = {
   border: 'grey solid 2px',

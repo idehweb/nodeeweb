@@ -10,6 +10,11 @@ import {
   useRedirect,
   useTranslate,
 } from 'react-admin';
+
+import React from 'react';
+
+import { RichTextInput } from 'ra-input-rich-text';
+
 import API from '@/functions/API';
 import { dateFormat } from '@/functions';
 import {
@@ -31,8 +36,6 @@ import {
   UploaderField,
 } from '@/components';
 import { Val } from '@/Utils';
-import React from 'react';
-import { RichTextInput } from 'ra-input-rich-text';
 
 // import { RichTextInput } from 'ra-input-rich-text';
 // import {ImportButton} from "react-admin-import-csv";

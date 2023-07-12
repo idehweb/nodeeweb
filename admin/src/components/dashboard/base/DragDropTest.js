@@ -2,7 +2,9 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import update from 'immutability-helper';
 import { useCallback, useState } from 'react';
+
 import { Card } from './Card.js';
+
 const DragDropTest = () => {
   const [cards, setCards] = useState([
     {

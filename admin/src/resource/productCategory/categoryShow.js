@@ -39,13 +39,18 @@ import { Loading } from 'notiflix/build/notiflix-loading-aio';
 import React, { Fragment, useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { CategoryRounded as Icon, LibraryAdd } from '@mui/icons-material';
+
+import { Chip } from '@mui/material';
+
+import Checkbox from '@mui/material/Checkbox';
+
 import { CustomResetViewsButton, List, SimpleForm } from '@/components';
 import useStyles from '@/styles';
-import { ChangesForm } from './changesForm';
+
 import { Val } from '@/Utils';
 import API, { BASE_URL } from '@/functions/API';
-import { Chip } from '@mui/material';
-import Checkbox from '@mui/material/Checkbox';
+
+import { ChangesForm } from './changesForm';
 
 export const categoryShow = (props) => {
   const translate = useTranslate();

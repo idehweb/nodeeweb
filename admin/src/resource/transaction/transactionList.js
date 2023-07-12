@@ -12,6 +12,8 @@ import {
   useTranslate,
 } from 'react-admin';
 
+import { useSelector } from 'react-redux';
+
 import { dateFormat } from '@/functions';
 import {
   List,
@@ -19,7 +21,6 @@ import {
   PaymentStatus,
   TransactionPaymentStatusField,
 } from '@/components';
-import { useSelector } from 'react-redux';
 // import Transactions from "../../../../main/src/client/views/Transactions";
 
 export const transactionList = (props) => {
@@ -76,7 +77,7 @@ export const transactionList = (props) => {
               <div className="theDate">
                 <a
                   href={'/admin/#/order/' + record.order._id}
-                  target={'_blank'}>
+                  target={'_blank'} rel="noreferrer">
                   {record.order.orderNumber ? record.order.orderNumber : ''}
                 </a>
               </div>

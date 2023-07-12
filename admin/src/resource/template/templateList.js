@@ -10,8 +10,13 @@ import {
   useTranslate,
 } from 'react-admin';
 
-import API, { BASE_URL } from '@/functions/API';
-import { dateFormat } from '@/functions';
+import { Button } from '@mui/material';
+
+import React from 'react';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import NoteAltIcon from '@mui/icons-material/NoteAlt';
+
 import {
   CatRefField,
   EditOptions,
@@ -26,12 +31,8 @@ import {
   SimpleImageField,
   UploaderField,
 } from '@/components';
-import { Button } from '@mui/material';
-
-import React from 'react';
-import PendingActionsIcon from '@mui/icons-material/PendingActions';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import NoteAltIcon from '@mui/icons-material/NoteAlt';
+import { dateFormat } from '@/functions';
+import API, { BASE_URL } from '@/functions/API';
 
 const PostPagination = (props) => (
   <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />
@@ -107,7 +108,7 @@ const list = (props) => {
                 {/*+"?token="+localStorage.getItem('token')*/}
                 <a
                   target={'_blank'}
-                  href={'/admin/#/builder' + '/template/' + record._id}>
+                  href={'/admin/#/builder' + '/template/' + record._id} rel="noreferrer">
                   <NoteAltIcon />
                   <span className={'ml-2 mr-2'}>
                     {translate('resources.page.pagebuilder')}
@@ -149,7 +150,7 @@ const list = (props) => {
                   target={'_blank'}
                   color="primary"
                   size="small"
-                  onClick={() => {}}>
+                  onClick={() => {}} rel="noreferrer">
                   <PendingActionsIcon />
                   <span className={'ml-2 mr-2'}>
                     {translate('resources.product.activities')}

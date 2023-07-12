@@ -9,6 +9,11 @@ import {
   useRecordContext,
   useTranslate,
 } from 'react-admin';
+
+import { makeStyles } from '@mui/styles';
+
+import React from 'react';
+
 import API, { BASE_URL } from '@/functions/API';
 import { dateFormat } from '@/functions';
 import {
@@ -25,11 +30,10 @@ import {
   SimpleImageField,
   UploaderField,
 } from '@/components';
-import { makeStyles } from '@mui/styles';
 import { Val } from '@/Utils';
+
 import Form from './pageForm';
 
-import React from 'react';
 
 const create = (props) => (
   <Create {...props}>

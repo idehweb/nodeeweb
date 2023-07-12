@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
+
 // import MuiGridList from '@mui/material/GridList';
 // import GridListTile from '@mui/material/GridListTile';
 // import GridListTileBar from '@mui/material/GridListTileBar';
 // import withWidth, { WithWidth } from '@mui/material/withWidth';
-import { ShopURL } from '@/functions/API';
-import { dateFormat } from '@/functions';
 import { useDataProvider, useTranslate } from 'react-admin';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -19,6 +18,9 @@ import { useSelector } from 'react-redux';
 import IconButton from '@mui/material/IconButton';
 
 import AddTaskIcon from '@mui/icons-material/AddTask';
+
+import { dateFormat } from '@/functions';
+import { ShopURL } from '@/functions/API';
 
 const Tasks = (props) => {
   const { record } = props;

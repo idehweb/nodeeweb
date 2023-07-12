@@ -1,5 +1,6 @@
 import React from 'react';
 import { TextField, useRecordContext, useTranslate } from 'react-admin';
+
 import API from '@/functions/API';
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
@@ -13,7 +14,7 @@ export default ({ base = 'product', theSource = 'title' }) => {
       {record.path && record.slug && (
         <a
           target={'_blank'}
-          href={window.BASE_URL + (base ? base + '' : '') + record.path + '/'}>
+          href={window.BASE_URL + (base ? base + '' : '') + record.path + '/'} rel="noreferrer">
           <TextField
             source={theSource + '.' + translate('lan')}
             label={translate('pos.' + theSource)}
@@ -24,7 +25,7 @@ export default ({ base = 'product', theSource = 'title' }) => {
       {!record.path && record.slug && (
         <a
           target={'_blank'}
-          href={window.SHOP_URL + (base ? base + '/' : '') + record.slug + '/'}>
+          href={window.SHOP_URL + (base ? base + '/' : '') + record.slug + '/'} rel="noreferrer">
           <TextField
             source={theSource + '.' + translate('lan')}
             label={translate('pos.' + theSource)}

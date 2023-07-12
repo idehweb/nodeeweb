@@ -1,6 +1,7 @@
+import Swiper from 'swiper';
+
 import constants from '../constants';
 import { elHasClass } from '../utils';
-import Swiper from 'swiper';
 
 export default (dc, config = {}) => {
   const defaultType = dc.getType('default');

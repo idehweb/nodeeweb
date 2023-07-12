@@ -21,13 +21,18 @@ import {
   useTranslate,
 } from 'react-admin';
 import { ImportButton } from 'react-admin-import-csv';
-import ProductRewriteButton from '@/components/ProductRewriteButton';
+
 
 import jsonExport from 'jsonexport/dist';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
-import API, { BASE_URL } from '@/functions/API';
-import { dateFormat } from '@/functions';
+
+import { Button, Chip, Divider, Tab, Tabs } from '@mui/material';
+import { useSelector } from 'react-redux';
+
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import { makeStyles } from '@mui/styles/index';
+
 import {
   CatRefField,
   EditOptions,
@@ -42,11 +47,9 @@ import {
   SimpleImageField,
   UploaderField,
 } from '@/components';
-import { Button, Chip, Divider, Tab, Tabs } from '@mui/material';
-import { useSelector } from 'react-redux';
-
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
-import { makeStyles } from '@mui/styles/index';
+import { dateFormat } from '@/functions';
+import API, { BASE_URL } from '@/functions/API';
+import ProductRewriteButton from '@/components/ProductRewriteButton';
 
 const PostPagination = (props) => (
   <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />
@@ -630,7 +633,7 @@ const TabbedDatagrid = (props) => {
                       target={'_blank'}
                       color="primary"
                       size="small"
-                      onClick={() => {}}>
+                      onClick={() => {}} rel="noreferrer">
                       <PendingActionsIcon />
                       <span className={'ml-2 mr-2'}>
                         {translate('resources.product.activities')}
@@ -747,7 +750,7 @@ const list = (props) => {
                             {/*+"?token="+localStorage.getItem('token')*/}
                             <a
                               target={'_blank'}
-                              href={'/admin/#/builder' + '/page/' + record._id}>
+                              href={'/admin/#/builder' + '/page/' + record._id} rel="noreferrer">
                               <NoteAltIcon />
                               <span className={'ml-2 mr-2'}>
                                 {translate('resources.page.pagebuilder')}
@@ -796,7 +799,7 @@ const list = (props) => {
                               target={'_blank'}
                               color="primary"
                               size="small"
-                              onClick={() => {}}>
+                              onClick={() => {}} rel="noreferrer">
                               <PendingActionsIcon />
                               <span className={'ml-2 mr-2'}>
                                 {translate('resources.page.activities')}

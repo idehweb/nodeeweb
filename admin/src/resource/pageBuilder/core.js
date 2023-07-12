@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
+
 import { dFormat } from './../../functions/utils';
+
 import { Button } from 'shards-react';
 import { useParams } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import { useDispatch } from 'react-redux';
-import OptionBox from './../../components/page-builder/OptionBox';
-import Component from './../../components/page-builder/Component';
+
 // import ComponentOptionBox from "#c/components/page-builder/ComponentOptionBox";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.rtl.min.css';
@@ -22,6 +23,9 @@ import {
   useNotify,
   useTranslate,
 } from 'react-admin';
+
+import Component from './../../components/page-builder/Component';
+import OptionBox from './../../components/page-builder/OptionBox';
 import {
   addBookmark,
   changeThemeData,

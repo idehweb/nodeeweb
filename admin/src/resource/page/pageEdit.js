@@ -1,4 +1,9 @@
 import { Edit, useForm, useTranslate } from 'react-admin';
+
+import React from 'react';
+
+import { useEditController, TextInput } from 'react-admin';
+
 import { BASE_URL } from '@/functions/API';
 import { dateFormat } from '@/functions';
 import {
@@ -16,9 +21,9 @@ import {
   UploaderField,
 } from '@/components';
 import { Val } from '@/Utils';
-import React from 'react';
+
 import Form from './pageForm';
-import { useEditController, TextInput } from 'react-admin';
+
 
 export const pageEdit = (props) => {
   console.log('props', props);

@@ -1,5 +1,8 @@
 // import {SimpleForm} from 'react-admin';
 import React, { useEffect } from 'react';
+
+import { useSelector } from 'react-redux';
+
 import IRANSansWeb_font_eot from '../assets/fonts/eot/IRANSansWeb.eot';
 import IRANSansWeb_font_woff2 from '../assets/fonts/woff2/IRANSansWeb.woff2';
 import IRANSansWeb_font_woff from '../assets/fonts/woff/IRANSansWeb.woff';
@@ -7,7 +10,6 @@ import IRANSansWeb_font_ttf from '../assets/fonts/ttf/IRANSansWeb.ttf';
 // export const logo = require('../assets/img/logo.svg');
 import { dateFormat } from '@/functions';
 import API, { BASE_URL } from '@/functions/API';
-import { useSelector } from 'react-redux';
 
 export default (props) => {
   // console.clear();

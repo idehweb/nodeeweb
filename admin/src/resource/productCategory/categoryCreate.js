@@ -7,6 +7,7 @@ import {
   useRedirect,
 } from 'react-admin';
 import React from 'react';
+
 import { CustomResetViewsButton, List, SimpleForm } from '@/components';
 import useStyles from '@/styles';
 import { Val } from '@/Utils';

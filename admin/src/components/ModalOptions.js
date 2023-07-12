@@ -8,7 +8,9 @@ import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import { CloseRounded } from '@mui/icons-material';
+
 import Tooltip from '@/components/Tooltip';
+
 const style = {
   position: 'absolute',
   top: '50%',

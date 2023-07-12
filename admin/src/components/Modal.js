@@ -4,8 +4,10 @@ import { Modal, Card, Slide } from '@mui/material';
 
 import { makeStyles } from '@mui/styles';
 import { CloseRounded } from '@mui/icons-material';
-import Tooltip from '@/components/Tooltip';
+
 import clsx from 'clsx';
+
+import Tooltip from '@/components/Tooltip';
 // import { withTranslation } from 'react-i18next';
 const Row = ({ children }) => {
   return <div>{children}</div>;

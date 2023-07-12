@@ -9,8 +9,11 @@ import {
   Pagination,
   downloadCSV,
 } from 'react-admin';
-import { List, SimpleForm } from '@/components';
+
 import jsonExport from 'jsonexport/dist';
+
+import { List, SimpleForm } from '@/components';
+
 const PostPagination = (props) => (
   <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />
 );

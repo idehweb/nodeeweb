@@ -1,6 +1,8 @@
 import { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+
 import { ItemTypes } from './ItemTypes.js';
+
 const style = {
   border: '1px dashed gray',
   padding: '0.5rem 1rem',

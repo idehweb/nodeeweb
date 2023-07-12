@@ -2,8 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 // import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import API, { BASE_URL } from '@/functions/API';
-import { ColorPicker, ShowImageField } from '@/components';
+
 import { Box, Button, Card, Tab, Tabs } from '@mui/material';
 import DoNotDisturbOnIcon from '@mui/icons-material/DoNotDisturbOn';
 import { useNotify, useRefresh, useTranslate } from 'react-admin';
@@ -11,6 +10,9 @@ import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import TuneIcon from '@mui/icons-material/Tune';
+
+import { ColorPicker, ShowImageField } from '@/components';
+import API, { BASE_URL } from '@/functions/API';
 // import {  } from 'react-hook-form';
 const Plugins = (props) => {
   const totals = 0;

@@ -38,14 +38,18 @@ import { Block } from 'notiflix/build/notiflix-block-aio';
 import React, { Fragment, useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { CategoryRounded as Icon, LibraryAdd } from '@mui/icons-material';
+
+import { Chip } from '@mui/material';
+
+import LinearProgress, {
+  LinearProgressProps,
+} from '@mui/material/LinearProgress';
+
 import { CustomResetViewsButton, List, SimpleForm } from '@/components';
 import useStyles from '@/styles';
 import { Val } from '@/Utils';
 import API, { BASE_URL } from '@/functions/API';
-import { Chip } from '@mui/material';
-import LinearProgress, {
-  LinearProgressProps,
-} from '@mui/material/LinearProgress';
+
 export const ChangesForm = (props) => {
   const [pro, setPro] = useState('');
   const [progress, setProgress] = useState(0);

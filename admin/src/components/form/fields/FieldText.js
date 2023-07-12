@@ -1,8 +1,10 @@
 import React, { memo, useState } from 'react';
 import { Field } from 'react-final-form';
 import { Col } from 'shards-react';
-import { MainUrl, uploadMedia } from '@/functions/index';
+
 import { useTranslate } from 'react-admin';
+
+import { MainUrl, uploadMedia } from '@/functions/index';
 
 function FieldText({ field }) {
   const t = useTranslate();

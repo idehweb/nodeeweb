@@ -3,6 +3,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { makeStyles } from '@mui/styles';
 import { FieldProps } from 'react-admin';
+
 import { Product } from '../types';
 
 const useStyles = makeStyles({

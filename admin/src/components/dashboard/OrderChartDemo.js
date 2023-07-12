@@ -14,8 +14,10 @@ import {
 } from 'recharts';
 import { subDays } from 'date-fns';
 import { useSelector } from 'react-redux';
-import { dateFormat, dateFormatter, getDays, jToM } from '@/functions';
+
 import { Block } from 'notiflix/build/notiflix-block-aio';
+
+import { dateFormat, dateFormatter, getDays, jToM } from '@/functions';
 import OrderDateChartFilters from '#c/components/dashboard/OrderDateChartFilters';
 import API from '#c/functions/API';
 

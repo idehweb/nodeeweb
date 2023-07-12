@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+
 import themeReducer from './themeReducer';
 import themeDataReducer from './themeDataReducer';
 

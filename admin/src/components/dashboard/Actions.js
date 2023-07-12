@@ -5,10 +5,12 @@ import FormatListNumberedRtlIcon from '@mui/icons-material/FormatListNumberedRtl
 import { Link } from 'react-router-dom';
 import { useGetList, useTranslate } from 'react-admin';
 import { subDays } from 'date-fns';
+
 import { dateFormat } from '@/functions';
 
-import CardWithIcon from './CardWithIcon';
 import { Customer } from '@/functions/types';
+
+import CardWithIcon from './CardWithIcon';
 
 const Actions = (props) => {
   const translate = useTranslate();

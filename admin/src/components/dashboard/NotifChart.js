@@ -24,10 +24,11 @@ import {
 import { Card, CardContent, CardHeader } from '@mui/material';
 import { addDays, format, subDays } from 'date-fns';
 
+import { dateFormat } from '@/functions';
+
 import CardWithIcon from './CardWithIcon';
 // import {Customer} from '../types';
 
-import { dateFormat } from '@/functions';
 
 const lastDay = new Date();
 const lastMonthDays = Array.from({ length: 30 }, (_, i) => subDays(lastDay, i));

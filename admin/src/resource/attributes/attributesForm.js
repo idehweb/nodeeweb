@@ -12,6 +12,7 @@ import {
   FormDataConsumer,
 } from 'react-admin';
 import { Divider } from '@mui/material';
+
 import { AttrType, List, SimpleForm, UploaderField } from '@/components';
 import useStyles from '@/styles';
 import { Val } from '@/Utils';

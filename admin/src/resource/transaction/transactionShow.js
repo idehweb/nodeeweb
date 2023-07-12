@@ -12,9 +12,10 @@ import {
   useTranslate,
 } from 'react-admin';
 
+import { MonetizationOn } from '@mui/icons-material';
+
 import { dateFormat } from '@/functions';
 import { List, StatusField, PaymentStatus } from '@/components';
-import { MonetizationOn } from '@mui/icons-material';
 
 export const transactionShow = (props) => (
   <Show {...props}>

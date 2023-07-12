@@ -5,6 +5,7 @@ import {
   EditButton,
   useTranslate,
 } from 'react-admin';
+
 import {
   CatRefField,
   DeliverySchedule,

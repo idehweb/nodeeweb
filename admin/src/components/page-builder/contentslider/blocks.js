@@ -1,5 +1,6 @@
-import constants from './constants';
 import Swiper from 'swiper';
+
+import constants from './constants';
 
 export default (editor, config = {}) => {
   const bm = editor.BlockManager;

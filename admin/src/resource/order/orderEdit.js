@@ -14,6 +14,13 @@ import { Box, Chip } from '@mui/material';
 
 import Button from '@mui/material/Button';
 import { HelpRounded } from '@mui/icons-material';
+
+import CardActions from '@mui/material/CardActions';
+
+import React from 'react';
+
+import { useEditController } from 'react-admin/dist/index';
+
 import {
   List,
   OrderPaymentStatus,
@@ -25,11 +32,8 @@ import {
 } from '@/components';
 import { dateFormat } from '@/functions';
 import { BASE_URL } from '@/functions/API';
-import CardActions from '@mui/material/CardActions';
 import TransactionCreate from '@/components/TransactionCreate';
 
-import React from 'react';
-import { useEditController } from 'react-admin/dist/index';
 
 export const orderEdit = (props) => {
   console.log('props', props);
@@ -98,7 +102,7 @@ export const orderEdit = (props) => {
                     return (
                       <a
                         target={'_blank'}
-                        href={'/#/product/' + link + '/show'}>
+                        href={'/#/product/' + link + '/show'} rel="noreferrer">
                         {record.title &&
                           (record.title.fa ? record.title.fa : record.title)}
                       </a>

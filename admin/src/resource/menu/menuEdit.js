@@ -25,11 +25,14 @@ import {
 import React, { Fragment } from 'react';
 import { useParams } from 'react-router';
 import { CategoryRounded as Icon, LibraryAdd } from '@mui/icons-material';
+
+import { Chip } from '@mui/material';
+
 import { CustomResetViewsButton, List, SimpleForm } from '@/components';
 import useStyles from '@/styles';
 import { Val } from '@/Utils';
 import API, { BASE_URL } from '@/functions/API';
-import { Chip } from '@mui/material';
+
 import Form from './menuForm';
 
 const edit = (props) => (

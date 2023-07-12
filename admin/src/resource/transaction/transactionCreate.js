@@ -7,6 +7,9 @@ import {
   ReferenceInput,
   AutocompleteInput,
 } from 'react-admin';
+
+import React, { useState } from 'react';
+
 import {
   AddProductsField,
   List,
@@ -18,7 +21,6 @@ import {
 } from '@/components';
 import { dateFormat } from '@/functions';
 import API, { BASE_URL } from '@/functions/API';
-import React, { useState } from 'react';
 // import { useTranslate } from "react-admin/dist/index";
 
 const Form = ({ children, ...props }) => {

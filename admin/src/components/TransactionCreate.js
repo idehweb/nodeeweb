@@ -2,8 +2,10 @@
 import React from 'react';
 import { Button } from '@mui/material';
 import axios from 'axios/index';
-import { BASE_URL } from '@/functions/API';
+
 import { useTranslate } from 'react-admin';
+
+import { BASE_URL } from '@/functions/API';
 
 export default (props) => {
   let { record } = props;

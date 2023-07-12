@@ -14,12 +14,15 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { makeStyles } from '@mui/styles';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Configuration, ToggleConfigButton } from '@/components';
-import { restartSystem, upgradeSystem } from '@/functions/index';
+
 import { createTheme } from '@mui/material';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+
+import { restartSystem, upgradeSystem } from '@/functions/index';
+import { Configuration, ToggleConfigButton } from '@/components';
+
 const useStyles = makeStyles({
   title: {
     flex: 1,

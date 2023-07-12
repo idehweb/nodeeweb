@@ -14,6 +14,11 @@ import {
   NumberInput,
   useTranslate,
 } from 'react-admin';
+
+import { SettingsApplications as Icon } from '@mui/icons-material';
+
+import { useNotify } from 'react-admin';
+
 import {
   CatRefField,
   DeliverySchedule,
@@ -23,10 +28,9 @@ import {
   SimpleForm,
 } from '@/components';
 import API from '@/functions/API';
-import { SettingsApplications as Icon } from '@mui/icons-material';
 import { Val } from '@/Utils';
 import useStyles from '@/styles';
-import { useNotify } from 'react-admin';
+
 
 const typeChoices3 = [
   {

@@ -7,8 +7,7 @@ import {
   useTranslate,
 } from 'react-admin';
 import { Dashboard, MoreHoriz } from '@mui/icons-material';
-import SubMenu from './SubMenu';
-import resources from '@/resource/index';
+
 import { useSelector } from 'react-redux';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import AddReactionIcon from '@mui/icons-material/AddReaction';
@@ -18,6 +17,10 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import SettingsInputHdmiIcon from '@mui/icons-material/SettingsInputHdmi';
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
+
+import resources from '@/resource/index';
+
+import SubMenu from './SubMenu';
 
 const {
   Automation,

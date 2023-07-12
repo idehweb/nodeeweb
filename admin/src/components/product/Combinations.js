@@ -1,5 +1,5 @@
 import React from 'react';
-import { numberWithCommas } from '@/functions';
+
 import {
   ArrayInput,
   FormDataConsumer,
@@ -9,6 +9,10 @@ import {
   TextInput,
   useTranslate,
 } from 'react-admin';
+
+import { useFormContext, useWatch } from 'react-hook-form';
+
+import { numberWithCommas } from '@/functions';
 import {
   CatRefField,
   FileChips,
@@ -24,8 +28,8 @@ import {
   StockStatus,
   UploaderField,
 } from '@/components';
+
 // API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
-import { useFormContext, useWatch } from 'react-hook-form';
 
 export default (props) => {
   let { record, counter, updater, theST } = props;

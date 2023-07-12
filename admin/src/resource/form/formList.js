@@ -14,8 +14,12 @@ import {
   DateField,
 } from 'react-admin';
 
-import API, { BASE_URL } from '@/functions/API';
-import { dateFormat } from '@/functions';
+import { Button } from '@mui/material';
+import jsonExport from 'jsonexport/dist';
+import React from 'react';
+import moment from 'jalali-moment';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+
 import {
   CatRefField,
   EditOptions,
@@ -31,11 +35,8 @@ import {
   SimpleImageField,
   UploaderField,
 } from '@/components';
-import { Button } from '@mui/material';
-import jsonExport from 'jsonexport/dist';
-import React from 'react';
-import moment from 'jalali-moment';
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import { dateFormat } from '@/functions';
+import API, { BASE_URL } from '@/functions/API';
 
 const PostPagination = (props) => (
   <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />
@@ -186,7 +187,7 @@ const list = (props) => {
                 {/*+"?token="+localStorage.getItem('token')*/}
                 <a
                   target={'_blank'}
-                  href={'/admin/#/builder' + '/form/' + record._id}>
+                  href={'/admin/#/builder' + '/form/' + record._id} rel="noreferrer">
                   {translate('resources.form.pagebuilder')}
                 </a>
               </div>

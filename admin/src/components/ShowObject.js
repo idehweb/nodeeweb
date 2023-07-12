@@ -1,4 +1,5 @@
 import { List } from 'react-admin';
+
 import { ShowObject } from '@/components';
 
 export default (props) => {

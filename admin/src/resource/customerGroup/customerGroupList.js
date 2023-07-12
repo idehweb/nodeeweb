@@ -13,13 +13,17 @@ import {
 } from 'react-admin';
 import React from 'react';
 import { Button } from '@mui/material';
+
+import MessageIcon from '@mui/icons-material/Message';
+
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+
 import { CustomResetViewsButton, List, SimpleForm } from '@/components';
 import { Val } from '@/Utils';
 import API, { BASE_URL } from '@/functions/API';
-import MessageIcon from '@mui/icons-material/Message';
 import CustomModal from '@/components/Modal';
 
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+
 var theID = null;
 const ResourceName = () => {
   const { resource } = useResourceContext();

@@ -1,9 +1,10 @@
+import { GroupAdd, Group } from '@mui/icons-material';
+
 import customerCreate from './customerCreate';
 import customerEdit from './customerEdit';
 import customerShow from './customerShow';
 import customerList from './customerList';
 
-import { GroupAdd, Group } from '@mui/icons-material';
 
 const Customer = {
   list: customerList,

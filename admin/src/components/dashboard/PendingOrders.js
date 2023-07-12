@@ -10,6 +10,7 @@ import Avatar from '@mui/material/Avatar';
 import { makeStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
 import { useTranslate } from 'react-admin';
+
 import { Customer, Order } from '../types';
 
 const useStyles = makeStyles((theme) => ({

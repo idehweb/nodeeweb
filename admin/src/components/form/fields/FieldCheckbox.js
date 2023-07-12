@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Field } from 'react-final-form';
 import { Col } from 'shards-react';
-import { getEntitiesForAdmin, MainUrl, uploadMedia } from '@/functions/index';
+
 import { useTranslate } from 'react-admin';
+
+import { getEntitiesForAdmin, MainUrl, uploadMedia } from '@/functions/index';
 import { EveryFields } from '@/components/form/fields';
+
 function FieldCheckbox(props) {
   // console.clear();
   console.log('checkboxcheckboxcheckbox', props);

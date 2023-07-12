@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Field } from 'react-final-form';
 import { Col } from 'shards-react';
-import { MainUrl, uploadMedia } from '@/functions/index';
+
 import Switch from '@mui/material/Switch';
 import { useTranslate } from 'react-admin';
+
+import { MainUrl, uploadMedia } from '@/functions/index';
 import { EveryFields } from '@/components/form/fields';
+
 function FieldBoolean(props) {
   const t = useTranslate();
 

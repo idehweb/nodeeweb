@@ -21,12 +21,15 @@ import {
   RadioButtonGroupInput,
 } from 'react-admin';
 import React, { Fragment } from 'react';
+
+import { Chip } from '@mui/material';
+
+import { RichTextInput } from 'ra-input-rich-text';
+
 import { CustomResetViewsButton, List, SimpleForm } from '@/components';
 import useStyles from '@/styles';
 import { Val } from '@/Utils';
 import API, { BASE_URL } from '@/functions/API';
-import { Chip } from '@mui/material';
-import { RichTextInput } from 'ra-input-rich-text';
 
 var theID = null;
 const ResourceName = () => {

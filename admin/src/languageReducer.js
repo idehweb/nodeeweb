@@ -1,7 +1,8 @@
+import { useStore } from 'react-redux';
+
 import { CHANGE_THEME, changeTheme, CHANGE_LOCALE } from '@/functions';
 // import { useContext} from 'react';
 
-import { useStore } from 'react-redux';
 // import store from 'store';
 // import { ThemeName } from '../types';
 

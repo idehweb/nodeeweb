@@ -1,24 +1,31 @@
 import React, { useRef, useState, Fragment } from 'react';
+
 // import {withTranslation} from "react-i18next";
-import { dFormat, PriceFormat } from '@/functions/utils';
 // import "@/assets/styles/nodeeweb-page-builder.css";
 import { Button } from 'shards-react';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import AddIcon from '@mui/icons-material/Add';
-import CreateForm from '@/components/form/CreateForm';
+
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import CloseIcon from '@mui/icons-material/Close';
+
+import { useDrag, useDrop } from 'react-dnd';
+
+import { CloseRounded } from '@mui/icons-material';
+
+import { ItemTypes } from '../../functions';
+import CreateForm from '@/components/form/CreateForm';
+import { dFormat, PriceFormat } from '@/functions/utils';
+
 import {
   MoveIconSvg,
   EditIconSvg,
   CloseIconSvg,
   AddIconSvg,
 } from './base/Icon';
-import { useDrag, useDrop } from 'react-dnd';
-import { ItemTypes } from '../../functions';
-import { CloseRounded } from '@mui/icons-material';
+
 const Component = (props) => {
   console.log('Cooooooooooooooooooooooooooo', props);
   let {

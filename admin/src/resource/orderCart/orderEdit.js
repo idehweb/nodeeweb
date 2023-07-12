@@ -29,6 +29,11 @@ import { Box, Chip, Divider, Tab, Tabs } from '@mui/material';
 import Button from '@mui/material/Button';
 import { useMediaQuery } from '@mui/material';
 import { HelpRounded, Receipt } from '@mui/icons-material';
+
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
+
+import { makeStyles } from '@mui/styles';
+
 import {
   List,
   PrintOrder,
@@ -37,10 +42,9 @@ import {
   OrderPaymentStatus,
   OrderStatus,
 } from '@/components';
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { dateFormat } from '@/functions';
 import API, { BASE_URL } from '@/functions/API';
-import { makeStyles } from '@mui/styles';
+
 
 const ListActions = () => (
   <Box width="100%">
@@ -205,7 +209,7 @@ export const orderEdit = (props) => {
                     link = c[0];
                   }
                   return (
-                    <a target={'_blank'} href={'/#/product/' + link + '/show'}>
+                    <a target={'_blank'} href={'/#/product/' + link + '/show'} rel="noreferrer">
                       {record.title.fa}
                     </a>
                   );

@@ -13,6 +13,7 @@ import {
   BooleanInput,
   useTranslate,
 } from 'react-admin';
+
 import { List, SimpleForm } from '@/components';
 
 export const userEdit = (props) => {

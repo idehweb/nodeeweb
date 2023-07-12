@@ -1,8 +1,10 @@
 import grapesjs from 'grapesjs';
+
 // import '../../../assets/'
+import Swiper from 'swiper';
+
 import loadComponents from './components/index';
 import loadBlocks from './blocks';
-import Swiper from 'swiper';
 
 export default grapesjs.plugins.add(
   'grapesjs-swiper-slider',

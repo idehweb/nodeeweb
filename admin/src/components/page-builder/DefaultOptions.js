@@ -1,4 +1,5 @@
 import DefaultGeneral from './DefaultGeneral';
+
 let { fields, rules } = DefaultGeneral;
 const DefaultOptions = [
   {

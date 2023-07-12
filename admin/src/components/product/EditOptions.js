@@ -11,11 +11,13 @@ import {
 import { Button, ButtonGroup } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import AddRoadIcon from '@mui/icons-material/AddRoad';
-import API from '@/functions/API';
-import { numberWithCommas } from '@/functions';
+
 import Select from 'react-select';
 import { useWatch, useFormContext } from 'react-hook-form';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+
+import { numberWithCommas } from '@/functions';
+import API from '@/functions/API';
 import {
   CatRefField,
   FileChips,
@@ -31,6 +33,7 @@ import {
   Combinations,
   StockStatus,
 } from '@/components';
+
 const customStyles = {
   option: (defaultStyles, state) => ({
     ...defaultStyles,
