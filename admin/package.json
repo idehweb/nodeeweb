@@ -13,7 +13,6 @@
     "build:d": "yarn build && yarn deploy",
     "anal": "export ANALYZE=true && set ANALYZE=true && yarn build"
   },
-
   "dependencies": {
     "@date-io/date-fns-jalali": "^2.16.0",
     "@emotion/react": "^11.9.0",
