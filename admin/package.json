@@ -1,8 +1,8 @@
 {
   "name": "nodeeweb-admin-panel",
   "version": "1.0.1",
-  "private": true,
   "homepage": ".",
+  "files": ["build"],
   "dependencies": {
     "@date-io/date-fns-jalali": "^2.16.0",
     "@emotion/react": "^11.9.0",
@@ -82,7 +82,9 @@
     "test": "craco test",
     "eject": "react-scripts eject",
     "deploy": "node deploy",
-    "build:d": "yarn build && yarn deploy"
+    "build:d": "yarn build && yarn deploy",
+    "publish" : "./publish.sh",
+    "build:publish": "npm run build && ./publish.sh"
   },
   "eslintConfig": {
     "extends": [
