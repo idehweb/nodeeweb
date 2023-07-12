@@ -11,7 +11,7 @@ import CustomerSchema from "../../schema/customer.schema";
 import { MiddleWare } from "../../types/global";
 import { Query } from "mongoose";
 import { CookieOptions } from "express";
-import { PUBLIC_ACCESS } from "../constants/String";
+import { OPTIONAL_LOGIN, PUBLIC_ACCESS } from "../constants/String";
 const strategyMap = new Map<string, Strategy>();
 
 export const AuthUserAccess: ControllerAccess[] = [
@@ -122,7 +122,10 @@ export function authWithToken(opt: JwtStrategyOpt) {
 
 export function authWithGoogle() {}
 
-export function authorizeWithToken(modelNames: string[]): MiddleWare[] {
+export function authorizeWithToken(
+  modelNames: string[],
+  opt: Partial<JwtStrategyOpt> = {}
+): MiddleWare[] {
   // add passport middleware
   const mw = modelNames
     //   change to passport middleware
@@ -131,6 +134,7 @@ export function authorizeWithToken(modelNames: string[]): MiddleWare[] {
         model: name,
         notThrow: i === modelNames.length - 1,
         name: `jwt-${name}-${i === modelNames.length - 1}`,
+        ...opt,
       })
     )
     //   add checker
@@ -151,8 +155,11 @@ export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
       .filter((access) => access.modelName === modelName)
       .map((access) => access.role);
     if (
-      !allowedRoles.includes(PUBLIC_ACCESS) &&
-      !allowedRoles.includes(req.user.role)
+      !(
+        allowedRoles.includes(PUBLIC_ACCESS) ||
+        allowedRoles.includes(OPTIONAL_LOGIN) ||
+        allowedRoles.includes(req.user.role)
+      )
     )
       return next(new ForbiddenError("user can not access"));
     return next();
