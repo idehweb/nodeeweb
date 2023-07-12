@@ -3,6 +3,16 @@
   "version": "1.0.1",
   "private": true,
   "homepage": ".",
+  "scripts": {
+    "dev": "craco start",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "react-scripts eject",
+    "deploy": "node deploy",
+    "build:d": "yarn build && yarn deploy",
+    "anal": "export ANALYZE=true && set ANALYZE=true && yarn build"
+  },
   "dependencies": {
     "@date-io/date-fns-jalali": "^2.16.0",
     "@emotion/react": "^11.9.0",
@@ -76,14 +86,6 @@
     "prettier": "^2.8.8",
     "typescript": "^5.1.6",
     "webpack-bundle-analyzer": "^4.9.0"
-  },
-  "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
-    "eject": "react-scripts eject",
-    "deploy": "node deploy",
-    "build:d": "yarn build && yarn deploy"
   },
   "imports": {
     "#json/*": "./*.json",
