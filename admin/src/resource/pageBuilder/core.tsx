@@ -32,17 +32,13 @@ const generateID = (tokenLen = 5) => {
   return text;
 };
 
+const lan = 'fa';
+
 const Core = (props) => {
   const [tabValue, setTabValue] = useState(0);
 
-  const handleChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
-  // const translate = useTranslate();
-
   const [c, setC] = useState(0);
-  const [data, setData] = useState({});
-  const [lan, setLan] = 'fa';
+  const [data, setData] = useState<any>({});
   const notify = useNotify();
   const translate = useTranslate();
   const dispatch = useDispatch();
@@ -55,6 +51,11 @@ const Core = (props) => {
     componentForSetting: {},
     componentOptionsBox: false,
   });
+
+  const handleChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
   const {
     components,
     optionBox,
@@ -64,8 +65,7 @@ const Core = (props) => {
     componentOptionsBox,
   } = state;
 
-  const params = useParams();
-  const { _id, model = 'page' } = params || null;
+  const { _id, model = 'page' } = useParams();
 
   const load = (options = {}) => {
     if (_id) {
@@ -111,7 +111,7 @@ const Core = (props) => {
 
   //SaveSettingsHere
   const changeComponentSetting = (the_com, method, element) => {
-    let address = '';
+    let address = [];
     let tempArray = [];
     the_com['settings'][method].fields = element;
     let array = Object.keys(element);
@@ -811,34 +811,28 @@ const Core = (props) => {
           }}>
           {tabValue === 0 && (
             <>
-              {components &&
-                components.map((component, index) => {
-                  if (!component) {
-                    return <></>;
-                  }
-                  return (
-                    <Component
-                      key={index}
-                      index={index}
-                      toggleOptionBox={toggleOptionBox}
-                      // moveContent={moveContent}
-                      // moveItem={moveItem}
-                      component={component}
-                      deleteItem={(e) => {
-                        deleteItem(e || component.id);
-                      }}
-                      changeComponentSetting={(e, j, d) => {
-                        changeComponentSetting(e, j, d);
-                      }}
-                      length={components.length}
-                      startDestHnadler={moveItemStart}
-                    />
-                  );
-                })}
+              {components?.filter(Boolean).map((component, index) => (
+                <Component
+                  key={index}
+                  index={index}
+                  toggleOptionBox={toggleOptionBox}
+                  // moveContent={moveContent}
+                  // moveItem={moveItem}
+                  component={component}
+                  deleteItem={(e) => {
+                    deleteItem(e || component.id);
+                  }}
+                  changeComponentSetting={(e, j, d) => {
+                    changeComponentSetting(e, j, d);
+                  }}
+                  length={components.length}
+                  startDestHnadler={moveItemStart}
+                />
+              ))}
               {/* <div ref={drop} className={"add-component element "+(isOver ? 'hover' : '')} onClick={(e) => { */}
               {/* <div ref={drop} className={"add-component newelement "+(isOver ? 'hover' : '')}  */}
               <div
-                className={'add-component newelement '}
+                className="add-component newelement"
                 onClick={(e) => {
                   setState({
                     ...state,
@@ -882,9 +876,7 @@ const Core = (props) => {
       <OptionBox
         {...props}
         defaultOptions={DefaultOptions}
-        onClose={(e) => {
-          toggleOptionBox();
-        }}
+        onClose={(e) => toggleOptionBox({})}
         exclude={excludeArray}
         open={state.optionBox}
         addToComponents={addToComponents}
