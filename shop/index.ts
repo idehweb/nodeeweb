@@ -11,7 +11,7 @@ import registerForm from "./src/form";
 import registerGateway from "./src/gateways";
 import registerMedia from "./src/media";
 import registerNotification from "./src/notification";
-// import registerOrder from "./src/order";
+import registerOrder from "./src/order";
 import registerModification from "./src/modification";
 
 async function deployShop() {
@@ -29,7 +29,7 @@ async function deployShop() {
   registerGateway();
   registerMedia();
   registerNotification();
-  // registerOrder();
+  registerOrder();
   registerModification();
 }
 

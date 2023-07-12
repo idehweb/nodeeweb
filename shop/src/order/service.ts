@@ -2,485 +2,327 @@ import { MiddleWare } from "@nodeeweb/core/types/global";
 import { serviceOnError } from "../common/service";
 import { classCatchBuilder } from "@nodeeweb/core/utils/catchAsync";
 import store from "@nodeeweb/core/store";
+import { checkSiteStatus, fireEvent } from "../common/mustImplement";
+import mongoose from "mongoose";
+import crypto from "crypto";
 
 export default class Service {
   static createByCustomer: MiddleWare = async (req, res) => {
-    // console.log('createByCustomer... , ', req.headers);
-    let Product = req.mongoose.model("Product");
-    let Order = req.mongoose.model("Order");
-    let Settings = req.mongoose.model("Settings");
+    const Product = store.db.model("product");
+    const Order = store.db.model("order");
+    const Settings = store.db.model("settings");
 
-    // if (req.headers.user && req.headers.token) {
-    //     let action = {
-    //         user: req.headers.user._id,
-    //         title: 'create order ' + order._id,
-    //         data: order,
-    //         // history:req.body,
-    //         order: order._id
-    //     };
-    //     req.global.submitAction(action);
-    // }
-    if (req.headers.customer && req.headers.token) {
-      let action = {
-        customer: req.headers.customer._id,
-        title: "create order " + req.body.amount,
-        data: req.body,
-        // history:req.body,
-        // order: order._id
-      };
-      // req.global.submitAction(action);
-    }
-    var _ids = [],
-      len = 0,
+    let len = 0,
       ii = 0;
     if (req.body.card && req.body.card.length) len = req.body.card.length;
-    _.forEach(req.body.card, function (pack) {
-      var main_id = pack._id.split("DDD");
-      var id = main_id[0];
+
+    for (const pack of req.body.card as any[]) {
+      let main_id = pack._id.split("DDD");
+      let id = main_id[0];
       if (!id) {
         id = pack._id;
       }
 
-      // console.log('_id', id, pack.price, pack.salePrice);
-      // _ids.push(id);
-      // console.log('find _id:', id);
-      let tempProducts = [];
-      Product.findOne(
+      const tempProducts = [];
+      const ps = await Product.findOne(
         { _id: id },
-        "_id combinations type price salePrice title quantity in_stock",
-        function (err, ps) {
-          // console.log('found id:', id, 'main_id[1]:', main_id[1], 'ps', ps);
-          if (!ps) {
-            return res.json({
-              success: false,
-              message: "product not found!",
-            });
-          }
-          ii++;
-          if (ps.type != "normal") {
-            if (ps.combinations) {
-              _.forEach(ps.combinations, function (comb, inde) {
-                if (inde == main_id[1] || comb.id == main_id[1]) {
-                  // console.log('find comb', comb);
-                  if (pack.salePrice) {
-                    if (pack.salePrice != comb.salePrice) {
-                      return res.json({
-                        success: false,
-                        message: "مغایرت در قیمت ها!",
-                        "pack.salePrice": pack.salePrice,
-                        "comb.salePrice": comb.salePrice,
-                        "ps.type": ps.type,
-                        "ps.title": ps.title,
-                        err: 1,
-                      });
-                      // return 0;
-                    }
-                  } else if (pack.price) {
-                    if (pack.price != comb.price) {
-                      return res.json({
-                        success: false,
-                        message: "مغایرت در قیمت ها!",
-                        "pack.price": pack.price,
-                        "comb.price": comb.price,
-                        "ps.type": ps.type,
-                        "ps.title": ps.title,
-                        err: 2,
-                      });
-                      // return 0;
-                    }
-                  }
+        "_id combinations type price salePrice title quantity in_stock"
+      );
 
-                  if (ps.combinations[inde].quantity == 0) {
-                    ps.combinations[inde].in_stock = false;
-                    comb.in_stock = false;
-                  }
-                  if (ps.combinations[inde].quantity) {
-                    ps.combinations[inde].quantity--;
-                  }
-                  if (comb.in_stock == false) {
-                    return res.json({
-                      success: false,
-                      message: "مغایرت در موجودی!",
-                      "comb.in_stock": comb.in_stock,
-                      "ps.type": ps.type,
-                      "ps.title": ps.title,
-                    });
-                    // return 0;
-                  }
+      if (!ps) {
+        return res.status(404).json({
+          success: false,
+          message: "product not found!",
+        });
+      }
+      ii++;
+      if (ps.type != "normal") {
+        if (ps.combinations) {
+          for (const [inde, comb] of (ps.combinations as any[]).entries()) {
+            if (inde == main_id[1] || comb.id == main_id[1]) {
+              if (pack.salePrice) {
+                if (pack.salePrice != comb.salePrice) {
+                  return res.status(400).json({
+                    success: false,
+                    message: "مغایرت در قیمت ها!",
+                    "pack.salePrice": pack.salePrice,
+                    "comb.salePrice": comb.salePrice,
+                    "ps.type": ps.type,
+                    "ps.title": ps.title,
+                    err: 1,
+                  });
                 }
-              });
-            }
-          }
-          if (ps.type == "normal") {
-            if (pack.salePrice) {
-              if (pack.salePrice != ps.salePrice) {
-                return res.json({
+              } else if (pack.price) {
+                if (pack.price != comb.price) {
+                  return res.status(400).json({
+                    success: false,
+                    message: "مغایرت در قیمت ها!",
+                    "pack.price": pack.price,
+                    "comb.price": comb.price,
+                    "ps.type": ps.type,
+                    "ps.title": ps.title,
+                    err: 2,
+                  });
+                }
+              }
+
+              if (ps.combinations[inde].quantity == 0) {
+                ps.combinations[inde].in_stock = false;
+                comb.in_stock = false;
+              }
+              if (ps.combinations[inde].quantity) {
+                ps.combinations[inde].quantity--;
+              }
+              if (comb.in_stock == false) {
+                return res.status(400).json({
                   success: false,
-                  message: "مغایرت در قیمت ها!",
-                  "pack.salePrice": pack.salePrice,
-                  "ps.salePrice": ps.salePrice,
+                  message: "مغایرت در موجودی!",
+                  "comb.in_stock": comb.in_stock,
                   "ps.type": ps.type,
                   "ps.title": ps.title,
                 });
-                // return 0;
               }
-            } else if (pack.price)
-              if (pack.price != ps.price) {
-                return res.json({
-                  success: false,
-                  message: "مغایرت در قیمت ها!",
-                  "pack.price": pack.price,
-                  "ps.price": ps.price,
-                  "ps.type": ps.type,
-                  "ps.title": ps.title,
-                });
-                // return 0;
-              }
-
-            if (ps.quantity == 0) {
-              ps.in_stock = false;
             }
-            if (ps.quantity) {
-              ps.quantity--;
-            }
-            if (ps.in_stock == false) {
-              return res.json({
-                success: false,
-                message: "مغایرت در موجودی!",
-                "ps.in_stock": ps.in_stock,
-                "ps.type": ps.type,
-                "ps.title": ps.title,
-              });
-              // return 0;
-            }
-          }
-
-          // }
-
-          // console.log('ii', ii);
-          // console.log('len', len);
-
-          tempProducts.push(ps);
-          req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
-          // return;
-          req.body.customer = req.headers._id;
-
-          if (ii == len) {
-            // console.log('\ntempProducts: ', tempProducts)
-            req.global
-              .checkSiteStatus()
-              .then(function (resp) {
-                // console.log('resp', resp);
-                Settings.findOne({}, "tax taxAmount", function (err, setting) {
-                  let tax = setting.tax || false;
-                  let taxAmount = setting.taxAmount || 0;
-                  // console.log('setting.taxAmount', setting.taxAmount)
-                  // if (setting.taxAmount)
-                  //     taxAmount = setting.taxAmount;
-
-                  if (taxAmount) {
-                    let theTaxAmount = parseInt(
-                      req.body.sum * (taxAmount / 100)
-                    );
-                    req.body.amount = theTaxAmount + req.body.sum;
-                    req.body.taxAmount = taxAmount;
-                    // req.body.amount=taxAmount+req.body.amount;
-                  }
-                  if (req.body.deliveryPrice) {
-                    let deliveryPrice = parseInt(req.body.deliveryPrice);
-                    req.body.amount = deliveryPrice + req.body.amount;
-                    // req.body.taxAmount = taxAmount;
-                    // req.body.amount=taxAmount+req.body.amount;
-                  }
-                  // console.log('req.body.customer', req.body.customer)
-                  let lastObject = {
-                    billingAddress: req.body.billingAddress,
-                    amount: req.body.amount,
-                    card: req.body.card,
-                    customer: req.body.customer,
-                    customer_data: req.body.customer_data,
-                    discount: req.body.discount,
-                    discountAmount: req.body.discountAmount,
-                    discountCode: req.body.discountCode,
-                    deliveryDay: req.body.deliveryDay,
-                    deliveryPrice: req.body.deliveryPrice,
-                    status: "processing",
-                    package: req.body.package,
-                    total: req.body.discount
-                      ? req.body.amount - req.body.discount
-                      : req.body.amount,
-                    sum: req.body.sum,
-                    ship: req.body.ship || false,
-                    shipAmount: req.body.shipAmount || 0,
-                    tax: setting.tax || false,
-                    taxAmount: req.body.taxAmount || 0,
-                    productsAfterThisOrder: tempProducts,
-                  };
-
-                  if (req.body.discountCode) {
-                    let Discount = req.mongoose.model("Discount");
-                    Discount.findOne(
-                      { slug: req.body.discountCode },
-                      function (err, discount) {
-                        if (err || !discount) {
-                          return res.json({
-                            success: false,
-                            err: err,
-                            message: "did not find any discount!",
-                          });
-                        }
-                        if (discount.count < 1) {
-                          return res.json({
-                            success: false,
-                            message: "discount is done!",
-                          });
-                        }
-                        if (!discount.customer) {
-                          discount.customer = [];
-                        }
-
-                        if (discount.customer && discount.customer.length > 0) {
-                          var isInArray = discount.customer.some(function (
-                            cus
-                          ) {
-                            return cus.equals(req.headers._id);
-                          });
-                          // || discount.customerLimit !== 0
-                          if (isInArray) {
-                            // console.log('found it', req.headers._id)
-                            // if (!discount.customerLimit || discount.customerLimit !== 0)
-                            if (discount.customerLimit)
-                              return res.json({
-                                success: false,
-                                message: "you have used this discount once!",
-                              });
-                            continueDiscount();
-                          } else {
-                            continueDiscount();
-                          }
-                        } else {
-                          continueDiscount();
-                        }
-
-                        function continueDiscount() {
-                          discount.customer.push(req.headers._id);
-                          // console.log('req.body.amount', req.body.amount)
-                          let theDiscount = 0;
-                          // return res.json(order);
-                          if (discount.price) {
-                            theDiscount = discount.price;
-                          }
-                          if (discount.percent) {
-                            let x = (req.body.sum * discount.percent) / 100;
-                            theDiscount = parseInt(x);
-                          }
-                          if (theDiscount < 0) {
-                            theDiscount = 0;
-                          }
-                          Discount.findOneAndUpdate(
-                            { slug: req.body.discountCode },
-                            {
-                              $set: {
-                                count: discount.count - 1,
-                                customer: discount.customer,
-                                order: req.body.order_id || null,
-                              },
-                            },
-                            function (err, discount) {
-                              if (err || !discount) {
-                                return res.json({
-                                  success: false,
-                                  message: "could not update discount!",
-                                });
-                              }
-                              lastObject["discountAmount"] = theDiscount;
-                              // console.log('req.body.amount', req.body.amount)
-                              // console.log('theDiscount', theDiscount)
-                              req.body.amount = req.body.amount - theDiscount;
-                              // console.log('req.body.amount', req.body.amount)
-                              lastObject["amount"] = req.body.amount;
-                              update_order();
-                            }
-                          );
-                        }
-                      }
-                    );
-                  } else {
-                    update_order();
-                  }
-
-                  function update_order() {
-                    // console.log('==> update_order')
-                    if (req.body.order_id) {
-                      // console.log('==> create order 1...', req.body.order_id);
-
-                      Order.findOneAndUpdate(
-                        { order_id: req.body.order_id },
-                        {
-                          $set: { ...lastObject, updatedAt: new Date() },
-                          $push: {
-                            statusArray: { status: "processing" },
-                          },
-                        },
-                        function (err, order) {
-                          if (err || !order) {
-                            // console.log('err', err);
-                            Order.create(
-                              {
-                                ...lastObject,
-                                order_id: req.body.order_id,
-                                status: "processing",
-                                orderNumber: req.body.orderNumber,
-                              },
-                              function (err, order) {
-                                if (err || !order) {
-                                  return res.json({
-                                    err: err,
-                                    success: false,
-                                    message: "error!",
-                                  });
-                                }
-                                if (req.headers.customer && req.headers.token) {
-                                  let action = {
-                                    customer: req.headers.customer._id,
-                                    title:
-                                      "create order successfully " + order._id,
-                                    data: req.body,
-                                    history: req.body,
-                                    order: order._id,
-                                  };
-                                  // req.global.submitAction(action);
-                                }
-                                // console.log('creating order successfully:', order);
-                                change_products_quantities();
-                                req.fireEvent(
-                                  "create-order-by-customer",
-                                  order
-                                );
-                                res.json({ success: true, order: order });
-                              }
-                            );
-                            // res.json({
-                            //     // obj: {
-                            //     //     amount: req.body.amount,
-                            //     //     // card: req.body.card
-                            //     // },
-                            //     hrer:'jhjk',
-                            //     err: err,
-                            //     order: order,
-                            //     success: false,
-                            //     message: 'error!'
-                            // });
-                            // return 0;
-                          } else {
-                            // if (req.headers.customer && req.headers.token) {
-                            //     let action = {
-                            //         customer: req.headers.customer._id,
-                            //         title: 'create order successfully ' + order._id,
-                            //         data: req.body,
-                            //         history: req.body,
-                            //         order: order._id
-                            //     };
-                            //     req.global.submitAction(action);
-                            // }
-                            // console.log('creating order successfully:', order);
-                            change_products_quantities();
-                            req.fireEvent("create-order-by-customer", order);
-
-                            res.json({ success: true, order: order });
-                          }
-                        }
-                      );
-                    } else {
-                      // console.log('create order 2... line 240');
-                      Order.create(
-                        {
-                          billingAddress: req.body.billingAddress,
-                          amount: req.body.amount,
-                          card: req.body.card,
-                          customer: req.body.customer,
-                          customer_data: req.body.customer_data,
-                          deliveryDay: req.body.deliveryDay,
-                          deliveryPrice: req.body.deliveryPrice,
-                          order_id: crypto.randomBytes(64).toString("hex"),
-                          package: req.body.package,
-                          total: req.body.total,
-                          orderNumber: req.body.orderNumber,
-                          sum: req.body.sum,
-                          ...lastObject,
-                        },
-                        function (err, order) {
-                          if (err || !order) {
-                            res.json({
-                              err: err,
-                              success: false,
-                              message: "error!",
-                            });
-                            return 0;
-                          }
-                          if (req.headers.customer && req.headers.token) {
-                            let action = {
-                              customer: req.headers.customer._id,
-                              title: "create order successfully " + order._id,
-                              data: req.body,
-                              history: req.body,
-                              order: order._id,
-                            };
-                            // req.global.submitAction(action);
-                          }
-                          // console.log('creating order successfully:', order);
-                          change_products_quantities();
-                          req.fireEvent("create-order-by-customer", order);
-                          res.json({ success: true, order: order });
-                          // return 0;
-                        }
-                      );
-                    }
-                  }
-
-                  function change_products_quantities() {
-                    console.log("****** change_products_quantities ******");
-                    // _.forEach(tempProducts, function (tempProduct) {
-                    //     console.log('\ntempProduct',{
-                    //         in_stock:tempProduct.in_stock,
-                    //         quantity:tempProduct.quantity,
-                    //         combinations:tempProduct.combinations,
-                    //     })
-                    //
-                    //     Product.findByIdAndUpdate(tempProduct._id,{
-                    //         $set:{
-                    //             in_stock:tempProduct.in_stock,
-                    //             quantity:tempProduct.quantity,
-                    //             combinations:tempProduct.combinations,
-                    //         }
-                    //     },function(err,resp){
-                    //         console.log('resp',resp._id)
-                    //     })
-                    // })
-                  }
-                });
-              })
-              .catch(function (err2) {
-                res.json({
-                  success: false,
-                  message: "site is deactive!",
-                });
-                return 0;
-              });
           }
         }
-      );
-    });
+      }
+      if (ps.type == "normal") {
+        if (pack.salePrice) {
+          if (pack.salePrice != ps.salePrice) {
+            return res.status(400).json({
+              success: false,
+              message: "مغایرت در قیمت ها!",
+              "pack.salePrice": pack.salePrice,
+              "ps.salePrice": ps.salePrice,
+              "ps.type": ps.type,
+              "ps.title": ps.title,
+            });
+          }
+        } else if (pack.price)
+          if (pack.price != ps.price) {
+            return res.status(400).json({
+              success: false,
+              message: "مغایرت در قیمت ها!",
+              "pack.price": pack.price,
+              "ps.price": ps.price,
+              "ps.type": ps.type,
+              "ps.title": ps.title,
+            });
+          }
+
+        if (ps.quantity == 0) {
+          ps.in_stock = false;
+        }
+        if (ps.quantity) {
+          ps.quantity--;
+        }
+        if (ps.in_stock == false) {
+          return res.status(400).json({
+            success: false,
+            message: "مغایرت در موجودی!",
+            "ps.in_stock": ps.in_stock,
+            "ps.type": ps.type,
+            "ps.title": ps.title,
+          });
+        }
+      }
+
+      tempProducts.push(ps);
+      req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
+      req.body.customer = req.user._id;
+
+      if (ii == len) {
+        if (!(await checkSiteStatus()))
+          return res.status(500).json({
+            success: false,
+            message: "site is deactive!",
+          });
+
+        const setting = await Settings.findOne({}, "tax taxAmount");
+        const taxAmount = +(setting.taxAmount || 0);
+        if (taxAmount) {
+          const theTaxAmount = Math.floor(+req.body.sum * (taxAmount / 100));
+          req.body.amount = theTaxAmount + req.body.sum;
+          req.body.taxAmount = taxAmount;
+        }
+        if (req.body.deliveryPrice) {
+          const deliveryPrice = parseInt(req.body.deliveryPrice);
+          req.body.amount = deliveryPrice + req.body.amount;
+        }
+        const lastObject = {
+          billingAddress: req.body.billingAddress,
+          amount: req.body.amount,
+          card: req.body.card,
+          customer: req.body.customer,
+          customer_data: req.body.customer_data,
+          discount: req.body.discount,
+          discountAmount: req.body.discountAmount,
+          discountCode: req.body.discountCode,
+          deliveryDay: req.body.deliveryDay,
+          deliveryPrice: req.body.deliveryPrice,
+          status: "processing",
+          package: req.body.package,
+          total: req.body.discount
+            ? req.body.amount - req.body.discount
+            : req.body.amount,
+          sum: req.body.sum,
+          ship: req.body.ship || false,
+          shipAmount: req.body.shipAmount || 0,
+          tax: setting.tax || false,
+          taxAmount: req.body.taxAmount || 0,
+          productsAfterThisOrder: tempProducts,
+        };
+
+        if (req.body.discountCode) {
+          const Discount = store.db.model("Discount");
+          const discount = await Discount.findOne({
+            slug: req.body.discountCode,
+          });
+
+          if (!discount) {
+            return res.status(404).json({
+              success: false,
+              message: "did not find any discount!",
+            });
+          }
+          if (discount.count < 1) {
+            return res.status(400).json({
+              success: false,
+              message: "discount is done!",
+            });
+          }
+          if (!discount.customer) {
+            discount.customer = [];
+          }
+
+          if (discount.customer && discount.customer.length > 0) {
+            const isInArray = (
+              discount.customer as mongoose.Types.ObjectId[]
+            ).some(function (cus) {
+              return cus.equals(req.user._id);
+            });
+            if (isInArray) {
+              if (discount.customerLimit)
+                return res.status(400).json({
+                  success: false,
+                  message: "you have used this discount once!",
+                });
+              continueDiscount();
+            } else {
+              continueDiscount();
+            }
+          } else {
+            continueDiscount();
+          }
+
+          async function continueDiscount() {
+            discount.customer.push(req.user._id);
+            let theDiscount = 0;
+            if (discount.price) {
+              theDiscount = discount.price;
+            }
+            if (discount.percent) {
+              theDiscount = Math.floor(req.body.sum * discount.percent) / 100;
+            }
+            if (theDiscount < 0) {
+              theDiscount = 0;
+            }
+            await Discount.findOneAndUpdate(
+              { slug: req.body.discountCode },
+              {
+                $set: {
+                  count: discount.count - 1,
+                  customer: discount.customer,
+                  order: req.body.order_id || null,
+                },
+              }
+            );
+
+            lastObject["discountAmount"] = theDiscount;
+            req.body.amount = req.body.amount - theDiscount;
+            lastObject["amount"] = req.body.amount;
+            await update_order();
+          }
+        } else {
+          await update_order();
+        }
+
+        async function update_order() {
+          if (req.body.order_id) {
+            let order = await Order.findOneAndUpdate(
+              { order_id: req.body.order_id },
+              {
+                $set: { ...lastObject, updatedAt: new Date() },
+                $push: {
+                  statusArray: { status: "processing" },
+                },
+              }
+            );
+
+            if (!order) {
+              order = await Order.create({
+                ...lastObject,
+                order_id: req.body.order_id,
+                status: "processing",
+                orderNumber: req.body.orderNumber,
+              });
+            }
+            change_products_quantities();
+            fireEvent("create-order-by-customer", order);
+            return res.status(201).json({ success: true, order });
+          } else {
+            const order = await Order.create({
+              billingAddress: req.body.billingAddress,
+              amount: req.body.amount,
+              card: req.body.card,
+              customer: req.body.customer,
+              customer_data: req.body.customer_data,
+              deliveryDay: req.body.deliveryDay,
+              deliveryPrice: req.body.deliveryPrice,
+              order_id: crypto.randomBytes(64).toString("hex"),
+              package: req.body.package,
+              total: req.body.total,
+              orderNumber: req.body.orderNumber,
+              sum: req.body.sum,
+              ...lastObject,
+            });
+
+            change_products_quantities();
+            fireEvent("create-order-by-customer", order);
+            return res.status(201).json({ success: true, order: order });
+          }
+        }
+
+        function change_products_quantities() {
+          console.log("****** change_products_quantities ******");
+          // _.forEach(tempProducts, function (tempProduct) {
+          //     console.log('\ntempProduct',{
+          //         in_stock:tempProduct.in_stock,
+          //         quantity:tempProduct.quantity,
+          //         combinations:tempProduct.combinations,
+          //     })
+          //
+          //     Product.findByIdAndUpdate(tempProduct._id,{
+          //         $set:{
+          //             in_stock:tempProduct.in_stock,
+          //             quantity:tempProduct.quantity,
+          //             combinations:tempProduct.combinations,
+          //         }
+          //     },function(err,resp){
+          //         console.log('resp',resp._id)
+          //     })
+          // })
+        }
+      }
+    }
   };
   static create: MiddleWare = async (req, res) => {
-    let Customer = req.mongoose.model("Customer");
-    let Order = req.mongoose.model("Order");
-
-    console.log("creating order by admin...");
+    const Customer = store.db.model("Customer");
+    const Order = store.db.model("Order");
     req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
     let pack = [],
       amount = 0;
-    let obj = {
+    const obj = {
       order_id: crypto.randomBytes(64).toString("hex"),
       amount: req.body.amount ? req.body.amount : amount,
       total: req.body.amount ? req.body.amount : amount,
@@ -491,7 +333,7 @@ export default class Service {
     if (req.body.card) {
       obj["card"] = req.body.card;
 
-      _.forEach(req.body.card, function (item, i) {
+      for (const item of req.body.card) {
         amount += (item.salePrice || item.price) * item.count;
         pack.push({
           product_name: item.title,
@@ -500,59 +342,36 @@ export default class Service {
           total_price: (item.salePrice || item.price) * item.count,
           quantity: item.count,
         });
-      });
+      }
 
       obj["package"] = pack;
       obj["amount"] = req.body.amount ? req.body.amount : amount;
     }
     if (req.body.customer) {
-      Customer.findById(
+      const customer = await Customer.findById(
         req.body.customer,
-        "_id firstName lastName countryCode internationalCode address phoneNumber",
-        function (err, customer) {
-          if (err || !customer) {
-            res.json({
-              err: err,
-              success: false,
-              message: "error!",
-            });
-            return 0;
-          }
-          obj["customer"] = req.body.customer;
-          obj["customer_data"] = customer;
-          obj["billingAddress"] =
-            customer.address && customer.address[0] ? customer.address[0] : {};
-          Order.create(obj, function (err, order) {
-            if (err || !order) {
-              res.json({
-                err: err,
-                success: false,
-                message: "error!",
-              });
-              return 0;
-            }
-            return res.json(order);
-          });
-        }
+        "_id firstName lastName countryCode internationalCode address phoneNumber"
       );
-    } else {
-      Order.create(obj, function (err, order) {
-        if (err || !order) {
-          res.json({
-            err: err,
-            success: false,
-            message: "error!",
-          });
-          return 0;
-        }
-        return res.json(order);
-      });
+
+      if (!customer)
+        return res.status(404).json({
+          success: false,
+          message: "error!",
+        });
+
+      obj["customer"] = req.body.customer;
+      obj["customer_data"] = customer;
+      obj["billingAddress"] =
+        customer.address && customer.address[0] ? customer.address[0] : {};
     }
+    const order = await Order.create(obj);
+    return res.status(201).json(order);
   };
+
   static importFromWordpress: MiddleWare = async (req, res) => {
     let url = "";
     if (req.query.url) {
-      url = req.query.url;
+      url = req.query.url as string;
     }
     if (req.query.consumer_secret) {
       url += "?consumer_secret=" + req.query.consumer_secret;
@@ -564,26 +383,16 @@ export default class Service {
     if (req.query.per_page) {
       url += "&per_page=" + 1;
     }
-    // if (req.query.page) {
-    //     url += '&page=' + req.query.page;
-    // }
-    // console.log('importFromWordpress', url);
-    let count = 0;
-    var i = req.query.page;
-    // for (var i = 3101; i < 7000; i++) {
-    // let theUrl = url;
-    // theUrl += '&page=' + i;
-    // console.log('theUrl:', theUrl);
-    // return
-    self.sendReq(req, url, parseInt(i));
-    // }
+    let i = Math.floor(+req.query.page);
+    await Service._sendReq(req, url, i);
+    res.send("Send result!!!");
   };
+
   static rewriteOrders: MiddleWare = async (req, res) => {
-    console.log("rewriteOrders");
-    let Customer = req.mongoose.model("Customer");
-    let Order = req.mongoose.model("Order");
-    let Media = req.mongoose.model("Media");
-    let Notfound = 0;
+    const Customer = store.db.model("Customer");
+    const Order = store.db.model("Order");
+    const Media = store.db.model("Media");
+    const Notfound = 0;
     Order.find({}, function (err, orders) {
       _.forEach(orders, (item, k) => {
         self.checkOrder(req, item, k);
@@ -591,7 +400,7 @@ export default class Service {
     });
   };
   static createCart: MiddleWare = async (req, res) => {
-    let obj = {};
+    const obj = {};
     if (req.body.billingAddress) {
       obj["billingAddress"] = req.body.billingAddress;
     }
@@ -630,9 +439,9 @@ export default class Service {
     } else {
       obj["orderNumber"] = Math.floor(10000 + Math.random() * 90000);
     }
-    let Order = req.mongoose.model("Order");
+    const Order = store.db.model("Order");
 
-    let status = "cart";
+    const status = "cart";
 
     if (req.body.status == "checkout") status = "checkout";
 
@@ -656,9 +465,9 @@ export default class Service {
             return 0;
           }
           //console.log('req.headers', req.headers);
-          if (req.headers.customer && req.headers.token) {
-            let action = {
-              customer: req.headers.customer._id,
+          if (req.user && req.headers.token) {
+            const action = {
+              customer: req.user._id,
               title: "customer edit cart " + order._id,
               data: order,
               history: req.body,
@@ -666,8 +475,8 @@ export default class Service {
             };
             // req.req.global.submitAction(action);
           }
-          if (!req.headers.customer && !req.headers.token) {
-            let action = {
+          if (!req.user && !req.headers.token) {
+            const action = {
               title: "guest edit cart " + order._id,
               data: order,
               history: req.body,
@@ -698,9 +507,9 @@ export default class Service {
           return 0;
         }
         //console.log('req.headers', req.headers);
-        if (req.headers.customer && req.headers.token) {
-          let action = {
-            customer: req.headers.customer._id,
+        if (req.user && req.headers.token) {
+          const action = {
+            customer: req.user._id,
             title: "create cart " + order._id,
             data: order,
             history: req.body,
@@ -708,9 +517,9 @@ export default class Service {
           };
           // req.req.global.submitAction(action);
         }
-        if (!req.headers.customer && !req.headers.token) {
-          let action = {
-            // customer: req.headers.customer._id,
+        if (!req.user && !req.headers.token) {
+          const action = {
+            // customer: req.user._id,
             title: "guest created cart " + order._id,
             data: order,
             history: req.body,
@@ -727,11 +536,11 @@ export default class Service {
     console.log("creating transaction by admin...");
     // req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
 
-    let Order = req.mongoose.model("Order");
-    let Product = req.mongoose.model("Product");
-    let Transaction = req.mongoose.model("Transaction");
-    let Gateway = req.mongoose.model("Gateway");
-    let Settings = req.mongoose.model("Settings");
+    const Order = store.db.model("Order");
+    const Product = store.db.model("Product");
+    const Transaction = store.db.model("Transaction");
+    const Gateway = store.db.model("Gateway");
+    const Settings = store.db.model("Settings");
 
     // console.log("buy...", req.params._id, req.body.amount);
     if (
@@ -754,7 +563,7 @@ export default class Service {
         }
         req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
 
-        let obj = {
+        const obj = {
           order_id: crypto.randomBytes(64).toString("hex"),
           amount: req.body.amount ? req.body.amount : amount,
           total: req.body.amount ? req.body.amount : amount,
@@ -774,7 +583,7 @@ export default class Service {
           // obj[]=;
           // console.log(order.amount/);
           //                 return;
-          let amount = parseInt(order.amount) * 10;
+          const amount = parseInt(order.amount) * 10;
           if (req.body.amount) {
             amount = parseInt(req.body.amount) * 10;
           }
@@ -784,7 +593,7 @@ export default class Service {
           if (amount < 0) {
             amount = 0;
           }
-          let LIMIT = 1000000000;
+          const LIMIT = 1000000000;
           if (amount > LIMIT) {
             return res.json({
               success: false,
@@ -817,8 +626,8 @@ export default class Service {
               gateway: JSON.parse(gateway.request),
               message: "gateway request not found",
             });
-          // let sendrequest=
-          var theReq = JSON.parse(gateway.request);
+          // const sendrequest=
+          let theReq = JSON.parse(gateway.request);
           // console.log('theReq[\'amount\']', theReq['data'])
 
           if (theReq["data"] && theReq["data"]["Amount"])
@@ -846,19 +655,15 @@ export default class Service {
           req
             .httpRequest(theReq)
             .then(function (parsedBody) {
-              let obj = {
+              const obj = {
                 amount: amount,
                 method: req.body.method,
                 order: req.params._id,
                 gatewayResponse: JSON.stringify(parsedBody["data"]),
                 Authority: parsedBody["data"]["trackId"],
               };
-              if (
-                req.headers &&
-                req.headers.customer &&
-                req.headers.customer._id
-              ) {
-                obj["customer"] = req.headers.customer._id;
+              if (req.headers && req.user && req.user._id) {
+                obj["customer"] = req.user._id;
               }
               // return res.json({
               //     ...obj, gateway: JSON.parse(gateway.request),
@@ -918,12 +723,12 @@ export default class Service {
     }
   };
   static myOrder: MiddleWare = async (req, res) => {
-    let Order = req.mongoose.model("Order");
+    const Order = store.db.model("Order");
 
     // console.log('hgfgh');
-    let obj = {
+    const obj = {
       _id: req.params.id,
-      customer: req.headers._id.toString(),
+      customer: req.user._id.toString(),
     };
     console.log("obj", obj);
     Order.findOne(obj, function (err, order) {
@@ -941,16 +746,16 @@ export default class Service {
       .populate("transaction", "Authority amount statusCode status");
   };
   static allWOrders: MiddleWare = async (req, res) => {
-    let Order = req.mongoose.model("Order");
+    const Order = store.db.model("Order");
 
     // console.log('allWOrders');
-    let offset = 0;
+    const offset = 0;
     if (req.params.offset) {
       offset = parseInt(req.params.offset);
     }
 
-    let search = {};
-    search["customer"] = req.headers._id;
+    const search = {};
+    search["customer"] = req.user._id;
     // search['status']='published';
     // console.log('search', search)
     Order.find(
@@ -983,7 +788,7 @@ export default class Service {
       .lean();
   };
   static destroy: MiddleWare = async (req, res) => {
-    let Order = req.mongoose.model("Order");
+    const Order = store.db.model("Order");
 
     Order.findByIdAndUpdate(
       req.params.id,
@@ -999,10 +804,10 @@ export default class Service {
             message: "error!",
           });
         }
-        if (req.headers._id && req.headers.token) {
-          let action = {
-            user: req.headers._id,
-            title: "delete order " + order._id,
+        if (req.user._id && req.headers.token) {
+          const action = {
+            user: req.user._id,
+            title: "deconste order " + order._id,
             // data:order,
             history: order,
             order: order._id,
@@ -1011,7 +816,7 @@ export default class Service {
         }
         return res.json({
           success: true,
-          message: "Deleted!",
+          message: "Deconsted!",
         });
       }
     );
@@ -1019,7 +824,7 @@ export default class Service {
   static async _sendReq(req, theUrl, page) {
     page = parseInt(page);
     // console.log('get:', theUrl, 'page:', page)
-    let url = theUrl;
+    const url = theUrl;
     url += "&page=" + page;
     // console.log('theUrl:', url);
     req
@@ -1029,11 +834,11 @@ export default class Service {
       })
       .then(function (response) {
         // count++;
-        // let x = count * parseInt(req.query.per_page)
-        let Order = req.mongoose.model("Order");
+        // const x = count * parseInt(req.query.per_page)
+        const Order = store.db.model("Order");
 
         response.data.forEach((dat) => {
-          let obj = {};
+          const obj = {};
           if (dat.total) {
             obj["amount"] = dat.total;
           }
@@ -1059,9 +864,9 @@ export default class Service {
           }
           // console.log('created dat id:', dat.id)
           Order.create(obj, function (err, ord) {
-            let y = page + 1;
+            const y = page + 1;
             self.checkOrder(req, ord);
-            self.sendReq(req, theUrl, y);
+            await Service._sendReq(req, theUrl, y);
           });
         });
         // return res.json(response.data)
@@ -1069,17 +874,17 @@ export default class Service {
       .catch((e) => {
         // console.log('#page =====>     error')
 
-        let y = page;
+        const y = page;
 
-        self.sendReq(req, theUrl, y);
+        await Service._sendReq(req, theUrl, y);
       });
   }
   static async _checkOrder(req, item, k = -1) {
-    let Customer = req.mongoose.model("Customer");
-    let Order = req.mongoose.model("Order");
-    let Media = req.mongoose.model("Media");
-    let Notfound = 0;
-    let obj = {};
+    const Customer = store.db.model("Customer");
+    const Order = store.db.model("Order");
+    const Media = store.db.model("Media");
+    const Notfound = 0;
+    const obj = {};
     if (item.data && item.data.date_created) {
       // console.log('date_created', item.data.date_created, new Date(item.data.date_created))
       obj["createdAt"] = moment(item.data.date_created).format();
@@ -1091,8 +896,8 @@ export default class Service {
     }
     if (item.data && item.data.coupon_lines) {
       _.forEach(item.data.coupon_lines, (coupon_lines) => {
-        let dcode = coupon_lines.code;
-        let discountAmount = coupon_lines.discount;
+        const dcode = coupon_lines.code;
+        const discountAmount = coupon_lines.discount;
         if (dcode) {
           obj["discountCode"] = dcode;
         }
@@ -1100,7 +905,7 @@ export default class Service {
           obj["discountAmount"] = discountAmount;
         }
         if (coupon_lines.meta_data && coupon_lines.meta_data[0]) {
-          let discount = coupon_lines.meta_data[0].display_value.amount;
+          const discount = coupon_lines.meta_data[0].display_value.amount;
 
           if (discount) {
             obj["discount"] = discount;
@@ -1113,7 +918,7 @@ export default class Service {
         parseInt(item.data.discount_total) + parseInt(item.data.discount_tax);
     }
     if (item.data && item.data.line_items) {
-      let theCart = [],
+      const theCart = [],
         thePackage = [];
       _.forEach(item.data.line_items, (cart_data) => {
         theCart.push({
@@ -1149,8 +954,8 @@ export default class Service {
         obj["paymentStatus"] = "paid";
         obj["paid"] = "true";
       }
-      if (item.data.status == "completed") {
-        obj["status"] = "complete";
+      if (item.data.status == "compconsted") {
+        obj["status"] = "compconste";
         obj["paymentStatus"] = "paid";
         obj["paid"] = "true";
       }
@@ -1197,7 +1002,7 @@ export default class Service {
     if (item.data && item.data.cart_tax) {
       obj["taxAmount"] = parseInt(item.data.cart_tax);
     }
-    let internationalCode = null,
+    const internationalCode = null,
       sex = null,
       birthday = null,
       monthday = null;
@@ -1219,7 +1024,7 @@ export default class Service {
     }
 
     if (item.data && item.data.billing && item.data.billing.phone) {
-      let custObj = {
+      const custObj = {
         // 'firstName': item.data.billing.first_name,
         // 'lastName': item.data.billing.last_name,
       };
@@ -1236,7 +1041,7 @@ export default class Service {
         // console.log(monthday + '/' + birthday)
         // custObj['birthdate']=sex
       }
-      let phoneNumber = item.data.billing.phone.slice(-12);
+      const phoneNumber = item.data.billing.phone.slice(-12);
       phoneNumber = phoneNumber.replace(/\s/g, "");
       // console.log('==> addCustomer() 1.11');
       phoneNumber = persianJs(phoneNumber).arabicNumber().toString().trim();
@@ -1319,8 +1124,8 @@ export default class Service {
               }
               // if(!item.data.billing.last_name){
               //     console.log(item.orderNumber+' has not last name')
-              //     let las=item.data.billing.first_name.split(' ');
-              //     let fi=las.shift()
+              //     const las=item.data.billing.first_name.split(' ');
+              //     const fi=las.shift()
               //     console.log('las')
               //     obj['firstName']=fi;
               //     obj['lastName']=las.join(' ', ' ')
