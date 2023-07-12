@@ -1,49 +1,39 @@
-import React, { useEffect, useState } from 'react';
-
-import { dFormat } from './../../functions/utils';
-
+import { useEffect, useState, memo } from 'react';
 import { Button } from 'shards-react';
 import { useParams } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import { useDispatch } from 'react-redux';
+import { useNotify, useTranslate } from 'react-admin';
+import clsx from 'clsx';
 
-// import ComponentOptionBox from "#c/components/page-builder/ComponentOptionBox";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.rtl.min.css';
-import './../../assets/shards-dashboards.1.1.0.min.css';
-import './../../assets/globalforpagebuilder.css';
-import './../../assets/nodeeweb-page-builder.css';
-import { DndProvider } from 'react-dnd';
-// import { DndProvider, useDrag ,useDrop} from "react-dnd";
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import '@/assets/shards-dashboards.1.1.0.min.css';
+import '@/assets/globalforpagebuilder.css';
+import '@/assets/nodeeweb-page-builder.css';
 
+import Component from '@/components/page-builder/Component';
+import OptionBox from '@/components/page-builder/OptionBox';
 import {
-  showNotification,
-  useForm,
-  useNotify,
-  useTranslate,
-} from 'react-admin';
-
-import Component from './../../components/page-builder/Component';
-import OptionBox from './../../components/page-builder/OptionBox';
-import {
-  addBookmark,
   changeThemeData,
   changeThemeDataFunc,
-  clearPost,
-  getBlogPost,
   GetBuilder,
-  isClient,
-  ItemTypes,
-  loadPost,
-  loveIt,
   SaveBuilder,
-  savePost,
-} from './../../functions/index';
-import DefaultOptions from './../../components/page-builder/DefaultOptions';
+} from '@/functions';
+import DefaultOptions from '@/components/page-builder/DefaultOptions';
+
+const generateID = (tokenLen = 5) => {
+  let text = '';
+  const possible =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < tokenLen; ++i)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+};
 
 const Core = (props) => {
-  const [tabValue, setTabValue] = React.useState(0);
+  const [tabValue, setTabValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
@@ -73,18 +63,18 @@ const Core = (props) => {
     componentForSetting,
     componentOptionsBox,
   } = state;
+
   const params = useParams();
-  let _id = params._id || null;
-  let model = params.model || 'page';
+  const { _id, model = 'page' } = params || null;
+
   const load = (options = {}) => {
     if (_id) {
       changeThemeDataFunc().then((e) => {
         dispatch(changeThemeData(e));
       });
-      GetBuilder(model, _id).then(async (r) => {
-        if (r) {
-          setData(r);
-        }
+      GetBuilder(model, _id).then((r) => {
+        if (r) setData(r);
+
         if (r && r.elements) {
           setC(r.elements.length);
           setState({ ...state, components: r.elements });
@@ -114,10 +104,6 @@ const Core = (props) => {
     console.log('useEffect');
     load();
   }, []);
-  useEffect(() => {
-    console.log('useEffect...', state);
-    // load();
-  }, [state]);
 
   const toggleOptionBox = (extra) => {
     setState({ ...state, optionBox: !state.optionBox, ...extra });
@@ -596,15 +582,7 @@ const Core = (props) => {
       });
     }
   };
-  const generateID = (tokenLen = 5) => {
-    let text = '';
-    const possible =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < tokenLen; ++i)
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
 
-    return text;
-  };
   const addToComponents2 = (element, extra) => {
     console.log('addToComponents:', element);
     console.log('where?', sourceAddress);
@@ -769,10 +747,14 @@ const Core = (props) => {
 
     // setState({ ...state, components: component });
   };
+
   return (
-    <React.Fragment>
+    <>
       <div
-        className={'nodeeweb-page-builder-wrapper ' + translate('direction')}
+        className={clsx(
+          'nodeeweb-page-builder-wrapper',
+          translate('direction')
+        )}
         style={{
           margin: 20,
         }}>
@@ -828,7 +810,7 @@ const Core = (props) => {
             padding: '20px',
           }}>
           {tabValue === 0 && (
-            <React.Fragment>
+            <>
               {components &&
                 components.map((component, index) => {
                   if (!component) {
@@ -876,7 +858,7 @@ const Core = (props) => {
                   Add Element <AddIcon />
                 </span>
               </div>
-            </React.Fragment>
+            </>
           )}
           {tabValue === 1 && (
             <div style={{ direction: 'ltr' }}>
@@ -907,9 +889,9 @@ const Core = (props) => {
         open={state.optionBox}
         addToComponents={addToComponents}
       />
-    </React.Fragment>
+    </>
   );
 };
 
 export const PageServer = [{}];
-export default React.memo(Core);
+export default memo(Core);
