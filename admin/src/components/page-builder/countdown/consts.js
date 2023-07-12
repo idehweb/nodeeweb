@@ -1,2 +1,1 @@
-export const
-  countdownRef = 'countdown';
+export const countdownRef = 'countdown';

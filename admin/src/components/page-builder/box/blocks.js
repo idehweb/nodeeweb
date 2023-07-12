@@ -1,12 +1,11 @@
-import {
-  boxRef
-} from './consts';
+import { boxRef } from './consts';
 
-export default function(editor, opt = {}) {
+export default function (editor, opt = {}) {
   const c = opt;
   const bm = editor.BlockManager;
   const pfx = c.boxClsPfx;
-  const style = c.defaultStyle ? `<style>
+  const style = c.defaultStyle
+    ? `<style>
     .${pfx} {
       text-align: center;
       font-family: Helvetica, serif;
@@ -30,7 +29,8 @@ export default function(editor, opt = {}) {
     .${pfx}-block {
       display: inline-block;
     }
-  </style>` : '';
+  </style>`
+    : '';
 
   if (c.blocks.indexOf(boxRef) >= 0) {
     bm.add(boxRef, {
@@ -42,7 +42,7 @@ export default function(editor, opt = {}) {
       content: `
         <div class="${pfx}">${'boxBlock'}${pfx}</div>
         ${style} 
-      `
+      `,
     });
   }
 }

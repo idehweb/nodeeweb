@@ -1,19 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { LinearProgress } from "@mui/material";
-import { FileField, FileInput, useInput } from "react-admin";
-import API, { BASE_URL } from "@/functions/API";
-import { TheImages, showFiles } from "@/components";
-import { useWatch } from "react-hook-form";
+import React, { useEffect, useState } from 'react';
+import { LinearProgress } from '@mui/material';
+import { FileField, FileInput, useInput } from 'react-admin';
+import API, { BASE_URL } from '@/functions/API';
+import { TheImages, showFiles } from '@/components';
+import { useWatch } from 'react-hook-form';
 
-API.defaults.headers.common["Content-Type"] = "multipart/form-data";
+API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 
 export default (props) => {
-
-
   // console.log("UploaderField...");
   // console.log("props", props);
-  let valuesphotos = useWatch({ name: "photos" });
-  let valuesthumbnail = useWatch({ name: "thumbnail" });
+  let valuesphotos = useWatch({ name: 'photos' });
+  let valuesthumbnail = useWatch({ name: 'thumbnail' });
 
   // let {values} = useFormState();
   let { field } = useInput(props);
@@ -24,7 +22,7 @@ export default (props) => {
   const [progress, setProgress] = useState(0);
   // console.log('props.photos',valuesthumbnail);
 
-  const [v, setV] = useState(valuesthumbnail || "");
+  const [v, setV] = useState(valuesthumbnail || '');
   // console.log("props.v", v, valuesthumbnail);
 
   // useEffect(() => {
@@ -40,13 +38,13 @@ export default (props) => {
     if (!file) return;
 
     let formData = new FormData();
-    formData.append("file", file);
-    formData.append("type", file.type);
-    API.post("/document/fileUpload", formData, {
+    formData.append('file', file);
+    formData.append('type', file.type);
+    API.post('/document/fileUpload', formData, {
       onUploadProgress: (e) => {
         let p = Math.floor((e.loaded * 100) / e.total);
         setProgress(p);
-      }
+      },
     })
       .then(({ data = {} }) => {
         if (data.success) {
@@ -61,9 +59,9 @@ export default (props) => {
             // console.log("setGallery...");
             setGallery(null);
             valuesphotos = GalleryTemp;
-            props.inReturn(GalleryTemp).then(res => {
+            props.inReturn(GalleryTemp).then((res) => {
               setGallery(GalleryTemp);
-              setCounter(counter+1);
+              setCounter(counter + 1);
               // console.log('res ',res);
             });
           }
@@ -90,7 +88,6 @@ export default (props) => {
     props.setPhotos(cc);
 
     // console.log('valuesphotos',valuesphotos);
-
   };
   const onImageClick = (photo) => {
     props.thep(photo);
@@ -100,15 +97,14 @@ export default (props) => {
     // e.preventDefault();
     let c = [];
     gallery.map((gal, t) => {
-      if (g !== t)
-        c.push(gal);
+      if (g !== t) c.push(gal);
     });
     // console.log('g', g);
     setGallery(c);
   };
 
-// console.cle/sar();
-//   console.log("gallery", props);
+  // console.cle/sar();
+  //   console.log("gallery", props);
   return (
     <>
       <FileInput
@@ -117,19 +113,20 @@ export default (props) => {
         onBlur={field.onBlur}
         accept={props.accept}
         options={{
-          onDrop: handleUpload
+          onDrop: handleUpload,
         }}>
-        <FileField
-          source="src"
-          title="title"
-        />
+        <FileField source="src" title="title" />
       </FileInput>
-      <TheImages gallery={gallery} v={v} onImageClick={onImageClick} deletFromObject={deletFromObject} counter={counter}/>
+      <TheImages
+        gallery={gallery}
+        v={v}
+        onImageClick={onImageClick}
+        deletFromObject={deletFromObject}
+        counter={counter}
+      />
       {progress ? (
-        <LinearProgress variant="determinate" value={progress}/>
+        <LinearProgress variant="determinate" value={progress} />
       ) : null}
-
-
     </>
   );
 };

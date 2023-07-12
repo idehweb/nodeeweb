@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { useTranslate } from 'react-admin';
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import { Form, FormGroup, FormInput ,Button} from "shards-react";
-import { Container, Row, Col } from "shards-react";
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import { Form, FormGroup, FormInput, Button } from 'shards-react';
+import { Container, Row, Col } from 'shards-react';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Box from '@mui/material/Box';
@@ -11,16 +11,12 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
-
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 
-
-
-
 function ConditionFiled(props) {
-  const translate=useTranslate();
-  const {type,data} = props;
+  const translate = useTranslate();
+  const { type, data } = props;
   const [condition, setCondition] = React.useState(false);
   const [showError, setShowError] = React.useState(false);
   const [selectOptionValue, setSelectOptionValue] = React.useState('');
@@ -28,47 +24,45 @@ function ConditionFiled(props) {
     return;
   }
   let bindData = [];
-  if(data){
+  if (data) {
     // setOptionValues(data);
     bindData = data;
-  }else{
-    bindData =
-      [
-        {
-          title: "",
-          value : ""
-        }
-      ]
-    ;
+  } else {
+    bindData = [
+      {
+        title: '',
+        value: '',
+      },
+    ];
   }
-  const [optionValues, setOptionValues] = useState(bindData)
+  const [optionValues, setOptionValues] = useState(bindData);
   props.saveOptions(optionValues);
   let handleChange = (i, e) => {
     let newFormValues = [...optionValues];
     newFormValues[i][e.target.name] = e.target.value;
     setOptionValues(newFormValues);
-  }
+  };
 
   let addFormFields = () => {
-    setOptionValues([...optionValues, { title: "", value: "" }])
-  }
+    setOptionValues([...optionValues, { title: '', value: '' }]);
+  };
 
   let removeFormFields = (i) => {
     let newFormValues = [...optionValues];
     newFormValues.splice(i, 1);
-    setOptionValues(newFormValues)
-  }
+    setOptionValues(newFormValues);
+  };
   let handleSubmit = (event) => {
     event.preventDefault();
     // props.saveOptions(JSON.stringify(optionValues))
     props.saveOptions(optionValues);
-  }
+  };
   const handleChangeCondition = (event) => {
-    if(optionValues.length <= 1){
-      setShowError(true)
+    if (optionValues.length <= 1) {
+      setShowError(true);
       setCondition(false);
-    }else{
-      setShowError(false)
+    } else {
+      setShowError(false);
       setCondition(event.target.checked);
     }
   };
@@ -76,21 +70,38 @@ function ConditionFiled(props) {
     <React.Fragment>
       <Form>
         <Container key={'addField'}>
-          <Button theme="success" size="sm" onClick={() => addFormFields()}>Add Option</Button>
+          <Button theme="success" size="sm" onClick={() => addFormFields()}>
+            Add Option
+          </Button>
           {/*<Button theme="info" size="sm" onClick={(e) => handleSubmit(e)}>Save</Button>*/}
           <Row>
             {optionValues.map((element, index) => (
-              <Col className={"d-flex justify-content-start"}>
+              <Col className={'d-flex justify-content-start'}>
                 <FormGroup key={index}>
                   <label htmlFor="title">Title</label>
-                  <FormInput id="title" type="text" name="title" value={element.title || ""} onChange={e => handleChange(index, e)} />
+                  <FormInput
+                    id="title"
+                    type="text"
+                    name="title"
+                    value={element.title || ''}
+                    onChange={(e) => handleChange(index, e)}
+                  />
                   <label htmlFor="value">Value</label>
-                  <FormInput id="value" type="text" name="value" value={element.value || ""} onChange={e => handleChange(index, e)} />
-                  {
-                    index ?
-                      <Button size="sm" theme="danger" onClick={() => removeFormFields(index)}><RemoveCircleOutlineIcon/></Button>
-                      : null
-                  }
+                  <FormInput
+                    id="value"
+                    type="text"
+                    name="value"
+                    value={element.value || ''}
+                    onChange={(e) => handleChange(index, e)}
+                  />
+                  {index ? (
+                    <Button
+                      size="sm"
+                      theme="danger"
+                      onClick={() => removeFormFields(index)}>
+                      <RemoveCircleOutlineIcon />
+                    </Button>
+                  ) : null}
                 </FormGroup>
               </Col>
             ))}
@@ -116,7 +127,6 @@ function ConditionFiled(props) {
         {/*            }*/}
         {/*          </select>*/}
         {/*        </label>*/}
-
 
         {/*        <Box sx={{ minWidth: 120 }}>*/}
         {/*          <FormControl >*/}
@@ -150,10 +160,8 @@ function ConditionFiled(props) {
         {/*  }*/}
         {/*</Container>*/}
       </Form>
-
-
     </React.Fragment>
-  )
+  );
 }
 
-export default (ConditionFiled);
+export default ConditionFiled;

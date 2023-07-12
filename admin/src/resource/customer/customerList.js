@@ -16,40 +16,53 @@ import {
   TextField,
   TextInput,
   TopToolbar,
-  useTranslate
-} from "react-admin";
-import { dateFormat } from "@/functions";
-import { List, SimpleForm } from "@/components";
-import { ImportButton } from "react-admin-import-csv";
-import API, { BASE_URL } from "@/functions/API";
-import jsonExport from "jsonexport/dist";
+  useTranslate,
+} from 'react-admin';
+import { dateFormat } from '@/functions';
+import { List, SimpleForm } from '@/components';
+import { ImportButton } from 'react-admin-import-csv';
+import API, { BASE_URL } from '@/functions/API';
+import jsonExport from 'jsonexport/dist';
 const PostFilter = (props) => {
   const translate = useTranslate();
 
-  return (
-    [<Filter {...props}>
-      <TextInput label={translate("resources.customers.firstName")} source="firstName" alwaysOn/>
-      <TextInput label={translate("resources.customers.lastName")} source="lastName" alwaysOn/>
-      <TextInput label={translate("resources.customers.phoneNumber")} source="phoneNumber" alwaysOn/>
-
-    </Filter>
-    ]
-  );
+  return [
+    <Filter {...props}>
+      <TextInput
+        label={translate('resources.customers.firstName')}
+        source="firstName"
+        alwaysOn
+      />
+      <TextInput
+        label={translate('resources.customers.lastName')}
+        source="lastName"
+        alwaysOn
+      />
+      <TextInput
+        label={translate('resources.customers.phoneNumber')}
+        source="phoneNumber"
+        alwaysOn
+      />
+    </Filter>,
+  ];
 };
 
-const PostPagination = props => <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />;
-const exporter = customers => {
+const PostPagination = (props) => (
+  <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />
+);
+const exporter = (customers) => {
   let allpros = [];
-  const customerForExport = customers.map(customer => {
+  const customerForExport = customers.map((customer) => {
     const { backlinks, author, ...customerForExport } = customer; // omit backlinks and author
-    if(customer){
+    if (customer) {
       allpros.push({
         _id: customer._id,
         firstName: customer.firstName && customer.firstName,
         lastName: customer.lastName && customer.lastName,
         activationCode: customer.activationCode && customer.activationCode,
         email: customer.email && customer.email,
-        internationalCode: customer.internationalCode && customer.internationalCode,
+        internationalCode:
+          customer.internationalCode && customer.internationalCode,
         source: customer.source && customer.source,
         credit: customer.credit && customer.credit,
         orderCount: customer.orderCount && customer.orderCount,
@@ -59,24 +72,28 @@ const exporter = customers => {
     }
     return customerForExport;
   });
-  jsonExport(allpros, {
-    headers: [
-      "_id",
-      "firstName",
-      "lastName",
-      "activationCode",
-      "email",
-      "internationalCode",
-      "source", 
-      "credit",
-      "orderCount",
-      "active",
-      "createdAt"
-    ] // order fields in the export
-  }, (err, csv) => {
-    const BOM = "\uFEFF";
-    downloadCSV(`${BOM} ${csv}`, "customers"); // download as 'posts.csv` file
-  });
+  jsonExport(
+    allpros,
+    {
+      headers: [
+        '_id',
+        'firstName',
+        'lastName',
+        'activationCode',
+        'email',
+        'internationalCode',
+        'source',
+        'credit',
+        'orderCount',
+        'active',
+        'createdAt',
+      ], // order fields in the export
+    },
+    (err, csv) => {
+      const BOM = '\uFEFF';
+      downloadCSV(`${BOM} ${csv}`, 'customers'); // download as 'posts.csv` file
+    }
+  );
 };
 
 const ListActions = (props) => {
@@ -94,31 +111,30 @@ const ListActions = (props) => {
     // postCommitCallback?: (error: any) => void;
     // Transform rows before anything is sent to dataprovider
     transformRows: (csvRows) => {
-      console.log("csvRows", csvRows);
+      console.log('csvRows', csvRows);
       // let update = [], create = [];
       let array = [];
       let postsForExport = [];
       if (csvRows)
-        postsForExport = csvRows.map(row => {
+        postsForExport = csvRows.map((row) => {
           // console.log("row", row);
 
-          row._id = row[" _id"];
+          row._id = row[' _id'];
           if (row._id)
             array.push({
-              _id: row._id
+              _id: row._id,
             });
-          if (!row.phoneNumber)
-            row.phoneNumber = row.phoneNumber2;
+          if (!row.phoneNumber) row.phoneNumber = row.phoneNumber2;
 
           if (row.phoneNumber && row.phoneNumber.toString().length < 12) {
             if (row.phoneNumber.toString().length === 10) {
-              row.phoneNumber = "98" + row.phoneNumber.toString();
+              row.phoneNumber = '98' + row.phoneNumber.toString();
             }
           }
           // else
           // delete row.photos;
-          delete row[" _id"];
-          delete row["id"];
+          delete row[' _id'];
+          delete row['id'];
           // row.title = {
           //   en: row.title_en,
           //   fa: row.title_fa,
@@ -140,11 +156,11 @@ const ListActions = (props) => {
           return row;
         });
       // console.log("ForImport", postsForExport);
-      API.post("/customer/import", JSON.stringify(postsForExport))
+      API.post('/customer/import', JSON.stringify(postsForExport))
         .then(({ data = {} }) => {
           const refresh = useRefresh();
           refresh();
-          alert("it is ok");
+          alert('it is ok');
           // window.location.reload();
           // if (data.success) {
           //   values = [];
@@ -152,30 +168,30 @@ const ListActions = (props) => {
           // }
         })
         .catch((err) => {
-          console.log("error", err);
+          console.log('error', err);
         });
     },
     validateRow: async (row) => {
-      console.log("row", row);
+      console.log('row', row);
       if (row.id) {
         // throw new Error("AAAA");
       }
     },
-    postCommitCallback: reportItems => {
-      console.log("reportItems", { reportItems });
+    postCommitCallback: (reportItems) => {
+      console.log('reportItems', { reportItems });
     },
     // Async function to Validate a row, reject the promise if it's not valid
     parseConfig: {
-      dynamicTyping: true
+      dynamicTyping: true,
       // complete: function(results, file) {
       //     console.log("Parsing complete:", results, file);
       // },
       // preview:1
-    }
+    },
   };
   return (
     <TopToolbar>
-      <ExportButton maxResults={10000000}/>
+      <ExportButton maxResults={10000000} />
       <ImportButton {...props} {...config} />
     </TopToolbar>
   );
@@ -183,26 +199,51 @@ const ListActions = (props) => {
 export const customerList = (props) => {
   const translate = useTranslate();
   return (
-    <List exporter={exporter}
+    <List
+      exporter={exporter}
       {...props}
-      filters={<PostFilter/>} pagination={<PostPagination/>} actions={<ListActions/>}>
+      filters={<PostFilter />}
+      pagination={<PostPagination />}
+      actions={<ListActions />}>
       <Datagrid>
-        <NumberField source="phoneNumber" label={translate("resources.customers.phoneNumber")}/>
-        <TextField source="activationCode" label={translate("resources.customers.activationCode")}/>
-        <TextField source="firstName" label={translate("resources.customers.firstName")}/>
-        <TextField source="lastName" label={translate("resources.customers.lastName")}/>
-        <EmailField source="email" label={translate("resources.customers.email")}/>
-        <TextField source="internationalCode" label={translate("resources.customers.internationalCode")}/>
-        <TextField source="source" label={translate("resources.customers.source")}/>
-        <ReferenceArrayField label={translate("resources.customers.customerGroup")} reference="customerGroup"
-                             source="customerGroup">
+        <NumberField
+          source="phoneNumber"
+          label={translate('resources.customers.phoneNumber')}
+        />
+        <TextField
+          source="activationCode"
+          label={translate('resources.customers.activationCode')}
+        />
+        <TextField
+          source="firstName"
+          label={translate('resources.customers.firstName')}
+        />
+        <TextField
+          source="lastName"
+          label={translate('resources.customers.lastName')}
+        />
+        <EmailField
+          source="email"
+          label={translate('resources.customers.email')}
+        />
+        <TextField
+          source="internationalCode"
+          label={translate('resources.customers.internationalCode')}
+        />
+        <TextField
+          source="source"
+          label={translate('resources.customers.source')}
+        />
+        <ReferenceArrayField
+          label={translate('resources.customers.customerGroup')}
+          reference="customerGroup"
+          source="customerGroup">
           <SingleFieldList>
-            <ChipField source="slug"/>
+            <ChipField source="slug" />
           </SingleFieldList>
         </ReferenceArrayField>
         {/*<FunctionField label={translate("resources.customer.customerGroup")}*/}
         {/*render={record => {*/}
-
 
         {/*return (*/}
         {/*<div className={"categories"}>*/}
@@ -214,39 +255,50 @@ export const customerList = (props) => {
         {/*</div>*/}
         {/*);*/}
         {/*}}/>*/}
-        <FunctionField label={translate("resources.customers.date")}
-                       render={record => {
+        <FunctionField
+          label={translate('resources.customers.date')}
+          render={(record) => {
+            return (
+              <div className="theDate">
+                <div>
+                  {translate('resources.customers.createdAt') +
+                    ': ' +
+                    `${dateFormat(record.createdAt)}`}
+                </div>
+                <div>
+                  {translate('resources.customers.updatedAt') +
+                    ': ' +
+                    `${dateFormat(record.updatedAt)}`}
+                </div>
 
-                         return (
-                           <div className='theDate'>
-                             <div>
-                               {translate("resources.customers.createdAt") + ": " + `${dateFormat(record.createdAt)}`}
-                             </div>
-                             <div>
-                               {translate("resources.customers.updatedAt") + ": " + `${dateFormat(record.updatedAt)}`}
-                             </div>
+                {Boolean(record.orderCount) && (
+                  <div>
+                    {translate('resources.customers.orderCount') +
+                      ': ' +
+                      `${record.orderCount}`}
+                  </div>
+                )}
+              </div>
+            );
+          }}
+        />
 
-                             {Boolean(record.orderCount) && <div>
-                               {translate("resources.customers.orderCount") + ": " + `${(record.orderCount)}`}
-                             </div>}
-                           </div>
-                         );
-                       }}/>
-
-        <BooleanField source="active" label={translate("resources.customers.active")}/>
-        <FunctionField label={translate("resources.product.edit")}
-                       render={record => (
-                         <>
-                           <EditButton/>
-                           <ShowButton/>
-
-                         </>
-                       )}/>
-
+        <BooleanField
+          source="active"
+          label={translate('resources.customers.active')}
+        />
+        <FunctionField
+          label={translate('resources.product.edit')}
+          render={(record) => (
+            <>
+              <EditButton />
+              <ShowButton />
+            </>
+          )}
+        />
       </Datagrid>
     </List>
   );
 };
-
 
 export default customerList;

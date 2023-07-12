@@ -1,5 +1,4 @@
-import React from "react";
-
+import React from 'react';
 
 export default (props) => {
   return [
@@ -8,49 +7,41 @@ export default (props) => {
       name: 'cart',
       color: 'tusabad',
       className: 'tusabad',
-
     },
     {
       id: 'checkout',
       name: 'checkout',
-      color: 'tucheckout'
-
+      color: 'tucheckout',
     },
     {
       id: 'processing',
       name: 'processing',
-      color: 'warn'
-
+      color: 'warn',
     },
     {
       id: 'indoing',
       name: 'indoing',
-      color: 'confirmshode'
-
+      color: 'confirmshode',
     },
     {
       id: 'makingready',
       name: 'makingready',
-      color: 'amadesazi'
-
+      color: 'amadesazi',
     },
     {
       id: 'inpeyk',
       name: 'inpeyk',
-      color: 'ersalshode'
-
+      color: 'ersalshode',
     },
     {
       id: 'complete',
       name: 'complete',
-      color: 'succ'
-
+      color: 'succ',
     },
     {
       id: 'cancel',
       name: 'cancel',
-      color: 'erro'
-
-    }
+      color: 'erro',
+    },
   ];
 };

@@ -12,70 +12,59 @@ import { Link } from 'react-router-dom';
 import { useTranslate } from 'react-admin';
 import { Customer, Order } from '../types';
 
-const useStyles = makeStyles(theme => ({
-    root: {
-        flex: 1,
-    },
-    cost: {
-        marginRight: '1em',
-        color: theme.palette.text.primary,
-    },
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flex: 1,
+  },
+  cost: {
+    marginRight: '1em',
+    color: theme.palette.text.primary,
+  },
 }));
 
 const PendingOrders = (props) => {
-    const { orders = [], customers = {} } = props;
-    const classes = useStyles();
-    const translate = useTranslate();
-    return (
-        <Card className={classes.root}>
-            <CardHeader title={props.title} />
-            <List dense={true}>
-                {orders.map(record => (
-                    <ListItem
-                        key={record.id}
-                        button
-                        component={Link}
-                        to={`/action/${record.id}`}
-                    >
-                        <ListItemAvatar>
-                            {customers[record.customer_id] ? (
-                                <Avatar
-                                    src={`${
-                                        customers[record.customer_id].avatar
-                                    }?size=32x32`}
-                                />
-                            ) : (
-                                <Avatar />
-                            )}
-                        </ListItemAvatar>
-                        <ListItemText
-                            primary={new Date(record.date).toLocaleString(
-                                'en-GB'
-                            )}
-                            secondary={translate('pos.dashboard.order.items', {
-                                smart_count: record.basket.length,
-                                nb_items: record.basket.length,
-                                customer_name: customers[record.customer_id]
-                                    ? `${
-                                          customers[record.customer_id]
-                                              .first_name
-                                      } ${
-                                          customers[record.customer_id]
-                                              .last_name
-                                      }`
-                                    : '',
-                            })}
-                        />
-                        <ListItemSecondaryAction>
-                            <span className={classes.cost}>
-                                {record.total}$
-                            </span>
-                        </ListItemSecondaryAction>
-                    </ListItem>
-                ))}
-            </List>
-        </Card>
-    );
+  const { orders = [], customers = {} } = props;
+  const classes = useStyles();
+  const translate = useTranslate();
+  return (
+    <Card className={classes.root}>
+      <CardHeader title={props.title} />
+      <List dense={true}>
+        {orders.map((record) => (
+          <ListItem
+            key={record.id}
+            button
+            component={Link}
+            to={`/action/${record.id}`}>
+            <ListItemAvatar>
+              {customers[record.customer_id] ? (
+                <Avatar
+                  src={`${customers[record.customer_id].avatar}?size=32x32`}
+                />
+              ) : (
+                <Avatar />
+              )}
+            </ListItemAvatar>
+            <ListItemText
+              primary={new Date(record.date).toLocaleString('en-GB')}
+              secondary={translate('pos.dashboard.order.items', {
+                smart_count: record.basket.length,
+                nb_items: record.basket.length,
+                customer_name: customers[record.customer_id]
+                  ? `${customers[record.customer_id].first_name} ${
+                      customers[record.customer_id].last_name
+                    }`
+                  : '',
+              })}
+            />
+            <ListItemSecondaryAction>
+              <span className={classes.cost}>{record.total}$</span>
+            </ListItemSecondaryAction>
+          </ListItem>
+        ))}
+      </List>
+    </Card>
+  );
 };
 
 export default PendingOrders;

@@ -1,9 +1,9 @@
-import Configuration from "./Configuration";
-import PrivateConfiguration from "./PrivateConfiguration";
+import Configuration from './Configuration';
+import PrivateConfiguration from './PrivateConfiguration';
 
 // export const Configuration;
-const configuration={
+const configuration = {
   Configuration,
-  PrivateConfiguration
-}
+  PrivateConfiguration,
+};
 export default configuration;

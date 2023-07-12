@@ -1,17 +1,25 @@
-import Welcome from "#c/components/dashboard/Welcome";
-import React, { useState } from "react";
-import { Chart as ChartJS, Filler, Legend, LineElement, PointElement, RadialLinearScale, Tooltip } from "chart.js";
-import { useDataProvider, useTranslate } from "react-admin";
-import { BASE_URL } from "#c/functions/API";
-import CustomerChart from "#c/components/dashboard/CustomerChart";
-import ProductOrdersTable from "#c/components/dashboard/ProductOrdersTable";
-import EntryFormChart from "#c/components/dashboard/EntryFormChart";
-import OrderChartDemo from "#c/components/dashboard/OrderChartDemo";
-import OrderChart from "#c/components/dashboard/OrderChart";
-import DragDropTest from "#c/components/dashboard/base/DragDropTest";
+import Welcome from '#c/components/dashboard/Welcome';
+import React, { useState } from 'react';
+import {
+  Chart as ChartJS,
+  Filler,
+  Legend,
+  LineElement,
+  PointElement,
+  RadialLinearScale,
+  Tooltip,
+} from 'chart.js';
+import { useDataProvider, useTranslate } from 'react-admin';
+import { BASE_URL } from '#c/functions/API';
+import CustomerChart from '#c/components/dashboard/CustomerChart';
+import ProductOrdersTable from '#c/components/dashboard/ProductOrdersTable';
+import EntryFormChart from '#c/components/dashboard/EntryFormChart';
+import OrderChartDemo from '#c/components/dashboard/OrderChartDemo';
+import OrderChart from '#c/components/dashboard/OrderChart';
+import DragDropTest from '#c/components/dashboard/base/DragDropTest';
 
-const Spacer = () => <span style={{ width: "1em" }}/>;
-const VerticalSpacer = () => <span style={{ height: "1em" }}/>;
+const Spacer = () => <span style={{ width: '1em' }} />;
+const VerticalSpacer = () => <span style={{ height: '1em' }} />;
 ChartJS.register(
   RadialLinearScale,
   PointElement,
@@ -22,31 +30,34 @@ ChartJS.register(
 );
 
 export const data = {
-  labels: ["Thing 1", "Thing 2", "Thing 3", "Thing 4", "Thing 5", "Thing 6"],
+  labels: ['Thing 1', 'Thing 2', 'Thing 3', 'Thing 4', 'Thing 5', 'Thing 6'],
   datasets: [
     {
-      label: "# of Votes",
+      label: '# of Votes',
       data: [2, 9, 3, 5, 2, 3],
-      backgroundColor: "rgba(255, 99, 132, 0.2)",
-      borderColor: "rgba(255, 99, 132, 1)",
-      borderWidth: 1
-    }
-  ]
+      backgroundColor: 'rgba(255, 99, 132, 0.2)',
+      borderColor: 'rgba(255, 99, 132, 1)',
+      borderWidth: 1,
+    },
+  ],
 };
 
-
 const styles = {
-  flex: { display: "flex" },
-  flexColumn: { display: "flex", flexDirection: "column" },
+  flex: { display: 'flex' },
+  flexColumn: { display: 'flex', flexDirection: 'column' },
   leftCol: {},
   rightCol: {},
-  singleCol: { marginTop: "1em", marginBottom: "1em" }
+  singleCol: { marginTop: '1em', marginBottom: '1em' },
 };
 
 const MainDashboard = () => {
   const [state, setState] = useState({});
   const translate = useTranslate();
-  let sOrders = [], nbPendingReviews = [], dollarPrice = 0, pendingReviews = [], pendingReviewsCustomers = [];
+  let sOrders = [],
+    nbPendingReviews = [],
+    dollarPrice = 0,
+    pendingReviews = [],
+    pendingReviewsCustomers = [];
 
   const dataProvider = useDataProvider();
   // const isXSmall = useMediaQuery((theme) =>
@@ -278,21 +289,20 @@ const MainDashboard = () => {
 
   return (
     <>
-      <Welcome/>
-      <div style={styles.flex} className={"flex-wrapp d-block"}>
-        <div style={styles.leftCol} className={"leftCol"}>
-          <div className={"dwfghrtjy"}>
+      <Welcome />
+      <div style={styles.flex} className={'flex-wrapp d-block'}>
+        <div style={styles.leftCol} className={'leftCol'}>
+          <div className={'dwfghrtjy'}>
             {/*<DragDropTest/>*/}
             {/*<OrderChart title={'orders'} model={'order'}/>*/}
-            <OrderChartDemo title={'orders'} model={'order'}/>
+            <OrderChartDemo title={'orders'} model={'order'} />
             {/*<CustomerChart title={'customers'} model={'customer'}/>*/}
-            <EntryFormChart title={'entryForm'} model={'entry'}/>
-            <ProductOrdersTable title={'topProductOrders'} model={'order'}/>
-
+            <EntryFormChart title={'entryForm'} model={'entry'} />
+            <ProductOrdersTable title={'topProductOrders'} model={'order'} />
           </div>
         </div>
-        <div style={styles.rightCol} className={"rightCol"}>
-          <div className={"dwfghrtjy"}>
+        <div style={styles.rightCol} className={'rightCol'}>
+          <div className={'dwfghrtjy'}>
             {/*<OrderChart orders={pendingOrders} title={translate('resources.dashboard.countOrdersSuccess30Days')}/>*/}
             {/*<NotifChart title={'notifications'} model={'notification'}/>*/}
           </div>
@@ -300,13 +310,12 @@ const MainDashboard = () => {
       </div>
 
       <div style={styles.flex}>
-        <div style={styles.leftCol} className={"leftCol"}>
+        <div style={styles.leftCol} className={'leftCol'}>
           <div style={styles.flex}>
             {/*<MonthlyRevenue value={revenue} title={translate('resources.dashboard.countAnnLast30Days')}/>*/}
-            <Spacer/>
+            <Spacer />
             {/*<NbNewOrders value={nbNewOrders} title={translate('resources.dashboard.countPayedLast30Days')}/>*/}
             {/*<NotifChart title={'customer'} model={'customer'}/>*/}
-
           </div>
           <div style={styles.singleCol}>
             {/*<Actions*/}
@@ -315,10 +324,10 @@ const MainDashboard = () => {
             {/*/>*/}
           </div>
         </div>
-        <div style={styles.rightCol} className={"rightCol"}>
+        <div style={styles.rightCol} className={'rightCol'}>
           <div style={styles.flex}>
             {/*<MonthlyRevenue value={revenue} title={translate('resources.dashboard.countUsers')}/>*/}
-            <Spacer/>
+            <Spacer />
             {/*<NbNewOrders value={dollarPrice} title={translate('resources.dashboard.dollarPrice')}/>*/}
           </div>
 
@@ -330,13 +339,11 @@ const MainDashboard = () => {
             {/*reviews={pendingReviews}*/}
             {/*customer={pendingReviewsCustomers}*/}
             {/*/>*/}
-            <Spacer/>
-
+            <Spacer />
           </div>
         </div>
       </div>
     </>
-
   );
 };
 export default MainDashboard;

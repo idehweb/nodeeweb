@@ -1,9 +1,9 @@
-import customerCreate from "./customerCreate";
-import customerEdit from "./customerEdit";
-import customerShow from "./customerShow";
-import customerList from "./customerList";
+import customerCreate from './customerCreate';
+import customerEdit from './customerEdit';
+import customerShow from './customerShow';
+import customerList from './customerList';
 
-import { GroupAdd,Group } from "@mui/icons-material";
+import { GroupAdd, Group } from '@mui/icons-material';
 
 const Customer = {
   list: customerList,
@@ -11,6 +11,6 @@ const Customer = {
   edit: customerEdit,
   show: customerShow,
   icon: Group,
-  createIcon:GroupAdd
+  createIcon: GroupAdd,
 };
 export default Customer;

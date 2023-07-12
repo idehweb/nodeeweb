@@ -7,10 +7,10 @@ import {
   Toolbar,
   useForm,
   useRecordContext,
-  useTranslate
-} from "react-admin";
-import API, { BASE_URL } from "@/functions/API";
-import { dateFormat } from "@/functions";
+  useTranslate,
+} from 'react-admin';
+import API, { BASE_URL } from '@/functions/API';
+import { dateFormat } from '@/functions';
 import {
   CatRefField,
   EditOptions,
@@ -23,22 +23,17 @@ import {
   ShowPictures,
   SimpleForm,
   SimpleImageField,
-  UploaderField
+  UploaderField,
+} from '@/components';
+import { makeStyles } from '@mui/styles';
+import { Val } from '@/Utils';
+import Form from './pageForm';
 
-} from "@/components";
-import { makeStyles } from "@mui/styles";
-import { Val } from "@/Utils";
-import Form from "./pageForm";
-
-import React from "react";
-
+import React from 'react';
 
 const create = (props) => (
   <Create {...props}>
-    <Form>
-
-
-    </Form>
+    <Form></Form>
   </Create>
 );
 

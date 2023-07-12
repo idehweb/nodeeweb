@@ -1,7 +1,7 @@
-import pageCreate from "./pageCreate";
-import pageEdit from "./pageEdit";
-import pageList from "./pageList";
-import { LibraryBooksRounded,PostAddRounded} from "@mui/icons-material";
+import pageCreate from './pageCreate';
+import pageEdit from './pageEdit';
+import pageList from './pageList';
+import { LibraryBooksRounded, PostAddRounded } from '@mui/icons-material';
 const Page = {
   list: pageList,
   edit: pageEdit,

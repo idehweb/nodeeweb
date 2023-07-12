@@ -1,19 +1,19 @@
-import * as React from "react";
-import { useState } from "react";
+import * as React from 'react';
+import { useState } from 'react';
 // import MuiGridList from '@mui/material/GridList';
 // import GridListTile from '@mui/material/GridListTile';
 // import GridListTileBar from '@mui/material/GridListTileBar';
 // import withWidth, { WithWidth } from '@mui/material/withWidth';
-import { ShopURL } from "@/functions/API";
-import { SubmitCustomerStatus } from "@/components";
+import { ShopURL } from '@/functions/API';
+import { SubmitCustomerStatus } from '@/components';
 
-import { dateFormat } from "@/functions";
-import { useDataProvider, useTranslate } from "react-admin";
-import { useSelector } from "react-redux";
+import { dateFormat } from '@/functions';
+import { useDataProvider, useTranslate } from 'react-admin';
+import { useSelector } from 'react-redux';
 
 const CustomerStatus = (props) => {
   const { record } = props;
-  console.log('custoooooooooooooomer',record);
+  console.log('custoooooooooooooomer', record);
   const { _id, status } = record;
   const [state, setState] = useState({});
   const translate = useTranslate();
@@ -85,12 +85,15 @@ const CustomerStatus = (props) => {
   //   pageSize={20}
   //   rowsPerPageOptions={[5, 20, 100]}
   // /></div>;
-  return <div style={{ padding: "10px" }}>
-    <div className={"label-top-table"}><span>{translate("customerStatus")}</span></div>
-    {/*{JSON.stringify(status)}*/}
-    <SubmitCustomerStatus _id={_id} theStatus={status}/>
-
-  </div>;
+  return (
+    <div style={{ padding: '10px' }}>
+      <div className={'label-top-table'}>
+        <span>{translate('customerStatus')}</span>
+      </div>
+      {/*{JSON.stringify(status)}*/}
+      <SubmitCustomerStatus _id={_id} theStatus={status} />
+    </div>
+  );
 };
 
 export default CustomerStatus;

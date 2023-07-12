@@ -17,7 +17,6 @@ import FieldUploadDocument from './FieldUploadDocument';
 import ConditionRow from './ConditionRow';
 import ChatBase from './ChatBase';
 
-
 export {
   FieldObject,
   EveryFields,
@@ -36,12 +35,12 @@ export {
   FieldUploadDocument,
   FieldUploadMedia,
   ChatBase,
-  ConditionRow
+  ConditionRow,
 };
 
 import { useTranslate } from 'react-admin';
 
-export const getField = type => {
+export const getField = (type) => {
   switch (type) {
     case 'object':
       return FieldObject;

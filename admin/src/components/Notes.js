@@ -1,66 +1,58 @@
-import * as React from "react";
-import { useCallback, useEffect, useState } from "react";
+import * as React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 // import MuiGridList from '@mui/material/GridList';
 // import GridListTile from '@mui/material/GridListTile';
 // import GridListTileBar from '@mui/material/GridListTileBar';
 // import withWidth, { WithWidth } from '@mui/material/withWidth';
-import { ShopURL } from "@/functions/API";
-import { NoteShow } from "@/components";
+import { ShopURL } from '@/functions/API';
+import { NoteShow } from '@/components';
 // import CreateIcon from '@mui/icons-material/Create';
-import IconButton from "@mui/material/IconButton";
-import { dateFormat } from "@/functions";
-import { Create, SimpleForm, useDataProvider, useTranslate } from "react-admin";
-import Box from "@mui/material/Box";
-import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import { useSelector } from "react-redux";
-import { RichTextInput } from "ra-input-rich-text";
+import IconButton from '@mui/material/IconButton';
+import { dateFormat } from '@/functions';
+import { Create, SimpleForm, useDataProvider, useTranslate } from 'react-admin';
+import Box from '@mui/material/Box';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import { useSelector } from 'react-redux';
+import { RichTextInput } from 'ra-input-rich-text';
 
 const Notes = (props) => {
   const { record } = props;
   const { _id } = record;
   const [state, setState] = useState({
-    enableAddNote:false
+    enableAddNote: false,
   });
   const translate = useTranslate();
   // const version = useVersion();
   const dataProvider = useDataProvider();
   const themeData = useSelector((st) => st.themeData);
 
-
   const fetchNotes = useCallback(async () => {
     const { data: Data } = await dataProvider.get(
-      "note/0/10000?customer=" + _id,
+      'note/0/10000?customer=' + _id,
       {}
     );
-    console.log("Data", Data);
+    console.log('Data', Data);
 
-
-    setState(state => ({
+    setState((state) => ({
       ...state,
       notes: Data,
-      enableAddNote: false
-
-
+      enableAddNote: false,
     }));
-
   }, [dataProvider]);
   useEffect(() => {
     fetchNotes();
   }, []);
   const addNote = () => {
-    setState(state => ({
+    setState((state) => ({
       ...state,
-      enableAddNote: !state.enableAddNote
-
+      enableAddNote: !state.enableAddNote,
     }));
+  };
+  let { notes, enableAddNote } = state;
 
-  }
-  let { notes,enableAddNote } = state;
-
-
-  const transform = data => ({
+  const transform = (data) => ({
     ...data,
-    customer: _id
+    customer: _id,
   });
   const onSuccess = (data) => {
     fetchNotes();
@@ -70,37 +62,55 @@ const Notes = (props) => {
     //
     // }));
   };
-  return <div style={{ padding: "10px" }}>
-    <div className={"label-top-table"}>
-      <span>{translate("notes")}</span>
-      <span>
-      <IconButton
-      aria-label="create" onClick={(e)=>{
-        addNote()
-      }}><NoteAddIcon/></IconButton></span></div>
-    {!enableAddNote && <div className={"grid-box one-box"}>{notes && notes.map((d, key) => {
-      return (
-        <NoteShow key={key} note={d}/>
-      );
-    })}
-    <NoteShow add={true} onClick={(e)=>{
-      addNote()
-    }}/></div>}
-    {enableAddNote && <Box>
-      <Create
-        mutationOptions={{ onSuccess }}
-        resource="note" redirect={"false"} transform={transform}>
-        <SimpleForm>
-          <RichTextInput
-            multiline
-            fullWidth
-            source={"description." + translate("lan")}
-            toolbar={false}
-            label={translate("resources.product.description")}/>
-        </SimpleForm>
-      </Create>
-    </Box>}
-  </div>;
+  return (
+    <div style={{ padding: '10px' }}>
+      <div className={'label-top-table'}>
+        <span>{translate('notes')}</span>
+        <span>
+          <IconButton
+            aria-label="create"
+            onClick={(e) => {
+              addNote();
+            }}>
+            <NoteAddIcon />
+          </IconButton>
+        </span>
+      </div>
+      {!enableAddNote && (
+        <div className={'grid-box one-box'}>
+          {notes &&
+            notes.map((d, key) => {
+              return <NoteShow key={key} note={d} />;
+            })}
+          <NoteShow
+            add={true}
+            onClick={(e) => {
+              addNote();
+            }}
+          />
+        </div>
+      )}
+      {enableAddNote && (
+        <Box>
+          <Create
+            mutationOptions={{ onSuccess }}
+            resource="note"
+            redirect={'false'}
+            transform={transform}>
+            <SimpleForm>
+              <RichTextInput
+                multiline
+                fullWidth
+                source={'description.' + translate('lan')}
+                toolbar={false}
+                label={translate('resources.product.description')}
+              />
+            </SimpleForm>
+          </Create>
+        </Box>
+      )}
+    </div>
+  );
 };
 
 export default Notes;

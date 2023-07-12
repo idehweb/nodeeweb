@@ -33,4 +33,4 @@ export default {
   nextId: `data-${nextName}`,
   paginationId: `data-${paginationName}`,
   scrollbarId: `data-${scrollbarName}`,
-}
+};

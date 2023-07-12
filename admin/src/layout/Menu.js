@@ -1,24 +1,53 @@
-import { useState } from "react";
-import { useMediaQuery } from "@mui/material";
-import { MenuItemLink, useResourceDefinitions, useSidebarState, useTranslate } from "react-admin";
-import { Dashboard, MoreHoriz } from "@mui/icons-material";
-import SubMenu from "./SubMenu";
-import resources from "@/resource/index";
-import { useSelector } from "react-redux";
-import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
-import AddReactionIcon from "@mui/icons-material/AddReaction";
-import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
-import DynamicFormIcon from "@mui/icons-material/DynamicForm";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import SettingsInputHdmiIcon from "@mui/icons-material/SettingsInputHdmi";
-import DocumentScannerIcon from "@mui/icons-material/DocumentScanner";
+import { useState } from 'react';
+import { useMediaQuery } from '@mui/material';
+import {
+  MenuItemLink,
+  useResourceDefinitions,
+  useSidebarState,
+  useTranslate,
+} from 'react-admin';
+import { Dashboard, MoreHoriz } from '@mui/icons-material';
+import SubMenu from './SubMenu';
+import resources from '@/resource/index';
+import { useSelector } from 'react-redux';
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import AddReactionIcon from '@mui/icons-material/AddReaction';
+import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
+import DynamicFormIcon from '@mui/icons-material/DynamicForm';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import SettingsInputHdmiIcon from '@mui/icons-material/SettingsInputHdmi';
+import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 
-const {Automation, Action, Attributes, CustomerGroup, Discount, Page, Gateway, Template, ProductCategory, Customer, MainDashboard, Media, Order, Document, Note, Task, OrderCart, Post, Product, Settings, Notification, Transaction, User } = resources;
+const {
+  Automation,
+  Action,
+  Attributes,
+  CustomerGroup,
+  Discount,
+  Page,
+  Gateway,
+  Template,
+  ProductCategory,
+  Customer,
+  MainDashboard,
+  Media,
+  Order,
+  Document,
+  Note,
+  Task,
+  OrderCart,
+  Post,
+  Product,
+  Settings,
+  Notification,
+  Transaction,
+  User,
+} = resources;
 const Menu = ({ onMenuClick, dense = false }) => {
   const themeData = useSelector((st) => st.themeData);
 
-  console.log('MenusThemeData',themeData);
+  console.log('MenusThemeData', themeData);
 
   const [state, setState] = useState({
     menuProduct: false,
@@ -28,7 +57,6 @@ const Menu = ({ onMenuClick, dense = false }) => {
     productCategorySection: false,
     discountSection: false,
 
-
     menuForm: false,
     menuOrder: false,
     menuCustomer: false,
@@ -36,148 +64,160 @@ const Menu = ({ onMenuClick, dense = false }) => {
 
     menuNotification: false,
     menuPost: false,
-    menuMore: false
-
+    menuMore: false,
   });
-  const isXSmall = useMediaQuery(theme => theme.breakpoints.down("xs"));
+  const isXSmall = useMediaQuery((theme) => theme.breakpoints.down('xs'));
   const [open] = useSidebarState();
   const resources = useResourceDefinitions();
   const translate = useTranslate();
   const handleToggle = (menu) => {
-    setState(state => ({ ...state, [menu]: !state[menu] }));
+    setState((state) => ({ ...state, [menu]: !state[menu] }));
   };
-  let exclude = ["automation","task","note","category","document","action","attributes", "customergroup", "entry", "form", "gateway", "discount", "template", "settings", "order", "admin", "menu", "page", "notification", "media", "post", "customer", "product", "productcategory", "transaction"];
+  let exclude = [
+    'automation',
+    'task',
+    'note',
+    'category',
+    'document',
+    'action',
+    'attributes',
+    'customergroup',
+    'entry',
+    'form',
+    'gateway',
+    'discount',
+    'template',
+    'settings',
+    'order',
+    'admin',
+    'menu',
+    'page',
+    'notification',
+    'media',
+    'post',
+    'customer',
+    'product',
+    'productcategory',
+    'transaction',
+  ];
 
-
-
-
-
-  
   return (
-    <div className={"the-dev-menu"}>
+    <div className={'the-dev-menu'}>
       <MenuItemLink
-        to={"/"}
+        to={'/'}
         primaryText={translate(`pos.menu.dashboard`)}
-        leftIcon={<Dashboard/>}
-        exact={"true"}
+        leftIcon={<Dashboard />}
+        exact={'true'}
         dense={dense}
-        className={"vas"}
+        className={'vas'}
       />
-     
 
       <SubMenu
-        handleToggle={() => handleToggle("menuMedia")}
+        handleToggle={() => handleToggle('menuMedia')}
         isOpen={state.menuMedia}
         name="media"
         label={translate(`pos.menu.medias`)}
-        icon={<Media.icon/>}
-        dense={dense}
-      >
+        icon={<Media.icon />}
+        dense={dense}>
         <MenuItemLink
           to={{
-            pathname: "/media/create",
-            state: { _scrollToTop: true }
+            pathname: '/media/create',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.addMedia`)}
-          leftIcon={<Media.createIcon/>}
+          leftIcon={<Media.createIcon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/media",
-            state: { _scrollToTop: true }
+            pathname: '/media',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allMedias`)}
-          leftIcon={<Media.icon/>}
+          leftIcon={<Media.icon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/document/create",
-            state: { _scrollToTop: true }
+            pathname: '/document/create',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.addDocument`)}
-          leftIcon={<Document.createIcon/>}
+          leftIcon={<Document.createIcon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/document",
-            state: { _scrollToTop: true }
+            pathname: '/document',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allDocuments`)}
-          leftIcon={<Document.icon/>}
+          leftIcon={<Document.icon />}
           dense={dense}
         />
-
       </SubMenu>
       <SubMenu
-        handleToggle={() => handleToggle("menuForm")}
+        handleToggle={() => handleToggle('menuForm')}
         isOpen={state.menuForm}
         name="form"
         label={translate(`pos.menu.forms`)}
-        icon={<DynamicFormIcon/>}
-        dense={dense}
-      >
+        icon={<DynamicFormIcon />}
+        dense={dense}>
         <MenuItemLink
           to={{
-            pathname: "/form/create",
-            state: { _scrollToTop: true }
+            pathname: '/form/create',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.addForm`)}
-          leftIcon={<DynamicFormIcon/>}
+          leftIcon={<DynamicFormIcon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/form",
-            state: { _scrollToTop: true }
+            pathname: '/form',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allForms`)}
-          leftIcon={<CheckBoxIcon/>}
+          leftIcon={<CheckBoxIcon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/entry",
-            state: { _scrollToTop: true }
+            pathname: '/entry',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allEntries`)}
-          leftIcon={<DocumentScannerIcon/>}
+          leftIcon={<DocumentScannerIcon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/entry/create",
-            state: { _scrollToTop: true }
+            pathname: '/entry/create',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.addEntry`)}
-          leftIcon={<NoteAddIcon/>}
+          leftIcon={<NoteAddIcon />}
           dense={dense}
         />
-
-
       </SubMenu>
       <SubMenu
-        handleToggle={() => handleToggle("shopSection")}
+        handleToggle={() => handleToggle('shopSection')}
         isOpen={state.shopSection}
         name="sections"
-        label={translate("pos.menu.shop")}
-        icon={<ShoppingBasketIcon/>}
-        dense={dense}
-      >
+        label={translate('pos.menu.shop')}
+        icon={<ShoppingBasketIcon />}
+        dense={dense}>
         <SubMenu
-          handleToggle={() => handleToggle("menuProduct")}
+          handleToggle={() => handleToggle('menuProduct')}
           isOpen={state.menuProduct}
           name="product"
           label={translate(`pos.menu.products`)}
-          icon={<Product.icon/>}
-          dense={dense}
-        >
+          icon={<Product.icon />}
+          dense={dense}>
           <MenuItemLink
             to={{
-              pathname: "/product/create",
-              state: { _scrollToTop: true }
+              pathname: '/product/create',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.addProduct`)}
             // leftIcon={<Product.createIcon/>}
@@ -185,8 +225,8 @@ const Menu = ({ onMenuClick, dense = false }) => {
           />
           <MenuItemLink
             to={{
-              pathname: "/product",
-              state: { _scrollToTop: true }
+              pathname: '/product',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.allProducts`)}
             // leftIcon={<Product.icon/>}
@@ -195,17 +235,16 @@ const Menu = ({ onMenuClick, dense = false }) => {
         </SubMenu>
 
         <SubMenu
-          handleToggle={() => handleToggle("attributeSection")}
+          handleToggle={() => handleToggle('attributeSection')}
           isOpen={state.attributeSection}
           name="sections"
-          label={translate("pos.menu.attributes")}
-          icon={<Attributes.icon/>}
-          dense={dense}
-        >
+          label={translate('pos.menu.attributes')}
+          icon={<Attributes.icon />}
+          dense={dense}>
           <MenuItemLink
             to={{
-              pathname: "/attributes/create",
-              state: { _scrollToTop: true }
+              pathname: '/attributes/create',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.addAttribute`)}
             // leftIcon={<Attributes.createIcon/>}
@@ -213,28 +252,25 @@ const Menu = ({ onMenuClick, dense = false }) => {
           />
           <MenuItemLink
             to={{
-              pathname: "/attributes",
-              state: { _scrollToTop: true }
+              pathname: '/attributes',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.allAttributes`)}
             // leftIcon={<Attributes.icon/>}
             dense={dense}
           />
-
         </SubMenu>
         <SubMenu
-          handleToggle={() => handleToggle("productCategorySection")}
+          handleToggle={() => handleToggle('productCategorySection')}
           isOpen={state.productCategorySection}
           name="sections"
-          label={translate("pos.menu.category")}
-          icon={<ProductCategory.icon/>}
-          dense={dense}
-        >
-
+          label={translate('pos.menu.category')}
+          icon={<ProductCategory.icon />}
+          dense={dense}>
           <MenuItemLink
             to={{
-              pathname: "/productCategory/create",
-              state: { _scrollToTop: true }
+              pathname: '/productCategory/create',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.addCategory`)}
             // leftIcon={<ProductCategory.createIcon/>}
@@ -242,29 +278,25 @@ const Menu = ({ onMenuClick, dense = false }) => {
           />
           <MenuItemLink
             to={{
-              pathname: "/productCategory",
-              state: { _scrollToTop: true }
+              pathname: '/productCategory',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.allCategories`)}
             // leftIcon={<ProductCategory.icon/>}
             dense={dense}
           />
-
-
         </SubMenu>
         <SubMenu
-          handleToggle={() => handleToggle("discountSection")}
+          handleToggle={() => handleToggle('discountSection')}
           isOpen={state.discountSection}
           name="sections"
-          label={translate("pos.menu.discount")}
-          icon={<Discount.icon/>}
-          dense={dense}
-        >
-
+          label={translate('pos.menu.discount')}
+          icon={<Discount.icon />}
+          dense={dense}>
           <MenuItemLink
             to={{
-              pathname: "/discount/create",
-              state: { _scrollToTop: true }
+              pathname: '/discount/create',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.addDiscount`)}
             // leftIcon={<ProductCategory.createIcon/>}
@@ -272,8 +304,8 @@ const Menu = ({ onMenuClick, dense = false }) => {
           />
           <MenuItemLink
             to={{
-              pathname: "/discount",
-              state: { _scrollToTop: true }
+              pathname: '/discount',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.allDiscounts`)}
             // leftIcon={<ProductCategory.icon/>}
@@ -281,17 +313,16 @@ const Menu = ({ onMenuClick, dense = false }) => {
           />
         </SubMenu>
         <SubMenu
-          handleToggle={() => handleToggle("menuOrder")}
+          handleToggle={() => handleToggle('menuOrder')}
           isOpen={state.menuOrder}
           name="order"
           label={translate(`pos.menu.orders`)}
-          icon={<Order.icon/>}
-          dense={dense}
-        >
+          icon={<Order.icon />}
+          dense={dense}>
           <MenuItemLink
             to={{
-              pathname: "/order",
-              state: { _scrollToTop: true }
+              pathname: '/order',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.allOrders`)}
             // leftIcon={<Order.icon/>}
@@ -299,8 +330,8 @@ const Menu = ({ onMenuClick, dense = false }) => {
           />
           <MenuItemLink
             to={{
-              pathname: "/ordercart",
-              state: { _scrollToTop: true }
+              pathname: '/ordercart',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.cart`)}
             // leftIcon={<OrderCart.icon/>}
@@ -308,28 +339,25 @@ const Menu = ({ onMenuClick, dense = false }) => {
           />
           <MenuItemLink
             to={{
-              pathname: "/order/create",
-              state: { _scrollToTop: true }
+              pathname: '/order/create',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.addOrder`)}
             // leftIcon={<OrderCart.icon/>}
             dense={dense}
           />
-
-
         </SubMenu>
         <SubMenu
-          handleToggle={() => handleToggle("menuTransaction")}
+          handleToggle={() => handleToggle('menuTransaction')}
           isOpen={state.menuTransaction}
           name="transaction"
           label={translate(`pos.menu.transactions`)}
-          icon={<Transaction.icon/>}
-          dense={dense}
-        >
+          icon={<Transaction.icon />}
+          dense={dense}>
           <MenuItemLink
             to={{
-              pathname: "/transaction/create",
-              state: { _scrollToTop: true }
+              pathname: '/transaction/create',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.addOrderLink`)}
             // leftIcon={<OrderCart.icon/>}
@@ -337,218 +365,206 @@ const Menu = ({ onMenuClick, dense = false }) => {
           />
           <MenuItemLink
             to={{
-              pathname: "/transaction",
-              state: { _scrollToTop: true }
+              pathname: '/transaction',
+              state: { _scrollToTop: true },
             }}
             primaryText={translate(`pos.menu.allTransactions`)}
             // leftIcon={<Transaction.icon/>}
             dense={dense}
           />
-
-
         </SubMenu>
       </SubMenu>
       <SubMenu
-        handleToggle={() => handleToggle("menuCustomer")}
+        handleToggle={() => handleToggle('menuCustomer')}
         isOpen={state.menuCustomer}
         name="customer"
         label={translate(`pos.menu.customers`)}
-        icon={<Customer.icon/>}
-        dense={dense}
-      >
+        icon={<Customer.icon />}
+        dense={dense}>
         <MenuItemLink
           to={{
-            pathname: "/customer/create",
-            state: { _scrollToTop: true }
+            pathname: '/customer/create',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.addCustomer`)}
-          leftIcon={<Customer.createIcon/>}
+          leftIcon={<Customer.createIcon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/customer",
-            state: { _scrollToTop: true }
+            pathname: '/customer',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allCustomers`)}
-          leftIcon={<Customer.icon/>}
+          leftIcon={<Customer.icon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/customerGroup",
-            state: { _scrollToTop: true }
+            pathname: '/customerGroup',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allCustomerGroup`)}
-          leftIcon={<EmojiEmotionsIcon/>}
+          leftIcon={<EmojiEmotionsIcon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/customerGroup/create",
-            state: { _scrollToTop: true }
+            pathname: '/customerGroup/create',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.addCustomerGroup`)}
-          leftIcon={<AddReactionIcon/>}
+          leftIcon={<AddReactionIcon />}
           dense={dense}
         />
       </SubMenu>
       <SubMenu
-        handleToggle={() => handleToggle("menuUser")}
+        handleToggle={() => handleToggle('menuUser')}
         isOpen={state.menuUser}
         name="users"
         label={translate(`pos.menu.users`)}
-        icon={<User.icon/>}
-        dense={dense}
-      >
+        icon={<User.icon />}
+        dense={dense}>
         <MenuItemLink
           to={{
-            pathname: "/admin/create",
-            state: { _scrollToTop: true }
+            pathname: '/admin/create',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.addUser`)}
-          leftIcon={<User.createIcon/>}
+          leftIcon={<User.createIcon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/admin",
-            state: { _scrollToTop: true }
+            pathname: '/admin',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allUsers`)}
-          leftIcon={<User.icon/>}
+          leftIcon={<User.icon />}
           dense={dense}
         />
       </SubMenu>
       <SubMenu
-        handleToggle={() => handleToggle("menuNotification")}
+        handleToggle={() => handleToggle('menuNotification')}
         isOpen={state.menuNotification}
         name="notification"
         label={translate(`pos.menu.notification`)}
-        icon={<Notification.icon/>}
-        dense={dense}
-      >
+        icon={<Notification.icon />}
+        dense={dense}>
         <MenuItemLink
           to={{
-            pathname: "/notification/create",
-            state: { _scrollToTop: true }
+            pathname: '/notification/create',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.sendNotification`)}
-          leftIcon={<Notification.createIcon/>}
+          leftIcon={<Notification.createIcon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/notification",
-            state: { _scrollToTop: true }
+            pathname: '/notification',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allNotification`)}
-          leftIcon={<Notification.icon/>}
+          leftIcon={<Notification.icon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/messages",
-            state: { _scrollToTop: true }
+            pathname: '/messages',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.messagesSettings`)}
-          leftIcon={<Notification.icon/>}
+          leftIcon={<Notification.icon />}
           dense={dense}
         />
       </SubMenu>
       <SubMenu
-        handleToggle={() => handleToggle("menuPost")}
+        handleToggle={() => handleToggle('menuPost')}
         isOpen={state.menuPost}
         name="sms"
         label={translate(`pos.menu.post`)}
-        icon={<Post.icon/>}
-        dense={dense}
-      >
+        icon={<Post.icon />}
+        dense={dense}>
         <MenuItemLink
           to={{
-            pathname: "/post/create",
-            state: { _scrollToTop: true }
+            pathname: '/post/create',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.createPost`)}
-          leftIcon={<Post.createIcon/>}
+          leftIcon={<Post.createIcon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/post",
-            state: { _scrollToTop: true }
+            pathname: '/post',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allPost`)}
-          leftIcon={<Post.icon/>}
+          leftIcon={<Post.icon />}
           dense={dense}
         />
 
         <MenuItemLink
           to={{
-            pathname: "/page/create",
-            state: { _scrollToTop: true }
+            pathname: '/page/create',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.createPage`)}
-          leftIcon={<Page.createIcon/>}
+          leftIcon={<Page.createIcon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/page",
-            state: { _scrollToTop: true }
+            pathname: '/page',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allPage`)}
-          leftIcon={<Page.icon/>}
+          leftIcon={<Page.icon />}
           dense={dense}
         />
       </SubMenu>
       <SubMenu
-        handleToggle={() => handleToggle("menuMore")}
+        handleToggle={() => handleToggle('menuMore')}
         isOpen={state.menuMore}
         name="more"
         label={translate(`pos.menu.more`)}
-        icon={<MoreHoriz/>}
-        dense={dense}
-      >
-
-
-
-
-
+        icon={<MoreHoriz />}
+        dense={dense}>
         <MenuItemLink
           to={{
-            pathname: "/plugins",
-            state: { _scrollToTop: true }
+            pathname: '/plugins',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.plugins`)}
-          leftIcon={<SettingsInputHdmiIcon/>}
+          leftIcon={<SettingsInputHdmiIcon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/template",
-            state: { _scrollToTop: true }
+            pathname: '/template',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.templates`)}
-          leftIcon={<Template.icon/>}
+          leftIcon={<Template.icon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/action",
-            state: { _scrollToTop: true }
+            pathname: '/action',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.siteActions`)}
-          leftIcon={<Action.icon/>}
+          leftIcon={<Action.icon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/gateway",
-            state: { _scrollToTop: true }
+            pathname: '/gateway',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allGateways`)}
-          leftIcon={<Gateway.icon/>}
+          leftIcon={<Gateway.icon />}
           dense={dense}
         />
         {/*<MenuItemLink*/}
@@ -562,67 +578,60 @@ const Menu = ({ onMenuClick, dense = false }) => {
         {/*/>*/}
         <MenuItemLink
           to={{
-            pathname: "/settings",
-            state: { _scrollToTop: true }
+            pathname: '/settings',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.siteSettings`)}
-          leftIcon={<Settings.icon/>}
+          leftIcon={<Settings.icon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/task",
-            state: { _scrollToTop: true }
+            pathname: '/task',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.tasks`)}
-          leftIcon={<Task.icon/>}
+          leftIcon={<Task.icon />}
           dense={dense}
         />
         <MenuItemLink
           to={{
-            pathname: "/note",
-            state: { _scrollToTop: true }
+            pathname: '/note',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.notes`)}
-          leftIcon={<Note.icon/>}
+          leftIcon={<Note.icon />}
           dense={dense}
-        /> <MenuItemLink
+        />{' '}
+        <MenuItemLink
           to={{
-            pathname: "/automation",
-            state: { _scrollToTop: true }
+            pathname: '/automation',
+            state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.automation`)}
-          leftIcon={<Automation.icon/>}
+          leftIcon={<Automation.icon />}
           dense={dense}
         />
-
-
-
-
- {themeData && themeData.models && themeData.models.map((model, m) => {
-      if (exclude.indexOf(model.toLowerCase()) == -1) {
-        let modelName=model.toLowerCase()
-        return <MenuItemLink
-          to={{
-            pathname: "/" + modelName,
-            state: { _scrollToTop: true }
-          }}
-          primaryText={translate(`${modelName}`)}
-          leftIcon={<Dashboard/>}
-          exact={"true"}
-          dense={dense}
-          className={"vas"}
-        />;
-      }
-      })}
-
-
-
-
-
-
-
-
+        {themeData &&
+          themeData.models &&
+          themeData.models.map((model, m) => {
+            if (exclude.indexOf(model.toLowerCase()) == -1) {
+              let modelName = model.toLowerCase();
+              return (
+                <MenuItemLink
+                  to={{
+                    pathname: '/' + modelName,
+                    state: { _scrollToTop: true },
+                  }}
+                  primaryText={translate(`${modelName}`)}
+                  leftIcon={<Dashboard />}
+                  exact={'true'}
+                  dense={dense}
+                  className={'vas'}
+                />
+              );
+            }
+          })}
       </SubMenu>
     </div>
   );

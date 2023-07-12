@@ -1,22 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { dFormat } from "./../../functions/utils";
-import { Button } from "shards-react";
-import { useParams } from "react-router-dom";
-import AddIcon from "@mui/icons-material/Add";
-import { useDispatch } from "react-redux";
-import OptionBox from "./../../components/page-builder/OptionBox";
-import Component from "./../../components/page-builder/Component";
+import React, { useEffect, useState } from 'react';
+import { dFormat } from './../../functions/utils';
+import { Button } from 'shards-react';
+import { useParams } from 'react-router-dom';
+import AddIcon from '@mui/icons-material/Add';
+import { useDispatch } from 'react-redux';
+import OptionBox from './../../components/page-builder/OptionBox';
+import Component from './../../components/page-builder/Component';
 // import ComponentOptionBox from "#c/components/page-builder/ComponentOptionBox";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/css/bootstrap.rtl.min.css";
-import "./../../assets/shards-dashboards.1.1.0.min.css";
-import "./../../assets/globalforpagebuilder.css";
-import "./../../assets/nodeeweb-page-builder.css";
-import { DndProvider} from "react-dnd";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.rtl.min.css';
+import './../../assets/shards-dashboards.1.1.0.min.css';
+import './../../assets/globalforpagebuilder.css';
+import './../../assets/nodeeweb-page-builder.css';
+import { DndProvider } from 'react-dnd';
 // import { DndProvider, useDrag ,useDrop} from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
-import { showNotification, useForm, useNotify, useTranslate } from "react-admin";
+import {
+  showNotification,
+  useForm,
+  useNotify,
+  useTranslate,
+} from 'react-admin';
 import {
   addBookmark,
   changeThemeData,
@@ -29,13 +34,9 @@ import {
   loadPost,
   loveIt,
   SaveBuilder,
-  savePost
-} from "./../../functions/index";
-import DefaultOptions from "./../../components/page-builder/DefaultOptions";
-
-
-
-
+  savePost,
+} from './../../functions/index';
+import DefaultOptions from './../../components/page-builder/DefaultOptions';
 
 const Core = (props) => {
   const [tabValue, setTabValue] = React.useState(0);
@@ -47,7 +48,7 @@ const Core = (props) => {
 
   const [c, setC] = useState(0);
   const [data, setData] = useState({});
-  const [lan, setLan] = "fa";
+  const [lan, setLan] = 'fa';
   const notify = useNotify();
   const translate = useTranslate();
   const dispatch = useDispatch();
@@ -56,55 +57,61 @@ const Core = (props) => {
     components: [],
     optionBox: false,
     excludeArray: [],
-    sourceAddress: "new",
+    sourceAddress: 'new',
     componentForSetting: {},
-    componentOptionsBox: false
+    componentOptionsBox: false,
   });
-  const { components, optionBox, excludeArray, sourceAddress, componentForSetting, componentOptionsBox } = state;
+  const {
+    components,
+    optionBox,
+    excludeArray,
+    sourceAddress,
+    componentForSetting,
+    componentOptionsBox,
+  } = state;
   const params = useParams();
   let _id = params._id || null;
-  let model = params.model || "page";
+  let model = params.model || 'page';
   const load = (options = {}) => {
-
     if (_id) {
-      changeThemeDataFunc().then(e => {
+      changeThemeDataFunc().then((e) => {
         dispatch(changeThemeData(e));
       });
-      GetBuilder(model, _id).then(async r => {
+      GetBuilder(model, _id).then(async (r) => {
         if (r) {
           setData(r);
         }
         if (r && r.elements) {
           setC(r.elements.length);
           setState({ ...state, components: r.elements });
-          return (r.elements);
+          return r.elements;
         }
       });
     }
   };
   const save = (options = {}) => {
     console.log('save Input');
-    SaveBuilder(model, _id, { elements: components }).then(r => {
-      if (r._id)
-        notify(translate("saved successfully."), {
-          type: "success"
+    SaveBuilder(model, _id, { elements: components })
+      .then((r) => {
+        if (r._id)
+          notify(translate('saved successfully.'), {
+            type: 'success',
+          });
+      })
+      .catch((f) => {
+        notify(translate('shit!'), {
+          type: 'warning',
         });
-    }).catch(f => {
-      notify(translate("shit!"), {
-        type: "warning"
       });
-    });
-
   };
 
   useEffect(() => {
     // console.clear();
-    console.log("useEffect");
+    console.log('useEffect');
     load();
   }, []);
   useEffect(() => {
-
-    console.log("useEffect...", state);
+    console.log('useEffect...', state);
     // load();
   }, [state]);
 
@@ -114,23 +121,31 @@ const Core = (props) => {
 
   //SaveSettingsHere
   const changeComponentSetting = (the_com, method, element) => {
-    let address = "";
+    let address = '';
     let tempArray = [];
-    the_com["settings"][method].fields = element;
+    the_com['settings'][method].fields = element;
     let array = Object.keys(element);
-    console.log("array", array);
+    console.log('array', array);
 
-    if (the_com && the_com.settings && the_com.settings.general && the_com.settings.general.rules) {
-
-      the_com.settings.general.rules = the_com.settings.general.rules.filter((rule, index) => {
-        return array.indexOf(rule.name) !== -1;
-      });
+    if (
+      the_com &&
+      the_com.settings &&
+      the_com.settings.general &&
+      the_com.settings.general.rules
+    ) {
+      the_com.settings.general.rules = the_com.settings.general.rules.filter(
+        (rule, index) => {
+          return array.indexOf(rule.name) !== -1;
+        }
+      );
       the_com.settings.general.rules.forEach((item, i) => {
         the_com.settings.general.rules[i].value = element[item];
       });
-      console.log("the_com.settings.general.rules", the_com.settings.general.rules);
+      console.log(
+        'the_com.settings.general.rules',
+        the_com.settings.general.rules
+      );
     }
-
 
     components.forEach((comp, j) => {
       if (the_com.id === comp.id) {
@@ -156,21 +171,19 @@ const Core = (props) => {
               address = [j];
             }
           });
-
         }
         tempArray.push(comp);
       }
     });
 
-    console.log("save components:", tempArray);
-    console.log("save components:", state);
-    console.log("save components:", address);
+    console.log('save components:', tempArray);
+    console.log('save components:', state);
+    console.log('save components:', address);
     setState({ ...state, components: tempArray });
   };
 
-
   const deleteItem = (id) => {
-    let found_path = "";
+    let found_path = '';
     let tempArray = [];
     components.forEach((comp, j) => {
       let deleteItem = false;
@@ -198,58 +211,51 @@ const Core = (props) => {
                   if (id == ch4.id) {
                     deleteItem4 = true;
                   }
-                  if(ch4.children && !deleteItem4){
+                  if (ch4.children && !deleteItem4) {
                     let tempChildren5 = [];
-                    ch4.children.forEach((ch5,j5)=>{
+                    ch4.children.forEach((ch5, j5) => {
                       let deleteItem5 = false;
-                      if(id == ch5.id){
+                      if (id == ch5.id) {
                         deleteItem5 = true;
                       }
-                      if(ch5.children && !deleteItem5){
+                      if (ch5.children && !deleteItem5) {
                         let tempChildren6 = [];
-                        ch5.children.forEach((ch6,j6)=>{
+                        ch5.children.forEach((ch6, j6) => {
                           let deleteItem6 = false;
-                          if(id == ch6.id){
+                          if (id == ch6.id) {
                             deleteItem6 = true;
                           }
 
-
-                          if(ch6.children && !deleteItem6){
+                          if (ch6.children && !deleteItem6) {
                             let tempChildren7 = [];
-                            ch6.children.forEach((ch7,j7)=>{
+                            ch6.children.forEach((ch7, j7) => {
                               let deleteItem7 = false;
-                              if(id == ch7.id){
+                              if (id == ch7.id) {
                                 deleteItem7 = true;
                               }
-                              if(!deleteItem7){
-                                tempChildren7.push(ch7)
+                              if (!deleteItem7) {
+                                tempChildren7.push(ch7);
                               }
                             });
                             ch6.children = tempChildren7;
                           }
 
-
-
-
-                          if(!deleteItem6){
-                            tempChildren6.push(ch6)
+                          if (!deleteItem6) {
+                            tempChildren6.push(ch6);
                           }
                         });
                         ch5.children = tempChildren6;
                       }
-                      if(!deleteItem5){
-                        tempChildren5.push(ch5)
+                      if (!deleteItem5) {
+                        tempChildren5.push(ch5);
                       }
                     });
                     ch4.children = tempChildren5;
                   }
 
-
-
                   if (!deleteItem4) {
                     tempChildren4.push(ch4);
                   }
-
                 });
                 ch3.children = tempChildren4;
               }
@@ -257,345 +263,399 @@ const Core = (props) => {
               if (!deleteItem3) {
                 tempChildren3.push(ch3);
               }
-
             });
             ch.children = tempChildren3;
           }
-          if (!deleteItem2)
-            tempChildren.push(ch);
+          if (!deleteItem2) tempChildren.push(ch);
         });
         comp.children = tempChildren;
       }
 
-
-      if (!deleteItem)
-        tempArray.push(comp);
+      if (!deleteItem) tempArray.push(comp);
     });
 
     let r = [...tempArray];
-    console.log("components out:", r);
+    console.log('components out:', r);
 
     setState({ ...state, components: tempArray });
-
   };
 
+  //   const moveContent = (thisKey, theDestinationKey, address = 0) => {
+  //     // console.clear();
+  //     console.log("moveContent.....................", thisKey, theDestinationKey, address);
+  //     // setLoading(true);
+  //     if (address === 0) {
+  //       let tempContent = components[theDestinationKey];
+  //       components[theDestinationKey] = components[thisKey];
+  //       components[thisKey] = tempContent;
+  //       // components.push(element)
+  //       // console.log('components', components)
+  //       // setComponents([...components]);
+  //       setState({ ...state, components: components });
 
-//   const moveContent = (thisKey, theDestinationKey, address = 0) => {
-//     // console.clear();
-//     console.log("moveContent.....................", thisKey, theDestinationKey, address);
-//     // setLoading(true);
-//     if (address === 0) {
-//       let tempContent = components[theDestinationKey];
-//       components[theDestinationKey] = components[thisKey];
-//       components[thisKey] = tempContent;
-//       // components.push(element)
-//       // console.log('components', components)
-//       // setComponents([...components]);
-//       setState({ ...state, components: components });
+  //     } else {
+  //       address = address.split("_");
+  //       if (address[0] === "component") {
+  //         address.shift();
+  //         let theNewComponents = components;
+  //         let mainAddress = address;
+  //         theNewComponents.forEach((comp, inde) => {
+  //           let the_id = "component_" + mainAddress[0];
 
+  //           console.log("the_id", the_id, comp.id);
+  //           if (!theNewComponents[inde].children) {
+  //             theNewComponents[inde].children = [];
+  //           }
+  //           // if (!theNewComponents[inde]['children'][mainAddress[1]]) {
+  //           //   theNewComponents[inde]['children'][mainAddress[1]]={};
+  //           // }
+  //           if (comp.id === the_id) {
+  //             console.log(inde, " ==> ", theDestinationKey, " in:", mainAddress[1]);
+  //             console.log(theNewComponents[inde].children[mainAddress[1]]);
+  //             let tempContent = theNewComponents[inde].children[mainAddress[1]][theDestinationKey];
+  //             console.log("tempContent", tempContent);
+  //             theNewComponents[inde].children[mainAddress[1]][theDestinationKey] = theNewComponents[inde].children[mainAddress[1]][thisKey];
+  //             theNewComponents[inde].children[mainAddress[1]][thisKey] = tempContent;
+  //           }
+  //         });
+  //         setState({ ...state, components: theNewComponents });
 
-//     } else {
-//       address = address.split("_");
-//       if (address[0] === "component") {
-//         address.shift();
-//         let theNewComponents = components;
-//         let mainAddress = address;
-//         theNewComponents.forEach((comp, inde) => {
-//           let the_id = "component_" + mainAddress[0];
+  //         // console.log('address',address);
+  //       }
+  //     }
+  //     // setComponents(components);
+  //     // setLoading(false);
 
-//           console.log("the_id", the_id, comp.id);
-//           if (!theNewComponents[inde].children) {
-//             theNewComponents[inde].children = [];
-//           }
-//           // if (!theNewComponents[inde]['children'][mainAddress[1]]) {
-//           //   theNewComponents[inde]['children'][mainAddress[1]]={};
-//           // }
-//           if (comp.id === the_id) {
-//             console.log(inde, " ==> ", theDestinationKey, " in:", mainAddress[1]);
-//             console.log(theNewComponents[inde].children[mainAddress[1]]);
-//             let tempContent = theNewComponents[inde].children[mainAddress[1]][theDestinationKey];
-//             console.log("tempContent", tempContent);
-//             theNewComponents[inde].children[mainAddress[1]][theDestinationKey] = theNewComponents[inde].children[mainAddress[1]][thisKey];
-//             theNewComponents[inde].children[mainAddress[1]][thisKey] = tempContent;
-//           }
-//         });
-//         setState({ ...state, components: theNewComponents });
+  //   };
+  //   const moveItem = (id,dest) => {
+  //     console.log('source:',id,'destination:',dest)
+  //     console.log('Compoinentsssssssssss',components)
+  //     let moveCurrentItem = [];
+  //     let pushCurrentItem = [];
+  //     let completeComponent = components;
+  //     // let destination = _(components)
+  //     //   .thru(function(coll) {
+  //     //     return _.union(coll, _.map(coll, 'children') || []);
+  //     //   })
+  //     //   .flatten()
+  //     //   .find({ id: dest });
+  //     // let current = _(components)
+  //     //   .thru(function(coll) {
+  //     //     return _.union(coll, _.map(coll, 'children') || []);
+  //     //   })
+  //     //   .flatten()
+  //     //   .find({ id: id });
+  //     //
+  //     completeComponent.forEach((component)=>{
+  //       if(component.id === id){
+  //         moveCurrentItem.push(component);
+  //       }else if(component.children){
+  //         component.children.forEach((subCom)=>{
+  //           if(subCom.id === id){
+  //             moveCurrentItem.push(subCom);
+  //           }else if(subCom.children){
+  //             subCom.children.forEach((subAny)=>{
+  //               if(subAny.id === id){
+  //                 moveCurrentItem.push(subAny);
+  //               }
+  //             })
+  //           }
+  //         })
+  //       }
+  //     })
+  //     completeComponent.forEach((component)=>{
+  //       if(component.id === dest){
+  //         pushCurrentItem.push(component)
+  //       }else if(component.children){
+  //         component.children.forEach((child)=>{
+  //           if(child.id === dest){
+  //             pushCurrentItem.push(child)
+  //           }else if(child.children){
+  //               child.children.forEach((subChild)=>{
+  //                 if(subChild.id === dest){
+  //                   pushCurrentItem.push(subChild)
+  //                 }
+  //               })
+  //           }
+  //         })
+  //       }
+  //     })
+  //     // _.find(components, el => {
+  //     //   if(el.id === id){
+  //     //     moveCurrentItem.push(el);
+  //     //   }
+  //     //   if(el.id === dest){
+  //     //     pushCurrentItem.push(el);
+  //     //   }else{
+  //     //     _.find(el.children,ch=>{
+  //     //       if(ch.id === dest){
+  //     //         pushCurrentItem.push(ch)
+  //     //       }else{
+  //     //         _.find(ch.children,chch=>{
+  //     //           if(chch.id === dest){
+  //     //             pushCurrentItem.push(chch)
+  //     //           }
+  //     //         })
+  //     //       }
+  //     //     })
+  //     //   }
 
-//         // console.log('address',address);
-//       }
-//     }
-//     // setComponents(components);
-//     // setLoading(false);
+  //     // });
+  // if(pushCurrentItem){
+  //   console.log('puuuush',pushCurrentItem);
+  //   pushCurrentItem.forEach(push=>{
+  //     if(push.hasOwnProperty('children')){
+  //       // Object.assign(push.children,moveCurrentItem)
+  //       // Object.push(push.children,moveCurrentItem)
+  //       push.children.push(moveCurrentItem[0]);
+  //       completeComponent.splice(completeComponent.findIndex(a => a.id === id) , 1)
+  //     }else{
+  //       Object.assign(push,{children:moveCurrentItem})
+  //       completeComponent.splice(completeComponent.findIndex(a => a.id === id) , 1)
+  //     }
+  //   })
 
-//   };
-//   const moveItem = (id,dest) => {
-//     console.log('source:',id,'destination:',dest)
-//     console.log('Compoinentsssssssssss',components)
-//     let moveCurrentItem = [];
-//     let pushCurrentItem = [];
-//     let completeComponent = components;
-//     // let destination = _(components)
-//     //   .thru(function(coll) {
-//     //     return _.union(coll, _.map(coll, 'children') || []);
-//     //   })
-//     //   .flatten()
-//     //   .find({ id: dest });
-//     // let current = _(components)
-//     //   .thru(function(coll) {
-//     //     return _.union(coll, _.map(coll, 'children') || []);
-//     //   })
-//     //   .flatten()
-//     //   .find({ id: id });
-//     //
-//     completeComponent.forEach((component)=>{
-//       if(component.id === id){
-//         moveCurrentItem.push(component);
-//       }else if(component.children){
-//         component.children.forEach((subCom)=>{
-//           if(subCom.id === id){
-//             moveCurrentItem.push(subCom);
-//           }else if(subCom.children){
-//             subCom.children.forEach((subAny)=>{
-//               if(subAny.id === id){
-//                 moveCurrentItem.push(subAny);
-//               }
-//             })
-//           }
-//         })
-//       }
-//     })
-//     completeComponent.forEach((component)=>{
-//       if(component.id === dest){
-//         pushCurrentItem.push(component)
-//       }else if(component.children){
-//         component.children.forEach((child)=>{
-//           if(child.id === dest){
-//             pushCurrentItem.push(child)
-//           }else if(child.children){
-//               child.children.forEach((subChild)=>{
-//                 if(subChild.id === dest){
-//                   pushCurrentItem.push(subChild)
-//                 }
-//               })
-//           }
-//         })
-//       }
-//     })
-//     // _.find(components, el => {
-//     //   if(el.id === id){
-//     //     moveCurrentItem.push(el);
-//     //   }
-//     //   if(el.id === dest){
-//     //     pushCurrentItem.push(el);
-//     //   }else{
-//     //     _.find(el.children,ch=>{
-//     //       if(ch.id === dest){
-//     //         pushCurrentItem.push(ch)
-//     //       }else{
-//     //         _.find(ch.children,chch=>{
-//     //           if(chch.id === dest){
-//     //             pushCurrentItem.push(chch)
-//     //           }
-//     //         })
-//     //       }
-//     //     })
-//     //   }
+  // }
+  //     console.log('moveCurrentItem:',moveCurrentItem)
+  //     console.log('pushCurrentItem:',pushCurrentItem)
+  //     console.log('completeComponent:',completeComponent)
 
-//     // });
-// if(pushCurrentItem){
-//   console.log('puuuush',pushCurrentItem);
-//   pushCurrentItem.forEach(push=>{
-//     if(push.hasOwnProperty('children')){
-//       // Object.assign(push.children,moveCurrentItem)
-//       // Object.push(push.children,moveCurrentItem)
-//       push.children.push(moveCurrentItem[0]);
-//       completeComponent.splice(completeComponent.findIndex(a => a.id === id) , 1)
-//     }else{
-//       Object.assign(push,{children:moveCurrentItem})
-//       completeComponent.splice(completeComponent.findIndex(a => a.id === id) , 1)
-//     }
-//   })
-
-// }
-//     console.log('moveCurrentItem:',moveCurrentItem)
-//     console.log('pushCurrentItem:',pushCurrentItem)
-//     console.log('completeComponent:',completeComponent)
-
-//     setState({ ...state, components: completeComponent });
-//   };
+  //     setState({ ...state, components: completeComponent });
+  //   };
 
   const addToComponents = (element, extra) => {
-    console.log("inside: ", sourceAddress);
-    let theNewComponents = components,mainAddress = [];
+    console.log('inside: ', sourceAddress);
+    let theNewComponents = components,
+      mainAddress = [];
 
     if (sourceAddress) {
-      mainAddress = sourceAddress.split("_");
+      mainAddress = sourceAddress.split('_');
     }
 
-
-    if (mainAddress[0] === "new") {
-
-      theNewComponents.push({ ...element, id: "component_" + generateID() });
+    if (mainAddress[0] === 'new') {
+      theNewComponents.push({ ...element, id: 'component_' + generateID() });
       setC(c + 1);
       setState({ ...state, components: theNewComponents, ...extra });
-
     } else {
-      console.log("addToComponentaddToComponent: ", theNewComponents);
+      console.log('addToComponentaddToComponent: ', theNewComponents);
       theNewComponents.forEach((compL1, indeL1) => {
-        if ((compL1.id === sourceAddress)) {
-          if (!theNewComponents[indeL1]["children"]) {
-            theNewComponents[indeL1]["children"] = [];
+        if (compL1.id === sourceAddress) {
+          if (!theNewComponents[indeL1]['children']) {
+            theNewComponents[indeL1]['children'] = [];
           }
-          theNewComponents[indeL1]["children"].push({
+          theNewComponents[indeL1]['children'].push({
             ...element,
-            id: "component_" + generateID()
+            id: 'component_' + generateID(),
           });
           setState({ ...state, components: theNewComponents, ...extra });
           return;
         }
-        if ((compL1.children)) {
+        if (compL1.children) {
           compL1.children.forEach((compL2, indeL2) => {
-            if ((compL2.id === sourceAddress)) {
-
-              console.log("we found it here level 1...", theNewComponents[indeL1]["children"][indeL2]);
-              if (!theNewComponents[indeL1]["children"][indeL2]["children"]) {
-                theNewComponents[indeL1]["children"][indeL2]["children"] = [];
+            if (compL2.id === sourceAddress) {
+              console.log(
+                'we found it here level 1...',
+                theNewComponents[indeL1]['children'][indeL2]
+              );
+              if (!theNewComponents[indeL1]['children'][indeL2]['children']) {
+                theNewComponents[indeL1]['children'][indeL2]['children'] = [];
               }
-              theNewComponents[indeL1]["children"][indeL2]["children"].push({
+              theNewComponents[indeL1]['children'][indeL2]['children'].push({
                 ...element,
-                id: "component_" + generateID()
+                id: 'component_' + generateID(),
               });
               setState({ ...state, components: theNewComponents, ...extra });
               return;
             }
-            if ((compL2.children)) {
+            if (compL2.children) {
               compL2.children.forEach((compL3, indeL3) => {
-                if ((compL3.id === sourceAddress)) {
-                  if (!theNewComponents[indeL1]["children"][indeL2]["children"][indeL3]["children"]) {
-                    theNewComponents[indeL1]["children"][indeL2]["children"][indeL3]["children"] = [];
+                if (compL3.id === sourceAddress) {
+                  if (
+                    !theNewComponents[indeL1]['children'][indeL2]['children'][
+                      indeL3
+                    ]['children']
+                  ) {
+                    theNewComponents[indeL1]['children'][indeL2]['children'][
+                      indeL3
+                    ]['children'] = [];
                   }
-                  theNewComponents[indeL1]["children"][indeL2]["children"][indeL3]["children"].push({
+                  theNewComponents[indeL1]['children'][indeL2]['children'][
+                    indeL3
+                  ]['children'].push({
                     ...element,
-                    id: "component_" + generateID()
+                    id: 'component_' + generateID(),
                   });
-                  setState({ ...state, components: theNewComponents, ...extra });
+                  setState({
+                    ...state,
+                    components: theNewComponents,
+                    ...extra,
+                  });
                   return;
                 }
                 if (compL3.children) {
                   compL3.children.forEach((compL4, indeL4) => {
-                    if ((compL4.id === sourceAddress)) {
-                      if (!theNewComponents[indeL1]["children"][indeL2]["children"][indeL3]["children"][indeL4]["children"]) {
-                        theNewComponents[indeL1]["children"][indeL2]["children"][indeL3]["children"][indeL4]["children"] = [];
+                    if (compL4.id === sourceAddress) {
+                      if (
+                        !theNewComponents[indeL1]['children'][indeL2][
+                          'children'
+                        ][indeL3]['children'][indeL4]['children']
+                      ) {
+                        theNewComponents[indeL1]['children'][indeL2][
+                          'children'
+                        ][indeL3]['children'][indeL4]['children'] = [];
                       }
-                      theNewComponents[indeL1]["children"][indeL2]["children"][indeL3]["children"][indeL4]["children"].push({
+                      theNewComponents[indeL1]['children'][indeL2]['children'][
+                        indeL3
+                      ]['children'][indeL4]['children'].push({
                         ...element,
-                        id: "component_" + generateID()
+                        id: 'component_' + generateID(),
                       });
-                      setState({ ...state, components: theNewComponents, ...extra });
+                      setState({
+                        ...state,
+                        components: theNewComponents,
+                        ...extra,
+                      });
                       return;
                     }
-                    if((compL4.children)){
-                      compL4.children.forEach((compL5,indeL5)=>{
-                        if ((compL5.id === sourceAddress)) {
-                          if (!theNewComponents[indeL1]["children"][indeL2]["children"][indeL3]["children"][indeL4]["children"][indeL5]["children"]) {
-                            theNewComponents[indeL1]["children"][indeL2]["children"][indeL3]["children"][indeL4]["children"][indeL5]["children"] = [];
+                    if (compL4.children) {
+                      compL4.children.forEach((compL5, indeL5) => {
+                        if (compL5.id === sourceAddress) {
+                          if (
+                            !theNewComponents[indeL1]['children'][indeL2][
+                              'children'
+                            ][indeL3]['children'][indeL4]['children'][indeL5][
+                              'children'
+                            ]
+                          ) {
+                            theNewComponents[indeL1]['children'][indeL2][
+                              'children'
+                            ][indeL3]['children'][indeL4]['children'][indeL5][
+                              'children'
+                            ] = [];
                           }
-                          theNewComponents[indeL1]["children"][indeL2]["children"][indeL3]["children"][indeL4]["children"][indeL5]["children"].push({
+                          theNewComponents[indeL1]['children'][indeL2][
+                            'children'
+                          ][indeL3]['children'][indeL4]['children'][indeL5][
+                            'children'
+                          ].push({
                             ...element,
-                            id: "component_" + generateID()
+                            id: 'component_' + generateID(),
                           });
-                          setState({ ...state, components: theNewComponents, ...extra });
+                          setState({
+                            ...state,
+                            components: theNewComponents,
+                            ...extra,
+                          });
                           return;
                         }
-                        if((compL5.children)){
-                          compL5.children.forEach((compL6,indeL6)=>{
-                            if ((compL6.id === sourceAddress)) {
-                              if (!theNewComponents[indeL1]["children"][indeL2]["children"][indeL3]["children"][indeL4]["children"][indeL5]["children"][indeL6]["children"]) {
-                                theNewComponents[indeL1]["children"][indeL2]["children"][indeL3]["children"][indeL4]["children"][indeL5]["children"][indeL6]["children"] = [];
+                        if (compL5.children) {
+                          compL5.children.forEach((compL6, indeL6) => {
+                            if (compL6.id === sourceAddress) {
+                              if (
+                                !theNewComponents[indeL1]['children'][indeL2][
+                                  'children'
+                                ][indeL3]['children'][indeL4]['children'][
+                                  indeL5
+                                ]['children'][indeL6]['children']
+                              ) {
+                                theNewComponents[indeL1]['children'][indeL2][
+                                  'children'
+                                ][indeL3]['children'][indeL4]['children'][
+                                  indeL5
+                                ]['children'][indeL6]['children'] = [];
                               }
-                              theNewComponents[indeL1]["children"][indeL2]["children"][indeL3]["children"][indeL4]["children"][indeL5]["children"][indeL6]["children"].push({
+                              theNewComponents[indeL1]['children'][indeL2][
+                                'children'
+                              ][indeL3]['children'][indeL4]['children'][indeL5][
+                                'children'
+                              ][indeL6]['children'].push({
                                 ...element,
-                                id: "component_" + generateID()
+                                id: 'component_' + generateID(),
                               });
-                              setState({ ...state, components: theNewComponents, ...extra });
+                              setState({
+                                ...state,
+                                components: theNewComponents,
+                                ...extra,
+                              });
                               return;
                             }
-                          })
+                          });
                         }
-                      })
+                      });
                     }
                   });
                 }
               });
             }
           });
-
         }
-
       });
     }
   };
   const generateID = (tokenLen = 5) => {
-
-    let text = "";
-    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let text = '';
+    const possible =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     for (let i = 0; i < tokenLen; ++i)
       text += possible.charAt(Math.floor(Math.random() * possible.length));
 
     return text;
   };
   const addToComponents2 = (element, extra) => {
-    console.log("addToComponents:", element);
-    console.log("where?", sourceAddress);
+    console.log('addToComponents:', element);
+    console.log('where?', sourceAddress);
     let theNewComponents = components;
     let mainAddress = [];
     if (sourceAddress) {
-      mainAddress = sourceAddress.split("_");
+      mainAddress = sourceAddress.split('_');
     }
-// let id_is
-    console.log("mainAddress", mainAddress);
-    if (mainAddress[0] == "component") {
+    // let id_is
+    console.log('mainAddress', mainAddress);
+    if (mainAddress[0] == 'component') {
       mainAddress.shift();
       // console.log('tempMainAddress', mainAddress[0], mainAddress[1], theNewComponents)
-      let the_id = "component_" + mainAddress[0];
+      let the_id = 'component_' + mainAddress[0];
       theNewComponents.forEach((comp, inde) => {
-        console.log("the_id", the_id, comp.id);
+        console.log('the_id', the_id, comp.id);
         if (!theNewComponents[inde].children) {
           theNewComponents[inde].children = [];
         }
-        if ((comp.id === the_id) || (inde === mainAddress[0])) {
-          console.log("theNewComponents[inde]", theNewComponents[inde]);
+        if (comp.id === the_id || inde === mainAddress[0]) {
+          console.log('theNewComponents[inde]', theNewComponents[inde]);
           //make changes here
           if (mainAddress[1]) {
-            if (!theNewComponents[inde]["children"][mainAddress[1]]) {
-              theNewComponents[inde]["children"][mainAddress[1]] = [];
+            if (!theNewComponents[inde]['children'][mainAddress[1]]) {
+              theNewComponents[inde]['children'][mainAddress[1]] = [];
             }
-            let ChildrenLength = theNewComponents[inde]["children"][mainAddress[1]].length;
+            let ChildrenLength =
+              theNewComponents[inde]['children'][mainAddress[1]].length;
             // if (!ChildrenLength)
-            theNewComponents[inde]["children"][mainAddress[1]].push({
+            theNewComponents[inde]['children'][mainAddress[1]].push({
               ...element,
-              id: "component_" + inde + "_" + mainAddress[1] + "_" + ChildrenLength
+              id:
+                'component_' +
+                inde +
+                '_' +
+                mainAddress[1] +
+                '_' +
+                ChildrenLength,
             });
-
           }
-
         }
       });
 
-      console.log("the newComponents are:", theNewComponents);
+      console.log('the newComponents are:', theNewComponents);
       setState({ ...state, components: theNewComponents, ...extra });
     }
-    if (mainAddress[0] == "new") {
-      console.log("addToComponents:", { ...element, id: "component_" + c });
+    if (mainAddress[0] == 'new') {
+      console.log('addToComponents:', { ...element, id: 'component_' + c });
       console.log(mainAddress, theNewComponents);
 
-      theNewComponents.push({ ...element, id: "component_" + c });
+      theNewComponents.push({ ...element, id: 'component_' + c });
       setC(c + 1);
       setState({ ...state, components: theNewComponents, ...extra });
-
     }
     // save();
-
   };
 
   // const [{ isDragging }, drag] = useDrag(() => ({
@@ -614,199 +674,238 @@ const Core = (props) => {
   //       // canDrop: !!monitor.canDrop()
   //     })
   //   })
-  const moveItemStart = (id,dest,component) => {
-    console.log('id',id)    
-    console.log('dest',dest)    
+  const moveItemStart = (id, dest, component) => {
+    console.log('id', id);
+    console.log('dest', dest);
     let moveCurrentItem = [];
     let pushCurrentItem = [];
     let lastName;
     let lastComponenet = [];
     let completeComponent = component;
-if(component){
-        if(component.id === id){
-          moveCurrentItem.push(component);
-        }else if(component.children){
-          component.children.forEach((subCom)=>{
-            if(subCom.id === id){
-              moveCurrentItem.push(subCom);
-            }else if(subCom.children){
-              subCom.children.forEach((subAny)=>{
-                if(subAny.id === id){
-                  moveCurrentItem.push(subAny);
-                }
-              })
-            }
-          })
-        }
-        
-        if(component.id === dest){
-          pushCurrentItem.push(component)
-        }else if(component.children){
-          component.children.forEach((child)=>{
-            if(child.id === dest){
-              pushCurrentItem.push(child)
-            }else if(child.children){
-                child.children.forEach((subChild)=>{
-                  if(subChild.id === dest){
-                    pushCurrentItem.push(subChild)
-                  }
-                })
-            }
-          })
-        }
-        let added;
-        if(pushCurrentItem){
-            pushCurrentItem.forEach(push=>{
-                if(push.hasOwnProperty('children')){
-                    push.children.forEach(p=>{
-                      if(p.id === id){
-                        added = false;
-                      }else{
-                        added=true;
-                        push.children.push(moveCurrentItem[0])
-                      }
-                    })
-                    // if(added){
-                    //   push.children.push(moveCurrentItem[0]);
-                    // }
-                    
-                  const deleteTarget =  component.children && component.children.findIndex((child) => {
-                    child.children && child.children.findIndex((chil) => {
-                      chil.children && chil.children.findIndex((chi) => {
-                         if(chi && chi.id === id){
-                          if(chil.id !== dest){
-                            chil.children.splice(chi,1)
-                          }
-                         }
-                       })
-                       if(chil && chil.id === id){
-                        if(child.id !== dest){
-                          child.children.splice(chil,1)
-                        }
-                       }
-                     })
-                   if(child && child.id === id){
-                    if(component.children.id !== dest){
-                      component.children.splice(child,1)
-                    }
-                   }
-                  })
-                  
-                }else{
-                  Object.assign(push,{children:lastComponenet})
-                  // component.splice(component.children.findIndex(a => a.id === id) , 1)
-                }
-            })
-        }
-       
+    if (component) {
+      if (component.id === id) {
+        moveCurrentItem.push(component);
+      } else if (component.children) {
+        component.children.forEach((subCom) => {
+          if (subCom.id === id) {
+            moveCurrentItem.push(subCom);
+          } else if (subCom.children) {
+            subCom.children.forEach((subAny) => {
+              if (subAny.id === id) {
+                moveCurrentItem.push(subAny);
+              }
+            });
+          }
+        });
+      }
 
-}
+      if (component.id === dest) {
+        pushCurrentItem.push(component);
+      } else if (component.children) {
+        component.children.forEach((child) => {
+          if (child.id === dest) {
+            pushCurrentItem.push(child);
+          } else if (child.children) {
+            child.children.forEach((subChild) => {
+              if (subChild.id === dest) {
+                pushCurrentItem.push(subChild);
+              }
+            });
+          }
+        });
+      }
+      let added;
+      if (pushCurrentItem) {
+        pushCurrentItem.forEach((push) => {
+          if (push.hasOwnProperty('children')) {
+            push.children.forEach((p) => {
+              if (p.id === id) {
+                added = false;
+              } else {
+                added = true;
+                push.children.push(moveCurrentItem[0]);
+              }
+            });
+            // if(added){
+            //   push.children.push(moveCurrentItem[0]);
+            // }
+
+            const deleteTarget =
+              component.children &&
+              component.children.findIndex((child) => {
+                child.children &&
+                  child.children.findIndex((chil) => {
+                    chil.children &&
+                      chil.children.findIndex((chi) => {
+                        if (chi && chi.id === id) {
+                          if (chil.id !== dest) {
+                            chil.children.splice(chi, 1);
+                          }
+                        }
+                      });
+                    if (chil && chil.id === id) {
+                      if (child.id !== dest) {
+                        child.children.splice(chil, 1);
+                      }
+                    }
+                  });
+                if (child && child.id === id) {
+                  if (component.children.id !== dest) {
+                    component.children.splice(child, 1);
+                  }
+                }
+              });
+          } else {
+            Object.assign(push, { children: lastComponenet });
+            // component.splice(component.children.findIndex(a => a.id === id) , 1)
+          }
+        });
+      }
+    }
 
     // setState({ ...state, components: component });
   };
   return (
-   <React.Fragment>
-     <div className={"nodeeweb-page-builder-wrapper " + translate("direction")}
-      style={{
-        margin:20
-      }}
-    >
-      <div style={{
-        background:'#ffffff',
-        padding:'4px 0px 4px 4px',
-        direction:'ltr',
-        border:'1px solid #ddd',
-        color:'#000000',
-        fontSize:'12px',
-        display:'flex',
-        justifyContent: 'space-between'
-      }}>
-        <span>Page Builder</span>
-        <div >
-        <span style={{background:'#464D55',color:'#ffffff',fontSize:'12px',fontWeight:'bold',border:'none !important',cursor:'pointer',padding:'3px'}}
-           onClick={(e)=>handleChange(e,0)}>Classic Mode</span>
-        <span style={{background:'#464D55',color:'#ffffff',fontSize:'12px',fontWeight:'bold',cursor:'pointer',padding:'3px'}}
-         onClick={(e)=>handleChange(e,1)}>Preview Mode</span>
+    <React.Fragment>
+      <div
+        className={'nodeeweb-page-builder-wrapper ' + translate('direction')}
+        style={{
+          margin: 20,
+        }}>
+        <div
+          style={{
+            background: '#ffffff',
+            padding: '4px 0px 4px 4px',
+            direction: 'ltr',
+            border: '1px solid #ddd',
+            color: '#000000',
+            fontSize: '12px',
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}>
+          <span>Page Builder</span>
+          <div>
+            <span
+              style={{
+                background: '#464D55',
+                color: '#ffffff',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                border: 'none !important',
+                cursor: 'pointer',
+                padding: '3px',
+              }}
+              onClick={(e) => handleChange(e, 0)}>
+              Classic Mode
+            </span>
+            <span
+              style={{
+                background: '#464D55',
+                color: '#ffffff',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                padding: '3px',
+              }}
+              onClick={(e) => handleChange(e, 1)}>
+              Preview Mode
+            </span>
+          </div>
+        </div>
+
+        <div
+          id="nodeeweb-page-builder"
+          style={{
+            height: '100vh',
+            width: '100vw !important',
+            opacity: 1,
+            // opacity: isDragging ? 0.5 : 1,
+            background: '#ffffff',
+            padding: '20px',
+          }}>
+          {tabValue === 0 && (
+            <React.Fragment>
+              {components &&
+                components.map((component, index) => {
+                  if (!component) {
+                    return <></>;
+                  }
+                  return (
+                    <Component
+                      key={index}
+                      index={index}
+                      toggleOptionBox={toggleOptionBox}
+                      // moveContent={moveContent}
+                      // moveItem={moveItem}
+                      component={component}
+                      deleteItem={(e) => {
+                        deleteItem(e || component.id);
+                      }}
+                      changeComponentSetting={(e, j, d) => {
+                        changeComponentSetting(e, j, d);
+                      }}
+                      length={components.length}
+                      startDestHnadler={moveItemStart}
+                    />
+                  );
+                })}
+              {/* <div ref={drop} className={"add-component element "+(isOver ? 'hover' : '')} onClick={(e) => { */}
+              {/* <div ref={drop} className={"add-component newelement "+(isOver ? 'hover' : '')}  */}
+              <div
+                className={'add-component newelement '}
+                onClick={(e) => {
+                  setState({
+                    ...state,
+                    sourceAddress: 'new',
+                    excludeArray: [],
+                    optionBox: !state.optionBox,
+                  });
+                }}>
+                <span
+                  style={{
+                    fontSize: '14px',
+                    padding: '10px 40px',
+                    background: 'rgb(2, 111, 176)',
+                    display: 'block',
+                    color: '#ffffff',
+                  }}>
+                  Add Element <AddIcon />
+                </span>
+              </div>
+            </React.Fragment>
+          )}
+          {tabValue === 1 && (
+            <div style={{ direction: 'ltr' }}>
+              <h5>Preview Mode Soon.... </h5>
+            </div>
+          )}
         </div>
       </div>
-
-        <div id="nodeeweb-page-builder"
-              style={{
-                  height: "100vh",
-                  width: "100vw !important",
-                  opacity: 1,
-                  // opacity: isDragging ? 0.5 : 1,
-                  background:'#ffffff',
-                  padding:'20px'
-                  }}
-              >
-                  {
-                    tabValue === 0 && (
-                            <React.Fragment>
-                                {components && components.map((component, index) => {
-                                  if (!component) {
-                                    return <></>;
-                                  }
-                                  return <Component
-                                    key={index}
-                                    index={index}
-                                    toggleOptionBox={toggleOptionBox}
-                                    // moveContent={moveContent}
-                                    // moveItem={moveItem}
-                                    component={component}
-                                    deleteItem={(e) => {
-                                      deleteItem(e || component.id);
-                                    }}
-                                    changeComponentSetting={(e, j, d) => {
-                                      changeComponentSetting(e, j, d);
-                                    }}
-                                    length={components.length}
-                                    startDestHnadler={moveItemStart}
-                                  />;
-                                })}
-                                {/* <div ref={drop} className={"add-component element "+(isOver ? 'hover' : '')} onClick={(e) => { */}
-                                  {/* <div ref={drop} className={"add-component newelement "+(isOver ? 'hover' : '')}  */}
-                                  <div  className={"add-component newelement "} 
-                                      onClick={(e) => {
-                                        setState({ ...state, sourceAddress: "new", excludeArray: [], optionBox: !state.optionBox });
-                                        }}
-                                  >
-                                  <span style={{fontSize:'14px',padding:'10px 40px',background:'rgb(2, 111, 176)',display:'block',color:'#ffffff'}}>
-                                    Add Element <AddIcon/>
-                                  </span>
-                                </div>
-                              </React.Fragment>
-                    )
-                  }
-                  {
-                    tabValue === 1 && (
-                      <div style={{direction:'ltr',}}>
-                        <h5>Preview Mode Soon.... </h5>
-                      </div>
-                    )
-                  }
+      <div className={'nodeeweb-fixed-bottom-bar'}>
+        <div className={'npb-d-flex '}>
+          <label style={{ direction: 'ltr' }}>
+            {data && typeof data.title == 'object'
+              ? data.title[lan]
+              : data.title}
+          </label>
+          <span className={'npb-settings'}>
+            <Button onClick={save}>Save</Button>
+          </span>
         </div>
-
-    </div>
-    <div className={"nodeeweb-fixed-bottom-bar"}>
-    <div className={"npb-d-flex "}>
-      <label
-        style={{ direction: "ltr" }}>{data && (typeof data.title == "object") ? data.title[lan] : data.title}</label>
-      <span className={"npb-settings"}>
-        <Button onClick={save}>
-          Save
-        </Button>
-      </span>
-    </div>
-</div>
-<OptionBox {...props} defaultOptions={DefaultOptions} onClose={(e) => {
-                          toggleOptionBox();
-                        }} exclude={excludeArray} open={state.optionBox} addToComponents={addToComponents}/>
+      </div>
+      <OptionBox
+        {...props}
+        defaultOptions={DefaultOptions}
+        onClose={(e) => {
+          toggleOptionBox();
+        }}
+        exclude={excludeArray}
+        open={state.optionBox}
+        addToComponents={addToComponents}
+      />
     </React.Fragment>
   );
 };
 
-export const PageServer = [
-  {}
-];
+export const PageServer = [{}];
 export default React.memo(Core);

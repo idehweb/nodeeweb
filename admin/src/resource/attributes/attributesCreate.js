@@ -1,25 +1,31 @@
-import { ArrayInput, Create, SelectInput, SimpleFormIterator, TextInput, useTranslate } from "react-admin";
-import { Divider } from "@mui/material";
-import { List, SimpleForm, UploaderField } from "@/components";
-import useStyles from "@/styles";
-import { Val } from "@/Utils";
-import Form  from "./attributesForm";
+import {
+  ArrayInput,
+  Create,
+  SelectInput,
+  SimpleFormIterator,
+  TextInput,
+  useTranslate,
+} from 'react-admin';
+import { Divider } from '@mui/material';
+import { List, SimpleForm, UploaderField } from '@/components';
+import useStyles from '@/styles';
+import { Val } from '@/Utils';
+import Form from './attributesForm';
 
 const defaultValues = {
   values: [
     {
       name: {
-        fa: ""
+        fa: '',
       },
-      slug: ""
-    }
-  ]
+      slug: '',
+    },
+  ],
 };
-
 
 const create = (props) => (
   <Create {...props}>
-    <Form/>
+    <Form />
   </Create>
 );
 

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 // import {changeTheme} from './actions';
-import { useDispatch, useSelector } from "react-redux";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Button from "@mui/material/Button";
-import { useLocale, useSetLocale, useTranslate } from "react-admin";
+import { useDispatch, useSelector } from 'react-redux';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Button from '@mui/material/Button';
+import { useLocale, useSetLocale, useTranslate } from 'react-admin';
 // import {AppState} from '../types';
-import { DollarPrice } from "@/components";
-import { changeLocale } from "@/functions";
+import { DollarPrice } from '@/components';
+import { changeLocale } from '@/functions';
 import LanguageIcon from '@mui/icons-material/Language';
 //
 // const useStyles = makeStyles({
@@ -22,14 +22,14 @@ const Configuration = () => {
 
   // const classes = useStyles();
   const theLocale = useSelector((state) => {
-    console.log("state", state,locale);
+    console.log('state', state, locale);
   });
 
   // const [variant, setVariant] = useState("contained");
 
   // const [theLocale, setTheLocale] = useStore('locale','fa');
   // const [theLocale, setTheLocale] = useStore('locale','fa');
-  console.log("theLocale", theLocale,locale);
+  console.log('theLocale', theLocale, locale);
   const dispatch = useDispatch();
   // contained
   // outlined
@@ -39,33 +39,30 @@ const Configuration = () => {
       <CardContent>
         {/*<div className={classes.label}>{translate('pos.language')}</div>*/}
         <Button
-          variant={(locale==='en') ? "contained" : "outlined"}
-          className={"lang-button"}
+          variant={locale === 'en' ? 'contained' : 'outlined'}
+          className={'lang-button'}
           // color={locale === 'en' ? 'primary' : 'default'}
           onClick={() => {
-            setLocale("en");
-            dispatch(changeLocale("en"));
-            console.log("setLocale", "en");
-          }}
-        >
+            setLocale('en');
+            dispatch(changeLocale('en'));
+            console.log('setLocale', 'en');
+          }}>
           en
         </Button>
         <Button
-          variant={(locale==='fa') ? "contained" : "outlined"}
-          className={"lang-button"}
+          variant={locale === 'fa' ? 'contained' : 'outlined'}
+          className={'lang-button'}
           // color={locale === 'fa' ? 'primary' : 'default'}
           onClick={() => {
-            setLocale("fa");
-            dispatch(changeLocale("fa"));
-            console.log("setLocale", "fa");
-          }}
-        >
+            setLocale('fa');
+            dispatch(changeLocale('fa'));
+            console.log('setLocale', 'fa');
+          }}>
           fa
         </Button>
-        <LanguageIcon/>
+        <LanguageIcon />
 
-        <DollarPrice/>
-
+        <DollarPrice />
       </CardContent>
     </Card>
   );

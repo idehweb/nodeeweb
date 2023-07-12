@@ -1,9 +1,9 @@
 // import * as React from 'react';
 // import {useSelector} from 'react-redux';
-import {Layout, LayoutProps,useTranslate} from 'react-admin';
+import { Layout, LayoutProps, useTranslate } from 'react-admin';
 import AppBar from './AppBar';
 import Menu from './Menu';
-import { ReactQueryDevtools } from 'react-query/devtools'
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 // import {darkTheme, lightTheme} from './themes';
 // // import {AppState} from '../types';
@@ -22,9 +22,18 @@ import { ReactQueryDevtools } from 'react-query/devtools'
 // };
 
 const MainLayout = (props) => {
-  console.log('props',props);
+  console.log('props', props);
   const translate = useTranslate();
-  return <><Layout {...props} className={translate("dir")} menu={Menu} appBar={AppBar}/><ReactQueryDevtools initialIsOpen={false} /></>;
-
+  return (
+    <>
+      <Layout
+        {...props}
+        className={translate('dir')}
+        menu={Menu}
+        appBar={AppBar}
+      />
+      <ReactQueryDevtools initialIsOpen={false} />
+    </>
+  );
 };
 export default MainLayout;

@@ -1,10 +1,10 @@
-import React from "react";
-import { useInput, useRecordContext } from "react-admin";
-import API from "@/functions/API";
-import Select from "react-select";
+import React from 'react';
+import { useInput, useRecordContext } from 'react-admin';
+import API from '@/functions/API';
+import Select from 'react-select';
 // import { useRecordContext } from "react-admin/dist/index";
 
-API.defaults.headers.common["Content-Type"] = "multipart/form-data";
+API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 let ckjhg = {};
 let hasTriggered = false;
 
@@ -16,50 +16,58 @@ export default (props) => {
 
   const { field } = useInput(props);
   const [v, setV] = React.useState([]);
-  const [defaultV, setDefaultV] = React.useState((record && record.firstCategory && record.firstCategory.name) ? {
-    value: record.firstCategory._id,
-    label: record.firstCategory.name.fa
-  } : {});
+  const [defaultV, setDefaultV] = React.useState(
+    record && record.firstCategory && record.firstCategory.name
+      ? {
+          value: record.firstCategory._id,
+          label: record.firstCategory.name.fa,
+        }
+      : {}
+  );
   const [g, setG] = React.useState([]);
-  const [defaultG, setDefaultG] = React.useState((record && record.secondCategory && record.secondCategory.name) ? {
-    value: record.secondCategory._id,
-    label: record.secondCategory.name.fa
-  } : {});
+  const [defaultG, setDefaultG] = React.useState(
+    record && record.secondCategory && record.secondCategory.name
+      ? {
+          value: record.secondCategory._id,
+          label: record.secondCategory.name.fa,
+        }
+      : {}
+  );
   const [d, setD] = React.useState([]);
-  const [defaultD, setDefaultD] = React.useState((record && record.thirdCategory && record.thirdCategory.name) ? {
-    value: record.thirdCategory._id,
-    label: record.thirdCategory.name.fa
-  } : {});
+  const [defaultD, setDefaultD] = React.useState(
+    record && record.thirdCategory && record.thirdCategory.name
+      ? {
+          value: record.thirdCategory._id,
+          label: record.thirdCategory.name.fa,
+        }
+      : {}
+  );
   const [selectS, setSelectS] = React.useState([true, true, true]);
   const ResetCats = () => {
     // console.log('ResetCats');
-    props.returnToHome({ "secondCategory": null, "thirdCategory": null });
+    props.returnToHome({ secondCategory: null, thirdCategory: null });
     setDefaultG(null);
     setDefaultD(null);
     // console.log('props.returnCatsValues',props.returnCatsValues());
   };
   const getData = () => {
-
-    API.get("" + props.url, {}, {})
-      .then(({ data = [] }) => {
-        var cds = [];
-        data.forEach((uf, s) => {
-          cds.push({
-            value: uf._id,
-            label: uf.name,
-            key: s
-          });
-
+    API.get('' + props.url, {}, {}).then(({ data = [] }) => {
+      var cds = [];
+      data.forEach((uf, s) => {
+        cds.push({
+          value: uf._id,
+          label: uf.name,
+          key: s,
         });
-        setV(cds);
-        setSelectS([false, true, true]);
-        changeSecondInput(defaultV);
       });
+      setV(cds);
+      setSelectS([false, true, true]);
+      changeSecondInput(defaultV);
+    });
   };
   // const [progress, setProgress] = React.useState(0);
 
   React.useEffect(() => {
-
     getData();
     // if (field.value) setV(field.value);
   }, []);
@@ -79,40 +87,36 @@ export default (props) => {
     // console.log('returnToHome...', uytfd);
     if (uytfd) {
       let _id = uytfd;
-      ckjhg["thirdCategory"] = _id;
+      ckjhg['thirdCategory'] = _id;
       props.returnToHome(ckjhg);
     }
-
   };
   const triggerSecondInput = (t) => {
     if (!hasTriggered) {
-      ckjhg["firstCategory"] = t;
+      ckjhg['firstCategory'] = t;
 
-      API.get("" + props.surl + "/" + t, {}, {})
-        .then(({ data = [] }) => {
-          // console.log('data', data);
-          var cds = [];
-          hasTriggered = true;
-          setG(data);
-
-        });
+      API.get('' + props.surl + '/' + t, {}, {}).then(({ data = [] }) => {
+        // console.log('data', data);
+        var cds = [];
+        hasTriggered = true;
+        setG(data);
+      });
     }
   };
   const triggerThirdInput = (t) => {
     // console.log('triggerThirdInput', hasTriggered);
     if (!hasTriggered) {
-      ckjhg["secondCategory"] = t;
+      ckjhg['secondCategory'] = t;
 
-      API.get("" + props.surl + "/" + t, {}, {})
+      API.get('' + props.surl + '/' + t, {}, {})
         .then(({ data = [] }) => {
           // console.log('data', data);
           var cds = [];
           hasTriggered = true;
           setD(data);
-
         })
         .catch((err) => {
-          console.log("error", err);
+          console.log('error', err);
           // setProgress(0);
         });
     }
@@ -131,41 +135,36 @@ export default (props) => {
       // console.log(v);
       let _id = t.value;
       // let _id = v[t.target.options.selectedIndex - 1]._id;
-      ckjhg["firstCategory"] = _id;
+      ckjhg['firstCategory'] = _id;
       props.returnToHome(ckjhg);
-      API.get("" + props.surl + "/" + _id, {}, {})
-        .then(({ data = [] }) => {
-          // console.log('data', data);
-          let cds = [], catTemp = false;
-          if (data && data[0]) {
-            data.forEach((uf, s) => {
-              cds.push({
-                value: uf._id,
-                label: uf.name,
-                key: s
-              });
-              if (defaultG && defaultG.value === uf._id)
-                catTemp = true;
-
-
+      API.get('' + props.surl + '/' + _id, {}, {}).then(({ data = [] }) => {
+        // console.log('data', data);
+        let cds = [],
+          catTemp = false;
+        if (data && data[0]) {
+          data.forEach((uf, s) => {
+            cds.push({
+              value: uf._id,
+              label: uf.name,
+              key: s,
             });
-            setG(cds);
-            setD([]);
-            setSelectS([false, false, true]);
+            if (defaultG && defaultG.value === uf._id) catTemp = true;
+          });
+          setG(cds);
+          setD([]);
+          setSelectS([false, false, true]);
 
-            if (!catTemp) {
-              setDefaultG({});
-              changeThirdInput({});
-
-            } else {
-              // console.clear();
-              // console.log('defaultG',defaultG,catTemp);
-              changeThirdInput(defaultG);
-            }
-            // ResetCats();
-
+          if (!catTemp) {
+            setDefaultG({});
+            changeThirdInput({});
+          } else {
+            // console.clear();
+            // console.log('defaultG',defaultG,catTemp);
+            changeThirdInput(defaultG);
           }
-        });
+          // ResetCats();
+        }
+      });
     }
   };
   const changeThirdInput = (t) => {
@@ -176,37 +175,29 @@ export default (props) => {
       // console.log(g);
       // let _id = g[t.target.options.selectedIndex - 1]._id;
       let _id = t.value;
-      ckjhg["secondCategory"] = _id;
+      ckjhg['secondCategory'] = _id;
       props.returnToHome(ckjhg);
-      API.get("" + props.surl + "/" + _id, {}, {})
-        .then(({ data = [] }) => {
-          // console.log('data', data);
-          var cds = [], catTemp = false;
-          data.forEach((uf, s) => {
-            cds.push({
-              value: uf._id,
-              label: uf.name,
-              key: s
-            });
-            if (defaultD && defaultD.value === uf._id)
-              catTemp = true;
-
-
+      API.get('' + props.surl + '/' + _id, {}, {}).then(({ data = [] }) => {
+        // console.log('data', data);
+        var cds = [],
+          catTemp = false;
+        data.forEach((uf, s) => {
+          cds.push({
+            value: uf._id,
+            label: uf.name,
+            key: s,
           });
-          if (!catTemp)
-            setDefaultD({});
-
-          setD(cds);
-          setSelectS([false, false, false]);
-
-
+          if (defaultD && defaultD.value === uf._id) catTemp = true;
         });
+        if (!catTemp) setDefaultD({});
+
+        setD(cds);
+        setSelectS([false, false, false]);
+      });
     } else {
       setSelectS([false, false, false]);
-
     }
   };
-
 
   // React.useEffect(() => {
   //     console.log('v changged', v);
@@ -222,42 +213,43 @@ export default (props) => {
   if (v)
     return (
       <>
-        <div className={"row mb-20"}>
-          <div className={"col-md-4"}>
+        <div className={'row mb-20'}>
+          <div className={'col-md-4'}>
             <Select
               isRtl={true}
               isLoading={selectS[0]}
               isDisabled={selectS[0]}
-              className={"zindexhigh"}
+              className={'zindexhigh'}
               defaultValue={defaultV}
               onChange={changeSecondInput}
               options={v}
             />
           </div>
-          <div className={"col-md-4"}>
-
-            {(g.length > 0) && <Select
-              isRtl={true}
-              isLoading={selectS[1]}
-              isDisabled={selectS[1]}
-              className={"zindexhigh"}
-              defaultValue={defaultG}
-              onChange={changeThirdInput}
-              options={g}
-            />}
+          <div className={'col-md-4'}>
+            {g.length > 0 && (
+              <Select
+                isRtl={true}
+                isLoading={selectS[1]}
+                isDisabled={selectS[1]}
+                className={'zindexhigh'}
+                defaultValue={defaultG}
+                onChange={changeThirdInput}
+                options={g}
+              />
+            )}
           </div>
-          <div className={"col-md-4"}>
-
-            {(d.length > 0) && <Select
-              isRtl={true}
-              isLoading={selectS[2]}
-              isDisabled={selectS[2]}
-              className={"zindexhigh"}
-              defaultValue={defaultD}
-              onChange={chooseThirdCat}
-              options={d}
-            />}
-
+          <div className={'col-md-4'}>
+            {d.length > 0 && (
+              <Select
+                isRtl={true}
+                isLoading={selectS[2]}
+                isDisabled={selectS[2]}
+                className={'zindexhigh'}
+                defaultValue={defaultD}
+                onChange={chooseThirdCat}
+                options={d}
+              />
+            )}
           </div>
         </div>
         {/*<select placeholder={'first category'} onChange={changeSecondInput}>*/}
@@ -302,6 +294,5 @@ export default (props) => {
         {/*</select>*/}
       </>
     );
-  else
-    return (<></>);
+  else return <></>;
 };

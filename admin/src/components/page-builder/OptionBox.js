@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
-import  FormOptions  from "./FormOptions";
-import CustomModal from "@/components/Modal";
-import { useDispatch, useSelector } from "react-redux";
-import ModalOptions from "#c/components/ModalOptions";
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
+import FormOptions from './FormOptions';
+import CustomModal from '@/components/Modal';
+import { useDispatch, useSelector } from 'react-redux';
+import ModalOptions from '#c/components/ModalOptions';
 const ListGroup = ({ children }) => {
   return <div>{children}</div>;
 };
@@ -18,18 +18,17 @@ const OptionBox = (props) => {
 
   const [Options, SetOptions] = useState('');
 
-
   useEffect(() => {
     let tempOption = [];
 
-    if(model==='form'){
+    if (model === 'form') {
       FormOptions.forEach((dO) => {
         if (exclude.indexOf(dO.name) === -1) {
           tempOption.push(dO);
         }
       });
       SetOptions(tempOption);
-    }else{
+    } else {
       defaultOptions.forEach((dO) => {
         if (exclude.indexOf(dO.name) === -1) {
           tempOption.push(dO);
@@ -37,21 +36,16 @@ const OptionBox = (props) => {
       });
       SetOptions(tempOption);
     }
-
   }, [exclude]);
   useEffect(() => {
     if (themeData && themeData.components) {
       let tempOption = Options;
       themeData.components.forEach((dO) => {
-
         tempOption.push(dO);
-
       });
       SetOptions(tempOption);
-
     }
     //
-
   }, [themeData]);
 
   return (
@@ -60,8 +54,9 @@ const OptionBox = (props) => {
       addToComponents={addToComponents}
       onClose={onClose}
       open={open}
-      className={"width50vw modal"}
-      title={("Choose Element")}/>
+      className={'width50vw modal'}
+      title={'Choose Element'}
+    />
     // <CustomModal onClose={onClose} open={open} className={"width50vw sdfghyjuikol kiuytgfhjuyt modal"}
     //              title={("Choose Element")}>
     //   <ListGroup flush>
@@ -82,7 +77,5 @@ const OptionBox = (props) => {
     // </CustomModal>
   );
 };
-export const PageServer = [
-  {}
-];
-export default (OptionBox);
+export const PageServer = [{}];
+export default OptionBox;
