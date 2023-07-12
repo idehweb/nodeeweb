@@ -11,7 +11,9 @@ import {
   EditIconSvg,
   CloseIconSvg,
   AddIconSvg,
-} from './base/Icon';
+} from '../base/Icon';
+
+import { EditButton, MoveButton, CloseButton } from './styles';
 
 const Component = (props) => {
   console.log('Cooooooooooooooooooooooooooo', props);
@@ -47,6 +49,7 @@ const Component = (props) => {
   const [{ isOver }, dropRef] = useDrop({
     accept: ItemTypes.KNIGHT,
     drop: (item, monitor) =>
+      // @ts-ignore
       startDestHnadler(item.id, setDropElement, component),
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
@@ -68,13 +71,8 @@ const Component = (props) => {
         </span>
       </div>
       <div className="controller">
-        <span
+        <MoveButton
           className="move"
-          style={{
-            border: '1px solid #ddd',
-            padding: '1px 3px',
-            cursor: 'grab',
-          }}
           id={component.id}
           ref={dragRef}
           onDragStart={(e) => dragStart(e, component)}
@@ -88,23 +86,17 @@ const Component = (props) => {
           // onDragEnter={(e) => dragEnter(e, component)}
         >
           <MoveIconSvg width="15px" height="15px" background="#464D55" />
-        </span>
-        <span
+        </MoveButton>
+        <EditButton
           onClick={() => setComponentForSetting(!componentForSetting)}
-          className="edit"
-          style={{
-            border: '1px solid #ddd',
-            borderTop: 'none',
-            padding: '1px 3px',
-            cursor: 'pointer',
-          }}>
+          className="edit">
           <EditIconSvg
-            width="15px"
-            height="15px"
+            width={15}
+            height={15}
             fill="none"
             background="#464D55"
           />
-        </span>
+        </EditButton>
       </div>
       <div className="content">
         {!componentForSetting && (
@@ -187,20 +179,13 @@ const Component = (props) => {
                     }}>
                     {component.label}
                   </span>
-                  <span
-                    style={{
-                      cursor: 'pointer',
-                      color: '#ffffff',
-                      height: '40px',
-                      lineHeight: '40px',
-                      padding: '0px 10px',
-                    }}>
+                  <CloseButton>
                     <CloseRounded
                       onClick={() => {
                         setComponentForSetting(!componentForSetting);
                       }}
                     />
-                  </span>
+                  </CloseButton>
                 </div>
                 <div className="bottom-bar-settings">
                   {/*{JSON.stringify(component.settings.general.fields)}*/}
