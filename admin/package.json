@@ -92,14 +92,6 @@
     "#assets/*": "./src/assets/*",
     "#c/*": "./src/*.js"
   },
-  "prettier": {
-    "bracketSpacing": true,
-    "singleQuote": true,
-    "jsxBracketSameLine": true,
-    "trailingComma": "es5",
-    "printWidth": 80,
-    "semi": true
-  },
   "browserslist": [
     ">0.2%",
     "not dead",

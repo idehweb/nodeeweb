@@ -1,0 +1,19 @@
+# version control systems
+**/.git
+**/.svn
+**/.hg
+
+# node_modules
+**/node_modules
+node_modules
+
+# next js dirs
+**/.next/**
+**/_next/**
+**/dist/**
+**/build/**
+
+
+
+# typescript
+*.tsbuildinfo
