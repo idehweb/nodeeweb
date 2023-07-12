@@ -1,10 +1,18 @@
-import { MiddleWare } from "@nodeeweb/core/types/global";
+import { MiddleWare, Req } from "@nodeeweb/core/types/global";
 import { serviceOnError } from "../common/service";
 import { classCatchBuilder } from "@nodeeweb/core/utils/catchAsync";
 import store from "@nodeeweb/core/store";
-import { checkSiteStatus, fireEvent } from "../common/mustImplement";
+import {
+  checkSiteStatus,
+  fireEvent,
+  submitAction,
+} from "../common/mustImplement";
 import mongoose from "mongoose";
 import crypto from "crypto";
+import stringMath from "string-math";
+import axios from "axios";
+import moment from "moment";
+import persianJs from "persianjs";
 
 export default class Service {
   static createByCustomer: MiddleWare = async (req, res) => {
@@ -316,7 +324,7 @@ export default class Service {
       }
     }
   };
-  static create: MiddleWare = async (req, res) => {
+  static createAdmin: MiddleWare = async (req, res) => {
     const Customer = store.db.model("Customer");
     const Order = store.db.model("Order");
     req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
@@ -389,334 +397,177 @@ export default class Service {
   };
 
   static rewriteOrders: MiddleWare = async (req, res) => {
-    const Customer = store.db.model("Customer");
-    const Order = store.db.model("Order");
-    const Media = store.db.model("Media");
-    const Notfound = 0;
-    Order.find({}, function (err, orders) {
-      _.forEach(orders, (item, k) => {
-        self.checkOrder(req, item, k);
-      });
-    });
+    return res.status(500).send("not implement yet!");
   };
+
   static createCart: MiddleWare = async (req, res) => {
-    const obj = {};
-    if (req.body.billingAddress) {
-      obj["billingAddress"] = req.body.billingAddress;
-    }
-    if (req.body.amount || req.body.amount == 0) {
-      obj["amount"] = req.body.amount;
-    }
-    if (req.body.card) {
-      obj["card"] = req.body.card;
-    }
-    if (req.body.customer) {
-      obj["customer"] = req.body.customer;
-    }
-    if (req.body.customer_data) {
-      obj["customer_data"] = req.body.customer_data;
-    }
-    if (req.body.customer_data && req.body.customer_data._id) {
-      obj["customer"] = req.body.customer_data._id;
-    }
-    if (req.body.deliveryDay) {
-      obj["deliveryDay"] = req.body.deliveryDay;
-    }
-    if (req.body.deliveryPrice) {
-      obj["deliveryPrice"] = req.body.deliveryPrice;
-    }
-    if (req.body.package) {
-      obj["package"] = req.body.package;
-    }
-    if (req.body.total) {
-      obj["total"] = req.body.total;
-    }
-    if (req.body.sum || req.body.sum == 0) {
-      obj["sum"] = req.body.sum;
-    }
-    if (req.body.orderNumber) {
-      obj["orderNumber"] = req.body.orderNumber;
-    } else {
-      obj["orderNumber"] = Math.floor(10000 + Math.random() * 90000);
-    }
+    const obj: any = {
+      billingAddress: req.body.billingAddress,
+      amount: req.body.amount,
+      card: req.body.card,
+      customer: req.body.customer,
+      customer_data: req.body.customer_data?._id,
+      deliveryDay: req.body.deliveryDay,
+      deliveryPrice: req.body.deliveryPrice,
+      package: req.body.package,
+      total: req.body.total,
+      sum: req.body.sum,
+      orderNumber:
+        req.body.orderNumber ?? Math.floor(10000 + Math.random() * 90000),
+      status: req.body.status == "checkout" ? "checkout" : "cart",
+    };
     const Order = store.db.model("Order");
-
-    const status = "cart";
-
-    if (req.body.status == "checkout") status = "checkout";
-
-    // if(req.body.)
-    obj["status"] = status;
     if (req.params.id) {
-      Order.findByIdAndUpdate(
+      const order = await Order.findByIdAndUpdate(
         req.params.id,
         {
           $set: obj,
-          $push: { statusArray: { status: status } },
+          $push: { statusArray: { status: obj.status } },
         },
-        { new: true },
-        function (err, order) {
-          if (err || !order) {
-            res.json({
-              success: false,
-              message: "error!",
-              err: err,
-            });
-            return 0;
-          }
-          //console.log('req.headers', req.headers);
-          if (req.user && req.headers.token) {
-            const action = {
-              customer: req.user._id,
-              title: "customer edit cart " + order._id,
-              data: order,
-              history: req.body,
-              order: order._id,
-            };
-            // req.req.global.submitAction(action);
-          }
-          if (!req.user && !req.headers.token) {
-            const action = {
-              title: "guest edit cart " + order._id,
-              data: order,
-              history: req.body,
-              // order: order._id
-            };
-            // req.req.global.submitAction(action);
-          }
-          res.json(order);
-          return 0;
-        }
+        { new: true }
       );
+
+      if (!order) return res.status(404).json({ message: "order not found" });
+      return res.status(200).json(order);
     } else {
-      req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
-      if (req.body.orderNumber) {
-        obj["orderNumber"] = req.body.orderNumber;
-      }
-      // console.log('obj', obj)
-      if (!obj.order_id) {
-        obj.order_id = crypto.randomBytes(64).toString("hex");
-      }
-      Order.create(obj, function (err, order) {
-        if (err || !order) {
-          res.json({
-            success: false,
-            message: "error!",
-            err: err,
-          });
-          return 0;
-        }
-        //console.log('req.headers', req.headers);
-        if (req.user && req.headers.token) {
-          const action = {
-            customer: req.user._id,
-            title: "create cart " + order._id,
-            data: order,
-            history: req.body,
-            order: order._id,
-          };
-          // req.req.global.submitAction(action);
-        }
-        if (!req.user && !req.headers.token) {
-          const action = {
-            // customer: req.user._id,
-            title: "guest created cart " + order._id,
-            data: order,
-            history: req.body,
-            // order: order._id
-          };
-          // req.req.global.submitAction(action);
-        }
-        res.json(order);
-        return 0;
-      });
+      obj.order_id =
+        req.body.order_id ?? crypto.randomBytes(64).toString("hex");
+      const order = await Order.create(obj);
+      return res.status(201).json(order);
     }
   };
   static createPaymentLink: MiddleWare = async (req, res) => {
-    console.log("creating transaction by admin...");
-    // req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
-
-    const Order = store.db.model("Order");
-    const Product = store.db.model("Product");
-    const Transaction = store.db.model("Transaction");
     const Gateway = store.db.model("Gateway");
-    const Settings = store.db.model("Settings");
+    const Order = store.db.model("Order");
+    const Transaction = store.db.model("Transaction");
 
-    // console.log("buy...", req.params._id, req.body.amount);
     if (
       req.body.amount &&
       (req.body.amount == null || req.body.amount == "null")
     )
-      return res.json({
+      return res.status(400).json({
         success: false,
         message: "req.body.amount",
       });
-    if (req.body.method)
-      Gateway.findOne({ slug: req.body.method }, function (err, gateway) {
-        if (!gateway || !gateway.request) {
-          return res.json({
-            success: false,
-            slug: req.body.method,
-            // gateway: gateway,
-            message: "gateway request not found",
-          });
-        }
-        req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
+    if (req.body.method) {
+      const gateway = await Gateway.findOne({ slug: req.body.method });
+
+      if (!gateway || !gateway.request) {
+        return res.status(404).json({
+          success: false,
+          slug: req.body.method,
+          message: "gateway request not found",
+        });
+      }
+      req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
+
+      const obj = {
+        order_id: crypto.randomBytes(64).toString("hex"),
+        amount: req.body.amount,
+        total: req.body.amount,
+        orderNumber: req.body.orderNumber,
+        sum: req.body.amount,
+        status: req.body.status || "checkout",
+      };
+
+      const order = await Order.create(obj);
+      let amount = parseInt(order.amount) * 10;
+      if (req.body.amount) {
+        amount = parseInt(req.body.amount) * 10;
+      }
+      if (order.discount) {
+        amount = amount - order.discount * 10;
+      }
+      if (amount < 0) {
+        amount = 0;
+      }
+      const LIMIT = 1000000000;
+      if (amount > LIMIT) {
+        return res.status(400).json({
+          success: false,
+          message: "price is more than 50,000,000T",
+        });
+      }
+      gateway.request = gateway.request.replace(
+        /%domain%/g,
+        process.env.BASE_URL
+      );
+
+      gateway.request = gateway.request.replace(/%amount%/g, order.amount);
+      gateway.request = gateway.request
+        .split("%orderNumber%")
+        .join(order.orderNumber);
+      gateway.request = gateway.request.replace(/%orderId%/g, order._id);
+      if (!JSON.parse(gateway.request))
+        return res.status(400).json({
+          success: false,
+          gateway: JSON.parse(gateway.request),
+          message: "gateway request not found",
+        });
+      let theReq = JSON.parse(gateway.request);
+
+      if (theReq["data"] && theReq["data"]["Amount"])
+        theReq["data"]["Amount"] = stringMath(
+          theReq["data"]["Amount"].toString()
+        );
+
+      if (theReq["data"] && theReq["data"]["amount"])
+        theReq["data"]["amount"] = stringMath(
+          theReq["data"]["amount"].toString()
+        );
+
+      if (theReq["body"] && theReq["body"]["Amount"])
+        theReq["body"]["Amount"] = stringMath(
+          theReq["body"]["Amount"].toString()
+        );
+
+      if (theReq["body"] && theReq["body"]["amount"])
+        theReq["body"]["amount"] = stringMath(
+          theReq["body"]["amount"].toString()
+        );
+
+      try {
+        const { data } = await axios(theReq);
 
         const obj = {
-          order_id: crypto.randomBytes(64).toString("hex"),
-          amount: req.body.amount ? req.body.amount : amount,
-          total: req.body.amount ? req.body.amount : amount,
-          orderNumber: req.body.orderNumber,
-          sum: req.body.amount ? req.body.amount : amount,
-          status: req.body.status || "checkout",
+          amount: amount,
+          method: req.body.method,
+          order: req.params._id,
+          gatewayResponse: JSON.stringify(data),
+          Authority: data["trackId"],
         };
-        Order.create(obj, function (err, order) {
-          if (err || !order) {
-            res.json({
-              success: false,
-              message: "error!",
-            });
-            return 0;
-          }
-
-          // obj[]=;
-          // console.log(order.amount/);
-          //                 return;
-          const amount = parseInt(order.amount) * 10;
-          if (req.body.amount) {
-            amount = parseInt(req.body.amount) * 10;
-          }
-          if (order.discount) {
-            amount = amount - order.discount * 10;
-          }
-          if (amount < 0) {
-            amount = 0;
-          }
-          const LIMIT = 1000000000;
-          if (amount > LIMIT) {
-            return res.json({
-              success: false,
-              message: "price is more than 50,000,000T",
-            });
-          }
-          //check if we have method or not,
-          // for both we have to create transaction
-          //    if we have method, submit method too
-          // console.log('order.orderNumber', order.orderNumber)
-          gateway.request = gateway.request.replaceAll(
-            "%domain%",
-            process.env.BASE_URL
-          );
-
-          gateway.request = gateway.request.replaceAll(
-            "%amount%",
-            order.amount
-          );
-
-          gateway.request = gateway.request
-            .split("%orderNumber%")
-            .join(order.orderNumber);
-          // gateway.request = gateway.request.replace("%orderNumber%", order.orderNumber);
-          gateway.request = gateway.request.replaceAll("%orderId%", order._id);
-          // console.log('gateway.request', gateway.request);
-          if (!JSON.parse(gateway.request))
-            return res.json({
-              success: false,
-              gateway: JSON.parse(gateway.request),
-              message: "gateway request not found",
-            });
-          // const sendrequest=
-          let theReq = JSON.parse(gateway.request);
-          // console.log('theReq[\'amount\']', theReq['data'])
-
-          if (theReq["data"] && theReq["data"]["Amount"])
-            theReq["data"]["Amount"] = stringMath(
-              theReq["data"]["Amount"].toString()
-            );
-
-          if (theReq["data"] && theReq["data"]["amount"])
-            theReq["data"]["amount"] = stringMath(
-              theReq["data"]["amount"].toString()
-            );
-
-          if (theReq["body"] && theReq["body"]["Amount"])
-            theReq["body"]["Amount"] = stringMath(
-              theReq["body"]["Amount"].toString()
-            );
-
-          if (theReq["body"] && theReq["body"]["amount"])
-            theReq["body"]["amount"] = stringMath(
-              theReq["body"]["amount"].toString()
-            );
-          // console.log('gateway.request', theReq)
-
-          // return;
-          req
-            .httpRequest(theReq)
-            .then(function (parsedBody) {
-              const obj = {
-                amount: amount,
-                method: req.body.method,
-                order: req.params._id,
-                gatewayResponse: JSON.stringify(parsedBody["data"]),
-                Authority: parsedBody["data"]["trackId"],
-              };
-              if (req.headers && req.user && req.user._id) {
-                obj["customer"] = req.user._id;
-              }
-              // return res.json({
-              //     ...obj, gateway: JSON.parse(gateway.request),
-              // });
-              Transaction.create(obj, function (err, transaction) {
-                if (err || !transaction) {
-                  return res.json({
-                    success: false,
-                    message: "transaction could not be created",
-                    err: err,
-                  });
-                }
-                Order.findByIdAndUpdate(
-                  req.params._id,
-                  {
-                    $push: {
-                      transaction: transaction._id,
-                    },
-                  },
-                  function (order_err, updated_order) {
-                    console.log("end of buy...");
-                    if (parsedBody["data"] && parsedBody["data"]["url"]) {
-                      return res.json({
-                        success: true,
-                        url: parsedBody["data"]["url"],
-                      });
-                    }
-                    if (parsedBody["data"] && parsedBody["data"].trackId) {
-                      return res.json({
-                        success: true,
-                        // data: parsedBody['data'],
-                        // request: JSON.parse(gateway.request),
-                        url:
-                          "https://gateway.zibal.ir/start/" +
-                          parsedBody["data"].trackId,
-                      });
-                    } else {
-                      return res.json({
-                        success: false,
-                        // data: parsedBody['data'],
-                        // request: JSON.parse(gateway.request),
-                        parsedBody: parsedBody["data"],
-                      });
-                    }
-                  }
-                );
-              });
-            })
-            .catch((e) => res.json({ e, requ: theReq }));
+        if (req.headers && req.user && req.user._id) {
+          obj["customer"] = req.user._id;
+        }
+        const transaction = await Transaction.create(obj);
+        await Order.findByIdAndUpdate(req.params._id, {
+          $push: {
+            transaction: transaction._id,
+          },
         });
-      });
-    else {
-      return res.json({
+
+        if (data && data["url"]) {
+          return res.status(201).json({
+            success: true,
+            url: data["url"],
+          });
+        }
+        if (data && data.trackId) {
+          return res.status(201).json({
+            success: true,
+            url: "https://gateway.zibal.ir/start/" + data.trackId,
+          });
+        } else {
+          return res.status(201).json({
+            success: false,
+            parsedBody: data,
+          });
+        }
+      } catch (e) {
+        return res.status(500).json({ e, requ: theReq });
+      }
+    } else {
+      return res.status(400).json({
         success: false,
         message: "you have no gateway",
       });
@@ -724,178 +575,125 @@ export default class Service {
   };
   static myOrder: MiddleWare = async (req, res) => {
     const Order = store.db.model("Order");
-
-    // console.log('hgfgh');
     const obj = {
       _id: req.params.id,
       customer: req.user._id.toString(),
     };
-    console.log("obj", obj);
-    Order.findOne(obj, function (err, order) {
-      if (err || !order) {
-        res.json({
-          success: false,
-          message: "error!",
-        });
-        return 0;
-      }
-
-      return res.json(order);
-    })
+    const order = await Order.findOne(obj)
       .populate("customer", "nickname phoneNumber firstName lastName")
       .populate("transaction", "Authority amount statusCode status");
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "error!",
+      });
+    }
+    return res.status(201).json(order);
   };
   static allWOrders: MiddleWare = async (req, res) => {
     const Order = store.db.model("Order");
-
-    // console.log('allWOrders');
-    const offset = 0;
+    let offset = 0;
     if (req.params.offset) {
       offset = parseInt(req.params.offset);
     }
-
     const search = {};
     search["customer"] = req.user._id;
-    // search['status']='published';
-    // console.log('search', search)
-    Order.find(
+    const orders = await Order.find(
       search,
-      "_id updatedAt createdAt card sum amount deliveryPrice orderNumber status paymentStatus deliveryDay customer_data billingAddress transaction",
-      function (err, orders) {
-        if (err || !orders) {
-          res.json([]);
-          return 0;
-        }
-
-        Order.countDocuments(search, function (err, count) {
-          // console.log('countDocuments', count);
-          if (err || !count) {
-            res.json([]);
-            return 0;
-          }
-          res.setHeader("X-Total-Count", count);
-
-          // orders.map(resource => ({ ...resource, id: resource._id }))
-          res.json(orders);
-          return 0;
-        });
-      }
+      "_id updatedAt createdAt card sum amount deliveryPrice orderNumber status paymentStatus deliveryDay customer_data billingAddress transaction"
     )
       .populate("customer", "nickname photos address")
       .skip(offset)
       .sort({ _id: -1 })
       .limit(parseInt(req.params.limit))
       .lean();
+
+    if (!orders.length) {
+      return res.json([]);
+    }
+
+    const count = await Order.countDocuments(search);
+    res.setHeader("X-Total-Count", count);
+    return res.json(orders);
   };
   static destroy: MiddleWare = async (req, res) => {
     const Order = store.db.model("Order");
-
-    Order.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: {
-          status: "trash",
-        },
+    const order = await Order.findByIdAndUpdate(req.params.id, {
+      $set: {
+        status: "trash",
       },
-      function (err, order) {
-        if (err || !order) {
-          return res.json({
-            success: false,
-            message: "error!",
-          });
-        }
-        if (req.user._id && req.headers.token) {
-          const action = {
-            user: req.user._id,
-            title: "deconste order " + order._id,
-            // data:order,
-            history: order,
-            order: order._id,
-          };
-          req.submitAction(action);
-        }
-        return res.json({
-          success: true,
-          message: "Deconsted!",
-        });
-      }
-    );
+    });
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "error!",
+      });
+    }
+    if (req.user._id) {
+      const action = {
+        user: req.user._id,
+        title: "deconste order " + order._id,
+        history: order,
+        order: order._id,
+      };
+      submitAction(action);
+    }
+    return res.status(204).json({
+      success: true,
+      message: "Deconsted!",
+    });
   };
-  static async _sendReq(req, theUrl, page) {
-    page = parseInt(page);
-    // console.log('get:', theUrl, 'page:', page)
-    const url = theUrl;
+  static async _sendReq(req: Req, theUrl: any, page: any) {
+    page = parseInt(page + "");
+    let url = theUrl;
     url += "&page=" + page;
-    // console.log('theUrl:', url);
-    req
-      .httpRequest({
+    try {
+      const { data } = await axios({
         method: "get",
         url: url,
-      })
-      .then(function (response) {
-        // count++;
-        // const x = count * parseInt(req.query.per_page)
-        const Order = store.db.model("Order");
-
-        response.data.forEach((dat) => {
-          const obj = {};
-          if (dat.total) {
-            obj["amount"] = dat.total;
-          }
-          // if (dat.description) {
-          //     obj['description'] = {
-          //         fa: dat.description
-          //
-          //     }
-          // }
-
-          if (dat.id) {
-            obj["orderNumber"] = dat.id;
-          }
-          obj["data"] = dat;
-          if (dat && dat.date_created) {
-            // console.log('date_created', dat.date_created, new Date(dat.date_created))
-            obj["createdAt"] = moment(dat.date_created).format();
-            obj["created_at"] = moment(dat.date_created).format();
-          }
-          if (dat && dat.date_modified) {
-            // console.log('date_created', dat.date_created, new Date(dat.date_created))
-            obj["updatedAt"] = moment(dat.date_modified).format();
-          }
-          // console.log('created dat id:', dat.id)
-          Order.create(obj, function (err, ord) {
-            const y = page + 1;
-            self.checkOrder(req, ord);
-            await Service._sendReq(req, theUrl, y);
-          });
-        });
-        // return res.json(response.data)
-      })
-      .catch((e) => {
-        // console.log('#page =====>     error')
-
-        const y = page;
-
-        await Service._sendReq(req, theUrl, y);
       });
+      const Order = store.db.model("Order");
+      for (const dat of data) {
+        const obj = {};
+        if (dat.total) {
+          obj["amount"] = dat.total;
+        }
+        if (dat.id) {
+          obj["orderNumber"] = dat.id;
+        }
+        obj["data"] = dat;
+        if (dat && dat.date_created) {
+          obj["createdAt"] = moment(dat.date_created).format();
+          obj["created_at"] = moment(dat.date_created).format();
+        }
+        if (dat && dat.date_modified) {
+          obj["updatedAt"] = moment(dat.date_modified).format();
+        }
+
+        const order = await Order.create(obj);
+        const y = page + 1;
+        await Service._checkOrder(req, order);
+        await Service._sendReq(req, theUrl, y);
+      }
+    } catch (err) {
+      const y = page;
+      await Service._sendReq(req, theUrl, y);
+    }
   }
-  static async _checkOrder(req, item, k = -1) {
+  static async _checkOrder(req: Req, item: any, k = -1) {
     const Customer = store.db.model("Customer");
     const Order = store.db.model("Order");
-    const Media = store.db.model("Media");
-    const Notfound = 0;
     const obj = {};
     if (item.data && item.data.date_created) {
-      // console.log('date_created', item.data.date_created, new Date(item.data.date_created))
       obj["createdAt"] = moment(item.data.date_created).format();
       obj["created_at"] = moment(item.data.date_created).format();
     }
     if (item.data && item.data.date_modified) {
-      // console.log('date_created', item.data.date_created, new Date(item.data.date_created))
       obj["updatedAt"] = moment(item.data.date_modified).format();
     }
     if (item.data && item.data.coupon_lines) {
-      _.forEach(item.data.coupon_lines, (coupon_lines) => {
+      item.data.coupon_lines.forEach((coupon_lines: any) => {
         const dcode = coupon_lines.code;
         const discountAmount = coupon_lines.discount;
         if (dcode) {
@@ -920,7 +718,7 @@ export default class Service {
     if (item.data && item.data.line_items) {
       const theCart = [],
         thePackage = [];
-      _.forEach(item.data.line_items, (cart_data) => {
+      item.data.line_items.forEach((cart_data: any) => {
         theCart.push({
           _id: cart_data.id,
           sku: cart_data.sku,
@@ -937,16 +735,12 @@ export default class Service {
           price: parseInt(cart_data.subtotal) || cart_data.price,
           total_price: cart_data.total,
           quantity: cart_data.quantity,
-          // "_id":  cart_data.id
         });
       });
 
       obj["card"] = theCart;
       obj["package"] = thePackage;
     }
-    // console.log('obj',obj)
-    // return
-    // console.log('item.data.date_created',item.data.date_created,moment(item.data.date_created).format())
     if (item.data && item.data.status) {
       obj["status"] = item.data.status;
       if (item.data.status == "processing") {
@@ -963,35 +757,26 @@ export default class Service {
         obj["status"] = "makingready";
         obj["paymentStatus"] = "paid";
         obj["paid"] = "true";
-
-        // obj['paymentStatus']='paid';
       }
       if (item.data.status == "pws-shipping") {
         obj["status"] = "makingready";
         obj["paymentStatus"] = "paid";
         obj["paid"] = "true";
-
-        // obj['paymentStatus']='paid';
       }
       if (item.data.status == "pws-packaged") {
         obj["status"] = "makingready";
         obj["paymentStatus"] = "paid";
         obj["paid"] = "true";
-
-        // obj['paymentStatus']='paid';
       }
       if (item.data.status == "cancelled") {
         obj["status"] = "cancel";
-        // obj['paymentStatus']='paid';
       }
       if (item.data.status == "pending") {
         obj["status"] = "processing";
-        // obj['paymentStatus']='paid';
       }
 
       if (item.data.status == "on-hold") {
         obj["status"] = "processing";
-        // obj['paymentStatus']='paid';
       }
     }
     if (item.data && item.data.total) {
@@ -1002,12 +787,12 @@ export default class Service {
     if (item.data && item.data.cart_tax) {
       obj["taxAmount"] = parseInt(item.data.cart_tax);
     }
-    const internationalCode = null,
+    let internationalCode = null,
       sex = null,
       birthday = null,
       monthday = null;
     if (item.data && item.data.meta_data && item.data.meta_data[0]) {
-      _.forEach(item.data.meta_data, (j) => {
+      item.data.meta_data.forEach((j: any) => {
         if (j.key == "_billing_national_id") {
           internationalCode = j.value;
         }
@@ -1024,10 +809,7 @@ export default class Service {
     }
 
     if (item.data && item.data.billing && item.data.billing.phone) {
-      const custObj = {
-        // 'firstName': item.data.billing.first_name,
-        // 'lastName': item.data.billing.last_name,
-      };
+      const custObj = {};
       if (item.data.billing && item.data.billing.email) {
         custObj["email"] = item.data.billing.email;
       }
@@ -1038,18 +820,14 @@ export default class Service {
         custObj["sex"] = sex;
       }
       if (birthday && monthday) {
-        // console.log(monthday + '/' + birthday)
-        // custObj['birthdate']=sex
       }
-      const phoneNumber = item.data.billing.phone.slice(-12);
+      let phoneNumber = item.data.billing.phone.slice(-12);
       phoneNumber = phoneNumber.replace(/\s/g, "");
-      // console.log('==> addCustomer() 1.11');
       phoneNumber = persianJs(phoneNumber).arabicNumber().toString().trim();
       phoneNumber = persianJs(phoneNumber).persianNumber().toString().trim();
       phoneNumber = parseInt(phoneNumber).toString();
 
       if (phoneNumber.length < 12) {
-        // console.log('to: ', to.toString(), to.toString().length);
         if (phoneNumber.toString().length === 10) {
           phoneNumber = "98" + phoneNumber.toString();
         }
@@ -1063,127 +841,70 @@ export default class Service {
           PostalCode: item.data.billing.postcode,
         },
       ];
-      // if(item.data.meta_data){
-      //     item.data.meta_data.forEach((j)=>{
-      //         if(j.key=='_billing_national_id'){
-      //             // j.value
-      //             custObj['internationalCode'] = j.value;
-      //
-      //         }
-      //     })
-      // }
-      if (phoneNumber.length == 12)
-        Customer.findOneAndUpdate(
+      if (phoneNumber.length == 12) {
+        const customer = await Customer.findOneAndUpdate(
           { phoneNumber: phoneNumber },
           custObj,
-          { new: true },
-          function (err, customer) {
-            if (!customer) {
-              Notfound++;
-              // console.log('#' + k + ' customer not found', item.data.billing.phone, phoneNumber);
-              custObj["firstName"] = item.data.billing.first_name;
-              custObj["lastName"] = item.data.billing.last_name;
-              Customer.create(
-                { phoneNumber: phoneNumber, ...custObj },
-                function (err, tcustomer) {
-                  if (tcustomer) {
-                    obj["customer"] = tcustomer._id;
-                    obj["customer_data"] = {
-                      firstName: item.data.billing.first_name,
-                      lastName: item.data.billing.last_name,
-                    };
-                    obj["billingAddress"] = {
-                      type: "",
-                      State: item.data.billing.state,
-                      City: item.data.billing.city,
-                      StreetAddress: item.data.billing.address_1,
-                      PostalCode: item.data.billing.postcode,
-                    };
-                    Order.findByIdAndUpdate(
-                      item._id,
-                      obj,
-                      function (err, products) {
-                        // console.log('k', k, moment(item.data.date_created).format(), products.createdAt)
-                      }
-                    );
-                  }
-                }
-              );
-            }
-            if (customer) {
-              obj["customer_data"] = {
-                phoneNumber: phoneNumber,
-                firstName: customer.firstName || item.data.billing.first_name,
-                lastName: customer.lastName || item.data.billing.last_name,
-                email: item.data.billing.email,
-                // 'internationalCode': item.data.billing.email,
-              };
-              if (custObj["internationalCode"]) {
-                obj["customer_data"]["internationalCode"] =
-                  custObj["internationalCode"];
-              }
-              // if(!item.data.billing.last_name){
-              //     console.log(item.orderNumber+' has not last name')
-              //     const las=item.data.billing.first_name.split(' ');
-              //     const fi=las.shift()
-              //     console.log('las')
-              //     obj['firstName']=fi;
-              //     obj['lastName']=las.join(' ', ' ')
-              // }
-              obj["customer"] = customer._id;
-
-              obj["billingAddress"] = {
-                type: "",
-                State: item.data.billing.state,
-                City: item.data.billing.city,
-                StreetAddress: item.data.billing.address_1,
-                PostalCode: item.data.billing.postcode,
-              };
-              if (!customer.firstName) {
-                custObj["firstName"] = item.data.billing.first_name;
-              }
-              if (!customer.lastName) {
-                custObj["lastName"] = item.data.billing.last_name;
-              }
-              Customer.findByIdAndUpdate(
-                customer._id,
-                custObj,
-                { new: true },
-                function (err, customer) {
-                  // console.log('custObj', custObj)
-                }
-              );
-              Order.findByIdAndUpdate(
-                item._id,
-                obj,
-                { new: true },
-                function (err, orders) {
-                  // console.log('obj', obj)
-                  if (err) {
-                    console.log("err", err);
-                  }
-                  // if (obj.card)
-                  // console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
-                }
-              );
-            }
-          }
+          { new: true }
         );
-    } else {
-      // console.log('obj', obj)
-      // return
-      Order.findByIdAndUpdate(
-        item._id,
-        obj,
-        { new: true },
-        function (err, orders) {
-          if (err) {
-            console.error("err", err);
+
+        if (!customer) {
+          custObj["firstName"] = item.data.billing.first_name;
+          custObj["lastName"] = item.data.billing.last_name;
+          const tcustomer = await Customer.create({
+            phoneNumber: phoneNumber,
+            ...custObj,
+          });
+          if (tcustomer) {
+            obj["customer"] = tcustomer._id;
+            obj["customer_data"] = {
+              firstName: item.data.billing.first_name,
+              lastName: item.data.billing.last_name,
+            };
+            obj["billingAddress"] = {
+              type: "",
+              State: item.data.billing.state,
+              City: item.data.billing.city,
+              StreetAddress: item.data.billing.address_1,
+              PostalCode: item.data.billing.postcode,
+            };
+            await Order.findByIdAndUpdate(item._id, obj);
           }
-          // if (item.data)
-          // console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
         }
-      );
+        if (customer) {
+          obj["customer_data"] = {
+            phoneNumber: phoneNumber,
+            firstName: customer.firstName || item.data.billing.first_name,
+            lastName: customer.lastName || item.data.billing.last_name,
+            email: item.data.billing.email,
+          };
+          if (custObj["internationalCode"]) {
+            obj["customer_data"]["internationalCode"] =
+              custObj["internationalCode"];
+          }
+          obj["customer"] = customer._id;
+
+          obj["billingAddress"] = {
+            type: "",
+            State: item.data.billing.state,
+            City: item.data.billing.city,
+            StreetAddress: item.data.billing.address_1,
+            PostalCode: item.data.billing.postcode,
+          };
+          if (!customer.firstName) {
+            custObj["firstName"] = item.data.billing.first_name;
+          }
+          if (!customer.lastName) {
+            custObj["lastName"] = item.data.billing.last_name;
+          }
+          await Customer.findByIdAndUpdate(customer._id, custObj, {
+            new: true,
+          });
+          await Order.findByIdAndUpdate(item._id, obj, { new: true });
+        }
+      }
+    } else {
+      await Order.findByIdAndUpdate(item._id, obj, { new: true });
     }
   }
   static onError = serviceOnError("Order");

@@ -74,12 +74,15 @@ export default function registerController() {
   );
 
   // create
-  controllerRegister({
-    method: "post",
-    url: "/",
-    service: Service.create,
-    access,
-  });
+  controllerRegister(
+    {
+      method: "post",
+      url: "/",
+      service: Service.createAdmin,
+      access,
+    },
+    { base_url: "/admin/order", from: "ShopEntity" }
+  );
 
   // crud
   registerEntityCRUD(

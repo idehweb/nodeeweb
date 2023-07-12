@@ -3,3 +3,10 @@ export async function checkSiteStatus(): Promise<boolean> {
 }
 
 export function fireEvent(event: "create-order-by-customer", value: any) {}
+
+export function submitAction(action: {
+  user: any;
+  title: string;
+  history: any;
+  order: any;
+}) {}
