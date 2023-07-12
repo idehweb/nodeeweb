@@ -21,6 +21,8 @@ import {
   SaveBuilder,
 } from '@/functions';
 
+import { Header, TabButton, Container } from './components';
+
 const generateID = (tokenLen = 5) => {
   let text = '';
   const possible =
@@ -551,57 +553,15 @@ const Core = (props) => {
         style={{
           margin: 20,
         }}>
-        <div
-          style={{
-            background: '#ffffff',
-            padding: '4px 0px 4px 4px',
-            direction: 'ltr',
-            border: '1px solid #ddd',
-            color: '#000000',
-            fontSize: '12px',
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}>
+        <Header>
           <span>Page Builder</span>
           <div>
-            <span
-              style={{
-                background: '#464D55',
-                color: '#ffffff',
-                fontSize: '12px',
-                fontWeight: 'bold',
-                border: 'none !important',
-                cursor: 'pointer',
-                padding: '3px',
-              }}
-              onClick={(e) => setTabValue(0)}>
-              Classic Mode
-            </span>
-            <span
-              style={{
-                background: '#464D55',
-                color: '#ffffff',
-                fontSize: '12px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                padding: '3px',
-              }}
-              onClick={(e) => setTabValue(1)}>
-              Preview Mode
-            </span>
+            <TabButton onClick={(e) => setTabValue(0)}>Classic Mode</TabButton>
+            <TabButton onClick={(e) => setTabValue(1)}>Preview Mode</TabButton>
           </div>
-        </div>
+        </Header>
 
-        <div
-          id="nodeeweb-page-builder"
-          style={{
-            height: '100vh',
-            width: '100vw !important',
-            opacity: 1,
-            // opacity: isDragging ? 0.5 : 1,
-            background: '#ffffff',
-            padding: '20px',
-          }}>
+        <Container id="nodeeweb-page-builder">
           {tabValue === 0 && (
             <>
               {components?.filter(Boolean).map((component, index) => (
@@ -652,7 +612,7 @@ const Core = (props) => {
               <h5>Preview Mode Soon.... </h5>
             </div>
           )}
-        </div>
+        </Container>
       </div>
       <div className="nodeeweb-fixed-bottom-bar">
         <div className="npb-d-flex">
