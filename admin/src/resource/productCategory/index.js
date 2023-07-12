@@ -1,8 +1,9 @@
-import categoryCreate from "./categoryCreate";
-import categoryEdit from "./categoryEdit";
-import categoryList from "./categoryList";
-import categoryShow from "./categoryShow";
-import { LibraryAdd,CategoryRounded } from "@mui/icons-material";
+import { LibraryAdd, CategoryRounded } from '@mui/icons-material';
+
+import categoryCreate from './categoryCreate';
+import categoryEdit from './categoryEdit';
+import categoryList from './categoryList';
+import categoryShow from './categoryShow';
 
 const Category = {
   list: categoryList,

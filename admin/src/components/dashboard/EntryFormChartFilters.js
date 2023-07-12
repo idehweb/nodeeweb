@@ -4,22 +4,24 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { useGetList } from "react-admin";
-import FilterWithDate from "#c/components/dashboard/base/FilterWithDate";
-import { dateFormat } from "#c/functions";
+import { useGetList } from 'react-admin';
+
+import FilterWithDate from '#c/components/dashboard/base/FilterWithDate';
+import { dateFormat } from '#c/functions';
+
 const EntryFormChartFilters = (props) => {
-  const {handleChangeForm,handlerStart,handlerEnd,model} = props;
+  const { handleChangeForm, handlerStart, handlerEnd, model } = props;
   const [form, setForm] = React.useState('');
   const { isLoading: loaded, data: forms } = useGetList(model);
   const dateFormatter = (date) => {
-    return dateFormat(new Date(date), "YYYY/MM/DD");
+    return dateFormat(new Date(date), 'YYYY/MM/DD');
   };
-const startHandler = (dateValue) =>{
-  handlerStart(dateValue);
-}
-const endHandler = (dateValue) =>{
-  handlerEnd(dateValue);
-  }
+  const startHandler = (dateValue) => {
+    handlerStart(dateValue);
+  };
+  const endHandler = (dateValue) => {
+    handlerEnd(dateValue);
+  };
 
   return (
     <Box sx={{ minWidth: 120 }}>
@@ -30,27 +32,27 @@ const endHandler = (dateValue) =>{
           id="demo-simple-select"
           value={form}
           label="form"
-          onChange={(e)=>{
+          onChange={(e) => {
             setForm(e.target.value);
             handleChangeForm(e.target.value);
-          }}
-        >
+          }}>
           <MenuItem disabled value="">
             <em>Please Select</em>
           </MenuItem>
           {/*<MenuItem  value="all">*/}
           {/*  <em>نمایش همه</em>*/}
           {/*</MenuItem>*/}
-          {
-            forms &&  forms.map((form,index)=>
-              <MenuItem key={index} value={form._id}>{form.title.fa}</MenuItem>
-            )
-          }
+          {forms &&
+            forms.map((form, index) => (
+              <MenuItem key={index} value={form._id}>
+                {form.title.fa}
+              </MenuItem>
+            ))}
         </Select>
       </FormControl>
       <FilterWithDate type={'startDate'} handlerChangeFilter={startHandler} />
       <FilterWithDate type={'endDate'} handlerChangeFilter={endHandler} />
     </Box>
   );
-}
-export default EntryFormChartFilters
+};
+export default EntryFormChartFilters;

@@ -1,22 +1,39 @@
-import * as React from "react";
-import { useState } from "react";
+import * as React from 'react';
+import { useState } from 'react';
 // import { useLocation } from 'react-router-dom';
-import { useForm } from "react-hook-form";
-import API, { BASE_URL } from "@/functions/API";
-import { ColorPicker, ShowImageField } from "@/components";
-import { Box, Card, CardActions, CircularProgress } from "@mui/material";
-import { Form, SaveButton, SelectInput, TextInput, useNotify, useRefresh, useTranslate } from "react-admin";
+import { useForm } from 'react-hook-form';
+
+import { Box, Card, CardActions, CircularProgress } from '@mui/material';
+
+import {
+  Form,
+  SaveButton,
+  SelectInput,
+  TextInput,
+  useNotify,
+  useRefresh,
+  useTranslate,
+} from 'react-admin';
+
+import API, { BASE_URL } from '@/functions/API';
+import { ColorPicker, ShowImageField } from '@/components';
 // import { SelectInput } from 'react-admin';
 // import {  } frsom 'react-hook-form';
 const SubmitEntryStatus = (props) => {
   const { _id, theStatus } = props;
   // return JSON.stringify(status)
   const refresh = useRefresh();
-  const { register, handleSubmit, formState: { errors }, setValue, getValues } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    getValues,
+  } = useForm({
     defaultValues: {
-      title: "",
-      status: ""
-    }
+      title: '',
+      status: '',
+    },
   });
   // const { setValue } = useFormContext();
   // const theTitle = useWatch({ name: "title" });
@@ -58,8 +75,8 @@ const SubmitEntryStatus = (props) => {
   const setTheValue = (e) => {
     console.log(e.target.value);
   };
-  const handleNotif = (t, type = "success") => {
-    notify((t), { type: type });
+  const handleNotif = (t, type = 'success') => {
+    notify(t, { type: type });
   };
   const handleUpload = (files) => {
     // let GalleryTemp = gallery;
@@ -69,25 +86,24 @@ const SubmitEntryStatus = (props) => {
     if (!file) return;
     setLoading(true);
     let formData = new FormData();
-    formData.append("file", file);
-    formData.append("type", file.type);
-    API.post("/settings/fileUpload", formData, {
+    formData.append('file', file);
+    formData.append('type', file.type);
+    API.post('/settings/fileUpload', formData, {
       onUploadProgress: (e) => {
         // let p = Math.floor((e.loaded * 100) / e.total);
         // setProgress(p);
-      }
-    })
-      .then(p => {
-        setLoading(false);
-        console.log(p);
-        window.location.reload();
-        // refresh();/
-        // setCounter(counter++);
-        // setTheData({...theData})
-        handleNotif("resources.settings.logoUploadedSuccessfully");
-      });
+      },
+    }).then((p) => {
+      setLoading(false);
+      console.log(p);
+      window.location.reload();
+      // refresh();/
+      // setCounter(counter++);
+      // setTheData({...theData})
+      handleNotif('resources.settings.logoUploadedSuccessfully');
+    });
   };
- 
+
   // React.useEffect(() => {
   //   console.log("theData", theData);
 
@@ -97,21 +113,23 @@ const SubmitEntryStatus = (props) => {
     //
     // setLoading(true);
     //
-    API.get("/settings/formStatus").then((response = {}) => {
-      const {data} = response
-      setLoading(false);
-      // Object.keys(data).forEach(d => {
-      //   setValue(d, data[d]);
-      // });
-      setChilds(data);
-      console.log("data", data);
-      // setValue("title",data.title);
-      setTheData(true);
-      return data;
-    }).catch(e => {
-      setLoading(false);
-      setTheData(true);
-    });
+    API.get('/settings/formStatus')
+      .then((response = {}) => {
+        const { data } = response;
+        setLoading(false);
+        // Object.keys(data).forEach(d => {
+        //   setValue(d, data[d]);
+        // });
+        setChilds(data);
+        console.log('data', data);
+        // setValue("title",data.title);
+        setTheData(true);
+        return data;
+      })
+      .catch((e) => {
+        setLoading(false);
+        setTheData(true);
+      });
   };
 
   const handleChange = (t, value) => {
@@ -126,131 +144,131 @@ const SubmitEntryStatus = (props) => {
     // console.clear();
     let jso = {
       description: theData.description,
-      status: theData.status
+      status: theData.status,
     };
-    console.log("jso", jso);
+    console.log('jso', jso);
 
     // return;
-    API.put("/entry/status/" + _id, JSON.stringify(
-      jso
-    )).then(({ data = {} }) => {
-      setLoading(false);
-      // setTheData(data);
-      console.log("data", data);
-      if (data.success) {
-        handleNotif("resources.settings.UpdatedSuccessfully");
-
-      } else {
-        handleNotif("resources.settings.sthWrong", "error");
-
+    API.put('/entry/status/' + _id, JSON.stringify(jso)).then(
+      ({ data = {} }) => {
+        setLoading(false);
+        // setTheData(data);
+        console.log('data', data);
+        if (data.success) {
+          handleNotif('resources.settings.UpdatedSuccessfully');
+        } else {
+          handleNotif('resources.settings.sthWrong', 'error');
+        }
+        return data;
       }
-      return data;
-
-    });
+    );
   };
 
   React.useEffect(() => {
-    getData()
+    getData();
   }, []);
 
-
   const returnStatus = (st) => {
-    let rd = childs && childs.filter(x => x.slug == st);
-    if (rd && rd[0] && rd[0].title)
-      return rd[0].title;
-    else
-      return JSON.stringify(st)
+    let rd = childs && childs.filter((x) => x.slug == st);
+    if (rd && rd[0] && rd[0].title) return rd[0].title;
+    else return JSON.stringify(st);
   };
   let co = 0;
-  if(theStatus){
-    co=theStatus.length
+  if (theStatus) {
+    co = theStatus.length;
   }
 
   if (!theData) {
     return <></>;
   }
   if (theData) {
-    let {
-      title, status
-    } = getValues();
+    let { title, status } = getValues();
     return (
-      <div><Form onSubmit={handleSubmit(onSubmit)} noValidate={true} redirect={false}>
-        <Box>
-          <Card sx={{ padding: "1em" }}>
-
-
-            <Box>
-              {
-                childs ? (
-                          <SelectInput source="status"
-                           onChange={(event) => {
-                             console.log("event.target", event);
-                             handleChange("status", event.target.value);
-                           }}
-                           choices={childs} optionText={"title"} optionValue={"slug"} allowEmpty={false}/>
-                ):(
+      <div>
+        <Form
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate={true}
+          redirect={false}>
+          <Box>
+            <Card sx={{ padding: '1em' }}>
+              <Box>
+                {childs ? (
+                  <SelectInput
+                    source="status"
+                    onChange={(event) => {
+                      console.log('event.target', event);
+                      handleChange('status', event.target.value);
+                    }}
+                    choices={childs}
+                    optionText={'title'}
+                    optionValue={'slug'}
+                    allowEmpty={false}
+                  />
+                ) : (
                   <span>Loadding...</span>
-                )
-              }
-              
-              <TextInput
-                autoFocus
-                fullWidth
-                label={translate("resources.settings.description")}
-                source={"description"}
-                disabled={loading}
-                defaultValue={title}
-                onChange={(event) => {
-                  handleChange("description", event.target.value);
-                }}
-              />
-              {/*<SelectInput optionText={"title."+translate("lan")}*/}
-              {/*defaultValue={home}*/}
-              {/*onChange={(event) => {*/}
-              {/*handleChange("home", event.target.value);*/}
-              {/*}}*/}
-              {/*/>*/}
-            </Box>
-
-
-            <CardActions sx={{ padding: "0 1em 1em 1em" }}>
-              <SaveButton
-                variant="contained"
-                type="submit"
-                color="primary"
-                disabled={loading}
-                alwaysEnable
-                redirect={false}
-                // saving={onSubmit}
-              >
-                {loading && (
-                  <CircularProgress size={25} thickness={2}/>
                 )}
-                {translate("resources.settings.save")}
-              </SaveButton>
-            </CardActions>
 
-          </Card>
+                <TextInput
+                  autoFocus
+                  fullWidth
+                  label={translate('resources.settings.description')}
+                  source={'description'}
+                  disabled={loading}
+                  defaultValue={title}
+                  onChange={(event) => {
+                    handleChange('description', event.target.value);
+                  }}
+                />
+                {/*<SelectInput optionText={"title."+translate("lan")}*/}
+                {/*defaultValue={home}*/}
+                {/*onChange={(event) => {*/}
+                {/*handleChange("home", event.target.value);*/}
+                {/*}}*/}
+                {/*/>*/}
+              </Box>
 
-        </Box>
-      </Form>
-        <div className={"item-box-parent"}>
+              <CardActions sx={{ padding: '0 1em 1em 1em' }}>
+                <SaveButton
+                  variant="contained"
+                  type="submit"
+                  color="primary"
+                  disabled={loading}
+                  alwaysEnable
+                  redirect={false}
+                  // saving={onSubmit}
+                >
+                  {loading && <CircularProgress size={25} thickness={2} />}
+                  {translate('resources.settings.save')}
+                </SaveButton>
+              </CardActions>
+            </Card>
+          </Box>
+        </Form>
+        <div className={'item-box-parent'}>
           {/*{JSON.stringify(status)}*/}
-          {theStatus && theStatus.reverse().map((item, i) => {
+          {theStatus &&
+            theStatus.reverse().map((item, i) => {
+              return (
+                <div className={'item-boxes'}>
+                  <span className={'child-item-boxes-f'}>
+                    <span className={'child-item-boxes-f-c'}>
+                      {'#' + (co - i)}
+                    </span>
+                    <span className={'child-item-boxes-f-d'}>
+                      {returnStatus(item.status)}
+                    </span>
+                  </span>
 
-            return <div className={"item-boxes"}>
-              <span className={"child-item-boxes-f"}><span
-                className={"child-item-boxes-f-c"}>{"#" + (co - i)}</span><span
-                className={"child-item-boxes-f-d"}>{returnStatus(item.status)}</span></span>
-
-              <span className={"child-item-boxes-t"}>{item.description}</span>
-            </div>;
-          })}
+                  <span className={'child-item-boxes-t'}>
+                    {item.description}
+                  </span>
+                </div>
+              );
+            })}
         </div>
       </div>
     );
   }
 };
-
 
 export default React.memo(SubmitEntryStatus);

@@ -1,8 +1,8 @@
-import orderCreate from "./orderCreate";
-import orderEdit from "./orderEdit";
-import orderList from "./orderList";
-import { Receipt,AddShoppingCartOutlined } from "@mui/icons-material";
+import { Receipt, AddShoppingCartOutlined } from '@mui/icons-material';
 
+import orderCreate from './orderCreate';
+import orderEdit from './orderEdit';
+import orderList from './orderList';
 
 const Order = {
   list: orderList,

@@ -1,5 +1,5 @@
-import * as React from "react";
-import { forwardRef } from "react";
+import * as React from 'react';
+import { forwardRef } from 'react';
 import {
   AppBar,
   defaultTheme,
@@ -8,52 +8,53 @@ import {
   UserMenu,
   useTranslate,
   useNotify,
-  useUserMenu
-} from "react-admin";
-import SettingsIcon from "@mui/icons-material/Settings";
-import LogoutIcon from "@mui/icons-material/Logout";
-import { makeStyles } from "@mui/styles";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { Configuration, ToggleConfigButton } from "@/components";
-import { restartSystem,upgradeSystem } from "@/functions/index";
-import { createTheme } from "@mui/material";
+  useUserMenu,
+} from 'react-admin';
+import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { makeStyles } from '@mui/styles';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+
+import { createTheme } from '@mui/material';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+
+import { restartSystem, upgradeSystem } from '@/functions/index';
+import { Configuration, ToggleConfigButton } from '@/components';
+
 const useStyles = makeStyles({
   title: {
     flex: 1,
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    overflow: "hidden"
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
   },
   spacer: {
-    flex: 1
-  }
+    flex: 1,
+  },
 });
 
 const darkTheme = createTheme({
-  palette: { mode: "dark" }
+  palette: { mode: 'dark' },
 });
 const UserProfileMenu = forwardRef((props, ref) => {
   const translate = useTranslate();
-  const userId = localStorage.getItem("user_id");
+  const userId = localStorage.getItem('user_id');
   const { onClose } = useUserMenu();
 
   return (
     <MenuItemLink
       ref={ref}
-      to={"/admin/"+userId}
-      primaryText={translate("pos.profile")}
-      leftIcon={<ManageAccountsIcon/>}
+      to={'/admin/' + userId}
+      primaryText={translate('pos.profile')}
+      leftIcon={<ManageAccountsIcon />}
       onClick={(e) => {
-        if (props.onClick)
-          props.onClick(e);
+        if (props.onClick) props.onClick(e);
         onClose();
       }}
       sidebarIsOpen
     />
-
   );
 });
 const ConfigurationMenu = forwardRef((props, ref) => {
@@ -64,16 +65,14 @@ const ConfigurationMenu = forwardRef((props, ref) => {
     <MenuItemLink
       ref={ref}
       to="/configuration"
-      primaryText={translate("pos.configuration")}
-      leftIcon={<SettingsIcon/>}
+      primaryText={translate('pos.configuration')}
+      leftIcon={<SettingsIcon />}
       onClick={(e) => {
-        if (props.onClick)
-          props.onClick(e);
+        if (props.onClick) props.onClick(e);
         onClose();
       }}
       sidebarIsOpen
     />
-
   );
 });
 const RestartSystem = forwardRef((props, ref) => {
@@ -85,19 +84,19 @@ const RestartSystem = forwardRef((props, ref) => {
     <MenuItemLink
       ref={ref}
       to="#"
-      primaryText={translate("pos.menu.restart")}
-      leftIcon={<RestartAltIcon/>}
+      primaryText={translate('pos.menu.restart')}
+      leftIcon={<RestartAltIcon />}
       onClick={(e) => {
         restartSystem();
-        notify(translate("restarted"));
+        notify(translate('restarted'));
 
         // if (props.onClick)
         //   props.onClick(e);
         onClose();
       }}
-      sidebarIsOpen
-    >{translate("pos.menu.restart")}</MenuItemLink>
-
+      sidebarIsOpen>
+      {translate('pos.menu.restart')}
+    </MenuItemLink>
   );
 });
 const UpgradeSystem = forwardRef((props, ref) => {
@@ -109,19 +108,19 @@ const UpgradeSystem = forwardRef((props, ref) => {
     <MenuItemLink
       ref={ref}
       to="#"
-      primaryText={translate("pos.menu.upgrade")}
-      leftIcon={<SystemUpdateAltIcon/>}
+      primaryText={translate('pos.menu.upgrade')}
+      leftIcon={<SystemUpdateAltIcon />}
       onClick={(e) => {
         upgradeSystem();
-        notify(translate("upgraded"));
+        notify(translate('upgraded'));
 
         // if (props.onClick)
         //   props.onClick(e);
         onClose();
       }}
-      sidebarIsOpen
-    >{translate("pos.menu.upgrade")}</MenuItemLink>
-
+      sidebarIsOpen>
+      {translate('pos.menu.upgrade')}
+    </MenuItemLink>
   );
 });
 
@@ -132,30 +131,28 @@ const LogoutMenu = forwardRef((props, ref) => {
     <MenuItemLink
       ref={ref}
       to="/logout"
-      primaryText={translate("pos.logout")}
-      leftIcon={<LogoutIcon/>}
+      primaryText={translate('pos.logout')}
+      leftIcon={<LogoutIcon />}
       onClick={(e) => {
-        if (props.onClick)
-          props.onClick(e);
+        if (props.onClick) props.onClick(e);
         onClose();
       }}
-      sidebarIsOpen
-    >{translate("logout")}</MenuItemLink>
-
+      sidebarIsOpen>
+      {translate('logout')}
+    </MenuItemLink>
   );
 });
 
 const CustomUserMenu = (props) => {
-
-  console.log("props", props);
+  console.log('props', props);
   return (
-    <UserMenu {...props} icon={<MoreHorizIcon/>}>
-      <UserProfileMenu/>
-      <ConfigurationMenu/>
-      <Configuration/>
-      <RestartSystem/>
-      <UpgradeSystem/>
-      <LogoutMenu/>
+    <UserMenu {...props} icon={<MoreHorizIcon />}>
+      <UserProfileMenu />
+      <ConfigurationMenu />
+      <Configuration />
+      <RestartSystem />
+      <UpgradeSystem />
+      <LogoutMenu />
     </UserMenu>
   );
 };
@@ -164,7 +161,7 @@ const CustomAppBar = (props) => {
   const classes = useStyles();
 
   return (
-    <AppBar {...props} elevation={1} userMenu={<CustomUserMenu/>}>
+    <AppBar {...props} elevation={1} userMenu={<CustomUserMenu />}>
       {/*<Typography*/}
       {/*variant="h6"*/}
       {/*color="inherit"*/}
@@ -172,14 +169,10 @@ const CustomAppBar = (props) => {
       {/*id="react-admin-title"*/}
       {/*/>*/}
       {/*<Logo />*/}
-      <span className={classes.spacer}/>
+      <span className={classes.spacer} />
       {/**/}
-      <ToggleThemeButton
-        lightTheme={defaultTheme}
-        darkTheme={darkTheme}
-      />
+      <ToggleThemeButton lightTheme={defaultTheme} darkTheme={darkTheme} />
       {/*<ToggleConfigButton />*/}
-
     </AppBar>
   );
 };

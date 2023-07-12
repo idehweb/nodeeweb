@@ -6,13 +6,8 @@ import { useTheme } from '@mui/styles';
 const Header = (props) => {
   const theme = useTheme();
   return (
-    <div
-      width={234.532}
-      height={20.475}
-      {...props}
-    >
+    <div width={234.532} height={20.475} {...props}>
       {/*<img style={{width: '40px'}} src={logo}/>*/}
-
     </div>
   );
 };

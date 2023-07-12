@@ -1,7 +1,9 @@
-import formCreate from "./formCreate";
-import formEdit from "./formEdit";
-import formList from "./formList";
-import { LibraryBooksRounded,PostAddRounded} from "@mui/icons-material";
+import { LibraryBooksRounded, PostAddRounded } from '@mui/icons-material';
+
+import formCreate from './formCreate';
+import formEdit from './formEdit';
+import formList from './formList';
+
 const Form = {
   list: formList,
   edit: formEdit,

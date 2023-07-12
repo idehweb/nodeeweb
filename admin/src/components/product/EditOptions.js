@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   ArrayInput,
   FormDataConsumer,
@@ -6,16 +6,18 @@ import {
   SelectInput,
   SimpleFormIterator,
   TextInput,
-  useTranslate
-} from "react-admin";
-import { Button, ButtonGroup } from "@mui/material";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import AddRoadIcon from "@mui/icons-material/AddRoad";
-import API from "@/functions/API";
-import { numberWithCommas } from "@/functions";
-import Select from "react-select";
-import { useWatch,useFormContext } from "react-hook-form";
+  useTranslate,
+} from 'react-admin';
+import { Button, ButtonGroup } from '@mui/material';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import AddRoadIcon from '@mui/icons-material/AddRoad';
+
+import Select from 'react-select';
+import { useWatch, useFormContext } from 'react-hook-form';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+
+import { numberWithCommas } from '@/functions';
+import API from '@/functions/API';
 import {
   CatRefField,
   FileChips,
@@ -29,39 +31,40 @@ import {
   SimpleImageField,
   UploaderField,
   Combinations,
-    StockStatus
-} from "@/components";
+  StockStatus,
+} from '@/components';
+
 const customStyles = {
   option: (defaultStyles, state) => ({
     ...defaultStyles,
-    color: state.isSelected ? "#212529" : "#fff",
-    backgroundColor: state.isSelected ? "#a0a0a0" : "#212529",
+    color: state.isSelected ? '#212529' : '#fff',
+    backgroundColor: state.isSelected ? '#a0a0a0' : '#212529',
   }),
 
   control: (defaultStyles) => ({
     ...defaultStyles,
-    backgroundColor: "rgba(255, 255, 255, 0.09)",
-    padding: "10px",
-    border: "none",
-    boxShadow: "none",
+    backgroundColor: 'rgba(255, 255, 255, 0.09)',
+    padding: '10px',
+    border: 'none',
+    boxShadow: 'none',
   }),
-  singleValue: (defaultStyles) => ({ ...defaultStyles, color: "#fff" }),
+  singleValue: (defaultStyles) => ({ ...defaultStyles, color: '#fff' }),
 };
 // API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 
 const typeChoices2 = [
   {
-    id: "",
-    name: "نامشخص"
+    id: '',
+    name: 'نامشخص',
   },
   {
     id: false,
-    name: "موجود نیست"
+    name: 'موجود نیست',
   },
   {
     id: true,
-    name: "موجود هست"
-  }
+    name: 'موجود هست',
+  },
 ];
 
 export default (props) => {
@@ -69,24 +72,26 @@ export default (props) => {
   // console.clear()/;
   const values = {};
   // let {values} = useFormState();
-  let valuesoptions = useWatch({ name: "options" });
-  let valuestype = useWatch({ name: "type" });
-  let valuesformData = useWatch({ name: "formData" });
-  let valuescombinations = useWatch({ name: "combinations" });
-  const {setValue} = useFormContext();
+  let valuesoptions = useWatch({ name: 'options' });
+  let valuestype = useWatch({ name: 'type' });
+  let valuesformData = useWatch({ name: 'formData' });
+  let valuescombinations = useWatch({ name: 'combinations' });
+  const { setValue } = useFormContext();
   let translate = useTranslate();
-  let lan = translate("lan");
+  let lan = translate('lan');
   // console.log('valuescombinations',valuescombinations)
   // console.log("edit options props", valuesoptions);
   // const {input} = useInput(props);
   // const [display, setDisplay] = React.useState(true);
-  const [options, setOptions] = React.useState(valuesoptions || [{ _id: 0, name: "", values: [] }]);
+  const [options, setOptions] = React.useState(
+    valuesoptions || [{ _id: 0, name: '', values: [] }]
+  );
   // const [combinations, setCombinations] = React.useState(valuescombinations || []);
   // const [type, setType] = React.useState(valuestype);
   const [change, setChanger] = React.useState(true);
   // const [TheformData, setTheformData] = React.useState(valuesformData);
   // const [selectS, setSelectS] = React.useState([true, true]);
-  const [name, setName] = React.useState("");
+  const [name, setName] = React.useState('');
   const [changes, setChanges] = React.useState(false);
   const [counter, setCounter] = React.useState(0);
   const [child, setChild] = React.useState([]);
@@ -104,10 +109,10 @@ export default (props) => {
     let y = props.onCreateCombinations(options);
     valuescombinations = y;
     valuesoptions = options;
-    console.log('valuesoptions',valuesoptions);
-    console.log('valuescombinations',valuescombinations);
-    setValue('options',valuesoptions);
-    setValue('combinations',valuescombinations);
+    console.log('valuesoptions', valuesoptions);
+    console.log('valuescombinations', valuescombinations);
+    setValue('options', valuesoptions);
+    setValue('combinations', valuescombinations);
 
     // setCombinations(valuescombinations);
     // console.log('form',form.watch('combinations'));
@@ -116,7 +121,7 @@ export default (props) => {
     props.updater(options);
     setOptions(options);
     setChanges(!changes);
-    setCounter(counter+1);
+    setCounter(counter + 1);
   };
   const handleAdd = (e) => {
     e.preventDefault();
@@ -124,7 +129,7 @@ export default (props) => {
     // console.log('options', options);
     // options.push({name:'',values:''});
     // setDisplay(false);
-    setOptions(options => [...options, { name: "", values: [] }]);
+    setOptions((options) => [...options, { name: '', values: [] }]);
     // setDisplay(true);
   };
   const handleRemove = (e, op) => {
@@ -150,9 +155,8 @@ export default (props) => {
       op.forEach((uf, s) => {
         cds.push({
           name: uf.label,
-          id: s
+          id: s,
         });
-
       });
     // setOptions();/
     options[ff].values = cds;
@@ -160,11 +164,10 @@ export default (props) => {
 
     // console.log('chooseValue res', cds);
     setOptions(options);
-
   };
   const chooseOptionName = (ff, op) => {
     // return;
-    console.log("== >  chooseOptionName", op, options, ff, attributes);
+    console.log('== >  chooseOptionName', op, options, ff, attributes);
     options[op]._id = ff.value;
     options[op].name = ff.label;
     options[op].values = ff.values;
@@ -192,35 +195,33 @@ export default (props) => {
     //     });
   };
   const getData = () => {
-
-    API.get("/attributes/0/1000", {}, true)
-      .then(({ data = [] }) => {
-        var cds = [];
-        data.forEach((uf, s) => {
-          cds[uf.name[lan]] = ({
-            values: uf.values,
-            value: uf.name[lan],
-            label: uf.name[lan],
-            key: s
-          });
-          attributesList.push({
-            values: uf.values,
-            value: uf.name[lan],
-            label: uf.name[lan],
-            key: s
-          });
+    API.get('/attributes/0/1000', {}, true).then(({ data = [] }) => {
+      var cds = [];
+      data.forEach((uf, s) => {
+        cds[uf.name[lan]] = {
+          values: uf.values,
+          value: uf.name[lan],
+          label: uf.name[lan],
+          key: s,
+        };
+        attributesList.push({
+          values: uf.values,
+          value: uf.name[lan],
+          label: uf.name[lan],
+          key: s,
         });
-        // console.clear();
-        // console.log('data.values', cds);
-        setAttributes(cds);
-        // setSelectS([false, false]);
-        // setName(name.fa);
-        // setSelectS([false, true, true]);
-        // changeSecondInput(defaultV);
       });
+      // console.clear();
+      // console.log('data.values', cds);
+      setAttributes(cds);
+      // setSelectS([false, false]);
+      // setName(name.fa);
+      // setSelectS([false, true, true]);
+      // changeSecondInput(defaultV);
+    });
   };
   React.useEffect(() => {
-console.log("React.useEffect")
+    console.log('React.useEffect');
     getData();
     // if (input.value) setV(input.value);
   }, []);
@@ -229,7 +230,7 @@ console.log("React.useEffect")
   //     setOptions(options => [...options, {name: '', values: ''}]);
 
   // setOptions(oldArray => [...oldArray, newElement]);
-// setDisplay(true);
+  // setDisplay(true);
   // getData();
   // if (input.value) setV(input.value);
   // }, [options]);
@@ -241,83 +242,106 @@ console.log("React.useEffect")
   // if (attributes) {
   // console.log("#attributes ", attributes);
 
-  if (valuestype === "variable") {
-    console.log("valuestype ==>",valuestype)
-    return ([
-      <div key="0" className={"width1000"}>
-
+  if (valuestype === 'variable') {
+    console.log('valuestype ==>', valuestype);
+    return [
+      <div key="0" className={'width1000'}>
         {options.map((option, op) => {
-      let tchild = [], tchildname;
-      let DefaultValues = [];
-      // console.log("#op:", op, " option", option, option.name);
-      if (attributes[option.name] && attributes[option.name].values) {
-        // console.log('attributes[op].values', attributes[op].values);
+          let tchild = [],
+            tchildname;
+          let DefaultValues = [];
+          // console.log("#op:", op, " option", option, option.name);
+          if (attributes[option.name] && attributes[option.name].values) {
+            // console.log('attributes[op].values', attributes[op].values);
 
-        if (attributes[option.name].label == option.name)
-          attributes[option.name].values.map((at) => {
-            tchildname = attributes[option.name].value;
-            tchild.push({
-              value: at.name[lan],
-              label: at.name[lan]
+            if (attributes[option.name].label == option.name)
+              attributes[option.name].values.map((at) => {
+                tchildname = attributes[option.name].value;
+                tchild.push({
+                  value: at.name[lan],
+                  label: at.name[lan],
+                });
+              });
+          }
+          if (options[op] && options[op].values) {
+            options[op].values.map((at) => {
+              DefaultValues.push({
+                value: at.name,
+                label: at.name,
+              });
             });
-          });
+          }
+          // console.log("#tchildname ", tchildname);
+          // console.log('#tchild ',   tchild,);
+          console.log('#combinations ');
 
-      }
-      if (options[op] && options[op].values) {
-
-        options[op].values.map((at) => {
-          DefaultValues.push({
-            value: at.name,
-            label: at.name
-          });
-        });
-      }
-      // console.log("#tchildname ", tchildname);
-      // console.log('#tchild ',   tchild,);
-      console.log("#combinations ");
-
-      return (
-        [<div key={op} className={"row mb-20 width1000"}>
-          <div style={{ direction: "rtl" }}># {op}</div>
-          <div className={"col-md-5"}>
-
-            <Select isRtl={true}
-             styles={customStyles}
-              // isLoading={selectS[op]}
-              // isDisabled={selectS[op]}
-                    className={"zindexhigh"}
-                    onChange={(e) => chooseOptionName(e, op)}
-                    defaultValue={{ value: option["name"], label: option["name"] }}
-                    options={attributesList}/>
-          </div>
-          {tchild && <div className={"col-md-5"}>
-            <Select isRtl={true}
-             styles={customStyles}
+          return [
+            <div key={op} className={'row mb-20 width1000'}>
+              <div style={{ direction: 'rtl' }}># {op}</div>
+              <div className={'col-md-5'}>
+                <Select
+                  isRtl={true}
+                  styles={customStyles}
+                  // isLoading={selectS[op]}
+                  // isDisabled={selectS[op]}
+                  className={'zindexhigh'}
+                  onChange={(e) => chooseOptionName(e, op)}
+                  defaultValue={{
+                    value: option['name'],
+                    label: option['name'],
+                  }}
+                  options={attributesList}
+                />
+              </div>
+              {tchild && (
+                <div className={'col-md-5'}>
+                  <Select
+                    isRtl={true}
+                    styles={customStyles}
                     isMulti
-              // isLoading={selectS[op]}
-              // isDisabled={selectS[op]}
-                    className={"zindexhigh"}
+                    // isLoading={selectS[op]}
+                    // isDisabled={selectS[op]}
+                    className={'zindexhigh'}
                     onChange={(e) => chooseValue(e, op)}
                     defaultValue={DefaultValues}
-                    options={tchild}/>
-          </div>}
-          <div className={"col-md-2"}>
-            <Button onClick={(e) => {
-              handleRemove(e, op);
-            }}><RemoveCircleOutlineIcon/>
-            </Button>
-          </div>
-        </div>
-        ]);
-      })}</div>,
-      <ButtonGroup  key="1" variant="contained" aria-label="outlined primary button group">
-      <Button onClick={(e) => {handleAdd(e);}}><AddCircleIcon/>{translate("resources.product.addAttr")}</Button>
-        <Button onClick={(e) => {handleVariables(e);}}><AddRoadIcon/>{translate("resources.product.createComb")}</Button>
+                    options={tchild}
+                  />
+                </div>
+              )}
+              <div className={'col-md-2'}>
+                <Button
+                  onClick={(e) => {
+                    handleRemove(e, op);
+                  }}>
+                  <RemoveCircleOutlineIcon />
+                </Button>
+              </div>
+            </div>,
+          ];
+        })}
+      </div>,
+      <ButtonGroup
+        key="1"
+        variant="contained"
+        aria-label="outlined primary button group">
+        <Button
+          onClick={(e) => {
+            handleAdd(e);
+          }}>
+          <AddCircleIcon />
+          {translate('resources.product.addAttr')}
+        </Button>
+        <Button
+          onClick={(e) => {
+            handleVariables(e);
+          }}>
+          <AddRoadIcon />
+          {translate('resources.product.createComb')}
+        </Button>
       </ButtonGroup>,
-      <div className={"mb-20"}  key="2"/>
-
-    ]);
-  }  else {
+      <div className={'mb-20'} key="2" />,
+    ];
+  } else {
     return <></>;
   }
 };

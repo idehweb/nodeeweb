@@ -1,24 +1,25 @@
 import React from 'react';
 import Box from '@mui/material/Box';
-import { useGetList } from "react-admin";
-import FilterWithDate from "#c/components/dashboard/base/FilterWithDate";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
+import { useGetList } from 'react-admin';
+
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+
+import FilterWithDate from '#c/components/dashboard/base/FilterWithDate';
+
 const OrderDateChartFilters = (props) => {
-  const {handleChangeStatus,handlerStart,handlerEnd,model} = props;
+  const { handleChangeStatus, handlerStart, handlerEnd, model } = props;
   const [status, setStatus] = React.useState('');
-  React.useEffect(()=>{
+  React.useEffect(() => {});
 
-  })
-
-  const startHandler = (dateValue) =>{
+  const startHandler = (dateValue) => {
     handlerStart(dateValue);
-  }
-  const endHandler = (dateValue) =>{
+  };
+  const endHandler = (dateValue) => {
     handlerEnd(dateValue);
-  }
+  };
 
   return (
     <Box sx={{ minWidth: 120 }}>
@@ -51,5 +52,5 @@ const OrderDateChartFilters = (props) => {
       <FilterWithDate type={'endDate'} handlerChangeFilter={endHandler} />
     </Box>
   );
-}
-export default OrderDateChartFilters
+};
+export default OrderDateChartFilters;
