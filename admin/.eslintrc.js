@@ -1,0 +1,63 @@
+/** @type { import("eslint").Linter.BaseConfig } */
+const config = {
+  extends: ['react-app', 'prettier'],
+  root: true,
+  env: {
+    node: true,
+    es6: true,
+  },
+  plugins: ['prettier', 'react'],
+  rules: {
+    'jsx-a11y/anchor-is-valid': 1,
+    'react-hooks/rules-of-hooks': 1,
+    'comma-dangle': [
+      'warn',
+      {
+        arrays: 'always-multiline',
+        objects: 'always-multiline',
+        imports: 'always-multiline',
+        exports: 'always-multiline',
+        functions: 'never',
+      },
+    ],
+
+    'no-undef': 1,
+    'react/jsx-no-undef': 1,
+    'import/newline-after-import': 1,
+    'import/first': 1,
+    'import/no-anonymous-default-export': 0,
+    'import/order': [
+      'warn',
+      {
+        pathGroups: [
+          {
+            pattern: '@/**',
+            group: 'unknown',
+          },
+        ],
+        groups: [
+          // Then builtin and external and internal types. They can be mingled together
+          ['builtin', 'external', 'internal'],
+          'object',
+          'type',
+          ['unknown', 'parent'],
+          'sibling',
+          'index',
+        ],
+        'newlines-between': 'always-and-inside-groups',
+      },
+    ],
+    'no-restricted-globals': 1,
+  },
+  globals: {
+    React: true,
+  },
+  ignorePatterns: [
+    'node_modules/',
+    '**/node_modules/',
+    '/**/node_modules/*',
+    'build/**',
+  ],
+};
+
+module.exports = config;

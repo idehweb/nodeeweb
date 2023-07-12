@@ -389,105 +389,41 @@ export default class Service {
   };
 
   static rewriteOrders: MiddleWare = async (req, res) => {
-    const Customer = store.db.model("Customer");
-    const Order = store.db.model("Order");
-    const Media = store.db.model("Media");
-    const Notfound = 0;
-    Order.find({}, function (err, orders) {
-      _.forEach(orders, (item, k) => {
-        self.checkOrder(req, item, k);
-      });
-    });
+    return res.status(500).send("not implement yet!");
   };
+
   static createCart: MiddleWare = async (req, res) => {
-    const obj = {};
-    if (req.body.billingAddress) {
-      obj["billingAddress"] = req.body.billingAddress;
-    }
-    if (req.body.amount || req.body.amount == 0) {
-      obj["amount"] = req.body.amount;
-    }
-    if (req.body.card) {
-      obj["card"] = req.body.card;
-    }
-    if (req.body.customer) {
-      obj["customer"] = req.body.customer;
-    }
-    if (req.body.customer_data) {
-      obj["customer_data"] = req.body.customer_data;
-    }
-    if (req.body.customer_data && req.body.customer_data._id) {
-      obj["customer"] = req.body.customer_data._id;
-    }
-    if (req.body.deliveryDay) {
-      obj["deliveryDay"] = req.body.deliveryDay;
-    }
-    if (req.body.deliveryPrice) {
-      obj["deliveryPrice"] = req.body.deliveryPrice;
-    }
-    if (req.body.package) {
-      obj["package"] = req.body.package;
-    }
-    if (req.body.total) {
-      obj["total"] = req.body.total;
-    }
-    if (req.body.sum || req.body.sum == 0) {
-      obj["sum"] = req.body.sum;
-    }
-    if (req.body.orderNumber) {
-      obj["orderNumber"] = req.body.orderNumber;
-    } else {
-      obj["orderNumber"] = Math.floor(10000 + Math.random() * 90000);
-    }
+    const obj = {
+      billingAddress: req.body.billingAddress,
+      amount: req.body.amount,
+      card: req.body.card,
+      customer: req.body.customer,
+      customer_data: req.body.customer_data?._id,
+      deliveryDay: req.body.deliveryDay,
+      deliveryPrice: req.body.deliveryPrice,
+      package: req.body.package,
+      total: req.body.total,
+      sum: req.body.sum,
+      orderNumber:
+        req.body.orderNumber ?? Math.floor(10000 + Math.random() * 90000),
+    };
     const Order = store.db.model("Order");
-
-    const status = "cart";
-
+    let status = "cart";
     if (req.body.status == "checkout") status = "checkout";
 
-    // if(req.body.)
     obj["status"] = status;
     if (req.params.id) {
-      Order.findByIdAndUpdate(
+      const order = await Order.findByIdAndUpdate(
         req.params.id,
         {
           $set: obj,
           $push: { statusArray: { status: status } },
         },
-        { new: true },
-        function (err, order) {
-          if (err || !order) {
-            res.json({
-              success: false,
-              message: "error!",
-              err: err,
-            });
-            return 0;
-          }
-          //console.log('req.headers', req.headers);
-          if (req.user && req.headers.token) {
-            const action = {
-              customer: req.user._id,
-              title: "customer edit cart " + order._id,
-              data: order,
-              history: req.body,
-              order: order._id,
-            };
-            // req.req.global.submitAction(action);
-          }
-          if (!req.user && !req.headers.token) {
-            const action = {
-              title: "guest edit cart " + order._id,
-              data: order,
-              history: req.body,
-              // order: order._id
-            };
-            // req.req.global.submitAction(action);
-          }
-          res.json(order);
-          return 0;
-        }
+        { new: true }
       );
+
+      res.json(order);
+      return 0;
     } else {
       req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
       if (req.body.orderNumber) {

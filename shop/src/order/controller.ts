@@ -85,6 +85,13 @@ export default function registerController() {
   registerEntityCRUD(
     "order",
     {
+      create: {
+        controller: {
+          access,
+          service: Service.create,
+        },
+        crud: { executeQuery: false, saveToReq: true },
+      },
       getCount: {
         controller: {
           access,
