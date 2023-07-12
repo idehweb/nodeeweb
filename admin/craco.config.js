@@ -27,6 +27,17 @@ module.exports = {
     ) => {
       if (env === 'development') return webpackConfig;
 
+      webpackConfig.optimization = {
+        ...webpackConfig.optimization,
+        runtimeChunk: 'single',
+        usedExports: true,
+        providedExports: true,
+        splitChunks: {
+          chunks: 'all',
+          minSize: 50000,
+        },
+      };
+
       if (process.env.ANALYZE) {
         const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
         const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
