@@ -29,7 +29,6 @@
     "json-diff": "^0.7.4",
     "lodash": "^4.17.21",
     "notiflix": "^3.2.6",
-    "prettier": "^2.6.2",
     "pure-react-carousel": "^1.28.1",
     "qrcode": "^1.5.0",
     "ra-i18n-polyglot": "^4.0.3",
@@ -63,18 +62,20 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.1",
     "shards-react": "^1.0.3",
-    "swiper": "^8.3.2",
-    "typescript": "^4.6.4"
+    "swiper": "^8.3.2"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@craco/craco": "^6.4.3",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "dotenv": "^16.0.1",
-    "eslint": "^8.15.0",
+    "duplicate-package-checker-webpack-plugin": "^3.0.0",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-react": "^7.29.4",
-    "ftp-deploy": "^2.4.2"
+    "ftp-deploy": "^2.4.4",
+    "prettier": "^2.8.8",
+    "typescript": "^5.1.6",
+    "webpack-bundle-analyzer": "^4.9.0"
   },
   "scripts": {
     "start": "craco start",
