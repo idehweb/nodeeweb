@@ -3,7 +3,6 @@ import { dFormat } from "./../../functions/utils";
 import { Button } from "shards-react";
 import { useParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
-// import _ from "lodash";
 import { useDispatch } from "react-redux";
 import OptionBox from "./../../components/page-builder/OptionBox";
 import Component from "./../../components/page-builder/Component";
@@ -13,7 +12,6 @@ import "bootstrap/dist/css/bootstrap.rtl.min.css";
 import "./../../assets/shards-dashboards.1.1.0.min.css";
 import "./../../assets/globalforpagebuilder.css";
 import "./../../assets/nodeeweb-page-builder.css";
-import * as _ from "lodash";
 import { DndProvider, useDrag ,useDrop} from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 

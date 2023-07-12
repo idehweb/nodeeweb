@@ -11,7 +11,6 @@ import {
 } from "react-admin";
 import API, { BASE_URL } from "@/functions/API";
 import { dateFormat } from "@/functions";
-import _ from "lodash";
 import {
   CatRefField,
   EditOptions,
