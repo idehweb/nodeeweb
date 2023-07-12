@@ -20,7 +20,6 @@ import {
   GetBuilder,
   SaveBuilder,
 } from '@/functions';
-import DefaultOptions from '@/components/page-builder/DefaultOptions';
 
 const generateID = (tokenLen = 5) => {
   let text = '';
@@ -669,7 +668,6 @@ const Core = (props) => {
       </div>
       <OptionBox
         {...props}
-        defaultOptions={DefaultOptions}
         onClose={(e) => toggleOptionBox({})}
         exclude={excludeArray}
         open={state.optionBox}
