@@ -85,35 +85,6 @@
     "deploy": "node deploy",
     "build:d": "yarn build && yarn deploy"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "prettier"
-    ],
-    "root": true,
-    "env": {
-      "node": true,
-      "es6": true
-    },
-    "plugins": [
-      "prettier",
-      "react"
-    ],
-    "rules": {
-      "import/no-anonymous-default-export": 0,
-      "prettier/prettier": 0,
-      "comma-dangle": [
-        "error",
-        {
-          "arrays": "always-multiline",
-          "objects": "always-multiline",
-          "imports": "always-multiline",
-          "exports": "always-multiline",
-          "functions": "never"
-        }
-      ]
-    }
-  },
   "imports": {
     "#json/*": "./*.json",
     "#assets/*": "./src/assets/*",
