@@ -1,3 +1,5 @@
+import { Req, Res } from "@nodeeweb/core/types/global";
+
 export async function checkSiteStatus(): Promise<boolean> {
   return true;
 }
@@ -13,3 +15,4 @@ export function submitAction(action: {
 }) {}
 
 export function updateThemeConfig(object: any) {}
+export async function show(req: Req, res: Res) {}

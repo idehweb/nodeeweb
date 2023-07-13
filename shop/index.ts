@@ -14,6 +14,8 @@ import registerNotification from "./src/notification";
 import registerOrder from "./src/order";
 import registerModification from "./src/modification";
 import registerPage from "./src/page";
+import registerPost from "./src/post";
+import registerProduct from "./src/product";
 
 async function deployShop() {
   await deployCore();
@@ -33,6 +35,8 @@ async function deployShop() {
   registerOrder();
   registerModification();
   registerPage();
+  registerPost();
+  registerProduct();
 }
 
 deployShop();
