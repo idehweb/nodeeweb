@@ -215,6 +215,8 @@ export class EntityCreator {
     filter,
     parseFilter,
     forceDelete,
+    update,
+    parseUpdate,
     paramFields = { id: "id" },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
@@ -223,9 +225,10 @@ export class EntityCreator {
         parseFilter(req) ?? {
           _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
         };
+      const u = update ?? parseUpdate ? parseUpdate(req) : { active: false };
       const query = forceDelete
         ? this.model.deleteOne(f)
-        : this.model.findOneAndUpdate(f, { $set: { active: false } });
+        : this.model.findOneAndUpdate(f, u);
       return await this.baseCreator(query, req, res, next, {
         ...opt,
         httpCode: 204,

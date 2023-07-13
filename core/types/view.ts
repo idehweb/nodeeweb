@@ -78,6 +78,8 @@ export type EditField = CreateField & {
 
 export type List = {
   header: Header[];
+  url?: string;
+  pageBuilder?: boolean;
 };
 
 export type Header = {

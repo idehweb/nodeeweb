@@ -2,11 +2,16 @@ import _ from "lodash";
 import store from "../../store";
 import { ControllerAccess, ControllerSchema } from "../../types/controller";
 import { MiddleWare } from "../../types/global";
-import { authenticate, authorizeWithToken } from "./auth.handler";
+import {
+  JwtStrategyOpt,
+  authenticate,
+  authorizeWithToken,
+} from "./auth.handler";
 import { Logger } from "./log.handler";
 import { join } from "path";
 import { color } from "../../utils/color";
 import { RegisterOptions } from "../../types/register";
+import { OPTIONAL_LOGIN } from "../constants/String";
 
 export function getUrlFromBaseUrl(url: string, base_url?: string) {
   return join(base_url ?? "", url).replace(/\\/g, "/");
@@ -48,9 +53,20 @@ export function controllerRegister(
   }
 }
 
+export function controllersBatchRegister(
+  schemas: ControllerSchema[],
+  opt: ControllerRegisterOptions
+) {
+  schemas.forEach((schema) => controllerRegister(schema, opt));
+}
+
 function translateAccess(accesses: ControllerAccess[]): MiddleWare[] {
+  const opt: Partial<JwtStrategyOpt> = {};
+
+  if (accesses.find(({ role }) => role === OPTIONAL_LOGIN)) opt.notThrow = true;
+
   return [
-    ...authorizeWithToken(_.uniq(accesses.map((a) => a.modelName))),
+    ...authorizeWithToken(_.uniq(accesses.map((a) => a.modelName)), opt),
     authenticate(...accesses),
   ];
 }

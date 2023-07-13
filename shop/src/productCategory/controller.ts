@@ -2,98 +2,22 @@ import {
   CRUD_DEFAULT_REQ_KEY,
   PUBLIC_ACCESS,
 } from '@nodeeweb/core/src/constants/String';
-import {
-  ControllerAccess,
-  ControllerSchema,
-} from '@nodeeweb/core/types/controller';
+import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
-import Service from './service';
-import { AuthUserAccess } from '@nodeeweb/core/src/handlers/auth.handler';
-import { controllerRegister } from '@nodeeweb/core/src/handlers/controller.handler';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
-
-  // api
-  const controllerSchemas: ControllerSchema[] = [
-    {
-      url: '/createByCustomer',
-      method: 'post',
-      access: AuthUserAccess,
-      service: Service.createByCustomer,
-    },
-    {
-      url: '/importFromWordpress',
-      method: 'post',
-      access: AuthUserAccess,
-      service: Service.importFromWordpress,
-    },
-    {
-      url: '/rewriteOrders',
-      method: 'post',
-      access: AuthUserAccess,
-      service: Service.rewriteOrders,
-    },
-    {
-      url: '/cart',
-      method: 'post',
-      access: AuthUserAccess,
-      service: Service.createCart,
-    },
-    {
-      url: '/createPaymentLink',
-      method: 'post',
-      access,
-      service: Service.createPaymentLink,
-    },
-    {
-      url: '/cart/:id',
-      method: 'post',
-      access: AuthUserAccess,
-      service: Service.createCart,
-    },
-    {
-      url: '/myOrders/onlyMine/:id',
-      method: 'get',
-      access: AuthUserAccess,
-      service: Service.myOrder,
-    },
-    {
-      url: '/myOrders/mine/:offset/:limit',
-      method: 'get',
-      access: AuthUserAccess,
-      service: Service.allWOrders,
-    },
-  ];
-
-  controllerSchemas.forEach((schema) =>
-    controllerRegister(schema, {
-      base_url: ['/admin', '/customer'],
-      from: 'ShopEntity',
-    })
-  );
-
-  // create
-  controllerRegister(
-    {
-      method: 'post',
-      url: '/',
-      service: Service.createAdmin,
-      access,
-    },
-    { base_url: '/admin/order', from: 'ShopEntity' }
-  );
-
-  // crud
   registerEntityCRUD(
-    'order',
+    'productCategory',
     {
       create: {
         controller: {
           access,
-          service: Service.createAdmin,
+          service(req, res) {
+            res.status(200).json(req[CRUD_DEFAULT_REQ_KEY]);
+          },
         },
-        crud: { executeQuery: false, saveToReq: true },
+        crud: { executeQuery: true, sendResponse: true },
       },
       getCount: {
         controller: {
@@ -168,6 +92,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/amin/order', from: 'ShopEntity' }
+    { base_url: '/amin/productCategory', from: 'ShopEntity' }
   );
 }
