@@ -1,66 +1,66 @@
 import {
   CRUD_DEFAULT_REQ_KEY,
   PUBLIC_ACCESS,
-} from "@nodeeweb/core/src/constants/String";
+} from '@nodeeweb/core/src/constants/String';
 import {
   ControllerAccess,
   ControllerSchema,
-} from "@nodeeweb/core/types/controller";
-import { registerEntityCRUD } from "@nodeeweb/core/src/handlers/entity.handler";
-import Service from "./service";
-import { AuthUserAccess } from "@nodeeweb/core/src/handlers/auth.handler";
-import { controllerRegister } from "@nodeeweb/core/src/handlers/controller.handler";
+} from '@nodeeweb/core/types/controller';
+import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
+import Service from './service';
+import { AuthUserAccess } from '@nodeeweb/core/src/handlers/auth.handler';
+import { controllerRegister } from '@nodeeweb/core/src/handlers/controller.handler';
 
 export default function registerController() {
-  const access: ControllerAccess = { modelName: "admin", role: PUBLIC_ACCESS };
+  const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
 
   // api
   const controllerSchemas: ControllerSchema[] = [
     {
-      url: "/createByCustomer",
-      method: "post",
+      url: '/createByCustomer',
+      method: 'post',
       access: AuthUserAccess,
       service: Service.createByCustomer,
     },
     {
-      url: "/importFromWordpress",
-      method: "post",
+      url: '/importFromWordpress',
+      method: 'post',
       access: AuthUserAccess,
       service: Service.importFromWordpress,
     },
     {
-      url: "/rewriteOrders",
-      method: "post",
+      url: '/rewriteOrders',
+      method: 'post',
       access: AuthUserAccess,
       service: Service.rewriteOrders,
     },
     {
-      url: "/cart",
-      method: "post",
+      url: '/cart',
+      method: 'post',
       access: AuthUserAccess,
       service: Service.createCart,
     },
     {
-      url: "/createPaymentLink",
-      method: "post",
+      url: '/createPaymentLink',
+      method: 'post',
       access,
       service: Service.createPaymentLink,
     },
     {
-      url: "/cart/:id",
-      method: "post",
+      url: '/cart/:id',
+      method: 'post',
       access: AuthUserAccess,
       service: Service.createCart,
     },
     {
-      url: "/myOrders/onlyMine/:id",
-      method: "get",
+      url: '/myOrders/onlyMine/:id',
+      method: 'get',
       access: AuthUserAccess,
       service: Service.myOrder,
     },
     {
-      url: "/myOrders/mine/:offset/:limit",
-      method: "get",
+      url: '/myOrders/mine/:offset/:limit',
+      method: 'get',
       access: AuthUserAccess,
       service: Service.allWOrders,
     },
@@ -68,26 +68,33 @@ export default function registerController() {
 
   controllerSchemas.forEach((schema) =>
     controllerRegister(schema, {
-      base_url: ["/admin", "/customer"],
-      from: "ShopEntity",
+      base_url: ['/admin', '/customer'],
+      from: 'ShopEntity',
     })
   );
 
   // create
   controllerRegister(
     {
-      method: "post",
-      url: "/",
+      method: 'post',
+      url: '/',
       service: Service.createAdmin,
       access,
     },
-    { base_url: "/admin/order", from: "ShopEntity" }
+    { base_url: '/admin/order', from: 'ShopEntity' }
   );
 
   // crud
   registerEntityCRUD(
-    "order",
+    'order',
     {
+      create: {
+        controller: {
+          access,
+          service: Service.createAdmin,
+        },
+        crud: { executeQuery: false, saveToReq: true },
+      },
       getCount: {
         controller: {
           access,
@@ -119,7 +126,7 @@ export default function registerController() {
         },
         crud: {
           parseFilter(req) {
-            if (req.query.filter && typeof req.query.filter === "string") {
+            if (req.query.filter && typeof req.query.filter === 'string') {
               return JSON.parse(req.query.filter);
             }
           },
@@ -127,8 +134,8 @@ export default function registerController() {
           saveToReq: true,
           executeQuery: true,
           paramFields: {
-            limit: "limit",
-            offset: "offset",
+            limit: 'limit',
+            offset: 'offset',
           },
         },
       },
@@ -150,7 +157,7 @@ export default function registerController() {
           service(req, res) {
             return res.status(204).json({
               success: true,
-              message: "Deleted!",
+              message: 'Deleted!',
             });
           },
         },
@@ -161,6 +168,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: "/amin/order", from: "ShopEntity" }
+    { base_url: '/amin/order', from: 'ShopEntity' }
   );
 }
