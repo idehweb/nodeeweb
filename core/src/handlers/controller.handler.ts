@@ -53,6 +53,13 @@ export function controllerRegister(
   }
 }
 
+export function controllersBatchRegister(
+  schemas: ControllerSchema[],
+  opt: ControllerRegisterOptions
+) {
+  schemas.forEach((schema) => controllerRegister(schema, opt));
+}
+
 function translateAccess(accesses: ControllerAccess[]): MiddleWare[] {
   const opt: Partial<JwtStrategyOpt> = {};
 
