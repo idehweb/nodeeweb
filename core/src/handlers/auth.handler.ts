@@ -1,27 +1,27 @@
-import jwt from "jsonwebtoken";
-import passport, { Strategy } from "passport";
-import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
-import bcrypt from "bcrypt";
-import { Strategy as LocalStrategy } from "passport-local";
-import { ControllerAccess } from "../../types/controller";
-import store from "../../store";
-import { ForbiddenError, UnauthorizedError } from "../core/error";
-import AdminSchema from "../../schema/admin.schema";
-import CustomerSchema from "../../schema/customer.schema";
-import { MiddleWare } from "../../types/global";
-import { Query } from "mongoose";
-import { CookieOptions } from "express";
-import { OPTIONAL_LOGIN, PUBLIC_ACCESS } from "../constants/String";
+import jwt from 'jsonwebtoken';
+import passport, { Strategy } from 'passport';
+import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
+import bcrypt from 'bcrypt';
+import { Strategy as LocalStrategy } from 'passport-local';
+import { ControllerAccess } from '../../types/controller';
+import store from '../../store';
+import { ForbiddenError, UnauthorizedError } from '../core/error';
+import AdminSchema from '../../schema/admin.schema';
+import CustomerSchema from '../../schema/customer.schema';
+import { MiddleWare } from '../../types/global';
+import { Query } from 'mongoose';
+import { CookieOptions, Response } from 'express';
+import { OPTIONAL_LOGIN, PUBLIC_ACCESS } from '../constants/String';
 const strategyMap = new Map<string, Strategy>();
 
 export const AuthUserAccess: ControllerAccess[] = [
   {
     role: PUBLIC_ACCESS,
-    modelName: "customer",
+    modelName: 'customer',
   },
   {
     role: PUBLIC_ACCESS,
-    modelName: "admin",
+    modelName: 'admin',
   },
 ];
 
@@ -57,7 +57,7 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
 
       if (!user && !opt.notThrow)
         return done(
-          new UnauthorizedError("token is valid but access to user failed")
+          new UnauthorizedError('token is valid but access to user failed')
         );
       done(null, user);
     }
@@ -73,8 +73,8 @@ function localStrategyBuilder(opt: UserPassStrategyOpt) {
 
   strategy = new LocalStrategy(
     {
-      usernameField: "username",
-      passwordField: "password",
+      usernameField: 'username',
+      passwordField: 'password',
       session: false,
       passReqToCallback: true,
     },
@@ -83,13 +83,13 @@ function localStrategyBuilder(opt: UserPassStrategyOpt) {
         .model<typeof AdminSchema | typeof CustomerSchema>(opt.model)
         .findOne(opt.query ? opt.query(req.body) : { username, active: true });
 
-      const msg = "username or password is wrong";
+      const msg = 'username or password is wrong';
       if (!user) {
         if (!opt.createIfNotExist) return done(new UnauthorizedError(msg));
 
         // create user
         const new_user =
-          typeof opt.createIfNotExist === "boolean"
+          typeof opt.createIfNotExist === 'boolean'
             ? req.body
             : opt.createIfNotExist(req.body);
         user = await store.db
@@ -150,7 +150,7 @@ export function authorizeWithToken(
 }
 export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
   return (req, res, next) => {
-    const modelName = req.user["constructor"].name;
+    const modelName = req.user['constructor'].name;
     const allowedRoles = accesses
       .filter((access) => access.modelName === modelName)
       .map((access) => access.role);
@@ -161,33 +161,37 @@ export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
         allowedRoles.includes(req.user.role)
       )
     )
-      return next(new ForbiddenError("user can not access"));
+      return next(new ForbiddenError('user can not access'));
     return next();
   };
 }
 
 export function signToken(id: string) {
   return jwt.sign({ id }, store.env.AUTH_SECRET, {
-    expiresIn: "30d",
+    expiresIn: '30d',
   });
 }
 export function verifyToken(token: string) {
   return jwt.verify(token, store.env.AUTH_SECRET);
 }
 
+export function setToCookie(res: Response, value: string, key = 'authToken') {
+  const exp = new Date();
+  exp.setDate(exp.getDate() + 30);
+  res.cookie(key, value, {
+    secure: !store.env.isLoc,
+    httpOnly: !store.env.isLoc,
+    sameSite: 'none',
+    expires: exp,
+  });
+}
+
 export function tokenSetToCookie(
   tokenName: string,
-  cookieOpt: CookieOptions & { name: string }
+  cookieOpt: { name: string }
 ): MiddleWare {
   return (req, res, next) => {
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 30);
-    res.cookie(cookieOpt.name, req[tokenName], {
-      secure: !store.env.isLoc,
-      httpOnly: !store.env.isLoc,
-      sameSite: "none",
-      expires: exp,
-    });
+    setToCookie(res, req[tokenName], cookieOpt.name);
     next();
   };
 }
