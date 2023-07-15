@@ -48,7 +48,7 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
         ExtractJwt.fromAuthHeaderAsBearerToken()(req) ||
         (opt.cookieName && req.cookies[opt.cookieName]),
       secretOrKey: store.env.AUTH_SECRET,
-      passReqToCallback: true,
+      passReqToCallback: false,
     },
     async ({ id }, done) => {
       const user = await store.db
@@ -117,7 +117,9 @@ export function authWithPass(opt: UserPassStrategyOpt) {
 }
 
 export function authWithToken(opt: JwtStrategyOpt) {
-  return passport.use(opt.name, jwtStrategyBuilder(opt)).authenticate(opt.name);
+  return passport
+    .use(opt.name, jwtStrategyBuilder(opt))
+    .authenticate(opt.name, { session: false });
 }
 
 export function authWithGoogle() {}
@@ -150,7 +152,7 @@ export function authorizeWithToken(
 }
 export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
   return (req, res, next) => {
-    const modelName = req.user['constructor'].name;
+    const modelName = req.user['constructor'].modelName;
     const allowedRoles = accesses
       .filter((access) => access.modelName === modelName)
       .map((access) => access.role);

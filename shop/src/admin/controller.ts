@@ -31,6 +31,7 @@ export default function registerController() {
         crud: {
           sendResponse: true,
           executeQuery: true,
+          project: { password: 0 },
         },
       },
     },
