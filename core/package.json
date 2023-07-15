@@ -5,9 +5,9 @@
   "main": "index.ts",
   "scripts": {
     "build": "tsc --build",
-    "dev": "nodemon index.ts",
+    "dev": "nodemon start.ts",
     "log": "nodemon src/core/log.ts",
-    "start": "node dist/index.js"
+    "start": "node dist/start.js"
   },
   "author": "",
   "license": "ISC",
