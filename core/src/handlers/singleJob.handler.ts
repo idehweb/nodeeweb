@@ -1,7 +1,8 @@
-import fs from "fs";
-import { isAsyncFunction } from "util/types";
-import { wait } from "../../utils/helpers";
-import { getSharedPath } from "../../utils/path";
+import fs from 'fs';
+import { isAsyncFunction } from 'util/types';
+import { wait } from '../../utils/helpers';
+import { getSharedPath } from '../../utils/path';
+import logger from './log.handler';
 
 export type SingleJob = () => void | Promise<void>;
 
@@ -23,8 +24,8 @@ export class SingleJobProcess {
 
   #block() {
     try {
-      fs.writeFileSync(this.file_name, "", {
-        flag: "wx",
+      fs.writeFileSync(this.file_name, '', {
+        flag: 'wx',
       });
       return true;
     } catch (err) {
@@ -35,10 +36,11 @@ export class SingleJobProcess {
     try {
       fs.rmSync(this.file_name);
     } catch (err) {
-      console.log("single job free error", err);
+      logger.error('single job free error', err);
     }
   }
   async runTask() {
+    let error: any;
     // block other process with same task id
     const canBlock = this.#block();
     if (!canBlock) {
@@ -49,10 +51,13 @@ export class SingleJobProcess {
     try {
       await this.job();
     } catch (err) {
-      console.log("single job error", err);
+      error = err;
     }
 
     // free others
     this.#free();
+
+    // failed to execute job
+    if (error) throw error;
   }
 }
