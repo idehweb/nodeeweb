@@ -118,7 +118,7 @@ export class EntityCreator {
         { reqKey: 'params', objKey: paramFields },
       ],
       'limit',
-      12
+      req.method === 'GET' ? 12 : 0
     );
 
     if (offset) query.skip(offset);
