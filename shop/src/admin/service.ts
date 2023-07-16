@@ -1,6 +1,11 @@
-import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
 import { serviceOnError } from '../common/service';
-import { MiddleWare, setToCookie, signToken, store } from '@nodeeweb/core';
+import {
+  MiddleWare,
+  NotImplement,
+  setToCookie,
+  signToken,
+  store,
+} from '@nodeeweb/core';
 import { AdminModel, IAdmin } from '../../schema/admin.schema';
 
 export default class Service {
@@ -34,7 +39,7 @@ export default class Service {
     });
   };
 
-  static onError = serviceOnError('Admin');
+  static resetAdmin: MiddleWare = async () => {
+    throw new NotImplement();
+  };
 }
-
-classCatchBuilder(Service);

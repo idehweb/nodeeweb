@@ -17,6 +17,12 @@ export default function registerController() {
         service: Service.login,
         url: '/login',
       },
+      {
+        method: 'post',
+        service: Service.resetAdmin,
+        url: '/resetAdmin',
+        access,
+      },
     ],
     { base_url: '/admin/admin', from: 'ShopEntity' }
   );
