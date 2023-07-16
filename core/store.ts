@@ -1,9 +1,10 @@
-import mongoose from "mongoose";
-import { ENV, USE_ENV } from "./types/global";
-import { Application } from "express";
-import { ErrorPackageFn } from "./types/error";
-import { Server } from "http";
-import { AdminViewSchema } from "./types/view";
+import mongoose from 'mongoose';
+import { ENV, USE_ENV } from './types/global';
+import { Application } from 'express';
+import { ErrorPackageFn } from './types/error';
+import { Server } from 'http';
+import { AdminViewSchema } from './types/view';
+import { AuthStrategy } from './types/auth';
 export class Store {
   env: {
     MONGO_URL: string;
@@ -30,6 +31,7 @@ export class Store {
   server: Server;
   systemLogger: any;
   adminViews: AdminViewSchema[] = [];
+  strategies = new Map<string, AuthStrategy>();
 
   constructor() {
     this.env = process.env as any;

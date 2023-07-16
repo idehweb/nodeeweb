@@ -12,7 +12,12 @@ import { MiddleWare } from '../../types/global';
 import { Query } from 'mongoose';
 import { CookieOptions, Response } from 'express';
 import { OPTIONAL_LOGIN, PUBLIC_ACCESS } from '../constants/String';
-const strategyMap = new Map<string, Strategy>();
+import { AuthStrategy } from '../../types/auth';
+import logger from './log.handler';
+import { color } from '../../utils/color';
+import _ from 'lodash';
+
+const jwtStrategyMap = new Map<string, Strategy>();
 
 export const AuthUserAccess: ControllerAccess[] = [
   {
@@ -39,7 +44,7 @@ export type JwtStrategyOpt = {
 };
 
 function jwtStrategyBuilder(opt: JwtStrategyOpt) {
-  let strategy = strategyMap.get(opt.name);
+  let strategy = jwtStrategyMap.get(opt.name);
   if (strategy) return strategy;
 
   strategy = new JwtStrategy(
@@ -66,12 +71,12 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
     }
   );
 
-  strategyMap.set(opt.name, strategy);
+  jwtStrategyMap.set(opt.name, strategy);
   return strategy;
 }
 function localStrategyBuilder(opt: UserPassStrategyOpt) {
   const strategyName = opt.name;
-  let strategy = strategyMap.get(strategyName);
+  let strategy = jwtStrategyMap.get(strategyName);
   if (strategy) return strategy;
 
   strategy = new LocalStrategy(
@@ -109,7 +114,7 @@ function localStrategyBuilder(opt: UserPassStrategyOpt) {
     }
   );
 
-  strategyMap.set(strategyName, strategy);
+  jwtStrategyMap.set(strategyName, strategy);
   return strategy;
 }
 
@@ -199,4 +204,21 @@ export function tokenSetToCookie(
     setToCookie(res, req[tokenName], cookieOpt.name);
     next();
   };
+}
+
+export type AuthCheckOpt = {
+  modelName: string;
+  checkerId: string;
+};
+
+export function registerAuthStrategy(strategy: AuthStrategy, from?: string) {
+  store.strategies.set(strategy.strategyId, strategy);
+  logger.log(
+    color(
+      'Red',
+      `## ${from ? `${from} ` : ''}Register ${_.capitalize(
+        strategy.strategyId
+      )} AuthStrategy ##`
+    )
+  );
 }
