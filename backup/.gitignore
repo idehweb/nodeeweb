@@ -1,0 +1,8 @@
+.env.local
+node_modules
+*.tar
+*.gz
+*-part*
+backup/
+
+v2ray-config.json
