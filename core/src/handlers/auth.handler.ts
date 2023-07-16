@@ -50,10 +50,13 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
       secretOrKey: store.env.AUTH_SECRET,
       passReqToCallback: false,
     },
-    async ({ id }, done) => {
-      const user = await store.db
-        .model(opt.model)
-        .findOne({ _id: id, active: true });
+    async ({ id, iat }, done) => {
+      iat = iat * 1000;
+      const user = await store.db.model(opt.model).findOne({
+        _id: id,
+        passwordChangeAt: { $lte: new Date(iat) },
+        active: true,
+      });
 
       if (!user && !opt.notThrow)
         return done(

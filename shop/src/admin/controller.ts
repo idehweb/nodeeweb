@@ -40,6 +40,17 @@ export default function registerController() {
           project: { password: 0 },
         },
       },
+      updateOne: {
+        controller: {
+          access,
+          url: '/',
+        },
+        crud: {
+          sendResponse: true,
+          executeQuery: true,
+          parseFilter: (req) => ({ _id: req.user._id }),
+        },
+      },
     },
     { base_url: '/admin/admin', from: 'ShopEntity' }
   );
