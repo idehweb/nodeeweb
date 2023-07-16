@@ -82,3 +82,10 @@ export class NotImplement extends GeneralError {
     super(message ?? 'not implement yet', 500, ErrorType.NotImplement);
   }
 }
+
+export class NotFound extends GeneralError {
+  isNotfound = true;
+  constructor(message?: string) {
+    super(message ?? 'no found', 404, ErrorType.Not_Found);
+  }
+}
