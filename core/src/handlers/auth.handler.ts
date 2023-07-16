@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { ControllerAccess } from '../../types/controller';
 import store from '../../store';
-import { ForbiddenError, UnauthorizedError } from '../core/error';
+import { ForbiddenError, UnauthorizedError } from '../../types/error';
 import AdminSchema from '../../schema/admin.schema';
 import CustomerSchema from '../../schema/customer.schema';
 import { MiddleWare } from '../../types/global';

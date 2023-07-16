@@ -9,7 +9,7 @@ import {
 } from './controller.handler';
 import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { isAsyncFunction } from 'util/types';
-import { BadRequestError, GeneralError } from '../core/error';
+import { BadRequestError, GeneralError } from '../../types/error';
 import { catchFn } from '../../utils/catchAsync';
 
 export class EntityCreator {
