@@ -1,17 +1,28 @@
-import mongoose, { PopulateOptions } from "mongoose";
-import store from "../../store";
-import { CRUD, CRUDCreatorOpt, MiddleWare, Req } from "../../types/global";
-import { NextFunction, Response } from "express";
-import { ControllerSchema } from "../../types/controller";
+import mongoose, { PopulateOptions } from 'mongoose';
+import store from '../../store';
+import { CRUD, CRUDCreatorOpt, MiddleWare, Req, Res } from '../../types/global';
+import { NextFunction, Response } from 'express';
+import { ControllerSchema } from '../../types/controller';
 import {
   ControllerRegisterOptions,
   controllerRegister,
-} from "./controller.handler";
-import { CRUD_DEFAULT_REQ_KEY } from "../constants/String";
-import { isAsyncFunction } from "util/types";
+} from './controller.handler';
+import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
+import { isAsyncFunction } from 'util/types';
+import { BadRequestError, GeneralError } from '../../types/error';
+import { catchFn } from '../../utils/catchAsync';
 
 export class EntityCreator {
-  constructor(private modelName: string) {}
+  constructor(private modelName: string) {
+    // // catch fn
+    // [this.baseCreator, this.handleResult].forEach(
+    //   (fn) =>
+    //     (this[fn.name] = catchFn(fn, {
+    //       self: this,
+    //       onError: EntityCreator.onError,
+    //     }))
+    // );
+  }
   private get model() {
     return store.db.model(this.modelName);
   }
@@ -27,14 +38,14 @@ export class EntityCreator {
       httpCode = 200,
     }: {
       result: any;
-      saveToReq: CRUDCreatorOpt["saveToReq"];
-      sendResponse: CRUDCreatorOpt["sendResponse"];
+      saveToReq: CRUDCreatorOpt['saveToReq'];
+      sendResponse: CRUDCreatorOpt['sendResponse'];
       httpCode: number;
     }
   ) {
     if (sendResponse && !saveToReq) {
       const data =
-        typeof sendResponse === "boolean"
+        typeof sendResponse === 'boolean'
           ? result
           : isAsyncFunction(sendResponse)
           ? await sendResponse(result)
@@ -44,12 +55,17 @@ export class EntityCreator {
 
     // save to req
     req[
-      !saveToReq || typeof saveToReq === "boolean"
+      !saveToReq || typeof saveToReq === 'boolean'
         ? CRUD_DEFAULT_REQ_KEY
         : saveToReq
     ] = result;
     return next();
   }
+
+  private static onError(err: GeneralError, next: NextFunction) {
+    return next(err);
+  }
+
   private getFrom(
     req: Req,
     objs: { reqKey: string; objKey: any }[],
@@ -88,21 +104,21 @@ export class EntityCreator {
     const offset = +this.getFrom(
       req,
       [
-        { reqKey: "query", objKey: queryFields },
-        { reqKey: "params", objKey: paramFields },
+        { reqKey: 'query', objKey: queryFields },
+        { reqKey: 'params', objKey: paramFields },
       ],
-      "offset",
+      'offset',
       0
     );
 
     const limit = +this.getFrom(
       req,
       [
-        { reqKey: "query", objKey: queryFields },
-        { reqKey: "params", objKey: paramFields },
+        { reqKey: 'query', objKey: queryFields },
+        { reqKey: 'params', objKey: paramFields },
       ],
-      "limit",
-      12
+      'limit',
+      req.method === 'GET' ? 12 : 0
     );
 
     if (offset) query.skip(offset);
@@ -116,7 +132,7 @@ export class EntityCreator {
 
     if (executeQuery) result = await query.exec();
     if (autoSetCount)
-      res.setHeader("X-Total-Count", await query.countDocuments());
+      res.setHeader('X-Total-Count', await query.countDocuments());
 
     // handle result and output
     this.handleResult(req, res, next, {
@@ -135,6 +151,13 @@ export class EntityCreator {
   }: CRUDCreatorOpt) {
     return async (req: Req, res: Response, next: NextFunction) => {
       const body = parseBody ? parseBody(req) : req.body;
+
+      if (!body)
+        return EntityCreator.onError(
+          new BadRequestError('body must exist'),
+          next
+        );
+
       let doc = this.model.create(body);
       if (executeQuery) {
         doc = (await doc)._doc;
@@ -170,7 +193,7 @@ export class EntityCreator {
   getOneCreator({
     filter,
     parseFilter,
-    paramFields = { id: "id" },
+    paramFields = { id: 'id' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
@@ -196,7 +219,7 @@ export class EntityCreator {
     parseFilter,
     update,
     parseUpdate,
-    paramFields = { id: "id" },
+    paramFields = { id: 'id' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
@@ -217,7 +240,7 @@ export class EntityCreator {
     forceDelete,
     update,
     parseUpdate,
-    paramFields = { id: "id" },
+    paramFields = { id: 'id' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
@@ -238,7 +261,7 @@ export class EntityCreator {
 }
 
 export type EntityCRUDOpt = {
-  crud: Omit<CRUDCreatorOpt, "httpCode">;
+  crud: Omit<CRUDCreatorOpt, 'httpCode'>;
   controller: Partial<ControllerSchema>;
 };
 export function registerEntityCRUD(
@@ -255,7 +278,6 @@ export function registerEntityCRUD(
 ) {
   const schemas: ControllerSchema[] = [];
   const creator = new EntityCreator(modelName);
-
   for (const [name, opt] of Object.entries(opts).filter(([k, v]) => v)) {
     const cName = name as CRUD;
     schemas.push({
@@ -275,33 +297,33 @@ export function registerEntityCRUD(
 function translateCRUD2Creator(name: CRUD): keyof EntityCreator {
   switch (name) {
     case CRUD.CREATE:
-      return "createOneCreator";
+      return 'createOneCreator';
     case CRUD.GET_ALL:
-      return "getAllCreator";
+      return 'getAllCreator';
     case CRUD.GET_ONE:
-      return "getOneCreator";
+      return 'getOneCreator';
     case CRUD.UPDATE_ONE:
-      return "updateOneCreator";
+      return 'updateOneCreator';
     case CRUD.DELETE_ONE:
-      return "deleteOneCreator";
+      return 'deleteOneCreator';
     case CRUD.GET_COUNT:
-      return "getCountCreator";
+      return 'getCountCreator';
     default:
       throw new Error(`Invalid CRUD name : ${name}`);
   }
 }
-function translateCRUD2Method(name: CRUD): ControllerSchema["method"] {
+function translateCRUD2Method(name: CRUD): ControllerSchema['method'] {
   switch (name) {
     case CRUD.CREATE:
-      return "post";
+      return 'post';
     case CRUD.GET_ALL:
     case CRUD.GET_ONE:
     case CRUD.GET_COUNT:
-      return "get";
+      return 'get';
     case CRUD.UPDATE_ONE:
-      return "put";
+      return 'put';
     case CRUD.DELETE_ONE:
-      return "delete";
+      return 'delete';
     default:
       throw new Error(`Invalid CRUD name : ${name}`);
   }
@@ -309,21 +331,21 @@ function translateCRUD2Method(name: CRUD): ControllerSchema["method"] {
 function translateCRUD2Url(
   name: CRUD,
   opt: CRUDCreatorOpt
-): ControllerSchema["url"] {
+): ControllerSchema['url'] {
   switch (name) {
     case CRUD.GET_COUNT:
-      return "/count";
+      return '/count';
     case CRUD.CREATE:
-      return "/";
+      return '/';
     case CRUD.GET_ALL:
-      let extra = "";
+      let extra = '';
       if (opt.paramFields?.offset) extra += `/?:${opt.paramFields.offset}`;
       if (opt.paramFields?.limit) extra += `/?:${opt.paramFields.limit}`;
       return `/${extra}`;
     case CRUD.GET_ONE:
     case CRUD.UPDATE_ONE:
     case CRUD.DELETE_ONE:
-      return `/:${opt.paramFields?.id ?? "id"}`;
+      return `/:${opt.paramFields?.id ?? 'id'}`;
     default:
       throw new Error(`Invalid CRUD name : ${name}`);
   }

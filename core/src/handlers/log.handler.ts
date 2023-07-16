@@ -1,41 +1,45 @@
-import winston from "winston";
-import morgan from "morgan";
-import { MiddleWare, USE_ENV } from "../../types/global";
-import { createCustomLogger } from "../core/log";
-import store from "../../store";
-import { Colors, color, yellow } from "../../utils/color";
+import winston from 'winston';
+import morgan from 'morgan';
+import { MiddleWare, USE_ENV } from '../../types/global';
+import { createCustomLogger } from '../core/log';
+import store from '../../store';
+import { Colors, color, yellow } from '../../utils/color';
+import bfs from '../../utils/bfs';
 
 export class Logger {
   constructor(private logger: winston.Logger, private label?: string) {}
 
   private convert(a: any) {
-    if (["number", "string", "boolean", "undefined"].includes(typeof a))
-      return String(a);
-    return a.toString();
+    const msgs: string[] = [];
+    bfs(a, ({ value, key }) => {
+      if (value === undefined) return;
+      msgs.push(key && key !== 'message' ? `${key} : ${value}` : value);
+    });
+    return msgs.join('\n');
   }
 
   log(...args: any[]) {
     this.logger.info({
-      message: args.map(this.convert).join(" "),
+      message: args.map(this.convert).join(' '),
       label: this.label,
     });
   }
   warn(...args: any[]) {
     this.logger.warn({
-      message: args.map(this.convert).join(" "),
+      message: args.map(this.convert).join(' '),
       label: this.label,
     });
   }
   error(...args: any[]) {
     this.logger.error({
-      message: args.map(this.convert).join(" "),
+      message: args.map(this.convert).join(' '),
       label: this.label,
     });
   }
 }
 const logger = new Logger(
-  createCustomLogger({ name: "core", handleExceptions: true }),
-  store.env.USE_ENV !== USE_ENV.NPM ? undefined : "CORE"
+  createCustomLogger({ name: 'core', handleExceptions: true }),
+  store.env.USE_ENV !== USE_ENV.NPM ? undefined : 'CORE'
 );
 export default logger;
 
@@ -44,8 +48,8 @@ export function createLogger(name: string, label?: string, maxFiles = 1) {
 }
 
 const morganLogger = createLogger(
-  "core.server",
-  store.env.USE_ENV !== USE_ENV.NPM ? undefined : "CORE_SERVER",
+  'core.server',
+  store.env.USE_ENV !== USE_ENV.NPM ? undefined : 'CORE_SERVER',
   5
 );
 const morganStream = {
@@ -60,7 +64,7 @@ const morganStream = {
       url,
     }: MorganDetailType = JSON.parse(msg);
 
-    let final_msg = "";
+    let final_msg = '';
 
     // ip , agent
     if (!store.env.isLoc) {
@@ -70,54 +74,54 @@ const morganStream = {
     // method
     let method_color: keyof typeof Colors;
     switch (method.toUpperCase()) {
-      case "GET":
-        method_color = "Green";
+      case 'GET':
+        method_color = 'Green';
         break;
-      case "POST":
-        method_color = "Yellow";
+      case 'POST':
+        method_color = 'Yellow';
         break;
-      case "PUT":
-      case "PATCH":
-        method_color = "Blue";
+      case 'PUT':
+      case 'PATCH':
+        method_color = 'Blue';
         break;
-      case "DELETE":
-        method_color = "Red";
+      case 'DELETE':
+        method_color = 'Red';
         break;
       default:
-        method_color = "White";
+        method_color = 'White';
     }
-    final_msg += " " + color(method_color, method.toUpperCase());
+    final_msg += ' ' + color(method_color, method.toUpperCase());
 
     // url
-    final_msg += " " + url;
+    final_msg += ' ' + url;
 
     // code
     let status_color: keyof typeof Colors;
     switch (Math.floor(status / 100)) {
       case 1:
-        status_color = "Cyan";
+        status_color = 'Cyan';
         break;
       case 2:
-        status_color = "Green";
+        status_color = 'Green';
         break;
       case 3:
-        status_color = "Blue";
+        status_color = 'Blue';
         break;
       case 4:
-        status_color = "Red";
+        status_color = 'Red';
         break;
       case 5:
       default:
-        status_color = "Magenta";
+        status_color = 'Magenta';
         break;
     }
-    final_msg += " " + color(status_color, String(status));
+    final_msg += ' ' + color(status_color, String(status));
 
     // time
-    final_msg += " - " + response_time.toFixed(2) + "ms";
+    final_msg += ' - ' + response_time.toFixed(2) + 'ms';
 
     // content length
-    if (content_length) final_msg += " - " + content_length;
+    if (content_length) final_msg += ' - ' + content_length;
 
     return morganLogger.log(final_msg);
   },
@@ -142,10 +146,10 @@ export const expressLogger: MiddleWare = morgan(
       method: tokens.method(req, res),
       url: tokens.url(req, res),
       status: Number.parseInt(tokens.status(req, res)),
-      content_length: tokens.res(req, res, "Content-Length"),
-      response_time: Number.parseFloat(tokens["response-time"](req, res)),
-      ip: tokens["remote-addr"](req, res),
-      agent: tokens["user-agent"](req, res),
+      content_length: tokens.res(req, res, 'Content-Length'),
+      response_time: Number.parseFloat(tokens['response-time'](req, res)),
+      ip: tokens['remote-addr'](req, res),
+      agent: tokens['user-agent'](req, res),
     } as MorganDetailType);
   },
   {

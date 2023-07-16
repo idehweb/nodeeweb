@@ -1,24 +1,24 @@
-import { createTerminus } from "@godaddy/terminus";
-import mongoose from "mongoose";
-import logger from "../handlers/log.handler";
-import store from "../../store";
+import { createTerminus } from '@godaddy/terminus';
+import mongoose from 'mongoose';
+import logger from '../handlers/log.handler';
+import store from '../../store';
 
 export function handleUncaughtException() {
-  process.once("uncaughtException", (err) => {
-    logger.error("#uncaughtException:", err);
+  process.once('uncaughtException', (err) => {
+    logger.error('#uncaughtException:', err);
     shutdown();
   });
-  process.once("unhandledRejection", (err) => {
-    logger.error("#unhandledRejection:", err);
+  process.once('unhandledRejection', (err) => {
+    logger.error('#unhandledRejection:', err);
     shutdown();
   });
 }
 
 export function gracefullyShutdown() {
   createTerminus(store.server, {
-    healthChecks: { "/health": onHealthcheck },
+    healthChecks: { '/health': onHealthcheck },
     onSignal,
-    signals: ["SIGINT", "SIGTERM"],
+    signals: ['SIGINT', 'SIGTERM'],
     useExit0: true,
   });
 }
@@ -36,5 +36,5 @@ async function onSignal() {
 }
 async function onHealthcheck() {
   const status = mongoose.connections.every((c) => c.readyState === 1);
-  if (!status) throw new Error("DB not connect yet!");
+  if (!status) throw new Error('DB not connect yet!');
 }

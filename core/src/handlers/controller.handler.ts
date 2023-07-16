@@ -1,20 +1,65 @@
-import _ from "lodash";
-import store from "../../store";
-import { ControllerAccess, ControllerSchema } from "../../types/controller";
-import { MiddleWare } from "../../types/global";
+import _ from 'lodash';
+import store from '../../store';
+import { ControllerAccess, ControllerSchema } from '../../types/controller';
+import { MiddleWare, MiddleWareError } from '../../types/global';
 import {
   JwtStrategyOpt,
   authenticate,
   authorizeWithToken,
-} from "./auth.handler";
-import { Logger } from "./log.handler";
-import { join } from "path";
-import { color } from "../../utils/color";
-import { RegisterOptions } from "../../types/register";
-import { OPTIONAL_LOGIN } from "../constants/String";
+} from './auth.handler';
+import { Logger } from './log.handler';
+import { join } from 'path';
+import { color } from '../../utils/color';
+import { RegisterOptions } from '../../types/register';
+import { OPTIONAL_LOGIN } from '../constants/String';
+import { catchMiddleware } from '../../utils/catchAsync';
 
 export function getUrlFromBaseUrl(url: string, base_url?: string) {
-  return join(base_url ?? "", url).replace(/\\/g, "/");
+  return join(base_url ?? '', url).replace(/\\/g, '/');
+}
+
+function clearMatchHandler(urls: string[], method: string) {
+  store.app._router.stack = ((store.app._router.stack ?? []) as any[]).reduce(
+    (prev, layer) => {
+      // diff path or diff method
+      if (
+        !urls.includes(layer.route?.path) ||
+        !layer.route?.methods?.[method]
+      ) {
+        prev.push(layer);
+        return prev;
+      }
+
+      // single method
+      if (Object.values(layer.route?.methods).filter((v) => v).length == 1) {
+        return prev;
+      }
+      // multi methods
+      else {
+        layer.route.methods[method] = false;
+        prev.push(layer);
+      }
+    },
+    []
+  );
+}
+
+function popErrorHandlers() {
+  const errorLayers: any[] = [];
+
+  // filter layers
+  store.app._router.stack = (store.app._router.stack as any[]).filter(
+    (layer) => {
+      if (Object.values(store.errorPackage).includes(layer.handle)) {
+        errorLayers.push(layer);
+        return false;
+      }
+      return true;
+    }
+  );
+
+  // push layers
+  store.app._router.stack.push(...errorLayers);
 }
 
 export type ControllerRegisterOptions = {
@@ -28,9 +73,9 @@ export function controllerRegister(
     logger = store.systemLogger,
   }: ControllerRegisterOptions = {}
 ) {
-  if (!Array.isArray(base_url)) base_url = [base_url ?? ""];
+  if (!Array.isArray(base_url)) base_url = [base_url ?? ''];
   const urls = base_url.map((url) => getUrlFromBaseUrl(schema.url, url));
-  const mw: MiddleWare[] = [];
+  let mw: MiddleWare[] = [];
 
   if (schema.access && !Array.isArray(schema.access))
     schema.access = [schema.access];
@@ -42,15 +87,27 @@ export function controllerRegister(
   if (!Array.isArray(schema.service)) schema.service = [schema.service];
   mw.push(...schema.service);
 
+  // catch mw
+  mw = mw.map((m) => catchMiddleware(m));
+
+  const method = schema.method.toLowerCase();
+
+  // clear match handler
+  clearMatchHandler(urls, method);
+
+  // push
   for (const url of urls) {
-    store.app[schema.method.toLowerCase()](url, ...mw);
+    store.app[method](url, ...mw);
     logger.log(
       color(
-        "Blue",
-        `## ${from ? `${from} ` : ""}${schema.method.toUpperCase()} ${url} ##`
+        'Blue',
+        `## ${from ? `${from} ` : ''}${method.toUpperCase()} ${url} ##`
       )
     );
   }
+
+  // pop error handlers
+  popErrorHandlers();
 }
 
 export function controllersBatchRegister(

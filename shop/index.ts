@@ -1,6 +1,6 @@
 import deployCore from '@nodeeweb/core/deploy';
-import { createLogger } from '@nodeeweb/core/src/handlers/log.handler';
-import store from '@nodeeweb/core/store';
+import './utils/log';
+import registerAdmin from './src/admin';
 import registerAttribute from './src/attributes';
 import registerCategory from './src/category';
 import registerCustomer from './src/customer';
@@ -18,12 +18,15 @@ import registerPost from './src/post';
 import registerProduct from './src/product';
 import registerProductCategory from './src/productCategory';
 import registerSettings from './src/settings';
+import logger from './utils/log';
+import { store } from '@nodeeweb/core';
 
 async function deployShop() {
   await deployCore();
-  store.systemLogger = createLogger('shop', 'Shop', 5);
+  store.systemLogger = logger;
 
   // register entity
+  registerAdmin();
   registerAttribute();
   registerCategory();
   registerCustomer();
