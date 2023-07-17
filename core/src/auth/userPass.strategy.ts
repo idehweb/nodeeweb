@@ -9,37 +9,22 @@ import {
 } from '../../types/auth';
 import { Req, Res } from '../../types/global';
 import { setToCookie, signToken } from '../handlers/auth.handler';
-import { NotFound } from '../../types/error';
+import { ForbiddenError, NotFound } from '../../types/error';
 
 export const USER_PASS_STRATEGY = 'user-pass';
 export default class UserPassStrategy extends AuthStrategy {
   strategyId = USER_PASS_STRATEGY;
-  async detect(req: Req, res: Res, next: NextFunction) {
-    const model = store.db.model(req.modelName);
-    const user = await model.findOne(
-      { username: req.body.username, active: true },
-      '+password'
-    );
-    if (!user) throw new NotFound('user not found');
-    req.user = user;
-    return next();
+  detect(req: Req, res: Res, next: NextFunction) {
+    return this.login(req, res);
   }
 
   async login(req: Req, res: Res) {
     const { username, password } = req.body;
 
-    // validate body
-    if (!username || !password)
-      return res.status(400).json({ message: 'username and password need' });
-
     const model = store.db.model(req.modelName);
-    const user: UserDocument =
-      req.user ??
-      (await model.findOne(
-        { username: req.body.username, active: true },
-        '+password'
-      ));
+    const user: UserDocument = await model.findOne({ username }, '+password');
     if (!user) throw new NotFound('user not found');
+    if (!user.active) throw new ForbiddenError('user inactive');
 
     if (!user || !(await user.passwordVerify(password)))
       return res.status(400).json({ message: 'username or password is wrong' });

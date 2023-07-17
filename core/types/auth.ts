@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { MiddleWare, Req, Res } from './global';
 import { NextFunction } from 'express';
 import { Document } from 'mongoose';
@@ -23,4 +23,11 @@ export interface IUser {
 }
 
 export type UserModel = Model<IUser, {}, IUserMethods>;
-export type UserDocument = Document<IUser> & IUserMethods;
+export type UserDocument = Document<unknown, {}, IUser> &
+  Omit<
+    IUser & {
+      _id: Types.ObjectId;
+    },
+    'passwordVerify'
+  > &
+  IUserMethods;

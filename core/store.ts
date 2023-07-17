@@ -5,6 +5,7 @@ import { ErrorPackageFn } from './types/error';
 import { Server } from 'http';
 import { AdminViewSchema } from './types/view';
 import { AuthStrategy } from './types/auth';
+import { PluginContent, PluginType } from './types/plugin';
 export class Store {
   env: {
     MONGO_URL: string;
@@ -23,6 +24,8 @@ export class Store {
     APP_DIRS: string;
     AUTH_SECRET: string;
     LOG_TO_FILE: string;
+    SMS_USERNAME?: string;
+    SMS_PASSWORD?: string;
   } & { [k: string]: string };
   db: typeof mongoose;
   dirs: string[];
@@ -32,6 +35,7 @@ export class Store {
   systemLogger: any;
   adminViews: AdminViewSchema[] = [];
   strategies = new Map<string, AuthStrategy>();
+  plugins = new Map<PluginType, PluginContent>();
 
   constructor() {
     this.env = process.env as any;

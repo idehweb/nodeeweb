@@ -1,17 +1,13 @@
-import store from '../../store';
 import AuthGatewayStrategy from '../auth/authGateway.strategy';
-import UserPassStrategy, {
-  USER_PASS_STRATEGY,
-} from '../auth/userPass.strategy';
+import { OtpStrategy } from '../auth/otp.strategy';
+import UserPassStrategy from '../auth/userPass.strategy';
 import { registerAuthStrategy } from '../handlers/auth.handler';
-import {
-  controllerRegister,
-  controllersBatchRegister,
-} from '../handlers/controller.handler';
+import { controllersBatchRegister } from '../handlers/controller.handler';
 
 export function activeAuthControllers() {
   // register auth
   registerAuthStrategy(new UserPassStrategy(), 'CoreAuth');
+  registerAuthStrategy(new OtpStrategy(), 'CoreAuth');
 
   //   gateway
   const gateway = new AuthGatewayStrategy();
@@ -21,12 +17,12 @@ export function activeAuthControllers() {
     [
       {
         method: 'post',
-        service: [gateway.detect.bind(gateway), gateway.login.bind(gateway)],
+        service: [gateway.detect.bind(gateway)],
         url: '/auth/:strategyId',
       },
       {
         method: 'post',
-        service: [gateway.detect.bind(gateway), gateway.login.bind(gateway)],
+        service: [gateway.detect.bind(gateway)],
         url: '/auth/:strategyId/detect',
       },
       {
