@@ -14,17 +14,7 @@ import { NotFound } from '../../types/error';
 export const USER_PASS_STRATEGY = 'user-pass';
 export default class UserPassStrategy extends AuthStrategy {
   strategyId = USER_PASS_STRATEGY;
-
-  exportModelName(req: Req) {
-    if (req.modelName) return req.modelName;
-    req.modelName = String(req.body.userType);
-    delete req.body.userType;
-    return req.modelName;
-  }
-
   async detect(req: Req, res: Res, next: NextFunction) {
-    this.exportModelName(req);
-
     const model = store.db.model(req.modelName);
     const user = await model.findOne(
       { username: req.body.username, active: true },
@@ -36,7 +26,6 @@ export default class UserPassStrategy extends AuthStrategy {
   }
 
   async login(req: Req, res: Res) {
-    this.exportModelName(req);
     const { username, password } = req.body;
 
     // validate body
@@ -69,8 +58,6 @@ export default class UserPassStrategy extends AuthStrategy {
     });
   }
   async signup(req: Req, res: Res) {
-    this.exportModelName(req);
-
     const userModel = store.db.model<IUser, UserModel>(req.modelName);
 
     // TODO validate body
