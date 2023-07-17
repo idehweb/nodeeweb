@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema({
   name: {
@@ -21,9 +21,9 @@ const schema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  media: [{ type: mongoose.Schema.Types.ObjectId, ref: "Media" }],
-  customer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" },
-  admin: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
+  media: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Media' }],
+  customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
+  admin: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

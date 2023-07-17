@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema(
   {
@@ -10,7 +10,7 @@ const schema = new mongoose.Schema(
     },
     type: {
       type: String,
-      default: "normal",
+      default: 'normal',
     },
     image: String,
     data: {},
@@ -18,7 +18,7 @@ const schema = new mongoose.Schema(
     metadescription: {},
     description: {},
     values: [],
-    parent: { type: mongoose.Schema.Types.ObjectId, ref: "ProductCategory" }, //category_id
+    parent: { type: mongoose.Schema.Types.ObjectId, ref: 'ProductCategory' }, //category_id
   },
   { timestamps: true }
 );

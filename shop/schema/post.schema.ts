@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema(
   {
     active: { type: Boolean, default: true },
-    category: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
+    category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
     data: {},
     description: {},
     excerpt: {},
@@ -16,8 +16,8 @@ const schema = new mongoose.Schema(
     },
     title: {},
     elements: {},
-    kind: { type: String, default: "post" },
-    status: { type: String, default: "processing" },
+    kind: { type: String, default: 'post' },
+    status: { type: String, default: 'processing' },
     photos: [],
     thumbnail: String,
   },

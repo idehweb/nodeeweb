@@ -1,19 +1,19 @@
-import { MiddleWare } from "@nodeeweb/core/types/global";
-import { serviceOnError } from "../common/service";
-import { classCatchBuilder } from "@nodeeweb/core/utils/catchAsync";
-import store from "@nodeeweb/core/store";
+import { MiddleWare } from '@nodeeweb/core/types/global';
+import { serviceOnError } from '../common/service';
+import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
+import store from '@nodeeweb/core/store';
 
 export default class Service {
   static addEntry: MiddleWare = async (req, res) => {
-    const Form = store.db.model("form");
-    const Entry = store.db.model("entry");
+    const Form = store.db.model('form');
+    const Entry = store.db.model('entry');
 
-    const form = await Form.findById(req.params.form, "_id");
+    const form = await Form.findById(req.params.form, '_id');
 
     if (!form) {
       return res.status(404).json({
         success: false,
-        message: "not found",
+        message: 'not found',
       });
     }
 
@@ -28,10 +28,10 @@ export default class Service {
     return res.status(201).json({
       success: true,
       trackingCode: trackingCode,
-      message: "submitted successfully!",
+      message: 'submitted successfully!',
     });
   };
-  static onError = serviceOnError("Form");
+  static onError = serviceOnError('Form');
 }
 
 classCatchBuilder(Service);

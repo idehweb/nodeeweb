@@ -1,17 +1,17 @@
 import {
   OPTIONAL_LOGIN,
   PUBLIC_ACCESS,
-} from "@nodeeweb/core/src/constants/String";
-import { ControllerAccess } from "@nodeeweb/core/types/controller";
-import { registerEntityCRUD } from "@nodeeweb/core/src/handlers/entity.handler";
-import Service from "./service";
+} from '@nodeeweb/core/src/constants/String';
+import { ControllerAccess } from '@nodeeweb/core/types/controller';
+import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
+import Service from './service';
 
 export default function registerController() {
-  const access: ControllerAccess = { modelName: "admin", role: PUBLIC_ACCESS };
+  const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
 
   // create , update
   registerEntityCRUD(
-    "page",
+    'page',
     {
       create: {
         controller: {
@@ -34,23 +34,23 @@ export default function registerController() {
         },
       },
     },
-    { base_url: "/amin/page", from: "ShopEntity" }
+    { base_url: '/amin/page', from: 'ShopEntity' }
   );
 
   // get one
   registerEntityCRUD(
-    "page",
+    'page',
     {
       getOne: {
         controller: {
           access: [
             {
               role: OPTIONAL_LOGIN,
-              modelName: "customer",
+              modelName: 'customer',
             },
             {
               role: OPTIONAL_LOGIN,
-              modelName: "admin",
+              modelName: 'admin',
             },
           ],
           service: Service.getOneAfter,
@@ -62,6 +62,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: "/customer/page", from: "ShopEntity" }
+    { base_url: '/customer/page', from: 'ShopEntity' }
   );
 }

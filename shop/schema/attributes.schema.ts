@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema({
   name: {},
@@ -9,7 +9,7 @@ const schema = new mongoose.Schema({
   },
   type: {
     type: String,
-    default: "normal",
+    default: 'normal',
   },
   image: String,
   useInFilter: {

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema(
   {
@@ -12,15 +12,15 @@ const schema = new mongoose.Schema(
     percent: Number,
     customerLimit: Number,
     count: Number,
-    customer: [{ type: mongoose.Schema.Types.ObjectId, ref: "Customer" }],
-    excludeProduct: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    customer: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
+    excludeProduct: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
     excludeProductCategory: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "ProductCategory" },
+      { type: mongoose.Schema.Types.ObjectId, ref: 'ProductCategory' },
     ],
 
-    includeProduct: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    includeProduct: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
     includeProductCategory: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "ProductCategory" },
+      { type: mongoose.Schema.Types.ObjectId, ref: 'ProductCategory' },
     ],
 
     expire: { type: Date },

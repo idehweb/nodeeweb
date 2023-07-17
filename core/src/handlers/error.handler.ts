@@ -1,5 +1,5 @@
-import store from "../../store";
-import { MiddleWare, MiddleWareError } from "../../types/global";
+import store from '../../store';
+import { MiddleWare, MiddleWareError } from '../../types/global';
 
 export function errorHandlerRegister(
   errorKey: keyof typeof store.errorPackage,

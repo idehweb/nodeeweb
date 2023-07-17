@@ -1,4 +1,4 @@
-import { MiddleWare } from "./global";
+import { MiddleWare } from './global';
 
 export type ControllerAccess = {
   modelName: string;
@@ -7,7 +7,7 @@ export type ControllerAccess = {
 
 export type ControllerSchema = {
   url: string;
-  method: "get" | "post" | "put" | "patch" | "delete";
+  method: 'get' | 'post' | 'put' | 'patch' | 'delete';
   access?: ControllerAccess | ControllerAccess[];
   service: MiddleWare | MiddleWare[];
 };

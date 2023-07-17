@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema(
   {
@@ -12,12 +12,12 @@ const schema = new mongoose.Schema(
     },
     button: {
       type: String,
-      default: "send",
+      default: 'send',
     },
     active: { type: Boolean, default: true },
     elements: [],
     responses: [],
-    status: { type: String, default: "processing" },
+    status: { type: String, default: 'processing' },
     view: { type: Number, default: 1 },
   },
   { timestamps: true }

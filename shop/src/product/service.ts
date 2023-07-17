@@ -1,15 +1,15 @@
-import { classCatchBuilder } from "@nodeeweb/core/utils/catchAsync";
-import { serviceOnError } from "../common/service";
-import { MiddleWare, Req } from "@nodeeweb/core/types/global";
-import store from "@nodeeweb/core/store";
-import { show, submitAction } from "../common/mustImplement";
-import { SortValues, isObjectIdOrHexString } from "mongoose";
-import { CRUD_DEFAULT_REQ_KEY } from "@nodeeweb/core/src/constants/String";
+import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
+import { serviceOnError } from '../common/service';
+import { MiddleWare, Req } from '@nodeeweb/core/types/global';
+import store from '@nodeeweb/core/store';
+import { show, submitAction } from '../common/mustImplement';
+import { SortValues, isObjectIdOrHexString } from 'mongoose';
+import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
 
 export default class Service {
   static getAll: MiddleWare = async (req, res) => {
-    const Product = store.db.model("product");
-    if (req.headers.response !== "json") {
+    const Product = store.db.model('product');
+    if (req.headers.response !== 'json') {
       return show(req, res);
     }
     const sort: { [key: string]: SortValues } = { in_stock: -1, updatedAt: -1 };
@@ -18,30 +18,30 @@ export default class Service {
     if (req.params.offset) {
       offset = parseInt(req.params.offset);
     }
-    let fields: any = "";
+    let fields: any = '';
     if (req.headers && req.headers.fields) {
       fields = req.headers.fields;
     }
     let search = {};
     if (req.params.search) {
-      search["title." + req.headers.lan] = {
+      search['title.' + req.headers.lan] = {
         $exists: true,
         $regex: req.params.search,
-        $options: "i",
+        $options: 'i',
       };
     }
     if (req.query.search) {
-      search["title." + req.headers.lan] = {
+      search['title.' + req.headers.lan] = {
         $exists: true,
         $regex: req.query.search,
-        $options: "i",
+        $options: 'i',
       };
     }
     if (req.query.Search) {
-      search["title." + req.headers.lan] = {
+      search['title.' + req.headers.lan] = {
         $exists: true,
         $regex: req.query.Search,
-        $options: "i",
+        $options: 'i',
       };
     }
     if (req.query && req.query.status) {
@@ -51,7 +51,7 @@ export default class Service {
 
     tt.forEach((item) => {
       if (Product.schema.paths[item]) {
-        const split = String(req.query[item]).split(",");
+        const split = String(req.query[item]).split(',');
         if (store.db.isValidObjectId(split[0])) {
           search[item] = {
             $in: split,
@@ -59,7 +59,7 @@ export default class Service {
         }
       }
     });
-    let thef: any = "";
+    let thef: any = '';
     function isStringified(jsonValue: any) {
       try {
         return JSON.parse(jsonValue);
@@ -70,58 +70,58 @@ export default class Service {
 
     if (req.query.filter) {
       const json = isStringified(req.query.filter);
-      if (typeof json == "object") {
+      if (typeof json == 'object') {
         thef = json;
         if (thef.search) {
-          thef["title." + req.headers.lan] = {
+          thef['title.' + req.headers.lan] = {
             $exists: true,
             $regex: thef.search,
-            $options: "i",
+            $options: 'i',
           };
           delete thef.search;
         }
       } else {
-        console.log("string is not a valid json");
+        console.log('string is not a valid json');
       }
     }
-    if (thef && thef != "") search = thef;
+    if (thef && thef != '') search = thef;
     let q: any;
-    if (search["productCategory.slug"]) {
-      const ProductCategory = store.db.model("ProductCategory");
+    if (search['productCategory.slug']) {
+      const ProductCategory = store.db.model('ProductCategory');
       const productcategory = await ProductCategory.findOne({
-        slug: search["productCategory.slug"],
+        slug: search['productCategory.slug'],
       });
       if (!productcategory) return res.json([]);
 
       if (productcategory._id) {
         const ss = { productCategory: productcategory._id };
         if (thef.device) {
-          ss["attributes.values"] = thef.device;
+          ss['attributes.values'] = thef.device;
         }
         if (thef.brand) {
-          ss["attributes.values"] = thef.brand;
+          ss['attributes.values'] = thef.brand;
         }
         const products = await Product.find(ss)
-          .populate("productCategory", "_id slug")
+          .populate('productCategory', '_id slug')
           .skip(offset)
           .sort(sort)
           .limit(parseInt(req.params.limit));
 
         const count = await Product.countDocuments(ss);
-        res.setHeader("X-Total-Count", count);
+        res.setHeader('X-Total-Count', count);
         return res.json(products);
       }
     } else {
-      if (!search["status"]) search["status"] = "published";
+      if (!search['status']) search['status'] = 'published';
 
       const products = await Product.find(search, fields)
-        .populate("productCategory", "_id slug")
+        .populate('productCategory', '_id slug')
         .skip(offset)
         .sort(sort)
         .limit(parseInt(req.params.limit));
 
       const count = await Product.countDocuments(search);
-      res.setHeader("X-Total-Count", count);
+      res.setHeader('X-Total-Count', count);
       return res.json(products);
     }
   };
@@ -131,16 +131,16 @@ export default class Service {
       offset = parseInt(req.params.offset);
     }
     const searchf = {};
-    searchf["title.fa"] = {
+    searchf['title.fa'] = {
       $exists: true,
     };
-    const Product = store.db.model("Product");
-    const Settings = store.db.model("Settings");
+    const Product = store.db.model('Product');
+    const Settings = store.db.model('Settings');
 
-    const setting = await Settings.findOne({}, "tax taxAmount");
+    const setting = await Settings.findOne({}, 'tax taxAmount');
     const products = await Product.find(
       {},
-      "_id title price type salePrice in_stock combinations firstCategory secondCategory thirdCategory slug"
+      '_id title price type salePrice in_stock combinations firstCategory secondCategory thirdCategory slug'
     )
       .skip(offset)
       .sort({
@@ -170,7 +170,7 @@ export default class Service {
       let last_price: any = 0;
       let last_sale_price: any = 0;
 
-      if (c.combinations && c.type == "variable") {
+      if (c.combinations && c.type == 'variable') {
         c.combinations.forEach((comb, cxt) => {
           if (comb.price && comb.price != null && parseInt(comb.price) != 0) {
             price_array.push(parseInt(comb.price));
@@ -192,7 +192,7 @@ export default class Service {
           price_stock.push(comb.in_stock);
         });
       }
-      if (c.type == "normal") {
+      if (c.type == 'normal') {
         price_array = [];
         sale_array = [];
         price_stock = [];
@@ -224,7 +224,7 @@ export default class Service {
         last_sale_price = tem;
       }
 
-      if (c.type == "normal") {
+      if (c.type == 'normal') {
         price_array = [];
         sale_array = [];
         price_stock = [];
@@ -234,7 +234,7 @@ export default class Service {
         if (c.price && c.price != null) price_array.push(c.price);
       }
 
-      let cat_inLink = "";
+      let cat_inLink = '';
       if (c.firstCategory && c.firstCategory.slug)
         cat_inLink = c.firstCategory.slug;
       if (c.secondCategory && c.secondCategory.slug)
@@ -245,40 +245,40 @@ export default class Service {
       if (setting && setting.tax && setting.taxAmount) {
         if (last_price) {
           const n = (parseInt(setting.taxAmount) * last_price) / 100;
-          last_price = last_price + parseInt(n + "");
+          last_price = last_price + parseInt(n + '');
         }
 
         if (last_sale_price) {
           const x = (parseInt(setting.taxAmount) * last_sale_price) / 100;
-          last_sale_price = last_sale_price + parseInt(x + "");
+          last_sale_price = last_sale_price + parseInt(x + '');
         }
       }
       modifedProducts.push({
         product_id: c._id,
-        name: c.title && c.title.fa ? c.title.fa : "",
+        name: c.title && c.title.fa ? c.title.fa : '',
 
-        page_url: process.env.BASE_URL + "/product/" + c._id + "/" + c.slug,
+        page_url: process.env.BASE_URL + '/product/' + c._id + '/' + c.slug,
         price: last_price,
         old_price: last_sale_price,
-        availability: price_stock.indexOf(true) >= 0 ? "instock" : "outofstock",
+        availability: price_stock.indexOf(true) >= 0 ? 'instock' : 'outofstock',
       });
     });
     return res.json(modifedProducts);
   };
   static getOneFilterParser = (req: Req) => {
     const obj = {};
-    if (isObjectIdOrHexString(req.params.id)) obj["_id"] = req.params.id;
-    else obj["slug"] = req.params.id;
+    if (isObjectIdOrHexString(req.params.id)) obj['_id'] = req.params.id;
+    else obj['slug'] = req.params.id;
     return obj;
   };
   static getOneAfter: MiddleWare = async (req, res) => {
-    const Product = store.db.model("product");
+    const Product = store.db.model('product');
     const product = req[CRUD_DEFAULT_REQ_KEY]?._doc;
 
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: "error!",
+        message: 'error!',
       });
     }
 
@@ -324,13 +324,13 @@ export default class Service {
       req.body = {};
     }
     if (!req.body.type) {
-      req.body.type = "normal";
+      req.body.type = 'normal';
     }
     if (req.body && req.body.slug) {
-      req.body.slug = req.body.slug.replace(/\s+/g, "-").toLowerCase();
+      req.body.slug = req.body.slug.replace(/\s+/g, '-').toLowerCase();
     }
 
-    if (req.body.type == "variable") {
+    if (req.body.type == 'variable') {
       req.body.in_stock = false;
       if (req.body.combinations) {
         req.body.combinations.forEach((comb) => {
@@ -340,7 +340,7 @@ export default class Service {
         });
       }
     }
-    if (req.body.type == "normal") {
+    if (req.body.type == 'normal') {
       delete req.body.combinations;
     }
     return req.body;
@@ -351,8 +351,8 @@ export default class Service {
     delete req.body.views;
     const action = {
       user: req.user._id,
-      title: "create product " + product._id,
-      action: "create-product",
+      title: 'create product ' + product._id,
+      action: 'create-product',
       data: product,
       history: req.body,
       product: product._id,
@@ -366,12 +366,12 @@ export default class Service {
       req.body = {};
     }
     if (!req.body.type) {
-      req.body.type = "normal";
+      req.body.type = 'normal';
     }
     if (req.body.slug) {
-      req.body.slug = req.body.slug.replace(/\s+/g, "-").toLowerCase();
+      req.body.slug = req.body.slug.replace(/\s+/g, '-').toLowerCase();
     }
-    if (req.body.type == "variable") {
+    if (req.body.type == 'variable') {
       req.body.in_stock = false;
       if (req.body.combinations) {
         req.body.combinations.forEach((comb) => {
@@ -381,15 +381,15 @@ export default class Service {
         });
       }
     }
-    if (req.body.type == "normal") {
+    if (req.body.type == 'normal') {
       delete req.body.options;
       delete req.body.combinations;
     }
     if (req.body.like) {
       delete req.body.like;
     }
-    if (!req.body.status || req.body.status == "") {
-      req.body.status = "processings";
+    if (!req.body.status || req.body.status == '') {
+      req.body.status = 'processings';
     }
 
     return req.body;
@@ -400,8 +400,8 @@ export default class Service {
     delete req.body.views;
     const action = {
       user: req.user._id,
-      title: "edit product " + product._id,
-      action: "edit-product",
+      title: 'edit product ' + product._id,
+      action: 'edit-product',
       data: product,
       history: req.body,
       product: product._id,
@@ -413,25 +413,25 @@ export default class Service {
     const product = req[CRUD_DEFAULT_REQ_KEY];
     const action = {
       user: req.user._id,
-      title: "delete product " + product._id,
-      action: "delete-product",
+      title: 'delete product ' + product._id,
+      action: 'delete-product',
       history: product,
       product: product._id,
     };
     submitAction(action);
     return res.status(204).json({
       success: true,
-      message: "Deleted!",
+      message: 'Deleted!',
     });
   };
 
   static rewriteProducts: MiddleWare = async (req, res) => {
-    return res.status(500).send("not implement yet!");
+    return res.status(500).send('not implement yet!');
   };
   static rewriteProductsImages: MiddleWare = async (req, res) => {
-    return res.status(500).send("not implement yet!");
+    return res.status(500).send('not implement yet!');
   };
-  static onError = serviceOnError("Product");
+  static onError = serviceOnError('Product');
 }
 
 classCatchBuilder(Service);

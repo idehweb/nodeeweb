@@ -1,5 +1,5 @@
-import { join } from "path";
-import * as fs from "fs";
+import { join } from 'path';
+import * as fs from 'fs';
 
 export function wait(sec: number) {
   return new Promise((resolve) => setTimeout(resolve, sec * 1000));
@@ -23,7 +23,7 @@ export function axiosError2String(error: any) {
       stack: error.stack,
     },
     null,
-    "  "
+    '  '
   );
 }
 
@@ -41,5 +41,5 @@ export function isExistsSync(path: string) {
 }
 
 export function isAsync(fn: Function) {
-  return fn["constructor"].name === "AsyncFunction";
+  return fn['constructor'].name === 'AsyncFunction';
 }

@@ -1,4 +1,4 @@
-import { Logger } from "../src/handlers/log.handler";
+import { Logger } from '../src/handlers/log.handler';
 
 export type RegisterOptions = {
   from?: string;

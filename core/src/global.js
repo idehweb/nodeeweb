@@ -1,10 +1,10 @@
 // console.log('#global')
-import fs from "fs";
-import path from "path";
-import mongoose from "mongoose";
-import request from "./request.mjs";
-import "../prepare.mjs";
-import myConfig from "../config.mjs";
+import fs from 'fs';
+import path from 'path';
+import mongoose from 'mongoose';
+import request from './request.mjs';
+import '../prepare.mjs';
+import myConfig from '../config.mjs';
 // const rp from 'request';
 // const randtoken from 'rand-token';
 // import User from "#models/user";
@@ -18,24 +18,24 @@ var User = {};
 // import config from "#json/variables/config";
 var config = {
   setting: {
-    logo: "",
-    title: "",
-    siteName: "",
-    separator: "|",
-    FRONT_ROUTE: "",
-    SHOP_URL: "",
-    BASE_URL: "",
-    primaryColor: "",
-    secondaryColor: "",
+    logo: '',
+    title: '',
+    siteName: '',
+    separator: '|',
+    FRONT_ROUTE: '',
+    SHOP_URL: '',
+    BASE_URL: '',
+    primaryColor: '',
+    secondaryColor: '',
   },
 };
 // import randtoken from "rand-token";
 
 let version = process.env.VERSION_NUM;
-export const isSSR = typeof window === "undefined";
+export const isSSR = typeof window === 'undefined';
 
 let global = {
-  body: "",
+  body: '',
   ip: process.env.BASE_URL,
   domain: process.env.BASE_URL,
   capitalize: (str) => {
@@ -44,11 +44,11 @@ let global = {
   },
   updateThemeConfig: (props = {}, __dirname = path.resolve()) => {
     global
-      .theme("admin", { props }, null)
+      .theme('admin', { props }, null)
       .then((resp = {}) => {
         global.updateFile(
-          "./theme/site_setting/",
-          "config.js",
+          './theme/site_setting/',
+          'config.js',
           "window.BASE_URL='" +
             process.env.BASE_URL +
             "';\n" +
@@ -64,14 +64,14 @@ let global = {
             "window.defaultLanguage='" +
             process.env.defaultLanguage +
             "';\n" +
-            "window.theme=" +
+            'window.theme=' +
             JSON.stringify(resp) +
-            ";",
+            ';',
           __dirname
         );
         global.updateFile(
-          "./public_media/site_setting/",
-          "config.js",
+          './public_media/site_setting/',
+          'config.js',
           "window.BASE_URL='" +
             process.env.BASE_URL +
             "';\n" +
@@ -87,16 +87,16 @@ let global = {
             "window.defaultLanguage='" +
             process.env.defaultLanguage +
             "';\n" +
-            "window.theme=" +
+            'window.theme=' +
             JSON.stringify(resp) +
-            ";",
+            ';',
           __dirname
         );
       })
       .catch((e) => {
         global.updateFile(
-          "./theme/site_setting/",
-          "config.js",
+          './theme/site_setting/',
+          'config.js',
           "window.BASE_URL='" +
             process.env.BASE_URL +
             "';\n" +
@@ -115,8 +115,8 @@ let global = {
           __dirname
         );
         global.updateFile(
-          "./public_media/site_setting/",
-          "config.js",
+          './public_media/site_setting/',
+          'config.js',
           "window.BASE_URL='" +
             process.env.BASE_URL +
             "';\n" +
@@ -155,7 +155,7 @@ let global = {
             type: global.getTypeOfVariable(model.schema.obj[y]),
           });
         });
-        if (en.admin && typeof en.admin === "object") {
+        if (en.admin && typeof en.admin === 'object') {
           rules[identifire] = en.admin;
         } else {
           rules[identifire] = {};
@@ -197,17 +197,17 @@ let global = {
     });
     return components;
   },
-  theme: (mode = "admin", req, res, next) => {
+  theme: (mode = 'admin', req, res, next) => {
     // console.log('get theme settings... ', mode);
     // return;
     return new Promise(function (resolve, reject) {
-      let Settings = mongoose.model("Settings");
-      let Template = mongoose.model("Template");
-      let Page = mongoose.model("Page");
-      Settings.findOne({}, "currency tax taxAmount ", function (err, setting) {
+      let Settings = mongoose.model('Settings');
+      let Template = mongoose.model('Template');
+      let Page = mongoose.model('Page');
+      Settings.findOne({}, 'currency tax taxAmount ', function (err, setting) {
         // console.log('setting', setting)
-        Template.findOne({ type: "header" }, function (err, header) {
-          Template.findOne({ type: "footer" }, function (err, footer) {
+        Template.findOne({ type: 'header' }, function (err, header) {
+          Template.findOne({ type: 'footer' }, function (err, footer) {
             let routes = [];
             Page.find({}, function (err, pages) {
               if (pages)
@@ -216,8 +216,8 @@ let global = {
                     routes.push({
                       path: page.path,
                       exact: true,
-                      layout: "DefaultLayout",
-                      element: "DynamicPage",
+                      layout: 'DefaultLayout',
+                      element: 'DynamicPage',
                       elements: page.elements || [],
                     });
                 });
@@ -227,7 +227,7 @@ let global = {
               }
               // let headerMaxWidth='100%';
               // if()
-              let currency = "rial";
+              let currency = 'rial';
               if (setting && setting.currency) {
                 currency = setting.currency;
               }
@@ -243,7 +243,7 @@ let global = {
               let lastObj = {
                 sso: {
                   google: {
-                    client_id: myConfig.config.sso?.google?.["client-id"],
+                    client_id: myConfig.config.sso?.google?.['client-id'],
                   },
                 },
                 taxAmount: taxAmount,
@@ -251,88 +251,88 @@ let global = {
                 currency: currency,
                 header: {
                   maxWidth:
-                    header && header.maxWidth ? header.maxWidth : "100%",
+                    header && header.maxWidth ? header.maxWidth : '100%',
                   backgroundColor:
                     header && header.backgroundColor
                       ? header.backgroundColor
-                      : "",
-                  classes: header && header.classes ? header.classes : "",
-                  padding: header && header.padding ? header.padding : "",
+                      : '',
+                  classes: header && header.classes ? header.classes : '',
+                  padding: header && header.padding ? header.padding : '',
                   showInDesktop:
-                    header && header.showInDesktop ? header.showInDesktop : "",
+                    header && header.showInDesktop ? header.showInDesktop : '',
                   showInMobile:
-                    header && header.showInMobile ? header.showInMobile : "",
+                    header && header.showInMobile ? header.showInMobile : '',
                   elements: header ? header.elements : [],
                 },
-                body: [{ name: "MainContent" }],
+                body: [{ name: 'MainContent' }],
                 footer: {
                   maxWidth:
-                    footer && footer.maxWidth ? footer.maxWidth : "100%",
+                    footer && footer.maxWidth ? footer.maxWidth : '100%',
                   backgroundColor:
                     footer && footer.backgroundColor
                       ? footer.backgroundColor
-                      : "",
-                  classes: footer && footer.classes ? footer.classes : "",
-                  padding: footer && footer.padding ? footer.padding : "",
+                      : '',
+                  classes: footer && footer.classes ? footer.classes : '',
+                  padding: footer && footer.padding ? footer.padding : '',
                   elements: footer ? footer.elements : [],
                 },
                 routes: [
                   {
-                    path: "/",
+                    path: '/',
                     exact: true,
-                    layout: "DefaultLayout",
-                    element: "Home",
+                    layout: 'DefaultLayout',
+                    element: 'Home',
                   },
 
                   {
-                    path: "/chat",
+                    path: '/chat',
                     exact: true,
-                    layout: "Nohf",
-                    element: "Chat",
+                    layout: 'Nohf',
+                    element: 'Chat',
                   },
                   {
-                    path: "/transaction/:method",
+                    path: '/transaction/:method',
                     exact: true,
-                    layout: "Nohf",
-                    element: "Transaction",
+                    layout: 'Nohf',
+                    element: 'Transaction',
                   },
                   {
-                    path: "/transaction",
+                    path: '/transaction',
                     exact: true,
-                    layout: "Nohf",
-                    element: "Transaction",
+                    layout: 'Nohf',
+                    element: 'Transaction',
                   },
                   {
-                    path: "/admin",
+                    path: '/admin',
                     exact: true,
-                    layout: "Nohf",
-                    element: "Admin",
+                    layout: 'Nohf',
+                    element: 'Admin',
                   },
                   {
-                    path: "/admin/:model",
+                    path: '/admin/:model',
                     exact: true,
-                    layout: "Nohf",
-                    element: "Admin",
+                    layout: 'Nohf',
+                    element: 'Admin',
                   },
                   {
-                    path: "/admin/:model/:action",
+                    path: '/admin/:model/:action',
                     exact: true,
-                    layout: "Nohf",
-                    element: "Admin",
+                    layout: 'Nohf',
+                    element: 'Admin',
                   },
                   {
-                    path: "/admin/:model/:action/:_id",
+                    path: '/admin/:model/:action/:_id',
                     exact: true,
-                    layout: "Nohf",
-                    element: "Admin",
+                    layout: 'Nohf',
+                    element: 'Admin',
                   },
                   {
-                    path: "/a/:_entity/:_id/:_slug",
-                    method: "get",
-                    access: "customer_all",
+                    path: '/a/:_entity/:_id/:_slug',
+                    method: 'get',
+                    access: 'customer_all',
                     controller: (req, res, next) => {
                       console.log(
-                        "show front, go visit ",
+                        'show front, go visit ',
                         process.env.SHOP_URL
                       );
                       res.show();
@@ -342,12 +342,12 @@ let global = {
                 ],
                 components: global.builderComponents([], { props: req.props }),
               };
-              if (mode == "admin") {
+              if (mode == 'admin') {
                 let rules = {};
                 rules = global.rules(rules, { props: req.props });
                 // console.log('global.models',global.models)
-                lastObj["models"] = global.models();
-                lastObj["rules"] = JSON.parse(JSON.stringify(rules));
+                lastObj['models'] = global.models();
+                lastObj['rules'] = JSON.parse(JSON.stringify(rules));
               }
               if (res) return res.json(lastObj);
               else return resolve(lastObj);
@@ -358,9 +358,9 @@ let global = {
     });
   },
   submitAction: (obj) => {
-    console.log("==> submitAction for user", obj.user);
+    console.log('==> submitAction for user', obj.user);
     return new Promise(function (resolve, reject) {
-      let Action = mongoose.model("Action");
+      let Action = mongoose.model('Action');
 
       Action.create(obj, function (err, res) {
         if (err || !res) {
@@ -387,7 +387,7 @@ let global = {
     res = null,
     next = null
   ) => {
-    console.log("Fire events...", event);
+    console.log('Fire events...', event);
     let functions = [];
     props.entity.forEach((en, d) => {
       // console.log('en',en.name)
@@ -408,7 +408,7 @@ let global = {
         });
       }
     });
-    let Automation = mongoose.model("Automation");
+    let Automation = mongoose.model('Automation');
     Automation.find({ trigger: event }, function (err, automations) {
       if (err || !automations) {
         // console.log('return...')
@@ -430,8 +430,8 @@ let global = {
   resetSystem: () => {
     request(
       {
-        method: "post",
-        url: "http://rest.payamak-panel.com/api/SendSMS/SendSMS",
+        method: 'post',
+        url: 'http://rest.payamak-panel.com/api/SendSMS/SendSMS',
         data: {
           username: process.env.SMS_USERNAME,
         },
@@ -443,15 +443,15 @@ let global = {
     BASE_URL: process.env.BASE_URL,
     SHOP_URL: process.env.SHOP_URL,
     THEME_URL: process.env.THEME_URL,
-    FRONT_ROUTE: process.env.BASE_URL + "/customer",
+    FRONT_ROUTE: process.env.BASE_URL + '/customer',
     setting: {
-      separator: "|",
+      separator: '|',
       siteName: process.env.SITE_NAME,
     },
   },
   getSetting: (name) => {
     return new Promise(function (resolve, reject) {
-      let Settings = mongoose.model("Settings");
+      let Settings = mongoose.model('Settings');
 
       Settings.findOne({}, name, function (err, setting) {
         if (err || !setting) {
@@ -466,9 +466,9 @@ let global = {
   sendSms: function (
     to,
     text,
-    From = "50004000004",
+    From = '50004000004',
     customerId = null,
-    countryCode = "98",
+    countryCode = '98',
     findKey = false
   ) {
     return new Promise(function (resolve, reject) {
@@ -477,27 +477,27 @@ let global = {
       if (to.length < 12) {
         // console.log('to: ', to.toString(), to.toString().length);
         if (to.toString().length === 10) {
-          to = "98" + to.toString();
+          to = '98' + to.toString();
         }
       }
-      console.log("countryCode", countryCode);
+      console.log('countryCode', countryCode);
       if (findKey) {
-        let Settings = mongoose.model("Settings");
+        let Settings = mongoose.model('Settings');
 
         Settings.find({}, function (err, setting) {
           if (setting && setting[setting.length - 1]) {
             let smstext = setting[setting.length - 1];
             smstext = smstext[findKey];
-            if (typeof text == "object") {
+            if (typeof text == 'object') {
               text.forEach((tt) => {
                 // const reg = /((\%(.*)\%)|(%(.*)%))/;
-                console.log("%" + tt.key + "%");
-                smstext = smstext.replace("%" + tt.key + "%", tt.value);
+                console.log('%' + tt.key + '%');
+                smstext = smstext.replace('%' + tt.key + '%', tt.value);
               });
             }
             global.sendmessage(
               countryCode,
-              "50001060009809",
+              '50001060009809',
               to,
               smstext,
               resolve,
@@ -510,7 +510,7 @@ let global = {
         //50001060009809
         global.sendmessage(
           countryCode,
-          "50001060009809",
+          '50001060009809',
           to,
           text,
           resolve,
@@ -520,23 +520,23 @@ let global = {
     });
   },
   sendmessage: function (
-    countryCode = "98",
-    From = "300088103373",
+    countryCode = '98',
+    From = '300088103373',
     to,
     text,
     resolve,
     reject
   ) {
-    if (countryCode === "98") {
+    if (countryCode === '98') {
       // From = '50004000004';
-      console.log("\n\n\n\n\n\nsend sms for Iran\n");
-      console.log("process.env.SMS_USERNAME:", process.env.SMS_USERNAME);
-      console.log("process.env.SMS_PASSWORD:", process.env.SMS_PASSWORD);
-      console.log("to:", to);
-      console.log("From", From);
-      console.log("text", text);
-      console.log("\n\n\n\n\n");
-      let Notification = mongoose.model("Notification");
+      console.log('\n\n\n\n\n\nsend sms for Iran\n');
+      console.log('process.env.SMS_USERNAME:', process.env.SMS_USERNAME);
+      console.log('process.env.SMS_PASSWORD:', process.env.SMS_PASSWORD);
+      console.log('to:', to);
+      console.log('From', From);
+      console.log('text', text);
+      console.log('\n\n\n\n\n');
+      let Notification = mongoose.model('Notification');
 
       Notification.create({
         message: text,
@@ -546,8 +546,8 @@ let global = {
         // console.log("sss", sms);
 
         let options = {
-          method: "post",
-          url: "http://rest.payamak-panel.com/api/SendSMS/SendSMS",
+          method: 'post',
+          url: 'http://rest.payamak-panel.com/api/SendSMS/SendSMS',
           data: {
             username: process.env.SMS_USERNAME,
             password: process.env.SMS_PASSWORD,
@@ -555,7 +555,7 @@ let global = {
             //  from: '300088103373',
 
             to: to,
-            isflash: "false",
+            isflash: 'false',
             text: text,
           },
           // json: true // Automatically stringifies the body to JSON
@@ -565,29 +565,29 @@ let global = {
         //     .then(function (parsedBody) {
         request(options, function (error, response, parsedBody) {
           console.log(
-            "parsedBody of sending sms to melli payamak:",
+            'parsedBody of sending sms to melli payamak:',
             parsedBody,
             to,
             text
           );
           console.log(
-            "melli payamak:",
+            'melli payamak:',
             parsedBody.StrRetStatus,
             parsedBody.RetStatus
           );
-          if (parsedBody.StrRetStatus == "Ok" && parsedBody.RetStatus == 1) {
+          if (parsedBody.StrRetStatus == 'Ok' && parsedBody.RetStatus == 1) {
             // Notification.editByAdmin(sms._id, {status: "sent"});
           }
           return resolve({
             success: true,
-            message: "کد برای شما ارسال شد!",
+            message: 'کد برای شما ارسال شد!',
           });
         }).catch(function (err) {
-          console.log("err global sms:", err);
+          console.log('err global sms:', err);
           return reject({
             success: true,
             err: err,
-            message: "مشکل در ارسال اس ام اس!",
+            message: 'مشکل در ارسال اس ام اس!',
           });
         });
       });
@@ -595,14 +595,14 @@ let global = {
       reject({});
     }
   },
-  publishToTelegram: function (obj, chname = "channelname") {
+  publishToTelegram: function (obj, chname = 'channelname') {
     return new Promise(function (resolve, reject) {
-      let u = encodeURI("https://idehweb.com/telegram/index.php");
+      let u = encodeURI('https://idehweb.com/telegram/index.php');
       // if (chname != "arvandguarantee_shop") {
       //   u += "?chname=@" + chname;
       // }
       let options = {
-        method: "POST",
+        method: 'POST',
         url: u,
         body: obj,
         json: true, // Automatically stringifies the body to JSON
@@ -657,21 +657,21 @@ let global = {
   sendNotif: function (title, body, pg) {
     return new Promise(function (resolve, reject) {
       let options = {
-        method: "POST",
-        url: "https://fcm.googleapis.com/fcm/send",
+        method: 'POST',
+        url: 'https://fcm.googleapis.com/fcm/send',
         body: {
           notification: {
             title: title,
             body: body,
-            click_action: "",
-            icon: "",
+            click_action: '',
+            icon: '',
           },
-          priority: "high",
-          to: "/topics/all",
+          priority: 'high',
+          to: '/topics/all',
         },
         headers: {
-          "Content-Type": "application/json",
-          Authorization: "",
+          'Content-Type': 'application/json',
+          Authorization: '',
         },
         json: true, // Automatically stringifies the body to JSON
       };
@@ -682,21 +682,21 @@ let global = {
         // console.log('parsedBody:', parsedBody, title, body);
         resolve({
           success: true,
-          message: "نوتیف شما ارسال شد!",
+          message: 'نوتیف شما ارسال شد!',
           parsedBody: parsedBody,
         });
       }).catch(function (err) {
         //  console.log('err:', err);
         reject({
           success: true,
-          message: "مشکل در ارسال نوتیف!",
+          message: 'مشکل در ارسال نوتیف!',
         });
       });
     });
   },
   generateUnid: function (arr, userIp) {
-    let abc = "abcdefghijklmnopqrstuvwxyz1234567890".split("");
-    var token = "";
+    let abc = 'abcdefghijklmnopqrstuvwxyz1234567890'.split('');
+    var token = '';
     for (let i = 0; i < 32; i++) {
       token += abc[Math.floor(Math.random() * abc.length)];
     }
@@ -722,7 +722,7 @@ let global = {
   },
   checkSiteStatus: function () {
     return new Promise(function (resolve, reject) {
-      let Settings = mongoose.model("Settings");
+      let Settings = mongoose.model('Settings');
 
       Settings.find(
         {},
@@ -737,7 +737,7 @@ let global = {
             // console.log('==> authenticateAdmin() got error');
             reject({
               success: false,
-              message: "something wrong!",
+              message: 'something wrong!',
             });
           }
           // console.log('setting', setting);
@@ -755,7 +755,7 @@ let global = {
           ) {
             reject({
               success: false,
-              message: setting.siteActiveMessage || "",
+              message: setting.siteActiveMessage || '',
               activeCategory: setting.activeCategory,
             });
           } else {
@@ -773,7 +773,7 @@ let global = {
         {
           token: token,
         },
-        "username , _id , active",
+        'username , _id , active',
         function (err, post) {
           if (err) {
             // console.log('==> authenticateAdmin() got error');
@@ -783,14 +783,14 @@ let global = {
             if (post) {
               resolve({
                 success: true,
-                message: "Admin has access!",
+                message: 'Admin has access!',
                 user: post,
               });
             } else {
               reject({
                 success: false,
                 status: 401,
-                message: "Admin does not exist!",
+                message: 'Admin does not exist!',
               });
             }
           }
@@ -821,7 +821,7 @@ let global = {
     return new Promise(function (resolve, reject) {
       Customer.findOne(
         {
-          "tokens.token": token,
+          'tokens.token': token,
         },
         function (err, customer) {
           if (err || !customer) {
@@ -834,7 +834,7 @@ let global = {
 
           resolve({
             success: true,
-            message: "Customer has access!",
+            message: 'Customer has access!',
             customer: customer,
           });
 
@@ -864,100 +864,100 @@ let global = {
     }
   },
   city: function (s) {
-    let x = "";
+    let x = '';
     switch (s) {
       case 1:
-        x = "آذربایجان شرقی";
+        x = 'آذربایجان شرقی';
         break;
       case 2:
-        x = "آذربایجان غربی";
+        x = 'آذربایجان غربی';
         break;
       case 3:
-        x = "اردبیل";
+        x = 'اردبیل';
         break;
       case 4:
-        x = "اصفهان";
+        x = 'اصفهان';
         break;
       case 5:
-        x = "ایلام";
+        x = 'ایلام';
         break;
       case 6:
-        x = "بوشهر";
+        x = 'بوشهر';
         break;
       case 7:
-        x = "تهران";
+        x = 'تهران';
         break;
       case 8:
-        x = "چهارمحال و بختیاری";
+        x = 'چهارمحال و بختیاری';
         break;
       case 9:
-        x = "خراسان جنوبی";
+        x = 'خراسان جنوبی';
         break;
       case 10:
-        x = "خراسان رضوی";
+        x = 'خراسان رضوی';
         break;
       case 11:
-        x = "خراسان شمالی";
+        x = 'خراسان شمالی';
         break;
       case 12:
-        x = "خوزستان";
+        x = 'خوزستان';
         break;
       case 13:
-        x = "زنجان";
+        x = 'زنجان';
         break;
       case 14:
-        x = "سمنان";
+        x = 'سمنان';
         break;
       case 15:
-        x = "سیستان و بلوچستان";
+        x = 'سیستان و بلوچستان';
         break;
       case 16:
-        x = "فارس";
+        x = 'فارس';
         break;
       case 17:
-        x = "قزوین";
+        x = 'قزوین';
         break;
       case 18:
-        x = "قم";
+        x = 'قم';
         break;
       case 19:
-        x = "کردستان";
+        x = 'کردستان';
         break;
       case 20:
-        x = "کرمان";
+        x = 'کرمان';
         break;
       case 21:
-        x = "کرمانشاه";
+        x = 'کرمانشاه';
         break;
       case 22:
-        x = "البرز";
+        x = 'البرز';
         break;
       case 23:
-        x = "گلستان";
+        x = 'گلستان';
         break;
       case 24:
-        x = "گیلان";
+        x = 'گیلان';
         break;
       case 25:
-        x = "لرستان";
+        x = 'لرستان';
         break;
       case 26:
-        x = "مازندران";
+        x = 'مازندران';
         break;
       case 27:
-        x = "مرکزی";
+        x = 'مرکزی';
         break;
       case 28:
-        x = "هرمزگان";
+        x = 'هرمزگان';
         break;
       case 29:
-        x = "همدان";
+        x = 'همدان';
         break;
       case 30:
-        x = "یزد";
+        x = 'یزد';
         break;
       case 31:
-        x = "کهگیلویه و بویراحمد";
+        x = 'کهگیلویه و بویراحمد';
         break;
     }
     return x;
@@ -970,7 +970,7 @@ let global = {
     let h = today.getHours();
     let m = today.getMinutes();
     let s = today.getSeconds();
-    return y + "-" + mo + "-" + d + "-" + h + "-" + m + "-" + s;
+    return y + '-' + mo + '-' + d + '-' + h + '-' + m + '-' + s;
   },
   updateFile: function (thePath, file_name, data, __dirname = path.resolve()) {
     // const __dirname = path.resolve();
@@ -978,11 +978,11 @@ let global = {
 
     try {
       // console.log('reading file:', filePath)
-      fs.promises.writeFile(filePath, data, "utf8");
+      fs.promises.writeFile(filePath, data, 'utf8');
       // console.log("\ndata is written successfully in the file\n" +
       //     "filePath: " + filePath + " " + file_name);
     } catch (err) {
-      console.error("not able to write data in the file ", err);
+      console.error('not able to write data in the file ', err);
     }
   },
   authenticateCustomer: function (_id, token) {
@@ -991,7 +991,7 @@ let global = {
       Customer.findOne(
         {
           _id: _id,
-          "tokens.token": token,
+          'tokens.token': token,
         },
         function (err, post) {
           if (err) {
@@ -1002,7 +1002,7 @@ let global = {
             if (post) {
               resolve({
                 success: true,
-                message: "Customer has access!",
+                message: 'Customer has access!',
                 user_id: post._id,
                 _id: post._id,
               });
@@ -1010,7 +1010,7 @@ let global = {
               reject({
                 success: false,
                 status: 401,
-                message: "Customer does not exist!",
+                message: 'Customer does not exist!',
               });
             }
           }

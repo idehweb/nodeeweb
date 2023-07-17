@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import bcrypt from "bcrypt";
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 
 const schema = new mongoose.Schema(
   {
@@ -28,22 +28,22 @@ const schema = new mongoose.Schema(
     internationalCode: String,
     sex: String,
     extra: { type: String },
-    source: { type: String, default: "WEBSITE" },
+    source: { type: String, default: 'WEBSITE' },
     bankData: {},
     data: {},
     type: {
       type: String,
       required: false,
-      default: "user",
+      default: 'user',
     },
     contacts: [
-      { _id: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" } },
+      { _id: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' } },
     ],
     wishlist: [
-      { _id: { type: mongoose.Schema.Types.ObjectId, ref: "Product" } },
+      { _id: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' } },
     ],
     customerGroup: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "CustomerGroup" },
+      { type: mongoose.Schema.Types.ObjectId, ref: 'CustomerGroup' },
     ],
     password: String,
     age: { type: Number },
@@ -67,7 +67,7 @@ const schema = new mongoose.Schema(
         createdAt: { type: Date, default: Date.now },
         description: String,
         status: String,
-        user: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
       },
     ],
     photos: [
@@ -76,13 +76,13 @@ const schema = new mongoose.Schema(
         url: String,
       },
     ],
-    role: { type: String, default: "user" },
+    role: { type: String, default: 'user' },
     address: [],
     companyName: String,
   },
   { timestamps: true }
 );
-schema.pre("save", async function (next) {
+schema.pre('save', async function (next) {
   const user = this;
   if (!user.password) return next();
 
@@ -90,6 +90,6 @@ schema.pre("save", async function (next) {
   return next();
 });
 
-schema.index({ _id: 1, active: 1 }, { name: "auth" });
+schema.index({ _id: 1, active: 1 }, { name: 'auth' });
 
 export default schema;
