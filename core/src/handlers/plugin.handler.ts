@@ -39,3 +39,12 @@ export function registerPlugin(
     )
   );
 }
+
+export function unregisterPlugin(type: PluginType, from?: string) {
+  const existBefore = store.plugins.delete(type);
+  if (!existBefore) return;
+
+  logger.log(
+    color('Yellow', `## ${from ? `${from} ` : ''}Unregister ${type} Plugin ##`)
+  );
+}

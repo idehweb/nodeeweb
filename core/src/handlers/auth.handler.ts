@@ -222,3 +222,16 @@ export function registerAuthStrategy(strategy: AuthStrategy, from?: string) {
     )
   );
 }
+
+export function unregisterAuthStrategy(id: string, from?: string) {
+  const existBefore = store.strategies.delete(id);
+  if (!existBefore) return;
+  logger.log(
+    color(
+      'Red',
+      `## ${from ? `${from} ` : ''}Unregister ${_.capitalize(
+        id
+      )} AuthStrategy ##`
+    )
+  );
+}
