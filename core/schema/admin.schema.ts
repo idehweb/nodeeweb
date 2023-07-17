@@ -6,9 +6,9 @@ export interface IAdminMethods {
 }
 
 export interface IAdmin {
-  email: string;
-  username: string;
-  nickname: string;
+  email?: string;
+  username?: string;
+  nickname?: string;
   password?: string;
   role: string;
   active: boolean;
@@ -24,29 +24,31 @@ const schema = new mongoose.Schema(
     email: {
       type: String,
       unique: true,
-      required: true,
+      sparse: true,
       trim: true,
     },
     username: {
       type: String,
       unique: true,
-      required: true,
+      sparse: true,
+      trim: true,
+    },
+    phone: {
+      type: String,
+      unique: true,
+      sparse: true,
       trim: true,
     },
     nickname: {
       type: String,
-      required: true,
     },
     password: {
       type: String,
-      required: true,
       select: false,
     },
     passwordChangeAt: {
       type: Date,
-      required: true,
       select: false,
-      default: Date.now,
     },
     role: { type: String, default: 'user' },
     active: { type: Boolean, default: true },

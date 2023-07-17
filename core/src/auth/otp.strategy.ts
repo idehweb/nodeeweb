@@ -28,8 +28,10 @@ export enum SmsSendType {
 export const OTP_STRATEGY = 'otp';
 export class OtpStrategy extends AuthStrategy {
   strategyId = OTP_STRATEGY;
-  async findUser(req: Req, throwOnNotfound = true) {
-    const { phone } = req.body;
+  private async exportUser(req: Req, throwOnNotfound = true) {
+    if (req.user) return req.user;
+
+    const { phone } = req.body.user;
     const model = store.db.model(req.modelName);
     const user: UserDocument = await model.findOne({ phone });
     if (!user && throwOnNotfound)
@@ -37,10 +39,12 @@ export class OtpStrategy extends AuthStrategy {
         `did'nt find any user with ${phone} number, please signup`
       );
     if (user && !user.active) throw new ForbiddenError('inactive user');
+
+    req.user = user;
     return user;
   }
 
-  async verify(phone: string, code: string) {
+  private async verify(phone: string, code: string) {
     const otpModel = store.db.model('otp');
 
     const codeDoc = await otpModel.findOneAndUpdate(
@@ -55,14 +59,15 @@ export class OtpStrategy extends AuthStrategy {
     if (!codeDoc) throw new UnauthorizedError();
     return codeDoc;
   }
-  async codeRevert(codeDoc: Document) {
+  private async codeRevert(codeDoc: Document) {
     await codeDoc.updateOne({ ...codeDoc.toObject() }, { timestamps: false });
   }
 
-  async detect(req: Req, res: Res, next: NextFunction) {
-    const user = await this.findUser(req, false);
-    const phone = user?.phone ?? req.body.phone,
-      userExists = Boolean(user);
+  private async sendCode(req: Req, res: Res) {
+    // generate and send code
+
+    const phone = req.user?.phone ?? req.body.user?.phone,
+      userExists = Boolean(req.user);
 
     // send code
     const smsPlugin = store.plugins.get(PluginType.SMS) as SMSPluginContent;
@@ -131,11 +136,25 @@ export class OtpStrategy extends AuthStrategy {
       },
     });
   }
+
+  async detect(req: Req, res: Res, next: NextFunction) {
+    const { login, signup } = req.body;
+
+    // export user
+    await this.exportUser(req, !signup && login);
+
+    if (login || signup) {
+      // progress
+      return await this.sendCode(req, res);
+    }
+
+    return res.json({ data: { userExists: Boolean(req.user) } });
+  }
   async login(req: Req, res: Res) {
-    const user = await this.findUser(req);
+    const user = await this.exportUser(req);
 
     // verify code
-    await this.verify(user.phone, req.body.code);
+    await this.verify(user.phone, req.body.user.code);
 
     // token
     const token = signToken(user.id);
@@ -150,14 +169,14 @@ export class OtpStrategy extends AuthStrategy {
   }
 
   async signup(req: Req, res: Res, next: NextFunction) {
-    const codeDoc = await this.verify(req.body.phone, req.body.code);
+    const codeDoc = await this.verify(req.body.user.phone, req.body.user.code);
 
-    delete req.body.code;
+    delete req.body.user.code;
 
     // create
     const userModel = store.db.model(req.modelName);
     try {
-      const user = await userModel.create(req.body);
+      const user = await userModel.create(req.body.user);
       const token = signToken(user.id);
       setToCookie(res, token, 'authToken');
 
