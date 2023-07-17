@@ -8,8 +8,11 @@ export function catchFn<F extends Function>(
 ) {
   return (async (...args: any[]) => {
     try {
-      if (isAsyncFunction(fn)) return await fn.call(self ?? this, ...args);
-      else return fn.call(self ?? this, ...args);
+      let result = fn.call(self ?? this, ...args);
+      while (result instanceof Promise) {
+        result = await result;
+      }
+      return result;
     } catch (err) {
       if (onError) {
         // logger.error('#CatchError', err);
@@ -30,9 +33,11 @@ export const catchMiddleware = <F extends MiddleWare>(
 ) => {
   const catchFn: MiddleWare = async (req, res, next) => {
     try {
-      if (isAsyncFunction(fn))
-        return await fn.call(self ?? this, req, res, next);
-      else return fn.call(self ?? this, req, res, next);
+      let result = fn.call(self ?? this, req, res, next);
+      while (result instanceof Promise) {
+        result = await result;
+      }
+      return result;
     } catch (err) {
       if (onError) {
         // logger.error('#CatchError', err);

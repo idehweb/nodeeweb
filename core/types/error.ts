@@ -17,6 +17,7 @@ export enum ErrorType {
   Forbidden = 'FORBIDDEN',
   Unauthorized = 'UNAUTHORIZED',
   NotImplement = 'NotImplement',
+  SMS = 'SMS',
 }
 
 export type ErrorPackageFn = {
@@ -50,8 +51,8 @@ export class ForbiddenError extends GeneralError {
   }
 }
 export class UnauthorizedError extends GeneralError {
-  constructor(message: string, additionType?: string) {
-    super(message, 401, ErrorType.Unauthorized, additionType);
+  constructor(message?: string, additionType?: string) {
+    super(message ?? 'unauthorized', 401, ErrorType.Unauthorized, additionType);
   }
 }
 
@@ -80,5 +81,23 @@ export class NotImplement extends GeneralError {
   isNotImplement = true;
   constructor(message?: string) {
     super(message ?? 'not implement yet', 500, ErrorType.NotImplement);
+  }
+}
+
+export class NotFound extends GeneralError {
+  isNotfound = true;
+  constructor(message?: string) {
+    super(message ?? 'no found', 404, ErrorType.Not_Found);
+  }
+}
+
+export class SendSMSError extends GeneralError {
+  isSMS = true;
+  constructor(message: string | boolean) {
+    super(
+      typeof message === 'string' ? message : 'send sms error',
+      500,
+      ErrorType.SMS
+    );
   }
 }

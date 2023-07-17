@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import path from 'path';
 import store from '../../store';
 import { expressLogger } from '../handlers/log.handler';
+import rateLimit from 'express-rate-limit';
 
 const dirname = path.resolve();
 
@@ -50,6 +51,16 @@ export function commonMiddleware(): (
 
   // logger
   mw.push(expressLogger);
+
+  // rate limit
+  const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  mw.push(limiter);
 
   mw.push(bodyParser.json({ limit: '10kb' }));
 

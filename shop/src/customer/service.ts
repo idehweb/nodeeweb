@@ -1,22 +1,21 @@
-import { CRUD_DEFAULT_REQ_KEY } from "@nodeeweb/core/src/constants/String";
-import store from "@nodeeweb/core/store";
-import { MiddleWare, Req, Res } from "@nodeeweb/core/types/global";
-import { classCatchBuilder } from "@nodeeweb/core/utils/catchAsync";
-import mongoose from "mongoose";
+import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
+import store from '@nodeeweb/core/store';
+import { MiddleWare, Req, Res } from '@nodeeweb/core/types/global';
+import mongoose from 'mongoose';
 
 export class Service {
   static getMe: MiddleWare = (req, res, next) => {
     const customer = req.user;
     const fields = [
-      "_id",
-      "email",
-      "nickname",
-      "firstName",
-      "lastName",
-      "data",
-      "phoneNumber",
-      "internationalCode",
-      "address",
+      '_id',
+      'email',
+      'nickname',
+      'firstName',
+      'lastName',
+      'data',
+      'phoneNumber',
+      'internationalCode',
+      'address',
     ];
     return res.status(200).json({
       customer: Object.fromEntries(fields.map((f) => [f, customer[f]])),
@@ -26,24 +25,24 @@ export class Service {
   static parseFilterForAllCustomer(req: Req) {
     let search = {};
     if (req.params.search) {
-      search["title." + req.headers.lan] = {
+      search['title.' + req.headers.lan] = {
         $exists: true,
         $regex: req.params.search,
-        $options: "i",
+        $options: 'i',
       };
     }
     if (req.query.search) {
-      search["title." + req.headers.lan] = {
+      search['title.' + req.headers.lan] = {
         $exists: true,
         $regex: req.query.search,
-        $options: "i",
+        $options: 'i',
       };
     }
     if (req.query.Search) {
-      search["title." + req.headers.lan] = {
+      search['title.' + req.headers.lan] = {
         $exists: true,
         $regex: req.query.Search,
-        $options: "i",
+        $options: 'i',
       };
     }
     if (req.query) {
@@ -60,23 +59,23 @@ export class Service {
       search = { $or: [] };
     }
     if (thef.firstName) {
-      search["$or"].push({
-        firstName: { $regex: thef.firstName, $options: "i" },
+      search['$or'].push({
+        firstName: { $regex: thef.firstName, $options: 'i' },
       });
     }
     if (thef.lastName) {
-      search["$or"].push({
-        lastName: { $regex: thef.lastName, $options: "i" },
+      search['$or'].push({
+        lastName: { $regex: thef.lastName, $options: 'i' },
       });
     }
     if (thef.phoneNumber) {
-      search["$or"].push({
-        phoneNumber: { $regex: thef.phoneNumber, $options: "i" },
+      search['$or'].push({
+        phoneNumber: { $regex: thef.phoneNumber, $options: 'i' },
       });
     }
     if (thef.internationalCode) {
-      search["$or"].push({
-        internationalCode: { $regex: thef.internationalCode, $options: "i" },
+      search['$or'].push({
+        internationalCode: { $regex: thef.internationalCode, $options: 'i' },
       });
     }
 
@@ -92,7 +91,7 @@ export class Service {
     );
 
     // aggregate
-    const orderCounts = await store.db.model("order").aggregate(
+    const orderCounts = await store.db.model('order').aggregate(
       [
         {
           $match: {
@@ -105,7 +104,7 @@ export class Service {
         },
         {
           $group: {
-            _id: "$customer",
+            _id: '$customer',
             count: { $sum: 1 },
           },
         },
@@ -122,7 +121,7 @@ export class Service {
   };
 
   static updateStatus: MiddleWare = async (req, res) => {
-    const customer = await store.db.model("customer").findByIdAndUpdate(
+    const customer = await store.db.model('customer').findByIdAndUpdate(
       req.params.id,
       {
         $push: {
@@ -141,15 +140,5 @@ export class Service {
       post: customer,
     });
   };
-
-  static onError(methodName: string, err: any, req: Req, res: Res) {
-    store.systemLogger.log(
-      `Customer Service ${methodName} Error: ${err.toString()}`
-    );
-    res.status(500).json({ message: err.toString(), error: err });
-  }
 }
-
-classCatchBuilder(Service);
-
 export default Service;

@@ -1,16 +1,18 @@
-import express from "express";
-import { commonMiddleware, headerMiddleware } from "./middleware";
-import handlePlugin from "../handlers/plugin.handler";
-import prepare from "./prepare";
-import { dbRegisterModels } from "./db";
-import store from "../../store";
-import { dbInit } from "./db";
-import { setErrorPackage } from "./error";
-import { registerDefaultControllers } from "./controller";
+import express from 'express';
+import { commonMiddleware, headerMiddleware } from './middleware';
+import handlePlugin from '../handlers/plugin.handler';
+import prepare from './prepare';
+import { dbRegisterModels } from './db';
+import store from '../../store';
+import { dbInit } from './db';
+import { setErrorPackage } from './error';
+import { registerDefaultControllers } from './controller';
+import { activeAuthControllers } from './auth';
+import registerDefaultPlugins from './plugin';
 
 const app = express();
 
-app.disable("x-powered-by");
+app.disable('x-powered-by');
 
 store.app = app;
 
@@ -37,10 +39,16 @@ export default async function buildApp() {
   });
 
   // plugins
-  await handlePlugin();
+  // await handlePlugin();
+
+  // auth controllers
+  activeAuthControllers();
 
   // default controller
   registerDefaultControllers();
+
+  // default plugins
+  registerDefaultPlugins();
 
   return app;
 }
