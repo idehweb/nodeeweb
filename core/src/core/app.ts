@@ -8,6 +8,7 @@ import { dbInit } from './db';
 import { setErrorPackage } from './error';
 import { registerDefaultControllers } from './controller';
 import { activeAuthControllers } from './auth';
+import registerDefaultPlugins from './plugin';
 
 const app = express();
 
@@ -38,13 +39,16 @@ export default async function buildApp() {
   });
 
   // plugins
-  await handlePlugin();
+  // await handlePlugin();
 
   // auth controllers
   activeAuthControllers();
 
   // default controller
   registerDefaultControllers();
+
+  // default plugins
+  registerDefaultPlugins();
 
   return app;
 }
