@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema(
   {
@@ -41,10 +41,10 @@ const schema = new mongoose.Schema(
     textColor: String,
     bgColor: String,
     footerBgColor: String,
-    activeCategory: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
+    activeCategory: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
     customerStatus: [],
     formStatus: [],
-    currency: { type: String, default: "Toman" },
+    currency: { type: String, default: 'Toman' },
     dollarPrice: Number,
     derhamPrice: Number,
     sms_welcome: {},

@@ -6,7 +6,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "module" : "CommonJS",
+    "module": "CommonJS",
     "strict": false,
     "allowJs": true,
     "rootDir": ".",
@@ -20,9 +20,9 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true,
-    "moduleResolution" : "Node",
-    "resolveJsonModule":true
+    "moduleResolution": "Node",
+    "resolveJsonModule": true
   },
   "include": ["**/*.ts", "**/*.js"],
-  "exclude": ["node_modules","**/node_modules/*","dist"]
+  "exclude": ["node_modules", "**/node_modules/*", "dist"]
 }

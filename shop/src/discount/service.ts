@@ -1,24 +1,24 @@
-import { classCatchBuilder } from "@nodeeweb/core/utils/catchAsync";
-import { serviceOnError } from "../common/service";
-import { MiddleWare } from "@nodeeweb/core/types/global";
-import store from "@nodeeweb/core/store";
+import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
+import { serviceOnError } from '../common/service';
+import { MiddleWare } from '@nodeeweb/core/types/global';
+import store from '@nodeeweb/core/store';
 
 class Service {
   static setDiscount: MiddleWare = async (req, res) => {
-    const Discount = store.db.model("discount");
+    const Discount = store.db.model('discount');
 
     const discount = await Discount.findOne({ slug: req.params.id });
     if (!discount)
       return res.status(404).json({
         success: false,
-        message: "did not find any discount!",
+        message: 'did not find any discount!',
         id: req.params.id,
       });
 
     if (discount.count < 1) {
       return res.status(403).json({
         success: false,
-        message: "discount is done!",
+        message: 'discount is done!',
       });
     }
     if (!discount.customer) {
@@ -33,13 +33,13 @@ class Service {
       if (isInArray && discount.customerLimit) {
         return res.status(403).json({
           success: false,
-          message: "you have used this discount once!",
+          message: 'you have used this discount once!',
         });
       }
     }
     return res.status(200).json(discount);
   };
-  static onError = serviceOnError("Discount");
+  static onError = serviceOnError('Discount');
 }
 
 classCatchBuilder(Service);

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 const schema = new mongoose.Schema(
   {
     active: { type: Boolean, default: true },
@@ -7,7 +7,7 @@ const schema = new mongoose.Schema(
     description: {},
     request: String,
     verify: String,
-    type: { type: String, default: "bank" },
+    type: { type: String, default: 'bank' },
     title: {},
     slug: {
       type: String,

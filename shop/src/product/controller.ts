@@ -1,35 +1,35 @@
 import {
   CRUD_DEFAULT_REQ_KEY,
   PUBLIC_ACCESS,
-} from "@nodeeweb/core/src/constants/String";
-import { ControllerAccess } from "@nodeeweb/core/types/controller";
-import { registerEntityCRUD } from "@nodeeweb/core/src/handlers/entity.handler";
-import { controllersBatchRegister } from "@nodeeweb/core/src/handlers/controller.handler";
-import Service from "./service";
-import { AuthUserAccess } from "@nodeeweb/core/src/handlers/auth.handler";
+} from '@nodeeweb/core/src/constants/String';
+import { ControllerAccess } from '@nodeeweb/core/types/controller';
+import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
+import { controllersBatchRegister } from '@nodeeweb/core/src/handlers/controller.handler';
+import Service from './service';
+import { AuthUserAccess } from '@nodeeweb/core/src/handlers/auth.handler';
 
 export default function registerController() {
-  const access: ControllerAccess = { modelName: "admin", role: PUBLIC_ACCESS };
+  const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
 
   // custom admin controllers
   controllersBatchRegister(
     [
       {
-        url: "/rewriteProducts",
-        method: "post",
+        url: '/rewriteProducts',
+        method: 'post',
         access,
         service: Service.rewriteProducts,
       },
       {
-        url: "/rewriteProductsImages",
-        method: "post",
+        url: '/rewriteProductsImages',
+        method: 'post',
         access,
         service: Service.rewriteProductsImages,
       },
     ],
     {
-      base_url: "/admin/product",
-      from: "ShopEntity",
+      base_url: '/admin/product',
+      from: 'ShopEntity',
     }
   );
 
@@ -37,22 +37,22 @@ export default function registerController() {
   controllersBatchRegister(
     [
       {
-        url: "/torob/:offset/:limit",
-        method: "get",
+        url: '/torob/:offset/:limit',
+        method: 'get',
         service: Service.torob,
       },
       {
-        url: "/?:offset/?:limit",
-        method: "get",
+        url: '/?:offset/?:limit',
+        method: 'get',
         service: Service.getAll,
       },
     ],
-    { base_url: "/product", from: "ShopEntity" }
+    { base_url: '/product', from: 'ShopEntity' }
   );
 
   // customer crud
   registerEntityCRUD(
-    "product",
+    'product',
     {
       getOne: {
         controller: {
@@ -66,12 +66,12 @@ export default function registerController() {
         },
       },
     },
-    { base_url: "/customer/product", from: "ShopEntity" }
+    { base_url: '/customer/product', from: 'ShopEntity' }
   );
 
   // admin crud
   registerEntityCRUD(
-    "product",
+    'product',
     {
       create: {
         controller: {
@@ -103,10 +103,10 @@ export default function registerController() {
         crud: {
           executeQuery: true,
           saveToReq: true,
-          update: { status: "trash" },
+          update: { status: 'trash' },
         },
       },
     },
-    { base_url: "/admin/product", from: "ShopEntity" }
+    { base_url: '/admin/product', from: 'ShopEntity' }
   );
 }

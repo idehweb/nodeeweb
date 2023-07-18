@@ -1,47 +1,47 @@
 import {
   CRUD_DEFAULT_REQ_KEY,
   PUBLIC_ACCESS,
-} from "@nodeeweb/core/src/constants/String";
-import { ControllerAccess } from "@nodeeweb/core/types/controller";
-import { registerEntityCRUD } from "@nodeeweb/core/src/handlers/entity.handler";
-import { controllerRegister } from "@nodeeweb/core/src/handlers/controller.handler";
-import Service from "./service";
+} from '@nodeeweb/core/src/constants/String';
+import { ControllerAccess } from '@nodeeweb/core/types/controller';
+import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
+import { controllerRegister } from '@nodeeweb/core/src/handlers/controller.handler';
+import Service from './service';
 
 export default function registerController() {
   const adminAccess: ControllerAccess = {
-    modelName: "admin",
+    modelName: 'admin',
     role: PUBLIC_ACCESS,
   };
   const customerAccess: ControllerAccess = {
-    modelName: "customer",
+    modelName: 'customer',
     role: PUBLIC_ACCESS,
   };
 
   // get me
   controllerRegister(
     {
-      method: "get",
+      method: 'get',
       service: Service.getMe,
-      url: "/getme",
+      url: '/getme',
       access: customerAccess,
     },
-    { base_url: "/customer/customer", from: "ShopEntity" }
+    { base_url: '/customer/customer', from: 'ShopEntity' }
   );
 
   // update status
   controllerRegister(
     {
-      method: "put",
+      method: 'put',
       service: Service.updateStatus,
-      url: "/status/:id",
+      url: '/status/:id',
       access: adminAccess,
     },
-    { base_url: "/admin/customer", from: "ShopEntity" }
+    { base_url: '/admin/customer', from: 'ShopEntity' }
   );
 
   // admin api : getAll
   registerEntityCRUD(
-    "customer",
+    'customer',
     {
       getAll: {
         controller: {
@@ -51,28 +51,28 @@ export default function registerController() {
         crud: {
           parseFilter: Service.parseFilterForAllCustomer,
           project:
-            "_id , firstName , lastName , internationalCode , active , source , email , phoneNumber , activationCode , credit , customerGroup  , createdAt , updatedAt , status",
+            '_id , firstName , lastName , internationalCode , active , source , email , phoneNumber , activationCode , credit , customerGroup  , createdAt , updatedAt , status',
           autoSetCount: true,
           saveToReq: true,
           executeQuery: true,
           paramFields: {
-            limit: "limit",
-            offset: "offset",
+            limit: 'limit',
+            offset: 'offset',
           },
         },
       },
     },
-    { base_url: "/admin/customer", from: "ShopEntity" }
+    { base_url: '/admin/customer', from: 'ShopEntity' }
   );
 
   // customer api : updateAddress
   registerEntityCRUD(
-    "customer",
+    'customer',
     {
       updateOne: {
         controller: {
           access: customerAccess,
-          url: "/updateAddress",
+          url: '/updateAddress',
         },
         crud: {
           executeQuery: true,
@@ -86,6 +86,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: "/customer/customer", from: "ShopEntity" }
+    { base_url: '/customer/customer', from: 'ShopEntity' }
   );
 }

@@ -1,18 +1,18 @@
-import { classCatchBuilder } from "@nodeeweb/core/utils/catchAsync";
-import { serviceOnError } from "../common/service";
-import { MiddleWare, Req } from "@nodeeweb/core/types/global";
-import { submitAction, updateThemeConfig } from "../common/mustImplement";
-import { CRUD_DEFAULT_REQ_KEY } from "@nodeeweb/core/src/constants/String";
-import store from "@nodeeweb/core/store";
+import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
+import { serviceOnError } from '../common/service';
+import { MiddleWare, Req } from '@nodeeweb/core/types/global';
+import { submitAction, updateThemeConfig } from '../common/mustImplement';
+import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
+import store from '@nodeeweb/core/store';
 
 export default class Service {
   static createAfter: MiddleWare = async (req, res) => {
     const menu = req[CRUD_DEFAULT_REQ_KEY];
-    const modelName = "Page";
+    const modelName = 'Page';
     const action = {
       user: req.user._id,
-      title: "create " + modelName + " " + menu._id,
-      action: "create-" + modelName,
+      title: 'create ' + modelName + ' ' + menu._id,
+      action: 'create-' + modelName,
       data: menu,
       history: req.body,
     };
@@ -23,11 +23,11 @@ export default class Service {
   };
   static updateAfter: MiddleWare = async (req, res) => {
     const menu = req[CRUD_DEFAULT_REQ_KEY];
-    const modelName = "Page";
+    const modelName = 'Page';
     const action = {
       user: req.user._id,
-      title: "edit " + modelName + " " + menu._id,
-      action: "edit-" + modelName,
+      title: 'edit ' + modelName + ' ' + menu._id,
+      action: 'edit-' + modelName,
       data: menu,
       history: req.body,
     };
@@ -40,30 +40,30 @@ export default class Service {
   static getOneFilterParser(req: Req) {
     const obj = {};
     if (store.db.isValidObjectId(req.params.id)) {
-      obj["_id"] = req.params.id;
+      obj['_id'] = req.params.id;
     } else {
-      obj["slug"] = req.params.id;
+      obj['slug'] = req.params.id;
     }
 
     return obj;
   }
   static getOneAfter: MiddleWare = (req, res) => {
     const menu = req[CRUD_DEFAULT_REQ_KEY];
-    if (menu.access && menu.access == "private") {
+    if (menu.access && menu.access == 'private') {
       if (!req.user) {
         return res.status(403).json({
           success: false,
           _id: menu && menu._id ? menu._id : null,
           slug: menu && menu.slug ? menu.slug : null,
-          access: "private",
-          message: "login please",
+          access: 'private',
+          message: 'login please',
         });
       }
     }
     return res.json(menu);
   };
 
-  static onError = serviceOnError("Page");
+  static onError = serviceOnError('Page');
 }
 
 classCatchBuilder(Service);

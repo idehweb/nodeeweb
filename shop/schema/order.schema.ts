@@ -1,24 +1,24 @@
-import mongoose from "mongoose";
-import crypto from "crypto";
+import mongoose from 'mongoose';
+import crypto from 'crypto';
 const lineItemSchema = new mongoose.Schema({
   product_name: {
-    type: "string",
+    type: 'string',
     required: true,
   },
   product_id: {
-    type: "string",
+    type: 'string',
     required: true,
   },
   price: {
-    type: "number",
+    type: 'number',
     required: true,
   },
   total_price: {
-    type: "number",
+    type: 'number',
     required: true,
   },
   quantity: {
-    type: "number",
+    type: 'number',
     required: true,
   },
 });
@@ -28,7 +28,7 @@ const schema = new mongoose.Schema(
     card: [
       {
         _id: String,
-        seller: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" },
+        seller: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
         price: Number,
         salePrice: Number,
         count: Number,
@@ -54,49 +54,49 @@ const schema = new mongoose.Schema(
     state: { type: Number, default: 0 },
     deliveryPrice: { type: Number, default: 0 },
     link: String,
-    status: { type: String, default: "processing" },
-    paymentStatus: { type: String, default: "notpaid" },
+    status: { type: String, default: 'processing' },
+    paymentStatus: { type: String, default: 'notpaid' },
 
     // kind: {type: String, default: 'post'},
-    transaction: [{ type: mongoose.Schema.Types.ObjectId, ref: "Transaction" }],
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" },
-    agent: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" },
+    transaction: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' }],
+    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
+    agent: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
 
     refunded: {
-      type: "Boolean",
+      type: 'Boolean',
       default: false,
     },
     order_id: {
-      type: "string",
-      default: crypto.randomBytes(64).toString("hex"),
+      type: 'string',
+      default: crypto.randomBytes(64).toString('hex'),
       // unique: true
     },
     amount: {
-      type: "number",
-      required: [true, "Amount must be specified"],
+      type: 'number',
+      required: [true, 'Amount must be specified'],
     },
     currency: {
-      type: "string",
-      default: "UZS",
+      type: 'string',
+      default: 'UZS',
     },
     created_at: {
-      type: "string",
+      type: 'string',
       default: Date.now(),
     },
     package: {
       type: [lineItemSchema],
-      required: [true, "Order must have a content"],
+      required: [true, 'Order must have a content'],
     },
     paid: {
-      type: "boolean",
+      type: 'boolean',
       default: false,
     },
     payment_id: {
-      type: "string",
-      default: crypto.randomBytes(64).toString("hex"),
+      type: 'string',
+      default: crypto.randomBytes(64).toString('hex'),
     },
     cancelled: {
-      type: "boolean",
+      type: 'boolean',
       default: false,
     },
   },

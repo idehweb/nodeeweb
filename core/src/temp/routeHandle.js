@@ -1,5 +1,5 @@
 // console.log("#f routeHandle");
-import path from "path";
+import path from 'path';
 // const __dirname = path.resolve();
 // const publicFolder = path.join(__dirname, "./public");
 
@@ -8,7 +8,7 @@ import {
   createPublicRoute,
   createRoute,
   returnDefaultModels,
-} from "../routes/index.mjs";
+} from '../routes/index.mjs';
 
 // const router = express.Router();
 
@@ -18,8 +18,8 @@ import {
 // createDefaultRoute();
 let routeHandle = (app, props = {}) => {
   if (props?.front?.routes?.[2]) {
-    let PR = createPublicRoute("", props.front.routes);
-    app.use("/", PR);
+    let PR = createPublicRoute('', props.front.routes);
+    app.use('/', PR);
   }
 
   let temp = [];
@@ -28,7 +28,7 @@ let routeHandle = (app, props = {}) => {
   props.entity.forEach((en) => {
     en.routes.forEach((rou) => {
       if (rou.access) {
-        let access = rou.access.split(",");
+        let access = rou.access.split(',');
         access.forEach((r) => {
           if (roles.indexOf(r.trim()) == -1) {
             roles.push(r.trim());
@@ -49,13 +49,13 @@ let routeHandle = (app, props = {}) => {
       if (en && en.routes) {
         // console.log('createRoute', en.modelName)
 
-        let R = createRoute(en.modelName, en.routes, "/customer/");
+        let R = createRoute(en.modelName, en.routes, '/customer/');
         // console.log('app.use', "/" + en.name, en.modelName)
 
-        app.use("/customer/" + en.name, R);
+        app.use('/customer/' + en.name, R);
         if (props.admin) {
-          let R2 = createRoute(en.modelName, en.routes, "/admin/");
-          app.use("/admin/" + en.name, R2);
+          let R2 = createRoute(en.modelName, en.routes, '/admin/');
+          app.use('/admin/' + en.name, R2);
         }
         // let adminPR = createPublicRoute('/admin/',props.theme.routes);
         // let adminPR = createPublicRoute("/admin/", en.routes);
@@ -67,8 +67,8 @@ let routeHandle = (app, props = {}) => {
   if (props && props.admin && props.admin.routes) {
     // console.log('createAdmin')
 
-    let PR2 = createPublicRoute("", props.admin.routes);
-    app.use("/", PR2);
+    let PR2 = createPublicRoute('', props.admin.routes);
+    app.use('/', PR2);
   }
   // console.log('app', app)
   // catch 404 and forward to error handler
@@ -105,7 +105,7 @@ let routeHandle = (app, props = {}) => {
     // const path = require('path');
 
     const defaultOptions = {
-      prefix: "",
+      prefix: '',
       spacer: 7,
     };
 
@@ -120,22 +120,22 @@ let routeHandle = (app, props = {}) => {
     };
 
     const spacer = (x) =>
-      x > 0 ? [...new Array(x)].map(() => " ").join("") : "";
+      x > 0 ? [...new Array(x)].map(() => ' ').join('') : '';
 
     const colorText = (color, string) =>
       `\u001b[${color}m${string}\u001b[${COLORS.clear}m`;
 
     function colorMethod(method) {
       switch (method) {
-        case "POST":
+        case 'POST':
           return colorText(COLORS.yellow, method);
-        case "GET":
+        case 'GET':
           return colorText(COLORS.green, method);
-        case "PUT":
+        case 'PUT':
           return colorText(COLORS.blue, method);
-        case "DELETE":
+        case 'DELETE':
           return colorText(COLORS.red, method);
-        case "PATCH":
+        case 'PATCH':
           return colorText(COLORS.grey, method);
         default:
           return method;
@@ -145,9 +145,9 @@ let routeHandle = (app, props = {}) => {
     function getPathFromRegex(regexp) {
       return regexp
         .toString()
-        .replace("/^", "")
-        .replace("?(?=\\/|$)/i", "")
-        .replace(/\\\//g, "/");
+        .replace('/^', '')
+        .replace('?(?=\\/|$)/i', '')
+        .replace(/\\\//g, '/');
     }
 
     function combineStacks(acc, stack) {
@@ -212,7 +212,7 @@ let routeHandle = (app, props = {}) => {
                     route.path,
                   ]
                     .filter((s) => !!s)
-                    .join("")
+                    .join('')
                 );
                 console.info(stackMethod, stackSpace, stackPath);
                 routeLogged[method] = true;
@@ -224,7 +224,7 @@ let routeHandle = (app, props = {}) => {
     }
 
     expressListRoutes(app);
-    console.log("end at:", new Date());
+    console.log('end at:', new Date());
   }
 };
 export default routeHandle;

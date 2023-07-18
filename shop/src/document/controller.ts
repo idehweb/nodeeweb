@@ -1,24 +1,24 @@
 import {
   CRUD_DEFAULT_REQ_KEY,
   PUBLIC_ACCESS,
-} from "@nodeeweb/core/src/constants/String";
-import { ControllerAccess } from "@nodeeweb/core/types/controller";
-import { registerEntityCRUD } from "@nodeeweb/core/src/handlers/entity.handler";
-import { controllerRegister } from "@nodeeweb/core/src/handlers/controller.handler";
-import { uploadSingle } from "@nodeeweb/core/src/handlers/upload.handler";
+} from '@nodeeweb/core/src/constants/String';
+import { ControllerAccess } from '@nodeeweb/core/types/controller';
+import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
+import { controllerRegister } from '@nodeeweb/core/src/handlers/controller.handler';
+import { uploadSingle } from '@nodeeweb/core/src/handlers/upload.handler';
 
 export default function registerController() {
-  const access: ControllerAccess = { modelName: "admin", role: PUBLIC_ACCESS };
+  const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
 
   // upload
   controllerRegister(
     {
-      url: "/fileUpload",
-      method: "post",
+      url: '/fileUpload',
+      method: 'post',
       access,
       service: [
         ...uploadSingle({
-          type: "all",
+          type: 'all',
           max_size_mb: 1024,
           reduce: {
             quality: 0.8,
@@ -27,6 +27,6 @@ export default function registerController() {
         (req, res) => res.status(201).json({ media: req.file_path }),
       ],
     },
-    { base_url: "/admin/document", from: "ShopEntity" }
+    { base_url: '/admin/document', from: 'ShopEntity' }
   );
 }

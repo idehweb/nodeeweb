@@ -1,14 +1,14 @@
-import store from "../../store";
+import store from '../../store';
 
-export async function getTheme(mode = "admin", req, res, next) {
+export async function getTheme(mode = 'admin', req, res, next) {
   // console.log('get theme settings... ', mode);
   // return;
-  const Settings = store.db.model("setting");
-  const Template = store.db.model("template");
-  const Page = store.db.model("page");
-  const setting = await Settings.findOne({}, "currency tax taxAmount ");
-  const header = await Template.findOne({ type: "header" });
-  const footer = await Template.findOne({ type: "footer" });
+  const Settings = store.db.model('setting');
+  const Template = store.db.model('template');
+  const Page = store.db.model('page');
+  const setting = await Settings.findOne({}, 'currency tax taxAmount ');
+  const header = await Template.findOne({ type: 'header' });
+  const footer = await Template.findOne({ type: 'footer' });
   const pages = await Page.find({});
 
   const routes = [];
@@ -18,14 +18,14 @@ export async function getTheme(mode = "admin", req, res, next) {
         routes.push({
           path: page.path,
           exact: true,
-          layout: "DefaultLayout",
-          element: "DynamicPage",
+          layout: 'DefaultLayout',
+          element: 'DynamicPage',
           elements: page.elements || [],
         });
     });
   if (req.headers && req.headers.token) {
   }
-  let currency = "rial";
+  let currency = 'rial';
   if (setting && setting.currency) {
     currency = setting.currency;
   }
@@ -48,80 +48,80 @@ export async function getTheme(mode = "admin", req, res, next) {
     tax: tax,
     currency: currency,
     header: {
-      maxWidth: header && header.maxWidth ? header.maxWidth : "100%",
+      maxWidth: header && header.maxWidth ? header.maxWidth : '100%',
       backgroundColor:
-        header && header.backgroundColor ? header.backgroundColor : "",
-      classes: header && header.classes ? header.classes : "",
-      padding: header && header.padding ? header.padding : "",
-      showInDesktop: header && header.showInDesktop ? header.showInDesktop : "",
-      showInMobile: header && header.showInMobile ? header.showInMobile : "",
+        header && header.backgroundColor ? header.backgroundColor : '',
+      classes: header && header.classes ? header.classes : '',
+      padding: header && header.padding ? header.padding : '',
+      showInDesktop: header && header.showInDesktop ? header.showInDesktop : '',
+      showInMobile: header && header.showInMobile ? header.showInMobile : '',
       elements: header ? header.elements : [],
     },
-    body: [{ name: "MainContent" }],
+    body: [{ name: 'MainContent' }],
     footer: {
-      maxWidth: footer && footer.maxWidth ? footer.maxWidth : "100%",
+      maxWidth: footer && footer.maxWidth ? footer.maxWidth : '100%',
       backgroundColor:
-        footer && footer.backgroundColor ? footer.backgroundColor : "",
-      classes: footer && footer.classes ? footer.classes : "",
-      padding: footer && footer.padding ? footer.padding : "",
+        footer && footer.backgroundColor ? footer.backgroundColor : '',
+      classes: footer && footer.classes ? footer.classes : '',
+      padding: footer && footer.padding ? footer.padding : '',
       elements: footer ? footer.elements : [],
     },
     routes: [
       {
-        path: "/",
+        path: '/',
         exact: true,
-        layout: "DefaultLayout",
-        element: "Home",
+        layout: 'DefaultLayout',
+        element: 'Home',
       },
 
       {
-        path: "/chat",
+        path: '/chat',
         exact: true,
-        layout: "Nohf",
-        element: "Chat",
+        layout: 'Nohf',
+        element: 'Chat',
       },
       {
-        path: "/transaction/:method",
+        path: '/transaction/:method',
         exact: true,
-        layout: "Nohf",
-        element: "Transaction",
+        layout: 'Nohf',
+        element: 'Transaction',
       },
       {
-        path: "/transaction",
+        path: '/transaction',
         exact: true,
-        layout: "Nohf",
-        element: "Transaction",
+        layout: 'Nohf',
+        element: 'Transaction',
       },
       {
-        path: "/admin",
+        path: '/admin',
         exact: true,
-        layout: "Nohf",
-        element: "Admin",
+        layout: 'Nohf',
+        element: 'Admin',
       },
       {
-        path: "/admin/:model",
+        path: '/admin/:model',
         exact: true,
-        layout: "Nohf",
-        element: "Admin",
+        layout: 'Nohf',
+        element: 'Admin',
       },
       {
-        path: "/admin/:model/:action",
+        path: '/admin/:model/:action',
         exact: true,
-        layout: "Nohf",
-        element: "Admin",
+        layout: 'Nohf',
+        element: 'Admin',
       },
       {
-        path: "/admin/:model/:action/:_id",
+        path: '/admin/:model/:action/:_id',
         exact: true,
-        layout: "Nohf",
-        element: "Admin",
+        layout: 'Nohf',
+        element: 'Admin',
       },
       {
-        path: "/a/:_entity/:_id/:_slug",
-        method: "get",
-        access: "customer_all",
+        path: '/a/:_entity/:_id/:_slug',
+        method: 'get',
+        access: 'customer_all',
         controller: (req, res, next) => {
-          console.log("show front, go visit ", process.env.SHOP_URL);
+          console.log('show front, go visit ', process.env.SHOP_URL);
           // res.show();
         },
       },
@@ -129,7 +129,7 @@ export async function getTheme(mode = "admin", req, res, next) {
     ],
     // components: global.builderComponents([], { props: req.props }),
   };
-  if (mode == "admin") {
+  if (mode == 'admin') {
     let rules = {};
     // rules = global.rules(rules, { props: req.props });
     // console.log('global.models',global.models)
@@ -143,7 +143,7 @@ export async function getTheme(mode = "admin", req, res, next) {
 export async function getAuth(req, res, next) {
   return res.json({
     success: true,
-    message: "در حال ریدایرکت...",
-    user: { tokens: [{ token: "token" }] },
+    message: 'در حال ریدایرکت...',
+    user: { tokens: [{ token: 'token' }] },
   });
 }

@@ -1,14 +1,14 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema(
   {
     active: { type: Boolean, default: true },
     productCategory: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "ProductCategory" },
+      { type: mongoose.Schema.Types.ObjectId, ref: 'ProductCategory' },
     ],
     attributes: [
       {
-        attribute: { type: mongoose.Schema.Types.ObjectId, ref: "Attributes" },
+        attribute: { type: mongoose.Schema.Types.ObjectId, ref: 'Attributes' },
         values: [],
       },
     ],
@@ -32,13 +32,13 @@ const schema = new mongoose.Schema(
     countries: [],
     like: [
       {
-        customer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" },
+        customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
         userIp: String,
         createdAt: { type: Date, default: Date.now },
       },
     ],
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" },
-    type: { type: String, default: "normal" },
+    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
+    type: { type: String, default: 'normal' },
     description: {},
     requireWarranty: {},
 
@@ -55,9 +55,9 @@ const schema = new mongoose.Schema(
       trim: true,
     },
     thumbnail: String,
-    status: { type: String, default: "processing" },
-    transaction: [{ type: mongoose.Schema.Types.ObjectId, ref: "Transaction" }],
-    relatedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    status: { type: String, default: 'processing' },
+    transaction: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' }],
+    relatedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
     photos: [],
     postNumber: String,
   },

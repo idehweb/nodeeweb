@@ -1,18 +1,18 @@
 import {
   CRUD_DEFAULT_REQ_KEY,
   PUBLIC_ACCESS,
-} from "@nodeeweb/core/src/constants/String";
-import { ControllerAccess } from "@nodeeweb/core/types/controller";
-import { registerEntityCRUD } from "@nodeeweb/core/src/handlers/entity.handler";
-import { controllerRegister } from "@nodeeweb/core/src/handlers/controller.handler";
-import { AuthUserAccess } from "@nodeeweb/core/src/handlers/auth.handler";
-import Service from "./service";
+} from '@nodeeweb/core/src/constants/String';
+import { ControllerAccess } from '@nodeeweb/core/types/controller';
+import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
+import { controllerRegister } from '@nodeeweb/core/src/handlers/controller.handler';
+import { AuthUserAccess } from '@nodeeweb/core/src/handlers/auth.handler';
+import Service from './service';
 
 export default function registerController() {
-  const access: ControllerAccess = { modelName: "admin", role: PUBLIC_ACCESS };
+  const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
   // crud
   registerEntityCRUD(
-    "discount",
+    'discount',
     {
       create: {
         controller: {
@@ -54,7 +54,7 @@ export default function registerController() {
         },
         crud: {
           parseFilter(req) {
-            if (req.query.filter && typeof req.query.filter === "string") {
+            if (req.query.filter && typeof req.query.filter === 'string') {
               return JSON.parse(req.query.filter);
             }
           },
@@ -62,8 +62,8 @@ export default function registerController() {
           saveToReq: true,
           executeQuery: true,
           paramFields: {
-            limit: "limit",
-            offset: "offset",
+            limit: 'limit',
+            offset: 'offset',
           },
         },
       },
@@ -85,7 +85,7 @@ export default function registerController() {
           service(req, res) {
             return res.status(204).json({
               success: true,
-              message: "Deleted!",
+              message: 'Deleted!',
             });
           },
         },
@@ -96,17 +96,17 @@ export default function registerController() {
         },
       },
     },
-    { base_url: "/amin/discount", from: "ShopEntity" }
+    { base_url: '/amin/discount', from: 'ShopEntity' }
   );
 
   // custom
   controllerRegister(
     {
-      url: "/set/:order_id/:id",
-      method: "get",
+      url: '/set/:order_id/:id',
+      method: 'get',
       access: AuthUserAccess,
       service: Service.setDiscount,
     },
-    { base_url: ["/customer", "/admin"], from: "ShopEntity" }
+    { base_url: ['/customer', '/admin'], from: 'ShopEntity' }
   );
 }

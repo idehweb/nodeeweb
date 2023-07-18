@@ -1,10 +1,10 @@
-import multer from "multer";
-import { join } from "path";
-import fs from "fs";
-import sharp from "sharp";
-import { getStaticDir } from "../../utils/path";
-import { MiddleWare, Req } from "../../types/global";
-import { isExist } from "../../utils/helpers";
+import multer from 'multer';
+import { join } from 'path';
+import fs from 'fs';
+import sharp from 'sharp';
+import { getStaticDir } from '../../utils/path';
+import { MiddleWare, Req } from '../../types/global';
+import { isExist } from '../../utils/helpers';
 
 export type UploadOptions = {
   file_key?: string;
@@ -14,7 +14,7 @@ export type UploadOptions = {
     format?: keyof sharp.FormatEnum;
     quality?: number;
   };
-  type: "image" | "video" | "audio" | "other" | "all";
+  type: 'image' | 'video' | 'audio' | 'other' | 'all';
   max_size_mb?: number;
   dir_path?: string;
   out_name?: string;
@@ -22,22 +22,22 @@ export type UploadOptions = {
 
 const IMAGE_FORMATS = [];
 
-function isReducibleFormat(format = "") {
-  return ["jpeg", "png", "webp", "avif", "tiff", "svg"].includes(
+function isReducibleFormat(format = '') {
+  return ['jpeg', 'png', 'webp', 'avif', 'tiff', 'svg'].includes(
     format.toLowerCase()
   );
 }
 
-function getFormat(name = "") {
-  return name.split(".")?.pop();
+function getFormat(name = '') {
+  return name.split('.')?.pop();
 }
 
 function getFileName(file: Express.Multer.File, custom_format?: string) {
   const format =
     custom_format ??
     getFormat(file.originalname) ??
-    file.mimetype.split("/").pop() ??
-    "file";
+    file.mimetype.split('/').pop() ??
+    'file';
 
   const file_name = `${file.fieldname}-${Date.now()}.${format}`;
   return file_name;
@@ -45,13 +45,13 @@ function getFileName(file: Express.Multer.File, custom_format?: string) {
 
 function getDir(opt: UploadOptions) {
   return (
-    opt.dir_path ?? join(getStaticDir("public_media", true)[0], "customer")
+    opt.dir_path ?? join(getStaticDir('public_media', true)[0], 'customer')
   );
 }
 
 export function uploadSingle(opt: UploadOptions) {
   const dir_path = getDir(opt);
-  const saveToMemory = opt.reduce && opt.type === "image";
+  const saveToMemory = opt.reduce && opt.type === 'image';
 
   const upload = multer({
     limits: {
@@ -61,8 +61,8 @@ export function uploadSingle(opt: UploadOptions) {
     },
     fileFilter(req, file, cb) {
       if (
-        opt.type === "other" ||
-        opt.type === "all" ||
+        opt.type === 'other' ||
+        opt.type === 'all' ||
         file.mimetype.startsWith(opt.type)
       )
         return cb(null, true);
@@ -84,8 +84,8 @@ export function uploadSingle(opt: UploadOptions) {
           },
         }),
   });
-  const mw: MiddleWare[] = [upload.single(opt.file_key ?? "file")];
-  if (opt.reduce && opt.type === "image") mw.push(reduceSingle(opt));
+  const mw: MiddleWare[] = [upload.single(opt.file_key ?? 'file')];
+  if (opt.reduce && opt.type === 'image') mw.push(reduceSingle(opt));
 
   return mw;
 }
@@ -113,7 +113,7 @@ function reduceSingle(opt: UploadOptions): MiddleWare {
     if (req.file_path && !isReducibleFormat(getFormat(req.file_path)))
       return next();
 
-    let format = opt.reduce.format ?? "webp";
+    let format = opt.reduce.format ?? 'webp';
     const file_path = join(
       getDir(opt),
       opt.out_name ?? getFileName(req.file, format)
@@ -123,7 +123,7 @@ function reduceSingle(opt: UploadOptions): MiddleWare {
 
     if (opt.reduce.width || opt.reduce.height) {
       s = s.resize({
-        fit: "cover",
+        fit: 'cover',
         width: opt.reduce.width,
         height: opt.reduce.height,
       });

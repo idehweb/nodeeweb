@@ -7,7 +7,10 @@ import logger from './log.handler';
 export type SingleJob = () => void | Promise<void>;
 
 export class SingleJobProcess {
-  constructor(private id: string, private job: SingleJob) {}
+  constructor(
+    private id: string,
+    private job: SingleJob
+  ) {}
 
   static builderAsync(id: string, job: SingleJob): () => Promise<void> {
     const jp = new SingleJobProcess(id, async () => {

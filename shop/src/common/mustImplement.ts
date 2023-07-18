@@ -1,10 +1,10 @@
-import { Req, Res } from "@nodeeweb/core/types/global";
+import { Req, Res } from '@nodeeweb/core/types/global';
 
 export async function checkSiteStatus(): Promise<boolean> {
   return true;
 }
 
-export function fireEvent(event: "create-order-by-customer", value: any) {}
+export function fireEvent(event: 'create-order-by-customer', value: any) {}
 
 export function submitAction(action: {
   user: any;
