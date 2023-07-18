@@ -1,104 +1,85 @@
-import mongoose from 'mongoose';
 import crypto from 'crypto';
-const lineItemSchema = new mongoose.Schema({
-  product_name: {
-    type: 'string',
-    required: true,
-  },
-  product_id: {
-    type: 'string',
-    required: true,
-  },
-  price: {
-    type: 'number',
-    required: true,
-  },
-  total_price: {
-    type: 'number',
-    required: true,
-  },
-  quantity: {
-    type: 'number',
-    required: true,
-  },
-});
+import mongoose, { Schema, Types } from 'mongoose';
 
+export enum OrderStatus {
+  Cart = 'cart',
+  NeedToPay = 'need-to-pay',
+  Packing = 'packing',
+  Posting = 'posting',
+  Completed = 'completed',
+}
 const schema = new mongoose.Schema(
   {
-    card: [
+    _id: {
+      type: String,
+      default: () =>
+        new Array(8)
+          .fill(0)
+          .map(() => crypto.randomInt(0, 10))
+          .join(''),
+    },
+    customer: {
+      type: {
+        _id: Schema.Types.ObjectId,
+        firstName: String,
+        lastName: String,
+        username: String,
+        phone: String,
+        email: String,
+      },
+      required: true,
+    },
+    address: {
+      state: { type: String, required: true },
+      city: { type: String, required: true },
+      street: { type: String, required: true },
+      postalCode: { type: String, required: true },
+      receiver: {
+        firstName: String,
+        lastName: String,
+        username: String,
+        phone: String,
+        email: String,
+      },
+    },
+    post: {
+      provider: String,
+      description: String,
+      logo: String,
+      link: String,
+      price: Number,
+      tracking: String,
+      postedAt: Date,
+      deliveredAt: Date,
+    },
+    products: [
       {
-        _id: String,
-        seller: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
-        price: Number,
-        salePrice: Number,
-        count: Number,
-        title: {},
+        _id: { type: Schema.Types.ObjectId, required: true },
+        name: { type: String, required: true },
+        image: String,
+        price: { type: Number, required: true },
+        quantity: { type: Number, required: true },
       },
     ],
-    deliveryDay: {},
-    customer_data: {},
-    data: {},
-    billingAddress: {},
-    statusArray: [],
-    productsAfterThisOrder: [],
-    sum: Number,
-    tax: Boolean,
-    taxAmount: Number,
-    discount: Number,
-    discountAmount: Number,
-    discountCode: String,
-    description: String,
-    agentIncome: Number,
-    sellerIncome: Number,
-    orderNumber: Number,
-    state: { type: Number, default: 0 },
-    deliveryPrice: { type: Number, default: 0 },
-    link: String,
-    status: { type: String, default: 'processing' },
-    paymentStatus: { type: String, default: 'notpaid' },
-
-    // kind: {type: String, default: 'post'},
-    transaction: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' }],
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
-    agent: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
-
-    refunded: {
-      type: 'Boolean',
-      default: false,
+    discount: {
+      code: String,
+      amount: Number,
     },
-    order_id: {
-      type: 'string',
-      default: crypto.randomBytes(64).toString('hex'),
-      // unique: true
+    tax: { type: Number, default: 0 },
+    totalPrice: Number,
+    transaction: {
+      provider: String,
+      payment_link: String,
+      authority: String,
+      createdAt: Date,
+      expiredAt: Date,
     },
-    amount: {
-      type: 'number',
-      required: [true, 'Amount must be specified'],
+    status: {
+      type: OrderStatus,
+      default: OrderStatus.Cart,
     },
-    currency: {
-      type: 'string',
-      default: 'UZS',
-    },
-    created_at: {
-      type: 'string',
-      default: Date.now(),
-    },
-    package: {
-      type: [lineItemSchema],
-      required: [true, 'Order must have a content'],
-    },
-    paid: {
-      type: 'boolean',
-      default: false,
-    },
-    payment_id: {
-      type: 'string',
-      default: crypto.randomBytes(64).toString('hex'),
-    },
-    cancelled: {
-      type: 'boolean',
-      default: false,
-    },
+    statusChangedAt: Date,
+    active: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
