@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import mongoose, { Schema, Types } from 'mongoose';
+import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
 export enum OrderStatus {
   Cart = 'cart',
@@ -7,7 +7,74 @@ export enum OrderStatus {
   Packing = 'packing',
   Posting = 'posting',
   Completed = 'completed',
+  Canceled = 'canceled',
+  Expired = 'expired',
 }
+
+export interface IOrder {
+  _id: string;
+  customer: {
+    _id: Types.ObjectId;
+    firstName: string;
+    lastName: string;
+    username?: string;
+    phone?: string;
+    email?: string;
+  };
+  address?: {
+    state: string;
+    city: string;
+    street: string;
+    postalCode: string;
+    receiver: {
+      firstName: string;
+      lastName: string;
+      username?: string;
+      phone?: string;
+      email?: string;
+    };
+  };
+  post?: {
+    provider?: string;
+    description?: string;
+    logo?: string;
+    link?: string;
+    price?: number;
+    tracking?: string;
+    postedAt?: Date;
+    deliveredAt?: Date;
+  };
+  products: {
+    _id: Types.ObjectId;
+    name: string;
+    image?: string;
+    price: number;
+    quantity: number;
+    weight: number;
+  }[];
+  discount?: {
+    code: string;
+    amount: number;
+  };
+  tax?: number;
+  totalPrice: number;
+  transaction?: {
+    provider: string;
+    payment_link: string;
+    authority: string;
+    createdAt: Date;
+    expiredAt: Date;
+  };
+  status: OrderStatus;
+  statusChangedAt: Date;
+  active: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type OrderModel = Model<IOrder>;
+export type OrderDocument = Document<unknown, {}, IOrder> & IOrder;
+
 const schema = new mongoose.Schema(
   {
     _id: {
@@ -30,17 +97,20 @@ const schema = new mongoose.Schema(
       required: true,
     },
     address: {
-      state: { type: String, required: true },
-      city: { type: String, required: true },
-      street: { type: String, required: true },
-      postalCode: { type: String, required: true },
-      receiver: {
-        firstName: String,
-        lastName: String,
-        username: String,
-        phone: String,
-        email: String,
+      type: {
+        state: { type: String, required: true },
+        city: { type: String, required: true },
+        street: { type: String, required: true },
+        postalCode: { type: String, required: true },
+        receiver: {
+          firstName: String,
+          lastName: String,
+          username: String,
+          phone: String,
+          email: String,
+        },
       },
+      required: false,
     },
     post: {
       provider: String,
@@ -59,6 +129,7 @@ const schema = new mongoose.Schema(
         image: String,
         price: { type: Number, required: true },
         quantity: { type: Number, required: true },
+        weight: { type: Number, required: true },
       },
     ],
     discount: {
@@ -75,7 +146,7 @@ const schema = new mongoose.Schema(
       expiredAt: Date,
     },
     status: {
-      type: OrderStatus,
+      type: String,
       default: OrderStatus.Cart,
     },
     statusChangedAt: Date,
