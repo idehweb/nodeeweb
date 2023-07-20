@@ -1,5 +1,5 @@
 # base image
-FROM node:18.17.0-bookworm as base
+FROM node:18.17.0-bullseye-slim as base
 
 # user
 USER node
