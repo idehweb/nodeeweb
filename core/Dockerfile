@@ -43,8 +43,8 @@ COPY --chown=node . .
 RUN yarn build
 
 # Replace Packages with Production one
-RUN rm -rf node_modules \
-    yarn install --production \
+RUN rm -rf node_modules && \
+    yarn install --production && \
     yarn cache clean --force 
 
 FROM base as production
