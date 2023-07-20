@@ -54,7 +54,7 @@ ENV NODE_ENV "production"
 COPY --chown=node --from=build /app/node_modules ./node_modules
 
 # Copy Build Files
-COPY --chown=node --from=build /app/dist/* .gitignore package.json tsconfig.json ./
+COPY --chown=node --from=build /app/dist/* /app/package.json /app/tsconfig.json ./
 
 # Copy Docker EntryPoint
 COPY --chown=node ./docker/docker-entrypoint-pro.sh /usr/local/bin
