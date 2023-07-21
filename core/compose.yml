@@ -2,9 +2,8 @@ version: '3'
 
 services:
   core:
-    build:
-      context: .
-      target: nodeeweb-core:0.0.3
+    image: nodeeweb-core:0.0.3
+    build: .
     container_name: nodeeweb-core
     deploy:
       replicas: 1
