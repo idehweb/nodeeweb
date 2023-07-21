@@ -1,11 +1,9 @@
 import { join, resolve } from 'path';
 import fs from 'fs';
 import os from 'os';
-import info from '../package.json';
 import store from '../store';
 import { USE_ENV } from '../types/global';
-
-export const PACKAGE_PREFIX = `./node_modules/${info.name}`;
+import { CORE_NODE_MODULE_PATH } from './package';
 
 export function getSharedPath(...path: string[]) {
   return join(store.env.SHARED_PATH || '.', ...path);
@@ -19,7 +17,7 @@ export function getScriptFile(
     resolve(appDirectory, relativePath);
   const scripts = resolveApp(
     store.env.USE_ENV === USE_ENV.NPM
-      ? `${PACKAGE_PREFIX}/scripts`
+      ? `${CORE_NODE_MODULE_PATH}/scripts`
       : './scripts'
   );
   return join(
@@ -41,5 +39,5 @@ export function getPublicDir(dirName: string, only_app_dir = true) {
 }
 export function getBuildDir(name: string) {
   const core_dir = store.dirs[store.dirs.length - 1];
-  return join(core_dir, 'node_modules', '@nodeeweb', `${name}-build`);
+  return join(core_dir, '..', `${name}-build`);
 }

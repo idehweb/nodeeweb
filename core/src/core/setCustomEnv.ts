@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import store from '../../store';
 import { USE_ENV } from '../../types/global';
-import { PACKAGE_PREFIX } from '../../utils/path';
+import { CORE_NODE_MODULE_PATH } from '../../utils/package';
 import _ from 'lodash';
 
 export default function setCustomEnv() {
@@ -11,8 +11,7 @@ export default function setCustomEnv() {
     path.resolve(appDirectory, relativePath);
 
   // use env
-  const node_modules_ns = resolveApp(PACKAGE_PREFIX);
-  if (fs.existsSync(node_modules_ns)) store.env.USE_ENV = USE_ENV.NPM;
+  if (CORE_NODE_MODULE_PATH) store.env.USE_ENV = USE_ENV.NPM;
   else store.env.USE_ENV = USE_ENV.GIT;
 
   // dirs
@@ -21,7 +20,7 @@ export default function setCustomEnv() {
     [
       appDirectory,
       ...env_dirs,
-      store.env.USE_ENV === USE_ENV.NPM ? PACKAGE_PREFIX : '',
+      store.env.USE_ENV === USE_ENV.NPM ? CORE_NODE_MODULE_PATH : '',
     ].filter((d) => d)
   );
 

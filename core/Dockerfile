@@ -11,7 +11,7 @@ ENV LOG_TO_FILE true
 ENV ADMIN_EMAIL "admin@nodeeweb.com"
 ENV ADMIN_USERNAME "admin"
 ENV ADMIN_PASSWORD "admin"
-ENV STATIC_SERVER false
+ENV STATIC_SERVER true
 ENV SHARED_PATH ./shared
 
 # Expose All Ports

@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import path, { join } from 'path';
 import {
-  PACKAGE_PREFIX,
   getBuildDir,
   getPublicDir,
   getScriptFile,
@@ -15,6 +14,7 @@ import logger from '../handlers/log.handler';
 import { isExistsSync } from '../../utils/helpers';
 import exec from '../../utils/exec';
 import { color } from '../../utils/color';
+import { APP_INFO } from '../../utils/package';
 
 export default async function prepare() {
   // install requirements
@@ -36,7 +36,8 @@ async function installRequirements() {
   if (store.env.NOT_INSTALL_REQUIREMENTS || store.env.USE_ENV !== USE_ENV.NPM)
     return;
 
-  const packageInfo = await import(path.join(path.resolve(), 'package.json'));
+  const packageInfo = await import(APP_INFO);
+
   const requirements = ['mongoose', 'bcrypt'].filter(
     (pack) => !packageInfo.dependencies[pack]
   );
