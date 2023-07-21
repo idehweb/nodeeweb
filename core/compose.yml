@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  core:
+    build: .
+    container_name: nodeeweb-core
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 3
+        window: 2m
+    ports:
+      - 2758:2758
+    networks:
+      - mongonet
+      - webnet
+    env_file:
+      - .env.local
+    volumes:
+      - /var/instances/core/shared:/app/shared:ro
+      - /var/instances/core/public/public_media:/app/public_media:ro
+      - /var/instances/core/public/admin:/app/admin:ro
+      - /var/instances/core/public/logs:/app/logs:ro
+
+networks:
+  mongonet:
+    external: true
+    name: nodeeweb_mongonet
+  webnet:
+    external: true
+    name: nodeeweb_webnet
