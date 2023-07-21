@@ -2,7 +2,7 @@ import multer from 'multer';
 import { join } from 'path';
 import fs from 'fs';
 import sharp from 'sharp';
-import { getStaticDir } from '../../utils/path';
+import { getPublicDir } from '../../utils/path';
 import { MiddleWare, Req } from '../../types/global';
 import { isExist } from '../../utils/helpers';
 
@@ -45,7 +45,7 @@ function getFileName(file: Express.Multer.File, custom_format?: string) {
 
 function getDir(opt: UploadOptions) {
   return (
-    opt.dir_path ?? join(getStaticDir('public_media', true)[0], 'customer')
+    opt.dir_path ?? join(getPublicDir('public_media', true)[0], 'customer')
   );
 }
 
