@@ -34,13 +34,13 @@ WORKDIR /app
 FROM base as build
 
 # Copy packege json and package lock
-COPY --chown=node package.json yarn.lock ./
+COPY package.json yarn.lock ./
 
 # Install Packages
 RUN yarn install
 
 # Copy modules
-COPY --chown=node . .
+COPY . .
 
 # Build
 RUN yarn build
@@ -54,16 +54,19 @@ FROM base as production
 ENV NODE_ENV "production"
 
 # Copy packages
-COPY --chown=node --from=build /app/node_modules ./node_modules
+COPY --from=build /app/node_modules ./node_modules
+
+# Copy Scripts
+COPY ./scripts /app/scripts
 
 # Copy Build Files
-COPY --chown=node --from=build /app/dist /app/package.json /app/tsconfig.json ./
+COPY --from=build /app/dist /app/package.json /app/tsconfig.json ./
 
 # Copy Docker EntryPoint
-COPY --chown=node ./docker/docker-entrypoint-pro.sh /usr/local/bin
+COPY ./docker/docker-entrypoint-pro.sh /usr/local/bin
 
 # user
-USER node
+# USER node
 
 ENTRYPOINT ["docker-entrypoint-pro.sh" ]
 CMD ["node","start"]
