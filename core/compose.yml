@@ -27,7 +27,7 @@ services:
 networks:
   mongonet:
     external: true
-    name: nodeeweb_mongonet
+    name: mongonet
   webnet:
     external: true
-    name: nodeeweb_webnet
+    name: webnet
