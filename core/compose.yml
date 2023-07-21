@@ -13,11 +13,11 @@ services:
         max_attempts: 3
         window: 2m
     networks:
-      - mongonet
-      - webnet:
-          aliases:
-            - nodeeweb-core
-            - nwi-core
+      mongonet:
+      webnet:
+        aliases:
+          - nodeeweb-core
+          - nwi-core
     env_file:
       - .env.local
     volumes:
