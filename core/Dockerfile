@@ -8,7 +8,7 @@ USER node
 ENV EnvLoader Docker
 ENV PATH /app/node_modules/.bin:$PATH
 ENV MONGO_URL "mongodb://mongomaster:27017"
-ENV PORT 2758
+ENV PORT 3000
 ENV DB_NAME "NodeewebCore"
 ENV LOG_TO_FILE true
 ENV ADMIN_EMAIL "admin@nodeeweb.com"

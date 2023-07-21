@@ -12,11 +12,12 @@ services:
         delay: 15s
         max_attempts: 3
         window: 2m
-    ports:
-      - 2758:2758
     networks:
       - mongonet
-      - webnet
+      - webnet:
+          aliases:
+            - nodeeweb-core
+            - nwi-core
     env_file:
       - .env.local
     volumes:
