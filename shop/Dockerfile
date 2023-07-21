@@ -68,10 +68,10 @@ FROM base as production
 ENV NODE_ENV "production"
 
 # Copy packages
-COPY --from=build /app/shop/node_modules ./node_modules
+COPY --from=build-dev /app/shop/node_modules ./node_modules
 
 # Copy Build Files
-COPY --from=build /app/shop/dist /app/shop/package.json /app/shop/tsconfig.json ./
+COPY --from=build-dev /app/shop/dist /app/shop/package.json /app/shop/tsconfig.json ./
 
 # Copy Docker EntryPoint
 COPY ./docker/docker-entrypoint-pro.sh /usr/local/bin
