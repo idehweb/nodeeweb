@@ -18,8 +18,8 @@ ENV SHARED_PATH ./shared
 EXPOSE ${PORT}
 
 # Install curl
-RUN apt-get update \ 
-    && apt-get install -y --no-install-recommends \ 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -34,18 +34,19 @@ WORKDIR /app
 FROM base as build-dev
 
 # Copy packege json and package lock
-COPY package.json yarn.lock ./shop/
+COPY shop/package.json shop/yarn.lock shop/
 
 # COPY core
-COPY ../core ./core
+COPY core /app/core
 
 # Copy core script
 RUN cd /app/core && \
     mkdir -p dist && \
-    cp -r scripts ./dist/scripts 
+    cp -r scripts dist/scripts
 
 # Build core
-RUN yarn install && \
+RUN cd /app/core && \ 
+    yarn install && \
     yarn build && \
     rm -rf node_modules
 
@@ -54,15 +55,17 @@ RUN cd /app/shop && \
     yarn install
 
 # Copy modules
-COPY . .
+COPY shop /app/shop
 
 # Build
-RUN yarn build
+RUN cd /app/shop && \
+    yarn build
 
 # Replace Packages with Production one
-RUN rm -rf node_modules && \
+RUN cd /app/shop && \ 
+    rm -rf node_modules && \
     yarn install --production && \
-    yarn cache clean --force 
+    yarn cache clean --force
 
 FROM base as production
 ENV NODE_ENV "production"
@@ -74,7 +77,7 @@ COPY --from=build-dev /app/shop/node_modules ./node_modules
 COPY --from=build-dev /app/shop/dist /app/shop/package.json /app/shop/tsconfig.json ./
 
 # Copy Docker EntryPoint
-COPY ./docker/docker-entrypoint-pro.sh /usr/local/bin
+COPY shop/docker/docker-entrypoint-pro.sh /usr/local/bin
 
 # user
 # USER node

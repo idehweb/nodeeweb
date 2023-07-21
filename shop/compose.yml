@@ -3,7 +3,9 @@ version: '3'
 services:
   shop:
     image: nodeeweb-shop:0.0.1
-    build: .
+    build:
+      context: ..
+      dockerfile: shop/Dockerfile
     container_name: nodeeweb-shop
     deploy:
       replicas: 1
