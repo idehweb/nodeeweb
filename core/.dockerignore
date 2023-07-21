@@ -77,7 +77,7 @@ env
 dist
 public_media
 admin/*
-
+public/
 ############################
 # docker
 ############################

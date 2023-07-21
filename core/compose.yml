@@ -21,10 +21,9 @@ services:
     env_file:
       - .env.local
     volumes:
-      - /var/instances/core/shared:/app/shared:ro
-      - /var/instances/core/public/public_media:/app/public_media:ro
-      - /var/instances/core/public/admin:/app/admin:ro
-      - /var/instances/core/public/logs:/app/logs:ro
+      - /var/instances/nwi-core/shared:/app/shared:ro
+      - /var/instances/nwi-core/logs:/app/logs:ro
+      - /var/instances/nwi-core/public:/app/public:ro
 
 networks:
   mongonet:

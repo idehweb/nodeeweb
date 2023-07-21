@@ -1,9 +1,6 @@
 # base image
 FROM node:18.17.0-bullseye-slim as base
 
-# user
-USER node
-
 # Set Enviroments
 ENV EnvLoader Docker
 ENV PATH /app/node_modules/.bin:$PATH
@@ -19,6 +16,12 @@ ENV SHARED_PATH ./shared
 
 # Expose All Ports
 EXPOSE ${PORT}
+
+# Install curl
+RUN apt-get update \ 
+    && apt-get install -y --no-install-recommends \ 
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Health check
 HEALTHCHECK --interval=1m --timeout=15s --retries=3 --start-period=2m \
@@ -58,6 +61,9 @@ COPY --chown=node --from=build /app/dist /app/package.json /app/tsconfig.json ./
 
 # Copy Docker EntryPoint
 COPY --chown=node ./docker/docker-entrypoint-pro.sh /usr/local/bin
+
+# user
+USER node
 
 ENTRYPOINT ["docker-entrypoint-pro.sh" ]
 CMD ["node","start"]
