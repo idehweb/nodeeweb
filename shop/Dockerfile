@@ -31,13 +31,27 @@ HEALTHCHECK --interval=1m --timeout=15s --retries=3 --start-period=2m \
 WORKDIR /app
 
 
-FROM base as build
+FROM base as build-dev
 
 # Copy packege json and package lock
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock ./shop/
+
+# COPY core
+COPY ../core ./core
+
+# Copy core script
+RUN cd /app/core && \
+    mkdir -p dist && \
+    cp -r scripts ./dist/scripts 
+
+# Build core
+RUN yarn install && \
+    yarn build && \
+    rm -rf node_modules
 
 # Install Packages
-RUN yarn install
+RUN cd /app/shop && \
+    yarn install
 
 # Copy modules
 COPY . .
@@ -54,13 +68,10 @@ FROM base as production
 ENV NODE_ENV "production"
 
 # Copy packages
-COPY --from=build /app/node_modules ./node_modules
-
-# Copy Scripts
-COPY ./scripts /app/scripts
+COPY --from=build /app/shop/node_modules ./node_modules
 
 # Copy Build Files
-COPY --from=build /app/dist /app/package.json /app/tsconfig.json ./
+COPY --from=build /app/shop/dist /app/shop/package.json /app/shop/tsconfig.json ./
 
 # Copy Docker EntryPoint
 COPY ./docker/docker-entrypoint-pro.sh /usr/local/bin
@@ -69,4 +80,4 @@ COPY ./docker/docker-entrypoint-pro.sh /usr/local/bin
 # USER node
 
 ENTRYPOINT ["docker-entrypoint-pro.sh" ]
-CMD ["node","start"]
+CMD ["node","index"]

@@ -1,10 +1,10 @@
 version: '3'
 
 services:
-  core:
-    image: nodeeweb-core:0.0.3
+  shop:
+    image: nodeeweb-shop:0.0.1
     build: .
-    container_name: nodeeweb-core
+    container_name: nodeeweb-shop
     deploy:
       replicas: 1
       restart_policy:
@@ -16,14 +16,14 @@ services:
       mongonet:
       webnet:
         aliases:
-          - nodeeweb-core
-          - nwi-core
+          - nodeeweb-shop
+          - nwi-shop
     env_file:
       - .env.local
     volumes:
-      - /var/instances/nwi-core/shared:/app/shared
-      - /var/instances/nwi-core/logs:/app/logs
-      - /var/instances/nwi-core/public:/app/public
+      - /var/instances/nwi-shop/shared:/app/shared
+      - /var/instances/nwi-shop/logs:/app/logs
+      - /var/instances/nwi-shop/public:/app/public
 
 networks:
   mongonet:
