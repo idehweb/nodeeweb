@@ -1,1 +1,2 @@
 export const DEFAULT_CART_LIMIT = 100;
+export const MAXIMUM_NEED_TO_PAY_TRANSACTION = 3;

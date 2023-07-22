@@ -11,6 +11,10 @@ export enum OrderStatus {
   Expired = 'expired',
 }
 
+export enum TransactionProvider {
+  Manual = 'manual',
+}
+
 export interface IOrder {
   _id: string;
   customer: {
@@ -49,12 +53,13 @@ export interface IOrder {
     name: string;
     image?: string;
     price: number;
+    salePrice: number;
     quantity: number;
     weight: number;
   }[];
   discount?: {
     code: string;
-    amount: number;
+    amount?: number;
   };
   tax?: number;
   totalPrice: number;
@@ -128,13 +133,14 @@ const schema = new mongoose.Schema(
         name: { type: String, required: true },
         image: String,
         price: { type: Number, required: true },
+        salePrice: { type: Number, required: true },
         quantity: { type: Number, required: true },
         weight: { type: Number, required: true },
       },
     ],
     discount: {
-      code: String,
-      amount: Number,
+      code: { type: String, required: true },
+      amount: { type: Number, required: true },
     },
     tax: { type: Number, default: 0 },
     totalPrice: Number,

@@ -5,6 +5,7 @@ export interface IProduct {
   name: string;
   image?: string;
   price: number;
+  salePrice: number;
   weight: number;
   quantity: number;
 }
@@ -31,7 +32,7 @@ const schema = new mongoose.Schema(
     price: { type: Number, required: true },
     weight: { type: Number, required: true },
     quantity: { type: Number, required: true },
-    salePrice: Number,
+    salePrice: { type: Number, required: true },
     data: {},
     sku: String,
     extra_button: String,
@@ -77,3 +78,8 @@ const schema = new mongoose.Schema(
 );
 
 export default schema;
+
+schema.pre('save', function (next) {
+  if (this.salePrice == undefined) this.salePrice = this.price;
+  return next();
+});

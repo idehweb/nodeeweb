@@ -64,7 +64,13 @@ export default class CartService {
       // create order
       const order = await CartService.orderModel.create({
         customer: req.user,
-        products: [{ ...product.toObject(), quantity }],
+        products: [
+          {
+            ...product.toObject(),
+            salePrice: product.salePrice ?? product.price,
+            quantity,
+          },
+        ],
       });
       return res.status(201).json({
         data: order,
@@ -83,7 +89,11 @@ export default class CartService {
         { _id: order._id },
         {
           $push: {
-            products: { ...product.toObject(), quantity },
+            products: {
+              ...product.toObject(),
+              salePrice: product.salePrice ?? product.price,
+              quantity,
+            },
           },
         }
       );
