@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import path, { join } from 'path';
 import {
-  PACKAGE_PREFIX,
   getBuildDir,
+  getPublicDir,
   getScriptFile,
   getSharedPath,
   getStaticDir,
@@ -14,6 +14,7 @@ import logger from '../handlers/log.handler';
 import { isExistsSync } from '../../utils/helpers';
 import exec from '../../utils/exec';
 import { color } from '../../utils/color';
+import { APP_INFO } from '../../utils/package';
 
 export default async function prepare() {
   // install requirements
@@ -21,22 +22,22 @@ export default async function prepare() {
 
   // create directories
   createSharedDir();
+  createPublicDir();
   createPublicMediaFolder();
 
-  // link
-  await createAndCopyBuildDir('admin');
+  // copy public files
+  await copyPublicFiles('admin');
 
-  const staticDirs = ['plugins'];
-  // run this command only if npm i @nodeeweb/core
-  if (store.env.USE_ENV === USE_ENV.NPM) staticDirs.push('schema', 'theme');
-  await Promise.all(staticDirs.map(createAndCopyStaticDir));
+  // copy static dirs
+  await copyStaticFiles('schema');
 }
 
 async function installRequirements() {
   if (store.env.NOT_INSTALL_REQUIREMENTS || store.env.USE_ENV !== USE_ENV.NPM)
     return;
 
-  const packageInfo = await import(path.join(path.resolve(), 'package.json'));
+  const packageInfo = await import(APP_INFO);
+
   const requirements = ['mongoose', 'bcrypt'].filter(
     (pack) => !packageInfo.dependencies[pack]
   );
@@ -48,9 +49,13 @@ async function installRequirements() {
 function createSharedDir() {
   if (!fs.existsSync(getSharedPath('.'))) fs.mkdirSync(getSharedPath('.'));
 }
+function createPublicDir() {
+  if (!fs.existsSync(getPublicDir('.', true)[0]))
+    fs.mkdirSync(getPublicDir('.', true)[0]);
+}
 
 function createPublicMediaFolder() {
-  const [public_mediaPath] = getStaticDir('public_media', true);
+  const [public_mediaPath] = getPublicDir('public_media', true);
   const public_media_customerPath = path.join(public_mediaPath, 'customer');
   const public_media_siteSettingPath = path.join(
     public_mediaPath,
@@ -87,7 +92,7 @@ function createPublicMediaFolder() {
   }
 }
 
-async function createAndCopyStaticDir(name: string) {
+async function copyStaticFiles(name: string) {
   const [dirLocalPath] = getStaticDir(name, true);
   const dirModulePath = getStaticDir(name, false).slice(1).filter(isExistsSync);
 
@@ -120,8 +125,8 @@ async function createAndCopyStaticDir(name: string) {
   logger.log(name, 'folder:', dirLocalPath);
 }
 
-async function createAndCopyBuildDir(name: string) {
-  const [dirLocalPath] = getStaticDir(name, true);
+async function copyPublicFiles(name: string) {
+  const [dirLocalPath] = getPublicDir(name, true);
   const dirModulePath = getBuildDir(name);
 
   // check if directory exist before
