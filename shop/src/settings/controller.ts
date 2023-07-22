@@ -8,7 +8,7 @@ import { controllersBatchRegister } from '@nodeeweb/core/src/handlers/controller
 import { AuthUserAccess } from '@nodeeweb/core/src/handlers/auth.handler';
 import Service from './service';
 import { uploadSingle } from '@nodeeweb/core/src/handlers/upload.handler';
-import { getStaticDir } from '@nodeeweb/core/utils/path';
+import { getPublicDir } from '@nodeeweb/core/utils/path';
 import { join } from 'path';
 
 export default function registerController() {
@@ -113,7 +113,7 @@ export default function registerController() {
           ...uploadSingle({
             type: 'all',
             dir_path: join(
-              getStaticDir('public_media', true)[0],
+              getPublicDir('public_media', true)[0],
               'site_setting'
             ),
             max_size_mb: 100,

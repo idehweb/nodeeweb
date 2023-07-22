@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  core:
+    image: nodeeweb-core:0.0.3
+    build: .
+    container_name: nodeeweb-core
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 3
+        window: 2m
+    networks:
+      mongonet:
+      webnet:
+        aliases:
+          - nodeeweb-core
+          - nwi-core
+    env_file:
+      - .env.local
+    volumes:
+      - /var/instances/nwi-core/shared:/app/shared
+      - /var/instances/nwi-core/logs:/app/logs
+      - /var/instances/nwi-core/public:/app/public
+
+networks:
+  mongonet:
+    external: true
+    name: mongonet
+  webnet:
+    external: true
+    name: webnet

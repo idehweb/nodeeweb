@@ -2,7 +2,7 @@
   "name": "@nodeeweb/core",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "index",
   "scripts": {
     "build": "tsc --build",
     "dev": "nodemon start.ts",

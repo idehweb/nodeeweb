@@ -1,7 +1,7 @@
-import path from 'path';
+import path, { join } from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import info from '../../package.json';
+import { CORE_NODE_MODULE_PATH } from '../../utils/package';
 
 if (process.env.EnvLoader !== 'Docker') loader();
 
@@ -12,7 +12,7 @@ function loader() {
     path.resolve(appDirectory, relativePath);
   //
   const envLocalPath = resolveApp('.env.local');
-  const envModulePath = resolveApp(`./node_modules/${info.name}/.env.local`);
+  const envModulePath = resolveApp(join(CORE_NODE_MODULE_PATH ?? '.', '.env'));
 
   if (!fs.existsSync(envLocalPath)) {
     const env = fs.readFileSync(envModulePath, 'utf8');
@@ -23,3 +23,5 @@ function loader() {
     path: envLocalPath,
   });
 }
+
+// console.log(process.env);

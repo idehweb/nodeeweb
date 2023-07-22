@@ -2,16 +2,10 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import { MiddleWare, MiddleWareError } from '../../types/global';
 import bodyParser from 'body-parser';
-import path from 'path';
 import store from '../../store';
 import { expressLogger } from '../handlers/log.handler';
 import rateLimit from 'express-rate-limit';
-
-const dirname = path.resolve();
-
-const public_mediaFolder = path.join(dirname, './public_media');
-const adminFolder = path.join(dirname, './admin');
-const themeFolder = path.join(dirname, './theme');
+import { getPublicDir } from '../../utils/path';
 
 export const headerMiddleware: MiddleWare = (req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -72,6 +66,10 @@ export function commonMiddleware(): (
     store.env.isLoc ||
     (store.env.STATIC_SERVER && store.env.STATIC_SERVER !== 'false')
   ) {
+    const public_mediaFolder = getPublicDir('public_media', true)[0];
+    const adminFolder = getPublicDir('admin', true)[0];
+    const themeFolder = getPublicDir('theme', true)[0];
+
     mw.push(express.static(public_mediaFolder, { maxAge: '1y' }));
     mw.push(['/site_setting', express.static(themeFolder + '/site_setting')]);
     mw.push(['/static', express.static(themeFolder + '/static')]);
