@@ -1,15 +1,12 @@
 import { useEffect, useState, memo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import AddIcon from '@mui/icons-material/Add';
-import { Button, ButtonBase } from '@mui/material';
-
+import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 import { useNotify, useTranslate } from 'react-admin';
-import clsx from 'clsx';
-
 
 import Component from '@/components/page-builder/Component';
 import OptionBox from '@/components/page-builder/OptionBox';
+import ComponentSetting from '@/components/page-builder/Component/Setting';
 import {
   changeThemeData,
   changeThemeDataFunc,
@@ -17,12 +14,11 @@ import {
   SaveBuilder,
 } from '@/functions';
 
-import { Header, Tabs, Container, Wrapper } from './components';
 import Header from './Header';
+import Container from './Container';
 import Preview from './Preview';
 import { generateCompID } from './utils';
-
-const lan = 'fa';
+import { DropTargetMonitor } from 'react-dnd';
 
 const Core = (props) => {
   const translate = useTranslate();
@@ -31,8 +27,7 @@ const Core = (props) => {
   const { _id, model = 'page' } = useParams();
 
   const [tabValue, setTabValue] = useState(0);
-
-  const [data, setData] = useState<any>({});
+  const [editItem, setEditItem] = useState<any>({});
 
   const [state, setState] = useState({
     components: [],
@@ -59,7 +54,6 @@ const Core = (props) => {
       dispatch(changeThemeData(e));
     });
     GetBuilder(model, _id).then((r) => {
-      if (r) setData(r);
       if (r && r.elements) {
         setState((s) => ({ ...s, components: r.elements }));
       }
@@ -160,7 +154,7 @@ const Core = (props) => {
     [components]
   );
 
-  const deleteItem = useCallback(
+  const handleDelete = useCallback(
     (id) => {
       let tempArray = [];
       components.forEach((comp, j) => {
@@ -262,7 +256,6 @@ const Core = (props) => {
 
   const addToComponents = useCallback(
     (element, extra) => {
-      console.log('inside: ', sourceAddress);
       let theNewComponents = components,
         mainAddress = [];
 
@@ -440,14 +433,11 @@ const Core = (props) => {
     [components, sourceAddress]
   );
 
-  const moveItemStart = useCallback((id, dest, component) => {
-    console.log('id', id);
-    console.log('dest', dest);
+  const handleDrop2 = useCallback((id, dest, component) => {
     let moveCurrentItem = [];
     let pushCurrentItem = [];
-    let lastName;
     let lastComponenet = [];
-    let completeComponent = component;
+
     if (component) {
       if (component.id === id) {
         moveCurrentItem.push(component);
@@ -482,14 +472,14 @@ const Core = (props) => {
       }
       let added;
       if (pushCurrentItem) {
-        pushCurrentItem.forEach((push) => {
-          if (push.hasOwnProperty('children')) {
-            push.children.forEach((p) => {
+        pushCurrentItem.forEach((i) => {
+          if (i.hasOwnProperty('children')) {
+            i.children.forEach((p) => {
               if (p.id === id) {
                 added = false;
               } else {
                 added = true;
-                push.children.push(moveCurrentItem[0]);
+                i.children.push(moveCurrentItem[0]);
               }
             });
             // if(added){
@@ -522,19 +512,30 @@ const Core = (props) => {
                 }
               });
           } else {
-            Object.assign(push, { children: lastComponenet });
+            let temp = Object.assign(i, { children: lastComponenet });
+            console.log('asd', temp);
             // component.splice(component.children.findIndex(a => a.id === id) , 1)
           }
         });
       }
     }
 
-    // setState({ ...state, components: component });
+    // setState((p) => ({ ...p, components: component }));
   }, []);
 
+  const handleDrop = useCallback(
+    (item, monitor: DropTargetMonitor<any, any>) => {
+      const { id } = item;
+      const dest = monitor.getItem();
+      console.log({ item, monitor, dest, id });
+
+      handleDrop2(id, dest, item);
+    },
+    [handleDrop2]
+  );
+
   return (
-    <Wrapper className={translate('direction')}>
-      <Container id="nodeeweb-page-builder">
+    <div className={translate('direction')}>
       <Header
         tabValue={tabValue}
         setTabValue={setTabValue}
@@ -548,30 +549,31 @@ const Core = (props) => {
         }}
         onSave={() => SaveData(components)}
       />
+
+      <Container onDrop={handleDrop}>
         {tabValue === 0 && (
-          <>
-            {components?.filter(Boolean).map((component, index) => (
-              <Component
-                key={index}
-                index={index}
-                toggleOptionBox={toggleOptionBox}
-                // moveContent={moveContent}
-                // moveItem={moveItem}
-                component={component}
-                deleteItem={(e) => {
-                  deleteItem(e || component.id);
-                }}
-                changeComponentSetting={(e, j, d) => {
-                  changeComponentSetting(e, j, d);
-                }}
-                length={components.length}
-                startDestHnadler={moveItemStart}
-              />
+          <AnimatePresence presenceAffectsLayout>
+            {components?.map((i, idx) => (
+              <motion.div
+                key={idx}
+                layout="position"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+                transition={{ type: 'just' }}>
+                <Component
+                  index={idx}
+                  item={i}
+                  onDelete={(e) => {
+                    handleDelete(e || i.id);
+                  }}
+                  onAdd={toggleOptionBox}
+                  onEdit={() => setEditItem(i)}
+                  onDrop={handleDrop}
+                />
+              </motion.div>
             ))}
-            {/* <div ref={drop} className={"add-component element "+(isOver ? 'hover' : '')} onClick={(e) => { */}
-            {/* <div ref={drop} className={"add-component newelement "+(isOver ? 'hover' : '')}  */}
-          </>
-        )}
+          </AnimatePresence>
         )}
         {tabValue === 1 && <Preview />}
       </Container>
@@ -582,9 +584,14 @@ const Core = (props) => {
         open={state.optionBox}
         addToComponents={addToComponents}
       />
-    </Wrapper>
+      <ComponentSetting
+        component={editItem}
+        open={Boolean(editItem.id)}
+        onClose={() => setEditItem({})}
+        onSubmit={changeComponentSetting}
+      />
+    </div>
   );
 };
 
-export const PageServer = [{}];
 export default memo(Core);

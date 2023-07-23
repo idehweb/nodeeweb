@@ -67,6 +67,7 @@ export const Container = styled('div')({
   border: '1px solid #ddd',
   marginBottom: 16,
   borderRadius: 4,
+  cursor: 'move',
   '&:hover > div > .pb-actions': {
     opacity: 1,
   },
