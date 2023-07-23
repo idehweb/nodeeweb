@@ -9,9 +9,9 @@ import { withTranslation } from 'react-i18next';
 
 import { useSelector } from 'react-redux';
 
-import LoadingComponent from '#c/components/components-overview/LoadingComponent';
-import Product from '#c/views/Product';
-import Sort from '#c/components/archive/Sort';
+import LoadingComponent from '@/components/components-overview/LoadingComponent';
+import Product from '@/views/Product';
+import Sort from '@/components/archive/Sort';
 import {
   enableAdmin,
   enableAgent,
@@ -25,10 +25,10 @@ import {
   loadProducts,
   SaveData,
   setCountry,
-} from '#c/functions/index';
-import { ProductsSliderServer } from '#c/components/components-overview/ProductsSlider';
-import { PostSliderServer } from '#c/components/components-overview/PostSlider';
-import PostCard from '#c/components/Home/PostCard';
+} from '@/functions/index';
+import { ProductsSliderServer } from '@/components/components-overview/ProductsSlider';
+import { PostSliderServer } from '@/components/components-overview/PostSlider';
+import PostCard from '@/components/Home/PostCard';
 
 
 let theFilter = false;

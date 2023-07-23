@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 
 // import {withTranslation} from "react-i18next";
-import { dFormat, PriceFormat } from '#c/functions/utils';
-import CustomModal from '#c/components/Modal';
+import { dFormat, PriceFormat } from '@/functions/utils';
+import CustomModal from '@/components/Modal';
 
-import '#c/assets/styles/nodeeweb-page-builder.css';
+import '@/assets/styles/nodeeweb-page-builder.css';
 import { Button, Card, Nav, NavItem, NavLink } from 'shards-react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import BrushIcon from '@mui/icons-material/Brush';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 
-import CreateForm from '#c/components/form/CreateForm';
+import CreateForm from '@/components/form/CreateForm';
 
 import {
   addBookmark,
@@ -24,8 +24,8 @@ import {
   MainUrl,
   SaveBuilder,
   savePost,
-} from '#c/functions/index';
-import { SnapChatIcon } from '#c/assets/index';
+} from '@/functions/index';
+import { SnapChatIcon } from '@/assets/index';
 
 const ComponentOptionBox = (props) => {
   const [tab, setTab] = useState('general');

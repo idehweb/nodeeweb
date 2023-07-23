@@ -1,4 +1,4 @@
-import store from '#c/functions/store';
+import store from '@/functions/store';
 // console.log('store',store)
 import constants from '../constants';
 // console.log('constants',constants)

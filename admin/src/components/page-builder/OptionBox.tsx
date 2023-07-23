@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 
-import ModalOptions from '#c/components/ModalOptions';
+import ModalOptions from '@/components/ModalOptions';
 
 import FormOptions from './FormOptions';
 import DefaultOptions from './DefaultOptions';

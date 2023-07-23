@@ -73,11 +73,6 @@
     "typescript": "^5.1.6",
     "webpack-bundle-analyzer": "^4.9.0"
   },
-  "imports": {
-    "#json/*": "./*.json",
-    "#assets/*": "./src/assets/*",
-    "#c/*": "./src/*.js"
-  },
   "browserslist": [
     ">0.2%",
     "not dead",
