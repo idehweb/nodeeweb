@@ -18,6 +18,7 @@ import {
 } from '@/functions';
 
 import { Header, Tabs, Container, Wrapper } from './components';
+import Header from './Header';
 import Preview from './Preview';
 import { generateCompID } from './utils';
 
@@ -533,42 +534,20 @@ const Core = (props) => {
 
   return (
     <Wrapper className={translate('direction')}>
-      <Header>
-        <div>
-          <Button
-            onClick={(e) => {
-              setState((p) => ({
-                ...p,
-                sourceAddress: 'new',
-                excludeArray: [],
-                optionBox: !p.optionBox,
-              }));
-            }}
-            variant="contained"
-            endIcon={<AddIcon />}>
-            Add Element
-          </Button>
-        </div>
-        <Tabs>
-          <ButtonBase
-            className={clsx(tabValue === 0 && 'active')}
-            onClick={(e) => setTabValue(0)}>
-            Builder
-          </ButtonBase>
-          <ButtonBase
-            className={clsx(tabValue === 1 && 'active')}
-            onClick={(e) => setTabValue(1)}>
-            Preview
-          </ButtonBase>
-        </Tabs>
-        <div>
-          <Button variant="contained" onClick={() => SaveData(components)}>
-            Save
-          </Button>
-        </div>
-      </Header>
-
       <Container id="nodeeweb-page-builder">
+      <Header
+        tabValue={tabValue}
+        setTabValue={setTabValue}
+        onAdd={() => {
+          setState((p) => ({
+            ...p,
+            sourceAddress: 'new',
+            excludeArray: [],
+            optionBox: !p.optionBox,
+          }));
+        }}
+        onSave={() => SaveData(components)}
+      />
         {tabValue === 0 && (
           <>
             {components?.filter(Boolean).map((component, index) => (
