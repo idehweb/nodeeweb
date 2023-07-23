@@ -39,14 +39,11 @@ export default function OptionBox({ onClose, open, addToComponents, exclude }) {
   }, [themeData]);
 
   return (
-    // @ts-ignore
     <ModalOptions
       Options={Options}
       addToComponents={addToComponents}
       onClose={onClose}
       open={open}
-      className="width50vw modal"
-      title="Choose Element"
     />
   );
 }
