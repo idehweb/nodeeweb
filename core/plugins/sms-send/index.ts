@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import {
   Plugin,
-  PluginType,
+  CorePluginType,
   SMSPluginArgs,
   SMSPluginContent,
 } from '../../types/plugin';
@@ -42,7 +42,7 @@ const smsSendPlugin: Plugin = () => {
     stack: [sendSMS],
   };
   return {
-    type: PluginType.SMS,
+    type: CorePluginType.SMS,
     content,
   };
 };

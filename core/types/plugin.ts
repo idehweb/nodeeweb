@@ -1,8 +1,7 @@
-export declare enum PluginType {
+export enum CorePluginType {
   SMS = 'sms',
-  BANK_GATEWAY = 'bank-gateway',
 }
-export declare enum SMSPluginType {
+export enum SMSPluginType {
   OTP = 'otp',
   Reg = 'regular',
 }
@@ -15,19 +14,6 @@ export type SMSPluginArgs = {
   text?: string;
   type: SMSPluginType;
 };
-export type BankGatewayCreateArgs = {
-  amount: number;
-  userPhone: string;
-  callback_url: string;
-  description: string;
-  currency: string;
-};
-export type BankGatewayCreateOut = {
-  authority: string;
-  payment_link: string;
-  expiredAt: Date;
-};
-
 export interface PluginContent {
   name: string;
   stack: ((...args: any) => Promise<boolean | any>)[];
@@ -35,11 +21,10 @@ export interface PluginContent {
 export interface SMSPluginContent extends PluginContent {
   stack: [(args: SMSPluginArgs) => Promise<boolean | string>];
 }
-export interface BankGatewayPluginContent extends PluginContent {
-  stack: [(args: BankGatewayCreateArgs) => Promise<BankGatewayCreateOut>];
-}
 
-export type Plugin = () => {
-  type: PluginType;
+export type PluginOut = {
+  type: CorePluginType | string;
   content: PluginContent;
 };
+
+export type Plugin = () => PluginOut;

@@ -5,7 +5,7 @@ import { ErrorPackageFn } from './types/error';
 import { Server } from 'http';
 import { AdminViewSchema } from './types/view';
 import { AuthStrategy } from './types/auth';
-import { PluginContent, PluginType } from './types/plugin';
+import { PluginOut } from './types/plugin';
 export class Store {
   env: {
     APP_NAME: string;
@@ -37,7 +37,7 @@ export class Store {
   systemLogger: any;
   adminViews: AdminViewSchema[] = [];
   strategies = new Map<string, AuthStrategy>();
-  plugins = new Map<PluginType, PluginContent>();
+  plugins = new Map<PluginOut['type'], PluginOut['content']>();
   settings: {
     taxRate: number;
   };
@@ -56,7 +56,7 @@ export class Store {
         break;
     }
 
-    this.settings = { taxRate: 0 };
+    this.settings = { taxRate: 0.25 };
   }
 }
 

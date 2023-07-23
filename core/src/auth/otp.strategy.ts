@@ -12,7 +12,7 @@ import {
   UnauthorizedError,
 } from '../../types/error';
 import {
-  PluginType,
+  CorePluginType,
   SMSPluginContent,
   SMSPluginType,
 } from '../../types/plugin';
@@ -70,7 +70,7 @@ export class OtpStrategy extends AuthStrategy {
       userExists = Boolean(req.user);
 
     // send code
-    const smsPlugin = store.plugins.get(PluginType.SMS) as SMSPluginContent;
+    const smsPlugin = store.plugins.get(CorePluginType.SMS) as SMSPluginContent;
     if (!smsPlugin) throw new NotImplement('sms plugin not found');
 
     // save to db

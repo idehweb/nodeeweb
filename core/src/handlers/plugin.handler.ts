@@ -3,7 +3,7 @@ import path, { join } from 'path';
 import fs from 'fs';
 import logger from './log.handler';
 import { isAsyncFunction } from 'util/types';
-import { PluginContent, PluginType } from '../../types/plugin';
+import { PluginContent, CorePluginType, PluginOut } from '../../types/plugin';
 import store from '../../store';
 import { color } from '../../utils/color';
 
@@ -27,8 +27,8 @@ export default async function handlePlugin() {
 }
 
 export function registerPlugin(
-  type: PluginType,
-  content: PluginContent,
+  type: PluginOut['type'],
+  content: PluginOut['content'],
   from?: string
 ) {
   store.plugins.set(type, content);
@@ -40,7 +40,7 @@ export function registerPlugin(
   );
 }
 
-export function unregisterPlugin(type: PluginType, from?: string) {
+export function unregisterPlugin(type: CorePluginType, from?: string) {
   const existBefore = store.plugins.delete(type);
   if (!existBefore) return;
 

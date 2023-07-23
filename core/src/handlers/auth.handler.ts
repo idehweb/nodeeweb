@@ -30,6 +30,11 @@ export const AuthUserAccess: ControllerAccess[] = [
   },
 ];
 
+export const AdminAccess: ControllerAccess = {
+  modelName: 'admin',
+  role: PUBLIC_ACCESS,
+};
+
 export type UserPassStrategyOpt = {
   model: string;
   query?: (body: any) => Query<any, any>;

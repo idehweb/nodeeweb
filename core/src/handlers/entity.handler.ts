@@ -9,7 +9,7 @@ import {
 } from './controller.handler';
 import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { isAsyncFunction } from 'util/types';
-import { BadRequestError, GeneralError } from '../../types/error';
+import { BadRequestError, GeneralError, NotFound } from '../../types/error';
 import { catchFn } from '../../utils/catchAsync';
 
 export class EntityCreator {
@@ -43,6 +43,9 @@ export class EntityCreator {
       httpCode: number;
     }
   ) {
+    if (!result && httpCode !== 204)
+      throw new NotFound(`${this.modelName} not found`);
+
     if (sendResponse && !saveToReq) {
       const data =
         typeof sendResponse === 'boolean'
@@ -132,10 +135,10 @@ export class EntityCreator {
 
     if (executeQuery) result = await query.exec();
     if (autoSetCount)
-      res.setHeader('X-Total-Count', await query.countDocuments());
+      res.setHeader('X-Total-Count', await query.clone().countDocuments());
 
     // handle result and output
-    this.handleResult(req, res, next, {
+    await this.handleResult(req, res, next, {
       result,
       saveToReq,
       sendResponse,
@@ -339,8 +342,8 @@ function translateCRUD2Url(
       return '/';
     case CRUD.GET_ALL:
       let extra = '';
-      if (opt.paramFields?.offset) extra += `/?:${opt.paramFields.offset}`;
-      if (opt.paramFields?.limit) extra += `/?:${opt.paramFields.limit}`;
+      if (opt.paramFields?.offset) extra += `/:${opt.paramFields.offset}?`;
+      if (opt.paramFields?.limit) extra += `/:${opt.paramFields.limit}?`;
       return `/${extra}`;
     case CRUD.GET_ONE:
     case CRUD.UPDATE_ONE:
