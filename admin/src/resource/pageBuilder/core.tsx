@@ -7,9 +7,6 @@ import { useDispatch } from 'react-redux';
 import { useNotify, useTranslate } from 'react-admin';
 import clsx from 'clsx';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/css/bootstrap.rtl.min.css';
-import '@/assets/shards-dashboards.1.1.0.min.css';
 
 import Component from '@/components/page-builder/Component';
 import OptionBox from '@/components/page-builder/OptionBox';
