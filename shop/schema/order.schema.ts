@@ -118,7 +118,7 @@ const schema = new mongoose.Schema(
       required: false,
     },
     post: {
-      provider: String,
+    type : {provider: String,
       description: String,
       logo: String,
       link: String,
@@ -126,6 +126,8 @@ const schema = new mongoose.Schema(
       tracking: String,
       postedAt: Date,
       deliveredAt: Date,
+    },
+    required:false  
     },
     products: [
       {
@@ -139,8 +141,11 @@ const schema = new mongoose.Schema(
       },
     ],
     discount: {
-      code: { type: String, required: true },
-      amount: { type: Number, required: true },
+      type: {
+        code: { type: String, required: true },
+        amount: { type: Number, required: true },
+      },
+      required: false,
     },
     tax: { type: Number, default: 0 },
     totalPrice: Number,

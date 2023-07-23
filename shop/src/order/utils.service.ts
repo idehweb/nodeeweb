@@ -2,8 +2,8 @@ import { UserDocument } from '@nodeeweb/core/types/auth';
 import { OrderDocument } from '../../schema/order.schema';
 
 export class Utils {
-  async sendOnStateChange(user: UserDocument, order: OrderDocument) {}
-  async sendOnExpire(user: UserDocument, order: OrderDocument) {}
+  async sendOnStateChange(order: OrderDocument) {}
+  async sendOnExpire(order: OrderDocument) {}
 }
 
 const utils = new Utils();

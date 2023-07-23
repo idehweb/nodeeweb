@@ -20,12 +20,16 @@ import { Types } from 'mongoose';
 import { DiscountDocument, DiscountModel } from '../../schema/discount.schema';
 import { roundPrice } from '../../utils/helpers';
 import { UserDocument } from '@nodeeweb/core/types/auth';
-import { INACTIVE_PRODUCT_TIME } from '../constants/limit';
+import { INACTIVE_PRODUCT_TIME } from '../../constants/limit';
 import utils from './utils.service';
+import { PaymentVerifyStatus, ShopCallbackStatus } from '../../types/order';
 import {
   BankGatewayPluginContent,
-  PluginType,
-} from '@nodeeweb/core/types/plugin';
+  PostGatewayPluginContent,
+  ShopPluginType,
+} from '../../types/plugin';
+import discountService from '../discount/service';
+import logger from '../../utils/log';
 
 class TransactionService {
   transactionSupervisors = new Map<string, NodeJS.Timer>();
@@ -39,7 +43,6 @@ class TransactionService {
   get discountModel() {
     return store.db.model('discount') as DiscountModel;
   }
-
   private productCheck(order: OrderDocument, products: ProductDocument[]) {
     let activeCheck: Types.ObjectId[] = [],
       priceCheck: Types.ObjectId[] = [],
@@ -59,69 +62,40 @@ class TransactionService {
       const mp = productMap.get(p._id.toString());
       if (!mp) return;
       if (mp.salePrice !== p.salePrice) priceCheck.push(p._id);
-      if (p.quantity - mp.quantity < 0) quantityCheck.push(p._id);
+      if (mp.quantity - p.quantity < 0) quantityCheck.push(p._id);
     });
 
     const errors = [activeCheck, priceCheck, quantityCheck].flat();
     if (errors.length)
       throw new BadRequestError(
-        `these products must be change\n${errors
-          .map((id) => id.toString())
-          .join(',')}`
+        `these products must be change\n${[
+          ...new Set(errors.map((id) => id.toString())),
+        ].join(',')}`
       );
-  }
-
-  private async detectDiscount(
-    discountCode: string,
-    userId: Types.ObjectId,
-    consume: boolean
-  ) {
-    const query = {
-      $and: [
-        {
-          code: discountCode,
-          active: true,
-          consumers: {
-            $ne: userId,
-          },
-          usageLimit: { $gt: 0 },
-        },
-        {
-          // expired at
-          $or: [
-            { expiredAt: { $exists: false } },
-            { expiredAt: { $gte: new Date() } },
-          ],
-        },
-      ],
-    };
-
-    const discount = consume
-      ? await this.discountModel.findOneAndUpdate(
-          query,
-          {
-            $inc: {
-              usageLimit: -1,
-            },
-            $push: {
-              consumers: userId,
-            },
-          },
-          { new: true }
-        )
-      : await this.discountModel.findOne(query);
-
-    if (!discount) throw new NotFound('discount not found');
-
-    return discount;
   }
 
   private async getPostPrice(
     products: ProductDocument[],
-    address: Omit<IOrder['address'], 'receiver'>,
-    provider?: string
+    address: Omit<IOrder['address'], 'receiver'>
   ) {
-    return 0;
+    const postPlugin = store.plugins.get(
+      ShopPluginType.POST_GATEWAY
+    ) as PostGatewayPluginContent;
+    if (!postPlugin) return 0;
+
+    return (await postPlugin.stack[1]({ products, address })).price;
+  }
+
+  private submitPostReq(order: OrderDocument) {
+    const postPlugin = store.plugins.get(
+      ShopPluginType.POST_GATEWAY
+    ) as PostGatewayPluginContent;
+    if (!postPlugin) return;
+
+    return postPlugin.stack[0]({
+      address: order.address,
+      products: order.products,
+    });
   }
 
   private async calculatePrice(
@@ -145,18 +119,14 @@ class TransactionService {
       totalPrice_before_discount: number,
       totalPrice: number;
 
-    const products = order.products;
+    const products = order?.products ?? [];
 
     const _post = async () =>
       postPrice !== undefined
         ? postPrice
         : opt.post
         ? roundPrice(
-            await this.getPostPrice(
-              products as any,
-              opt.post.address,
-              opt.post.provider
-            )
+            await this.getPostPrice(products as any, opt.post?.address)
           )
         : 0;
     const _products = () =>
@@ -216,26 +186,25 @@ class TransactionService {
       postPrice,
       productsPrice,
       totalPrice_before_taxes,
-      totalPrice_before_discount,
       taxesPrice,
-      totalPrice,
+      totalPrice_before_discount,
       discount,
+      totalPrice,
     };
   }
 
   private async createPaymentLink(
     amount: number,
     products: ProductDocument[],
-    userPhone: string,
-    signal?: AbortSignal
+    userPhone: string
   ): Promise<Partial<OrderDocument['transaction']>> {
     const bankPlugin = store.plugins.get(
-      PluginType.BANK_GATEWAY
+      ShopPluginType.BANK_GATEWAY
     ) as BankGatewayPluginContent;
 
     if (!bankPlugin)
       return {
-        authority: new Date() + '',
+        authority: new Date().toISOString(),
         provider: TransactionProvider.Manual,
       };
 
@@ -250,39 +219,16 @@ class TransactionService {
 
     return await bankPlugin.stack[0]({
       amount,
-      callback_url: `${store.env.BASE_URL}/api/v1/shop/payment_callback?amount=${amount}`,
+      callback_url: `${store.env.BASE_URL}/api/v1/order/payment_callback?amount=${amount}`,
       currency: 'IRT',
       description,
       userPhone,
     });
   }
 
-  getDiscount: MiddleWare = async (req, res) => {
-    const discount = await this.detectDiscount(
-      req.params.discountId,
-      req.user._id,
-      false
-    );
-    return res.json({
-      data: {
-        code: discount.code,
-        amount: discount.amount,
-        maxAmount: discount.maxAmount,
-        percentage: discount.percentage,
-        expiredAt: discount.expiredAt,
-      },
-    });
-  };
-
   createTransaction: MiddleWare = async (req, res) => {
-    const transactionController = new AbortController();
-    // set abort controller when request is closed
-    req.socket.on('close', () => {
-      transactionController.abort('Request Closed');
-    });
-
     // 1. check user maximum need paid transaction
-    const tds = await this.orderModel
+    const needToPayOrders = await this.orderModel
       .find({
         'customer._id': req.user._id,
         status: OrderStatus.NeedToPay,
@@ -290,19 +236,19 @@ class TransactionService {
       })
       .count();
 
-    if (tds > MAXIMUM_NEED_TO_PAY_TRANSACTION)
+    if (needToPayOrders > MAXIMUM_NEED_TO_PAY_TRANSACTION)
       throw new LimitError(
         'Maximum need to pay transaction , please paid them first'
       );
 
     // 2. find order
     const order = await this.orderModel.findOne({
-      _id: req.params.orderId,
       'customer._id': req.user._id,
       status: OrderStatus.Cart,
+      'products.0': { $exists: true },
       active: true,
     });
-    if (!order) throw new NotFound();
+    if (!order) throw new NotFound('order not found');
 
     // 3. check product details
     const products = await this.productModel.find({
@@ -314,11 +260,7 @@ class TransactionService {
     // 4. discount
     let discount: DiscountDocument;
     if (req.body.discount) {
-      discount = await this.detectDiscount(
-        req.body.discount,
-        req.user._id,
-        true
-      );
+      discount = await discountService.consumeDiscount(req);
     }
 
     // 5. pricing and verify post
@@ -329,25 +271,17 @@ class TransactionService {
       discount: discountPrice,
     } = await this.calculatePrice(order, {
       discount,
-      post: req.post,
+      post: req.body.post,
       tax: true,
       total: true,
     });
 
-    let transaction: Partial<OrderDocument['transaction']> = {};
-    // zero payment
-    if (!totalPrice) {
-      transaction.authority = Date.now() + '';
-      transaction.provider = TransactionProvider.Manual;
-    } else {
-      // 6. create payment link
-      transaction = await this.createPaymentLink(
-        totalPrice,
-        products,
-        req.user.phone,
-        transactionController.signal
-      );
-    }
+    // 6. create payment link
+    const transaction = await this.createPaymentLink(
+      totalPrice,
+      products,
+      req.user.phone
+    );
 
     // 7. update order
     const newOrder = await this.orderModel.findOneAndUpdate(
@@ -366,7 +300,7 @@ class TransactionService {
           post: req.body.post
             ? { ...req.body.post, price: postPrice }
             : undefined,
-          status: OrderStatus.NeedToPay,
+          status: totalPrice ? OrderStatus.NeedToPay : OrderStatus.Packing,
           tax: taxesPrice,
           totalPrice,
           transaction,
@@ -382,13 +316,147 @@ class TransactionService {
       notif_watcher: totalPrice ? true : false,
     });
 
+    // 9. send sms if payment completed by discount
     if (!totalPrice) {
       // send change state sms
-      utils.sendOnStateChange(req.user, newOrder)?.then();
+      utils.sendOnStateChange(newOrder)?.then();
     }
 
     return res.status(201).json({ data: newOrder });
   };
+
+  getPrice: MiddleWare = async (req, res) => {
+    const order = await this.orderModel.findOne({
+      'customer._id': req.user._id,
+      status: OrderStatus.Cart,
+      active: true,
+    });
+
+    const extraOpt: any = {};
+    if (req.query.discount)
+      extraOpt.discount = await discountService.getOne(req);
+
+    if (req.query.post) {
+      extraOpt.post = JSON.parse(req.query.post as string);
+    }
+
+    return res.json({
+      data: await this.calculatePrice(order, { ...req.query, ...extraOpt }),
+    });
+  };
+
+  async handlePayment(
+    order: OrderDocument,
+    successAction: boolean,
+    failedAction: boolean,
+    withTransaction: boolean
+  ) {
+    return;
+    // let order = typeof authorityOrOrder !== 'string' ? authorityOrOrder : null;
+    // const authority =
+    //   typeof authorityOrOrder === 'string'
+    //     ? authorityOrOrder
+    //     : order
+    //     ? order.transaction.authority
+    //     : null;
+    // const successAction = typeof amountOrSA === 'boolean' ? amountOrSA : SA;
+    // const amount =
+    //   typeof amountOrSA === 'number'
+    //     ? amountOrSA
+    //     : order
+    //     ? order.totalPrice
+    //     : null;
+    // const failedAction = typeof stateOrFA === 'boolean' ? stateOrFA : FA;
+    // const state = typeof stateOrFA === 'string' ? stateOrFA : null;
+
+    // const _clearTimer = (authority: string) => {
+    //   const expiredTimer = this.transactionSupervisors.get(authority + '-1');
+    //   const notifTimer = this.transactionSupervisors.get(authority + '-2');
+
+    //   [expiredTimer, notifTimer]
+    //     .filter((t) => t)
+    //     .forEach((timer, index) => {
+    //       clearTimeout(timer);
+    //       this.transactionSupervisors.delete(`${authority}-${index + 1}`);
+    //     });
+    // };
+
+    // // clear timer
+    // _clearTimer(authority);
+
+    // const _success = async () => {
+    //   const update = {
+    //     $set: { state: OrderStatus.Packing },
+    //     $unset: { expiredAt: '' },
+    //   };
+    //   let td: OrderDocument;
+    //   if (order) {
+    //     await order.updateOne(update);
+    //     td = order;
+    //   } else if (authority) {
+    //     td = await this.orderModel.findOneAndUpdate(
+    //       { authority, state: OrderStatus.NeedToPay },
+    //       update
+    //     );
+    //     order = td;
+    //   }
+    //   if (!td) return;
+
+    //   // send sms
+    //   utils.sendOnStateChange(td)?.then();
+    // };
+
+    // const _failed = async () => {
+    //   let td = order;
+    //   // rollback
+    //   // disabled transaction
+    //   if (!td && authority) {
+    //     td = await this.orderModel.findOneAndUpdate(
+    //       { authority, state: OrderStatus.NeedToPay },
+    //       { $set: { active: false } }
+    //     );
+    //     order = td;
+    //   } else await td.updateOne({ $set: { active: false } });
+
+    //   if (td) {
+    //     // activate products
+    //     await this.productModel.updateMany(
+    //       { _id: { $in: td.products.map(({ _id }) => _id) } },
+    //       { $set: { active: true } }
+    //     );
+
+    //     // pull discount consumer
+    //     if (td.discount_code) {
+    //       await this.discountModel.updateOne(
+    //         { code: td.discount_code.toLowerCase() },
+    //         { $pull: { consumers: td.user } }
+    //       );
+    //     }
+    //   }
+    // };
+
+    // const _core = async () => {
+    //   let status: PaymentVerifyStatus;
+    //   if (state === ShopCallbackStatus.NOK) {
+    //     status = PaymentVerifyStatus.Failed;
+    //     if (failedAction) await _failed();
+    //   } else {
+    //     const vR = await this.verifyPayment(authority, amount);
+    //     if (+vR?.data?.code === 100) {
+    //       status = PaymentVerifyStatus.Paid;
+    //       if (successAction) await _success();
+    //     } else if (+vR?.data?.code === 101)
+    //       status = PaymentVerifyStatus.CheckBefore;
+    //     else {
+    //       status = PaymentVerifyStatus.Failed;
+    //       if (failedAction) await _failed();
+    //     }
+    //   }
+    //   return { status, order };
+    // };
+
+    // return await _core();
+  }
 
   private async transactionSupervisor(
     user: UserDocument,
@@ -424,7 +492,7 @@ class TransactionService {
     }
 
     // watchers
-    if (expired_watcher) {
+    if (expired_watcher && watchers_timeout !== -1) {
       // create watcher
       // 1. Expire
       const expiredTimer = setTimeout(async () => {
@@ -446,7 +514,7 @@ class TransactionService {
       );
     }
 
-    if (notif_watcher) {
+    if (notif_watcher && watchers_timeout !== -1) {
       //2. Notification Before Expired
       const notifTimer = setTimeout(async () => {
         try {
@@ -459,7 +527,7 @@ class TransactionService {
             active: true,
           });
           if (!td) return;
-          utils.sendOnExpire(user, order)?.then();
+          utils.sendOnExpire(order)?.then();
         } catch (err) {}
       }, watchers_timeout * 0.6);
       this.transactionSupervisors.set(
@@ -467,6 +535,154 @@ class TransactionService {
         notifTimer
       );
     }
+  }
+
+  private verifyPayment(authority: string, amount?: number) {
+    // return tryCount(
+    //   async () => {
+    //     const td = await this.shopTransactionModel.findOne({ authority });
+    //     if (!amount) {
+    //       if (!td) throw new NotFoundException('Transaction Notfound');
+    //       amount = td.totalPrice - td.taxesPrice;
+    //     }
+    //     try {
+    //       const { data } = await axios.post(GLOBAL.env.VERIFY_AUTHORITY_URL, {
+    //         authority,
+    //         merchant_id: GLOBAL.env.MERCHANT_ID,
+    //         amount,
+    //       });
+    //       // decrease discount limit usage
+    //       if (td?.discount_code) {
+    //         await this.discountModel.findOneAndUpdate(
+    //           { code: td.discount_code, usageLimit: { $exists: true } },
+    //           { $inc: { usageLimit: -1 } }
+    //         );
+    //       }
+    //       return data;
+    //       // return {};
+    //     } catch (err) {
+    //       if (err?.response?.data?.errors) return err?.response?.data?.errors;
+    //       throw err;
+    //     }
+    //   },
+    //   { count: 5, name: 'Verify Payment', timer: 2000 }
+    // );
+  }
+  paymentCallback: MiddleWare = (req, res) => {
+    // // handle payment
+    // let { status, transaction } = await this.handlePayment(
+    //   query.Authority,
+    //   query.amount,
+    //   query.Status,
+    //   true,
+    //   true,
+    //   false
+    // );
+    // if (!transaction)
+    //   transaction = await this.shopTransactionModel.findOne(
+    //     { authority: query.Authority },
+    //     { _id: 1 }
+    //   );
+    // let html = GLOBAL.pages.PaymentCallback;
+    // html = html.replace(
+    //   PaymentCallbackPageKeys.Link,
+    //   `vilibook://${
+    //     status === PaymentVerifyStatus.Failed
+    //       ? 'shop_transactions'
+    //       : `payment_factor/${transaction?.id}`
+    //   }`
+    // );
+    // html = html.replace(PaymentCallbackPageKeys.LinkText, 'بازگشت به برنامه');
+    // switch (status) {
+    //   case PaymentVerifyStatus.Paid:
+    //     html = html.replace(PaymentCallbackPageKeys.Message, 'پرداخت انجام شد');
+    //     break;
+    //   case PaymentVerifyStatus.CheckBefore:
+    //     html = html.replace(
+    //       PaymentCallbackPageKeys.Message,
+    //       'تایید عملیات پرداخت قبلا انجام شده است'
+    //     );
+    //     break;
+    //   case PaymentVerifyStatus.Failed:
+    //     html = html.replace(
+    //       PaymentCallbackPageKeys.Message,
+    //       'پرداخت انجام نشد'
+    //     );
+    //     break;
+    // }
+    // res.header('Content-Type', 'text/html');
+    // res.code(200);
+    // return res.send(html);
+  };
+  async shopJob() {
+    // try {
+    //   const taskId = [];
+    //   const _unverified_authorities = async () => {
+    //     const { data } = await axios.post(
+    //       GLOBAL.env.GET_UNVERIFIED_AUTHORITY_URL,
+    //       { merchant_id: GLOBAL.env.MERCHANT_ID }
+    //     );
+    //     if (+data.data?.code !== 100) return [];
+    //     const { authorities }: { authorities: any[] } = data.data;
+    //     // unverified authorities
+    //     return authorities.map(({ authority, amount }) => {
+    //       if (taskId.includes(authority)) return;
+    //       taskId.push(authority);
+    //       return this.handlePayment(
+    //         authority,
+    //         roundAmount(amount, true),
+    //         null,
+    //         true,
+    //         true,
+    //         false
+    //       );
+    //     });
+    //   };
+    //   const _expired_transactions = async () => {
+    //     const expiredTransactions = await this.shopTransactionModel.find({
+    //       expiredAt: { $lt: new Date() },
+    //       active: true,
+    //     });
+    //     // expired transactions
+    //     return expiredTransactions.map((td) => {
+    //       if (taskId.includes(td.authority)) return;
+    //       taskId.push(td.authority);
+    //       return this.handlePayment(td, true, true, true);
+    //     });
+    //   };
+    //   const _watcher_transactions = async () => {
+    //     const openTransactions = await this.shopTransactionModel.find({
+    //       active: true,
+    //       state: ShopTransactionState.NeedToPay,
+    //       expiredAt: { $gt: new Date() },
+    //     });
+    //     return openTransactions.map((td) => {
+    //       if (taskId.includes(td.authority)) return;
+    //       taskId.push(td.authority);
+    //       return this.inactiveTransactionJob(
+    //         null as any,
+    //         td,
+    //         null as any,
+    //         td.authority,
+    //         null as any,
+    //         {
+    //           expired_watcher: true,
+    //           watchers_timeout: td.expiredAt.getTime() - Date.now(),
+    //         }
+    //       );
+    //     });
+    //   };
+    //   const promises = [
+    //     ...(await _unverified_authorities()),
+    //     ...(await _expired_transactions()),
+    //     ...(await _watcher_transactions()),
+    //   ];
+    //   // execute parallel
+    //   await Promise.all(promises);
+    // } catch (err) {
+    //   console.log('shop job error\n');
+    //   if (!err.isAxiosError) console.log(err);
+    // }
   }
 }
 
