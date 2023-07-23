@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import { useDispatch } from 'react-redux';
 
-// import ComponentOptionBox from "#c/components/page-builder/ComponentOptionBox";
+// import ComponentOptionBox from "@/components/page-builder/ComponentOptionBox";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.rtl.min.css';
 import './../../assets/shards-dashboards.1.1.0.min.css';

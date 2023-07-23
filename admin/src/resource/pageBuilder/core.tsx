@@ -1,7 +1,8 @@
 import { useEffect, useState, memo, useCallback } from 'react';
-import { Button } from 'shards-react';
 import { useParams } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
+import { Button, ButtonBase } from '@mui/material';
+
 import { useDispatch } from 'react-redux';
 import { useNotify, useTranslate } from 'react-admin';
 import clsx from 'clsx';
@@ -9,8 +10,6 @@ import clsx from 'clsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.rtl.min.css';
 import '@/assets/shards-dashboards.1.1.0.min.css';
-import '@/assets/globalforpagebuilder.css';
-import '@/assets/nodeeweb-page-builder.css';
 
 import Component from '@/components/page-builder/Component';
 import OptionBox from '@/components/page-builder/OptionBox';
@@ -21,17 +20,8 @@ import {
   SaveBuilder,
 } from '@/functions';
 
-import { Header, TabButton, Container } from './components';
-
-const generateID = (tokenLen = 5) => {
-  let text = '';
-  const possible =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < tokenLen; ++i)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-  return text;
-};
+import { Header, Tabs, Container, Wrapper } from './components';
+import { generateCompID } from './utils';
 
 const lan = 'fa';
 
@@ -282,7 +272,7 @@ const Core = (props) => {
       }
 
       if (mainAddress[0] === 'new') {
-        theNewComponents.push({ ...element, id: 'component_' + generateID() });
+        theNewComponents.push({ ...element, id: generateCompID() });
         setState((s) => ({ ...s, components: theNewComponents, ...extra }));
       } else {
         console.log('addToComponentaddToComponent: ', theNewComponents);
@@ -293,7 +283,7 @@ const Core = (props) => {
             }
             theNewComponents[indeL1]['children'].push({
               ...element,
-              id: 'component_' + generateID(),
+              id: generateCompID(),
             });
             setState((s) => ({
               ...s,
@@ -314,7 +304,7 @@ const Core = (props) => {
                 }
                 theNewComponents[indeL1]['children'][indeL2]['children'].push({
                   ...element,
-                  id: 'component_' + generateID(),
+                  id: generateCompID(),
                 });
                 setState((s) => ({
                   ...s,
@@ -339,7 +329,7 @@ const Core = (props) => {
                       indeL3
                     ]['children'].push({
                       ...element,
-                      id: 'component_' + generateID(),
+                      id: generateCompID(),
                     });
                     setState((s) => ({
                       ...s,
@@ -364,7 +354,7 @@ const Core = (props) => {
                           'children'
                         ][indeL3]['children'][indeL4]['children'].push({
                           ...element,
-                          id: 'component_' + generateID(),
+                          id: generateCompID(),
                         });
                         setState((s) => ({
                           ...s,
@@ -395,7 +385,7 @@ const Core = (props) => {
                               'children'
                             ].push({
                               ...element,
-                              id: 'component_' + generateID(),
+                              id: generateCompID(),
                             });
                             setState((s) => ({
                               ...s,
@@ -426,7 +416,7 @@ const Core = (props) => {
                                   indeL5
                                 ]['children'][indeL6]['children'].push({
                                   ...element,
-                                  id: 'component_' + generateID(),
+                                  id: generateCompID(),
                                 });
                                 setState((s) => ({
                                   ...s,
@@ -544,88 +534,73 @@ const Core = (props) => {
   }, []);
 
   return (
-    <>
-      <div
-        className={clsx(
-          'nodeeweb-page-builder-wrapper',
-          translate('direction')
-        )}
-        style={{
-          margin: 20,
-        }}>
-        <Header>
-          <span>Page Builder</span>
-          <div>
-            <TabButton onClick={(e) => setTabValue(0)}>Classic Mode</TabButton>
-            <TabButton onClick={(e) => setTabValue(1)}>Preview Mode</TabButton>
-          </div>
-        </Header>
-
-        <Container id="nodeeweb-page-builder">
-          {tabValue === 0 && (
-            <>
-              {components?.filter(Boolean).map((component, index) => (
-                <Component
-                  key={index}
-                  index={index}
-                  toggleOptionBox={toggleOptionBox}
-                  // moveContent={moveContent}
-                  // moveItem={moveItem}
-                  component={component}
-                  deleteItem={(e) => {
-                    deleteItem(e || component.id);
-                  }}
-                  changeComponentSetting={(e, j, d) => {
-                    changeComponentSetting(e, j, d);
-                  }}
-                  length={components.length}
-                  startDestHnadler={moveItemStart}
-                />
-              ))}
-              {/* <div ref={drop} className={"add-component element "+(isOver ? 'hover' : '')} onClick={(e) => { */}
-              {/* <div ref={drop} className={"add-component newelement "+(isOver ? 'hover' : '')}  */}
-              <div
-                className="add-component newelement"
-                onClick={(e) => {
-                  setState({
-                    ...state,
-                    sourceAddress: 'new',
-                    excludeArray: [],
-                    optionBox: !state.optionBox,
-                  });
-                }}>
-                <span
-                  style={{
-                    fontSize: '14px',
-                    padding: '10px 40px',
-                    background: 'rgb(2, 111, 176)',
-                    display: 'block',
-                    color: '#ffffff',
-                  }}>
-                  Add Element <AddIcon />
-                </span>
-              </div>
-            </>
-          )}
-          {tabValue === 1 && (
-            <div style={{ direction: 'ltr' }}>
-              <h5>Preview Mode Soon.... </h5>
-            </div>
-          )}
-        </Container>
-      </div>
-      <div className="nodeeweb-fixed-bottom-bar">
-        <div className="npb-d-flex">
-          <label style={{ direction: 'ltr' }}>
-            {data && typeof data.title == 'object'
-              ? data.title[lan]
-              : data.title}
-          </label>
-          <span className="npb-settings">
-            <Button onClick={() => SaveData(components)}>Save</Button>
-          </span>
+    <Wrapper className={translate('direction')}>
+      <Header>
+        <div>
+          <Button
+            onClick={(e) => {
+              setState((p) => ({
+                ...p,
+                sourceAddress: 'new',
+                excludeArray: [],
+                optionBox: !p.optionBox,
+              }));
+            }}
+            variant="contained"
+            endIcon={<AddIcon />}>
+            Add Element
+          </Button>
         </div>
-      </div>
+        <Tabs>
+          <ButtonBase
+            className={clsx(tabValue === 0 && 'active')}
+            onClick={(e) => setTabValue(0)}>
+            Builder
+          </ButtonBase>
+          <ButtonBase
+            className={clsx(tabValue === 1 && 'active')}
+            onClick={(e) => setTabValue(1)}>
+            Preview
+          </ButtonBase>
+        </Tabs>
+        <div>
+          <Button variant="contained" onClick={() => SaveData(components)}>
+            Save
+          </Button>
+        </div>
+      </Header>
+
+      <Container id="nodeeweb-page-builder">
+        {tabValue === 0 && (
+          <>
+            {components?.filter(Boolean).map((component, index) => (
+              <Component
+                key={index}
+                index={index}
+                toggleOptionBox={toggleOptionBox}
+                // moveContent={moveContent}
+                // moveItem={moveItem}
+                component={component}
+                deleteItem={(e) => {
+                  deleteItem(e || component.id);
+                }}
+                changeComponentSetting={(e, j, d) => {
+                  changeComponentSetting(e, j, d);
+                }}
+                length={components.length}
+                startDestHnadler={moveItemStart}
+              />
+            ))}
+            {/* <div ref={drop} className={"add-component element "+(isOver ? 'hover' : '')} onClick={(e) => { */}
+            {/* <div ref={drop} className={"add-component newelement "+(isOver ? 'hover' : '')}  */}
+          </>
+        )}
+        {tabValue === 1 && (
+          <div style={{ direction: 'ltr' }}>
+            <h5>Preview Mode Soon.... </h5>
+          </div>
+        )}
+      </Container>
       <OptionBox
         {...props}
         onClose={(e) => toggleOptionBox({})}
@@ -633,7 +608,7 @@ const Core = (props) => {
         open={state.optionBox}
         addToComponents={addToComponents}
       />
-    </>
+    </Wrapper>
   );
 };
 

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 // import {withTranslation} from "react-i18next";
-import { dFormat, PriceFormat } from '@/functions/utils';
 import CustomModal from '@/components/Modal';
 
-import '@/assets/styles/nodeeweb-page-builder.css';
 import { Button, Card, Nav, NavItem, NavLink } from 'shards-react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import BrushIcon from '@mui/icons-material/Brush';
