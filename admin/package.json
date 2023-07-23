@@ -3,7 +3,9 @@
   "version": "1.0.1",
   "license": "MIT",
   "homepage": ".",
-  "files": ["build"],
+  "files": [
+    "build"
+  ],
   "scripts": {
     "dev": "craco start",
     "start": "craco start",
@@ -31,6 +33,7 @@
     "date-fns": "^2.28.0",
     "date-fns-jalali": "^2.29.3-0",
     "final-form": "^4.20.7",
+    "framer-motion": "^10.13.0",
     "grapesjs": "^0.19.5",
     "grapesjs-preset-webpage": "^0.1.11",
     "immutability-helper": "^3.1.1",
