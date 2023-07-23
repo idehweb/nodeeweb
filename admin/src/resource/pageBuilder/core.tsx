@@ -21,6 +21,7 @@ import {
 } from '@/functions';
 
 import { Header, Tabs, Container, Wrapper } from './components';
+import Preview from './Preview';
 import { generateCompID } from './utils';
 
 const lan = 'fa';
@@ -595,11 +596,8 @@ const Core = (props) => {
             {/* <div ref={drop} className={"add-component newelement "+(isOver ? 'hover' : '')}  */}
           </>
         )}
-        {tabValue === 1 && (
-          <div style={{ direction: 'ltr' }}>
-            <h5>Preview Mode Soon.... </h5>
-          </div>
         )}
+        {tabValue === 1 && <Preview />}
       </Container>
       <OptionBox
         {...props}
