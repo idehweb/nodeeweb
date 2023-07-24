@@ -3,9 +3,10 @@ import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 import { useNotify, useTranslate } from 'react-admin';
+import { DropTargetMonitor } from 'react-dnd';
 
-import Component from '@/components/page-builder/Component';
-import OptionBox from '@/components/page-builder/OptionBox';
+import { Component, OptionBox } from '@/components/page-builder';
+
 import ComponentSetting from '@/components/page-builder/Component/Setting';
 import {
   changeThemeData,
@@ -18,7 +19,6 @@ import Header from './Header';
 import Container from './Container';
 import Preview from './Preview';
 import { generateCompID } from './utils';
-import { DropTargetMonitor } from 'react-dnd';
 
 const Core = (props) => {
   const translate = useTranslate();
