@@ -5,8 +5,8 @@ import { useDispatch } from 'react-redux';
 import { useNotify, useTranslate } from 'react-admin';
 import { DropTargetMonitor } from 'react-dnd';
 
+import { LoadingContainer } from '@/components/global';
 import { Component, OptionBox } from '@/components/page-builder';
-
 import ComponentSetting from '@/components/page-builder/Component/Setting';
 import {
   changeThemeData,
@@ -26,6 +26,8 @@ const Core = (props) => {
   const notify = useNotify();
   const { _id, model = 'page' } = useParams();
 
+  const [loading, setLoading] = useState(true);
+
   const [tabValue, setTabValue] = useState(0);
   const [editItem, setEditItem] = useState<any>({});
 
@@ -38,26 +40,22 @@ const Core = (props) => {
     componentOptionsBox: false,
   });
 
-  const {
-    components,
-    optionBox,
-    excludeArray,
-    sourceAddress,
-    componentForSetting,
-    componentOptionsBox,
-  } = state;
+  const { components, excludeArray, sourceAddress } = state;
 
   const LoadData = useCallback(() => {
     if (!_id) return;
 
+    setLoading(true);
     changeThemeDataFunc().then((e) => {
       dispatch(changeThemeData(e));
     });
-    GetBuilder(model, _id).then((r) => {
-      if (r && r.elements) {
-        setState((s) => ({ ...s, components: r.elements }));
-      }
-    });
+    GetBuilder(model, _id)
+      .then((r) => {
+        if (r && r.elements) {
+          setState((s) => ({ ...s, components: r.elements }));
+        }
+      })
+      .finally(() => setLoading(false));
   }, [_id, model, dispatch]);
   useEffect(() => {
     console.log('useEffect');
@@ -68,6 +66,7 @@ const Core = (props) => {
 
   const SaveData = useCallback(
     (data = {}) => {
+      setLoading(true);
       console.log('SaveData');
       SaveBuilder(model, _id, { elements: data })
         .then((r) => {
@@ -80,7 +79,8 @@ const Core = (props) => {
           notify(translate('shit!'), {
             type: 'warning',
           });
-        });
+        })
+        .finally(() => setLoading(false));
     },
     [notify, translate, _id, model]
   );
@@ -532,10 +532,11 @@ const Core = (props) => {
       handleDrop2(id, dest, item);
     },
     [handleDrop2]
+    [handleDrop2, components]
   );
 
   return (
-    <div className={translate('direction')}>
+    <LoadingContainer loading={loading} className={translate('direction')}>
       <Header
         tabValue={tabValue}
         setTabValue={setTabValue}
@@ -590,7 +591,7 @@ const Core = (props) => {
         onClose={() => setEditItem({})}
         onSubmit={changeComponentSetting}
       />
-    </div>
+    </LoadingContainer>
   );
 };
 
