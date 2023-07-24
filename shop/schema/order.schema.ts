@@ -103,6 +103,7 @@ const schema = new mongoose.Schema(
     },
     address: {
       type: {
+        _id: false,
         state: { type: String, required: true },
         city: { type: String, required: true },
         street: { type: String, required: true },
@@ -118,16 +119,18 @@ const schema = new mongoose.Schema(
       required: false,
     },
     post: {
-    type : {provider: String,
-      description: String,
-      logo: String,
-      link: String,
-      price: Number,
-      tracking: String,
-      postedAt: Date,
-      deliveredAt: Date,
-    },
-    required:false  
+      type: {
+        _id: false,
+        provider: String,
+        description: String,
+        logo: String,
+        link: String,
+        price: Number,
+        tracking: String,
+        postedAt: Date,
+        deliveredAt: Date,
+      },
+      required: false,
     },
     products: [
       {
@@ -142,6 +145,7 @@ const schema = new mongoose.Schema(
     ],
     discount: {
       type: {
+        _id: false,
         code: { type: String, required: true },
         amount: { type: Number, required: true },
       },
@@ -150,9 +154,10 @@ const schema = new mongoose.Schema(
     tax: { type: Number, default: 0 },
     totalPrice: Number,
     transaction: {
+      _id: false,
       provider: String,
       payment_link: String,
-      authority: String,
+      authority: { type: String, unique: true, sparse: true },
       createdAt: Date,
       expiredAt: Date,
     },

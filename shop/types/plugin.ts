@@ -1,5 +1,6 @@
 import { PluginContent } from '@nodeeweb/core/types/plugin';
 import { IOrder } from '../schema/order.schema';
+import { PaymentVerifyStatus } from './order';
 
 export enum ShopPluginType {
   BANK_GATEWAY = 'bank-gateway',
@@ -44,8 +45,26 @@ export type PostGatewayCalcPrice = (args: {
   }
 >;
 
+export type BankGatewayVerifyArgs = {
+  authority: string;
+  amount: number;
+  status: string;
+} & { [key: string]: any };
+
+export type BankGatewayVerify = (
+  args: BankGatewayVerifyArgs
+) => Promise<{ status: PaymentVerifyStatus }>;
+
+export type BankGatewayUnverified = () => Promise<
+  Partial<BankGatewayVerifyArgs>[]
+>;
+
 export interface BankGatewayPluginContent extends PluginContent {
-  stack: [(args: BankGatewayCreateArgs) => Promise<BankGatewayCreateOut>];
+  stack: [
+    (args: BankGatewayCreateArgs) => Promise<BankGatewayCreateOut>,
+    BankGatewayVerify,
+    BankGatewayUnverified
+  ];
 }
 export interface PostGatewayPluginContent extends PluginContent {
   stack: [PostGatewaySendPostReq, PostGatewayCalcPrice];
