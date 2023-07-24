@@ -58,9 +58,9 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
         ExtractJwt.fromAuthHeaderAsBearerToken()(req) ||
         (opt.cookieName && req.cookies[opt.cookieName]),
       secretOrKey: store.env.AUTH_SECRET,
-      passReqToCallback: false,
+      passReqToCallback: true,
     },
-    async ({ id, iat }, done) => {
+    async (req, { id, iat }, done) => {
       iat = iat * 1000;
       const models = Array.isArray(opt.model) ? opt.model : [opt.model];
       const query = (model: string) =>
@@ -72,7 +72,10 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
 
       for (const model of models) {
         const user = await query(model);
-        if (user) return done(null, user);
+        if (user) {
+          req.modelName = model;
+          return done(null, user);
+        }
       }
 
       if (opt.notThrow) return done(null, {});

@@ -10,19 +10,9 @@ import {
 import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { isAsyncFunction } from 'util/types';
 import { BadRequestError, GeneralError, NotFound } from '../../types/error';
-import { catchFn } from '../../utils/catchAsync';
 
 export class EntityCreator {
-  constructor(private modelName: string) {
-    // // catch fn
-    // [this.baseCreator, this.handleResult].forEach(
-    //   (fn) =>
-    //     (this[fn.name] = catchFn(fn, {
-    //       self: this,
-    //       onError: EntityCreator.onError,
-    //     }))
-    // );
-  }
+  constructor(private modelName: string) {}
   private get model() {
     return store.db.model(this.modelName);
   }

@@ -1,12 +1,19 @@
 import { NextFunction, Response } from 'express';
 import { MiddleWare, MiddleWareError, Req } from '../types/global';
 import { isAsyncFunction } from 'util/types';
+import store from '../store';
 
-export function catchFn<F extends Function>(
+export const catchFn = <F extends Function>(
   fn: F,
-  { self, onError }: { self?: any; onError?: any } = {}
-) {
-  return (async (...args: any[]) => {
+  {
+    self,
+    onError,
+  }: {
+    self?: any;
+    onError?: Function;
+  } = {}
+) => {
+  const newFn = async (...args: any[]) => {
     try {
       let result = fn.call(self ?? this, ...args);
       while (result instanceof Promise) {
@@ -19,8 +26,10 @@ export function catchFn<F extends Function>(
         return onError(err, ...args);
       }
     }
-  }) as any as F;
-}
+  };
+
+  return newFn as any as F;
+};
 export const catchMiddleware = <F extends MiddleWare>(
   fn: F,
   {

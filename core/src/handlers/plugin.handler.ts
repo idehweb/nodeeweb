@@ -6,6 +6,7 @@ import { isAsyncFunction } from 'util/types';
 import { PluginContent, CorePluginType, PluginOut } from '../../types/plugin';
 import store from '../../store';
 import { color } from '../../utils/color';
+import { catchFn } from '../../utils/catchAsync';
 
 export default async function handlePlugin() {
   const __dirname = path.resolve();
@@ -31,6 +32,15 @@ export function registerPlugin(
   content: PluginOut['content'],
   from?: string
 ) {
+  // catch
+  content.stack = content.stack.map((cb) =>
+    catchFn(cb, {
+      onError(error) {
+        logger.error('# ShopPlugin #\n', error);
+      },
+    })
+  );
+
   store.plugins.set(type, content);
   store.systemLogger.log(
     color(
