@@ -92,7 +92,7 @@ const ShowElementIcon = ({ type }) => {
           <svg
             width="30px"
             height="30px"
-            class="svg-icon"
+            className="svg-icon"
             style={{ verticalAlign: 'middle', overflow: 'hidden' }}
             viewBox="0 0 1024 1024"
             version="1.1"
@@ -226,9 +226,9 @@ const ShowElementIcon = ({ type }) => {
                 id="Vector"
                 d="M15 15L21 21M10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10C17 13.866 13.866 17 10 17Z"
                 stroke="#ffffff"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </g>
           </svg>
@@ -274,25 +274,25 @@ const ShowElementIcon = ({ type }) => {
               fill="#ffffff"
               d="M18 7V17C18 17.62 17.98 18.17 17.91 18.66C17.62 21.29 16.38 22 13 22H11C7.62 22 6.38 21.29 6.09 18.66C6.02 18.17 6 17.62 6 17V7C6 6.38 6.02 5.83 6.09 5.34C6.38 2.71 7.62 2 11 2H13C16.38 2 17.62 2.71 17.91 5.34C17.98 5.83 18 6.38 18 7Z"
               stroke="#292D32"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               fill="#ffffff"
               d="M6 17.0001C6 17.6201 6.02 18.1701 6.09 18.6601C5.95 18.6701 5.82 18.6701 5.67 18.6701H5.33C2.67 18.6701 2 18.0001 2 15.3301V8.67008C2 6.00008 2.67 5.33008 5.33 5.33008H5.67C5.82 5.33008 5.95 5.33008 6.09 5.34008C6.02 5.83008 6 6.38008 6 7.00008V17.0001Z"
               stroke="#292D32"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               fill="#ffffff"
               d="M22 8.67008V15.3301C22 18.0001 21.33 18.6701 18.67 18.6701H18.33C18.18 18.6701 18.05 18.6701 17.91 18.6601C17.98 18.1701 18 17.6201 18 17.0001V7.00008C18 6.38008 17.98 5.83008 17.91 5.34008C18.05 5.33008 18.18 5.33008 18.33 5.33008H18.67C21.33 5.33008 22 6.00008 22 8.67008Z"
               stroke="#292D32"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </Icon>
@@ -311,9 +311,9 @@ const ShowElementIcon = ({ type }) => {
                 id="Vector"
                 d="M10 19H12M12 19H14M12 19V5M12 5H6V6M12 5H18V6"
                 stroke="#ffffff"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </g>
           </svg>
@@ -331,21 +331,21 @@ const ShowElementIcon = ({ type }) => {
             <path
               d="M8.976 3C4.05476 3 3 4.05476 3 8.976L3 15.024C3 19.9452 4.05476 21 8.976 21L15.024 21C19.9452 21 21 19.9452 21 15.024L21 8.976C21 4.05477 19.9452 3 15.024 3L8.976 3Z"
               stroke="#ffffff"
-              stroke-width="2"
+              strokeWidth="2"
             />
             <path
               d="M3 12L21 12"
               stroke="#ffffff"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               d="M12 21L12 12"
               stroke="#ffffff"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </Icon>
@@ -367,21 +367,21 @@ const ShowElementIcon = ({ type }) => {
             <path
               d="M21 8.976C21 4.05476 19.9452 3 15.024 3H8.976C4.05476 3 3 4.05476 3 8.976V15.024C3 19.9452 4.05476 21 8.976 21H15.024C19.9452 21 21 19.9452 21 15.024V8.976Z"
               stroke="#ffffff"
-              stroke-width="2"
+              strokeWidth="2"
             />
             <path
               d="M12 3V21"
               stroke="#ffffff"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               d="M3 12L12 12"
               stroke="#ffffff"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </Icon>
@@ -452,9 +452,9 @@ const ShowElementIcon = ({ type }) => {
                 id="Vector"
                 d="M12 21V3"
                 stroke="#ffffff"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </g>
           </svg>
@@ -489,7 +489,7 @@ const ShowElementIcon = ({ type }) => {
             <path
               d="M5.23852 14.8117C5.63734 16.3002 6.51616 17.6154 7.73867 18.5535C8.96118 19.4915 10.4591 20 12 20C13.5409 20 15.0388 19.4915 16.2613 18.5535C17.4838 17.6154 18.3627 16.3002 18.7615 14.8117"
               stroke="#ffffff"
-              stroke-width="2"
+              strokeWidth="2"
             />
             <path
               d="M12 13L11.3753 13.7809L12 14.2806L12.6247 13.7809L12 13ZM13 4C13 3.44772 12.5523 3 12 3C11.4477 3 11 3.44771 11 4L13 4ZM6.37531 9.78087L11.3753 13.7809L12.6247 12.2191L7.6247 8.21913L6.37531 9.78087ZM12.6247 13.7809L17.6247 9.78087L16.3753 8.21913L11.3753 12.2191L12.6247 13.7809ZM13 13L13 4L11 4L11 13L13 13Z"
@@ -517,7 +517,7 @@ const ShowElementIcon = ({ type }) => {
               <g
                 id="ic_fluent_phone_pagination_24_regular"
                 fill="#ffffff"
-                fill-rule="nonzero">
+                fillRule="nonzero">
                 <path
                   fill="#ffffff"
                   d="M15.75,2 C16.9926407,2 18,3.00735931 18,4.25 L18,19.75 C18,20.9926407 16.9926407,22 15.75,22 L8.25,22 C7.00735931,22 6,20.9926407 6,19.75 L6,4.25 C6,3.00735931 7.00735931,2 8.25,2 L15.75,2 Z M15.75,3.5 L8.25,3.5 C7.83578644,3.5 7.5,3.83578644 7.5,4.25 L7.5,19.75 C7.5,20.1642136 7.83578644,20.5 8.25,20.5 L15.75,20.5 C16.1642136,20.5 16.5,20.1642136 16.5,19.75 L16.5,4.25 C16.5,3.83578644 16.1642136,3.5 15.75,3.5 Z M9.49877889,17.7544525 C9.91299245,17.7544525 10.2487789,18.0902389 10.2487789,18.5044525 C10.2487789,18.9186661 9.91299245,19.2544525 9.49877889,19.2544525 C9.08456533,19.2544525 8.74877889,18.9186661 8.74877889,18.5044525 C8.74877889,18.0902389 9.08456533,17.7544525 9.49877889,17.7544525 Z M11.9987789,17.7544525 C12.4129925,17.7544525 12.7487789,18.0902389 12.7487789,18.5044525 C12.7487789,18.9186661 12.4129925,19.2544525 11.9987789,19.2544525 C11.5845653,19.2544525 11.2487789,18.9186661 11.2487789,18.5044525 C11.2487789,18.0902389 11.5845653,17.7544525 11.9987789,17.7544525 Z M14.4987789,17.7544525 C14.9129925,17.7544525 15.2487789,18.0902389 15.2487789,18.5044525 C15.2487789,18.9186661 14.9129925,19.2544525 14.4987789,19.2544525 C14.0845653,19.2544525 13.7487789,18.9186661 13.7487789,18.5044525 C13.7487789,18.0902389 14.0845653,17.7544525 14.4987789,17.7544525 Z"
@@ -549,14 +549,14 @@ const ShowElementIcon = ({ type }) => {
             width="30px"
             height="30px"
             xmlns="http://www.w3.org/2000/svg"
-            shape-rendering="geometricPrecision"
-            text-rendering="geometricPrecision"
-            image-rendering="optimizeQuality"
-            fill-rule="evenodd"
-            clip-rule="evenodd"
+            shapeRendering="geometricPrecision"
+            textRendering="geometricPrecision"
+            imageRendering="optimizeQuality"
+            fillRule="evenodd"
+            clipRule="evenodd"
             viewBox="0 0 512 389.24">
             <path
-              fill-rule="nonzero"
+              fillRule="nonzero"
               d="M0 0h275.1v50.04H0V0zm361.79 115.14 54.44 54.44H0v50.04h416.2l-54.41 54.41 35.39 35.39L512 194.6v-.03l-35.39-35.36-79.43-79.46-35.39 35.39zM0 339.2h275.1v50.04H0V339.2z"
             />
           </svg>
@@ -592,14 +592,14 @@ const ShowElementIcon = ({ type }) => {
             width="30px"
             height="30px"
             xmlns="http://www.w3.org/2000/svg"
-            shape-rendering="geometricPrecision"
-            text-rendering="geometricPrecision"
-            image-rendering="optimizeQuality"
-            fill-rule="evenodd"
-            clip-rule="evenodd"
+            shapeRendering="geometricPrecision"
+            textRendering="geometricPrecision"
+            imageRendering="optimizeQuality"
+            fillRule="evenodd"
+            clipRule="evenodd"
             viewBox="0 0 478 512.29">
             <path
-              fill-rule="nonzero"
+              fillRule="nonzero"
               d="M161.37 396.74H129.6V6.58c0-3.33-3.25-6.58-6.58-6.58H52.94c-3.41 0-6.63 2.93-6.63 6.58v390.16H14.58c-3.37 0-6.82 1.15-9.56 3.57-6.1 5.28-6.7 14.52-1.46 20.59l75.28 86.42c5.99 6.63 16.46 6.71 22.25-.27l71.07-85.87c2.38-2.62 3.81-6.11 3.81-9.84 0-8.13-6.51-14.6-14.6-14.6zM211.39 0c-3.33 0-6.59 3.25-6.59 6.58v56.6c0 3.37 2.94 6.63 6.59 6.63h260.03c3.65 0 6.58-3.26 6.58-6.63V6.58c0-3.33-3.25-6.58-6.58-6.58H211.39zm0 142.11c-3.17 0-6.59 3.37-6.59 6.59v56.59c0 3.26 2.98 6.63 6.59 6.63h192.84c3.61 0 6.58-3.26 6.58-6.63V148.7c0-3.34-3.33-6.59-6.58-6.59H211.39zm0 142.11c-3.17 0-6.59 3.33-6.59 6.59v56.59c0 3.3 2.94 6.63 6.59 6.63h125.65c3.65 0 6.58-3.25 6.58-6.63v-56.59c0-3.34-3.33-6.59-6.58-6.59H211.39z"
             />
           </svg>
