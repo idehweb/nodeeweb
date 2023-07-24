@@ -1,4 +1,5 @@
 import {
+  AdminAccess,
   PUBLIC_ACCESS,
   controllersBatchRegister,
   registerEntityCRUD,
@@ -7,6 +8,7 @@ import { ControllerSchema } from '@nodeeweb/core';
 import CartService from './cart.service';
 import { AuthUserAccess } from '@nodeeweb/core';
 import transactionService from './transaction.service';
+import orderService from './order.service';
 
 export default function registerController() {
   // api
@@ -58,4 +60,52 @@ export default function registerController() {
     base_url: '/api/v1/order',
     from: 'ShopEntity',
   });
+
+  // crud
+  registerEntityCRUD(
+    'order',
+    {
+      getOne: {
+        controller: {
+          access: AuthUserAccess,
+        },
+        crud: {
+          parseFilter: orderService.getOneFilterParser,
+          sendResponse: true,
+          executeQuery: true,
+        },
+      },
+      getAll: {
+        controller: {
+          access: AuthUserAccess,
+        },
+        crud: {
+          parseFilter: orderService.getAllFilterParser,
+          sendResponse: true,
+          executeQuery: true,
+          sort: { updatedAt: -1 },
+          paramFields: {
+            limit: 'limit',
+            offset: 'offset',
+          },
+        },
+      },
+      updateOne: {
+        controller: {
+          access: AdminAccess,
+          service: orderService.updateOneAfter,
+        },
+        crud: {
+          parseFilter: orderService.updateOneFilterParser,
+          parseUpdate: orderService.updateOneParseBody,
+          saveToReq: true,
+          executeQuery: true,
+        },
+      },
+    },
+    {
+      base_url: '/api/v1/order',
+      from: 'ShopEntity',
+    }
+  );
 }
