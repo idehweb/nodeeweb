@@ -75,7 +75,7 @@ export class EntityCreator {
     key: string,
     def: any
   ) {
-    for (const { reqKey, objKey } of objs) {
+    for (const { reqKey, objKey, ...others } of objs) {
       if (objKey?.[key]) return req[reqKey][objKey[key]];
     }
     return def;
@@ -123,7 +123,6 @@ export class EntityCreator {
       'limit',
       req.method === 'GET' ? 12 : 0
     );
-
     if (offset) query.skip(offset);
     if (limit) query.limit(limit);
 
@@ -180,12 +179,7 @@ export class EntityCreator {
       });
     };
   }
-  getAllCreator({
-    filter,
-    parseFilter,
-    paramFields,
-    ...opt
-  }: CRUDCreatorOpt): MiddleWare {
+  getAllCreator({ filter, parseFilter, ...opt }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = filter ?? parseFilter ? parseFilter(req) : {};
       if (!opt.sort) opt.sort = { createdAt: -1 };
@@ -342,8 +336,10 @@ function translateCRUD2Url(
       return '/';
     case CRUD.GET_ALL:
       let extra = '';
-      if (opt.paramFields?.offset) extra += `/:${opt.paramFields.offset}?`;
-      if (opt.paramFields?.limit) extra += `/:${opt.paramFields.limit}?`;
+      if (opt.paramFields?.offset)
+        extra += `/:${opt.paramFields.offset}([0-9]+)?`;
+      if (opt.paramFields?.limit)
+        extra += `/:${opt.paramFields.limit}([0-9]+)?`;
       return `/${extra}`;
     case CRUD.GET_ONE:
     case CRUD.UPDATE_ONE:

@@ -54,7 +54,6 @@ export default function registerController() {
       getAll: {
         controller: {
           access: AdminAccess,
-          service: (req, res) => res.json(req[CRUD_DEFAULT_REQ_KEY]),
         },
         crud: {
           parseFilter(req) {
@@ -63,7 +62,7 @@ export default function registerController() {
             }
           },
           autoSetCount: true,
-          saveToReq: true,
+          sendResponse: true,
           executeQuery: true,
           paramFields: {
             limit: 'limit',
