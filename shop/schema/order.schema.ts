@@ -4,7 +4,6 @@ import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 export enum OrderStatus {
   Cart = 'cart',
   NeedToPay = 'need-to-pay',
-  Packing = 'packing',
   Posting = 'posting',
   Completed = 'completed',
   Canceled = 'canceled',

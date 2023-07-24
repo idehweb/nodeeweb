@@ -32,7 +32,7 @@ export function registerPlugin(
   from?: string
 ) {
   store.plugins.set(type, content);
-  logger.log(
+  store.systemLogger.log(
     color(
       'Yellow',
       `## ${from ? `${from} ` : ''}Register ${type}:${content.name} Plugin ##`

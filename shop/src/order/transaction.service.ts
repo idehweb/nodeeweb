@@ -141,7 +141,7 @@ class TransactionService {
           post: req.body.post
             ? { ...req.body.post, ...post, price: postPrice }
             : post,
-          status: totalPrice ? OrderStatus.NeedToPay : OrderStatus.Packing,
+          status: totalPrice ? OrderStatus.NeedToPay : OrderStatus.Posting,
           tax: taxesPrice,
           totalPrice,
           transaction,
@@ -188,16 +188,20 @@ class TransactionService {
 
   paymentCallback: MiddleWare = async (req, res) => {
     // handle payment
-    const order = await this.getNeedToPayOrder({ _id: req.params.orderId });
+    const order = await this.orderModel.findOne({
+      _id: req.params.orderId,
+      active: true,
+    });
 
-    let { status } = await this.handlePayment(order, true, true, req.query);
+    const { status } = await this.handlePayment(order, true, true, req.query);
+
     let msg: string;
     switch (status) {
       case PaymentVerifyStatus.Paid:
         msg = 'paid';
         break;
       case PaymentVerifyStatus.CheckBefore:
-        msg = 'paid before';
+        msg = 'verify before';
         break;
       case PaymentVerifyStatus.Failed:
         msg = 'failed';
@@ -408,17 +412,18 @@ class TransactionService {
         });
     };
 
-    // clear timer
-    _clearTimer(order.transaction.authority);
-
     const _success = async () => {
       const update = {
         $set: {
-          state: OrderStatus.Packing,
-          post: { ...order.post, ...(await this.submitPostReq(order)) },
+          status: OrderStatus.Posting,
+          post: {
+            ...order.toObject().post,
+            ...(await this.submitPostReq(order)),
+          },
         },
         $unset: { 'transaction.expiredAt': '' },
       };
+      console.log('call', update);
       order = await order.updateOne(update);
 
       // send sms
@@ -453,6 +458,15 @@ class TransactionService {
     };
 
     const _core = async () => {
+      if ([OrderStatus.Posting, OrderStatus.Completed].includes(order.status))
+        return { status: PaymentVerifyStatus.CheckBefore, order };
+      else if (
+        [OrderStatus.Cart, OrderStatus.Canceled, OrderStatus.Expired].includes(
+          order.status
+        )
+      )
+        return { status: PaymentVerifyStatus.Failed, order };
+
       if (order.status !== OrderStatus.NeedToPay)
         throw new BadRequestError(
           `order status invalid, current status: ${order.status}`
@@ -478,6 +492,10 @@ class TransactionService {
       return { status, order };
     };
 
+    // clear timer
+    _clearTimer(order.transaction.authority);
+
+    // core
     return await _core();
   }
 
@@ -524,7 +542,7 @@ class TransactionService {
           );
           const td = await this.orderModel.findOne({
             _id: order._id,
-            state: OrderStatus.NeedToPay,
+            status: OrderStatus.NeedToPay,
           });
           if (!td) return;
           await this.handlePayment(td, true, true, true);
@@ -545,7 +563,7 @@ class TransactionService {
           );
           const td = await this.orderModel.findOne({
             _id: order._id,
-            state: OrderStatus.NeedToPay,
+            status: OrderStatus.NeedToPay,
             active: true,
           });
           if (!td) return;
@@ -611,7 +629,7 @@ class TransactionService {
       const _watcher_transactions = async () => {
         const openTransactions = await this.orderModel.find({
           active: true,
-          state: OrderStatus.NeedToPay,
+          status: OrderStatus.NeedToPay,
           'transaction.expiredAt': { $gt: new Date() },
         });
         return openTransactions.map((order) => {
