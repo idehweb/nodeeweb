@@ -4,7 +4,7 @@ import { Button, ButtonBase } from '@mui/material';
 import { styled } from '@mui/material';
 import clsx from 'clsx';
 
-const Tabs = styled('div')({
+const Tabs = styled('nav')({
   position: 'absolute',
   left: '50%',
   top: '50%',
@@ -25,9 +25,9 @@ const Tabs = styled('div')({
   },
 });
 
-const Component = styled('div')({
+const Component = styled('header')({
+  height: 60,
   background: '#fff',
-  direction: 'ltr',
   color: '#000000',
   fontSize: '12px',
   display: 'flex',

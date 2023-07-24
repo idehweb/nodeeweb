@@ -6,8 +6,8 @@ interface ComponentProps {
   isOver?: boolean;
 }
 
-export const Component = styled('div')<ComponentProps>(({ isOver }) => ({
-  height: '100vh',
+export const Component = styled('main')<ComponentProps>(({ isOver }) => ({
+  minHeight: 'calc(100vh - 60px)',
   background: '#fff',
   paddingTop: '12px',
   margin: '0 4px',
