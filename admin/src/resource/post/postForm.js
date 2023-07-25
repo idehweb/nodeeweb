@@ -25,7 +25,6 @@ import {
   PageBuilder,
   ProductType,
   ShowDescription,
-  showFiles,
   ShowLink,
   ShowOptions,
   ShowPictures,

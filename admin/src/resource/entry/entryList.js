@@ -32,7 +32,6 @@ import {
   FileChips,
   List,
   ShowDescription,
-  showFiles,
   ShowLink,
   ShowOptions,
   ShowPictures,

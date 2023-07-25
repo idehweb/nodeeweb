@@ -16,10 +16,8 @@ import { numberWithCommas } from '@/functions';
 import {
   CatRefField,
   FileChips,
-  getStockStatus,
   List,
   ShowDescription,
-  showFiles,
   ShowLink,
   ShowOptions,
   ShowPictures,
