@@ -1,4 +1,4 @@
-import { Edit, useForm, useTranslate } from 'react-admin';
+import { Edit, useTranslate } from 'react-admin';
 
 import React from 'react';
 
@@ -12,7 +12,6 @@ import {
   FileChips,
   List,
   ShowDescription,
-  showFiles,
   ShowLink,
   ShowOptions,
   ShowPictures,
