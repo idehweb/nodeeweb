@@ -1,6 +1,6 @@
 import { makeStyles } from '@mui/styles';
 
-export default makeStyles<any>(({ palette, spacing }) => ({
+export default makeStyles(() => ({
   modal: {
     maxHeight: '100vh',
     margin: '16px auto !important',
