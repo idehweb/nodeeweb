@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Field } from 'react-final-form';
-import TextField from '@material-ui/core/TextField';
 import { Col } from 'shards-react';
 
 import { useTranslate } from 'react-admin';
