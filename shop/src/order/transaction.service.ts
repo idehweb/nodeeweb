@@ -424,7 +424,11 @@ class TransactionService {
         $unset: { 'transaction.expiredAt': '' },
       };
       console.log('call', update);
-      order = await order.updateOne(update);
+      order = await this.orderModel.findOneAndUpdate(
+        { _id: order._id },
+        update,
+        { new: true }
+      );
 
       // send sms
       utils.sendOnStateChange(order)?.then();
@@ -433,9 +437,13 @@ class TransactionService {
     const _failed = async () => {
       // rollback
       // disabled order
-      order = await order.updateOne({
-        $set: { active: false, status: OrderStatus.Canceled },
-      });
+      order = await this.orderModel.findOneAndUpdate(
+        { _id: order._id },
+        {
+          $set: { active: false, status: OrderStatus.Canceled },
+        },
+        { new: true }
+      );
 
       // rollback products
       await this.productModel.bulkWrite(
@@ -513,6 +521,7 @@ class TransactionService {
       watchers_timeout?: number;
     }
   ) {
+    console.log(watchers_timeout);
     // clear
     if (clear) {
       // inactive products
@@ -545,7 +554,7 @@ class TransactionService {
             status: OrderStatus.NeedToPay,
           });
           if (!td) return;
-          await this.handlePayment(td, true, true, true);
+          await this.handlePayment(td, true, true);
         } catch (err) {}
       }, watchers_timeout);
       this.transactionSupervisors.set(

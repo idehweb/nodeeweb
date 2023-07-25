@@ -34,34 +34,33 @@ export class Utils {
       case OrderStatus.Canceled:
         orderStatus = 'کنسل شده';
         break;
-        break;
       case OrderStatus.Expired:
         orderStatus = 'منقضی شده';
         break;
     }
     const values = {
+      ...Object.fromEntries(
+        Object.entries(store.env).map(([k, v]) => [`%${k}%`, v])
+      ),
       '%ORDER_STATUS%': orderStatus,
       '%ORDER_ID%': order._id,
       '%CUSTOMER_FIRST_NAME%': order.customer.firstName,
       '%CUSTOMER_LAST_NAME%': order.customer.lastName,
-      ...Object.fromEntries(
-        Object.entries(store.env).map(([k, v]) => [`%${k}%`, v])
-      ),
     };
 
+    let newMsg = msg;
     const pattern = /(%[^% ]+%)/g;
     let value = pattern.exec(msg);
     while (value) {
       if (values[value[0]])
-        msg = msg.replace(new RegExp(value[0], 'g'), values[value[0]]);
+        newMsg = newMsg.replace(new RegExp(value[0], 'g'), values[value[0]]);
       value = pattern.exec(msg);
     }
-    return msg;
+    return newMsg;
   }
 
   async sendOnStateChange(order: OrderDocument) {
     const message = this.replaceValues(order, ORDER_STATUS_CHANGE_MESSAGE);
-    console.log(message);
 
     if (!this.smsPlugin || !order.customer.phone) return;
 
@@ -73,7 +72,6 @@ export class Utils {
   }
   async sendOnExpire(order: OrderDocument) {
     const message = this.replaceValues(order, TRANSACTION_ON_EXPIRE_MESSAGE);
-    console.log(message);
 
     if (!this.smsPlugin || !order.customer.phone) return;
 
