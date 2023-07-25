@@ -1,7 +1,6 @@
 import { NextFunction, Response } from 'express';
 import { MiddleWare, MiddleWareError, Req } from '../types/global';
-import { isAsyncFunction } from 'util/types';
-import store from '../store';
+import { axiosError2String } from './helpers';
 
 export const catchFn = <F extends Function>(
   fn: F,
@@ -22,8 +21,15 @@ export const catchFn = <F extends Function>(
       return result;
     } catch (err) {
       if (onError) {
-        // logger.error('#CatchError', err);
-        return onError(err, ...args);
+        const parsed = axiosError2String(err);
+        let newError: Error;
+        if (parsed.message) {
+          newError = new Error(parsed.message);
+          delete newError.stack;
+        } else {
+          newError = parsed.error;
+        }
+        return onError(newError, ...args);
       }
     }
   };
@@ -40,23 +46,7 @@ export const catchMiddleware = <F extends MiddleWare>(
     onError?: MiddleWareError;
   } = {}
 ) => {
-  const catchFn: MiddleWare = async (req, res, next) => {
-    try {
-      let result = fn.call(self ?? this, req, res, next);
-      while (result instanceof Promise) {
-        result = await result;
-      }
-      return result;
-    } catch (err) {
-      if (onError) {
-        // logger.error('#CatchError', err);
-        return onError(err, req, res, next);
-      }
-      return next(err);
-    }
-  };
-
-  return catchFn as F;
+  return catchFn(fn, { self, onError }) as F;
 };
 
 export function classCatchBuilder<CustomClass>(

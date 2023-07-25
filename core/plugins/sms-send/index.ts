@@ -25,15 +25,9 @@ async function sendSMS({
       text: text,
     },
   };
-
-  try {
-    const { data } = await axios(configs);
-    console.log(data);
-    return true;
-  } catch (err) {
-    console.log(axiosError2String(err));
-    return err.message;
-  }
+  const { data } = await axios(configs);
+  store.systemLogger.log(`core-sms-send:`, data);
+  return true;
 }
 
 const smsSendPlugin: Plugin = () => {

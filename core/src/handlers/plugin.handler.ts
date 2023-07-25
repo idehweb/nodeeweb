@@ -35,8 +35,14 @@ export function registerPlugin(
   // catch
   content.stack = content.stack.map((cb) =>
     catchFn(cb, {
-      onError(error) {
-        logger.error('# ShopPlugin #\n', error);
+      onError(err: any) {
+        store.systemLogger.error(
+          color(
+            'Red',
+            `## ${from ? `${from} ` : ''}${type}:${content.name} Plugin ##\n`
+          ),
+          err
+        );
       },
     })
   );
