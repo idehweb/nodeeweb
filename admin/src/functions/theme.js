@@ -1,8 +1,9 @@
 import { createTheme } from '@mui/material/styles';
 
 export default createTheme({
+  direction: 'rtl',
+
   typography: {
-    direction: 'rtl',
     fontFamily: [
       'Roboto',
       'Arial',
@@ -11,7 +12,6 @@ export default createTheme({
       '"Segoe UI Emoji"',
       '"Segoe UI Symbol"',
     ].join(','),
-    isRtl: true,
   },
   palette: {
     mode: 'dark', // Switching the dark mode on is a single property value change.
