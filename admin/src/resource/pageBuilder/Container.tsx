@@ -19,10 +19,8 @@ const Container = ({ children, onDrop }) => {
   const [{ isOver }, dropRef] = useDrop(
     () => ({
       accept: 'ITEM',
-      drop: onDrop,
-      canDrop: (i: any) => i?.addable,
       collect: (monitor) => ({
-        isOver: !!monitor.isOver(),
+        isOver: !!monitor.isOver({ shallow: true }),
       }),
     }),
     [onDrop]

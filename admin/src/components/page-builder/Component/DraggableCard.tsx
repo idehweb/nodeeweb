@@ -1,5 +1,5 @@
-import { HTMLAttributes } from 'react';
-import { useDrag } from 'react-dnd';
+import { HTMLAttributes, useRef, useLayoutEffect } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 import { styled } from '@mui/material';
 
 interface ComponentProps {
@@ -23,38 +23,49 @@ export const Component = styled('div')<ComponentProps>(
 interface DraggableCardProps extends HTMLAttributes<HTMLDivElement> {
   item: any;
   canDrag: boolean;
-  isOver: boolean;
+  onDropEnd(a: any, b: any): void;
 }
 type DraggableProps = Omit<DraggableCardProps, 'canDrag'>;
 
-function Draggable({ item, isOver = false, ...props }: DraggableProps) {
-  const [{ isDragging }, dragRef] = useDrag(
+function Draggable({ item, onDropEnd, ...props }: DraggableProps) {
+  const ref = useRef(null); // Initialize the reference
+
+  const [{ isOver }, drop] = useDrop({
+    accept: 'ITEM',
+    drop: () => item,
+    canDrop: (i: any) => i?.addable,
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver({ shallow: true }),
+    }),
+  });
+
+  const [{ isDragging }, drag] = useDrag(
     () => ({
       type: 'ITEM',
       item,
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
+      end(source, monitor) {
+        onDropEnd(source, monitor.getDropResult());
+      },
     }),
     [item]
   );
+  useLayoutEffect(() => {
+    drag(drop(ref));
+  }, [drag, drop]);
 
   return (
-    <Component
-      ref={dragRef}
-      isDragging={isDragging}
-      isOver={isOver}
-      {...props}
-    />
+    <Component ref={ref} isDragging={isDragging} isOver={isOver} {...props} />
   );
 }
 
 export default function DraggableCard({
   canDrag = true,
-  isOver = false,
   ...props
 }: DraggableCardProps) {
   if (!canDrag) return <Component {...props} />;
 
-  return <Draggable isOver={isOver} {...props} />;
+  return <Draggable {...props} />;
 }

@@ -3,7 +3,10 @@ import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 import { useNotify, useTranslate } from 'react-admin';
-import { DropTargetMonitor } from 'react-dnd';
+
+import _ from 'lodash';
+
+// import _omit from 'lodash/omit';
 
 import { LoadingContainer } from '@/components/global';
 import { Component, OptionBox } from '@/components/page-builder';
@@ -19,6 +22,26 @@ import Header from './Header';
 import Container from './Container';
 import Preview from './Preview';
 import { generateCompID } from './utils';
+
+const mergeObject = (obj, path) => {};
+
+const FindNodeAddress = (item, id, path = '') => {
+  let temp = '';
+  if (!item) return '';
+  else if (Array.isArray(item))
+    temp = item
+      .map((i, idx) => FindNodeAddress(i, id, `[${idx}]`))
+      .filter(Boolean)
+      .join('');
+  else if (item.id === id) return path;
+  else if (Array.isArray(item.children))
+    temp = item.children
+      .map((i, idx) => FindNodeAddress(i, id, `.children.[${idx}]`))
+      .filter(Boolean)
+      .join('');
+
+  return temp ? path + temp : '';
+};
 
 const Core = (props) => {
   const translate = useTranslate();
@@ -524,15 +547,68 @@ const Core = (props) => {
   }, []);
 
   const handleDrop = useCallback(
-    (item, monitor: DropTargetMonitor<any, any>) => {
-      const { id } = item;
-      const dest = monitor.getItem();
-      console.log({ item, monitor, dest, id });
+    (source, dest) => {
+      console.log({ components, source, dest });
 
-      handleDrop2(id, dest, item);
+      const baseNodeAddress = FindNodeAddress(components, source.id);
+      const destNodeAddress = FindNodeAddress(components, dest.id);
+
+      function removeAt(obj, path) {
+        let arr = path.split('.');
+        arr.splice(-1);
+        let parentPath = arr.join('.');
+        let index: string | number = path.split('.').pop();
+        index = Number((index as string).replace(/\[|]/gi, ''));
+
+        console.log('index', index, path, parentPath);
+
+        const res = _.cloneDeep(obj);
+        let parent: [] = _.get(res, parentPath, []) || [];
+        console.log('parent', parent);
+
+        if (Array.isArray(parent)) {
+          parent.splice(index, 1);
+          _.set(res, parentPath, parent);
+          return res;
+        }
+        return obj;
+      }
+      function pushAt(obj, path, value) {
+        let index: string | number = path.split('.').pop();
+        index = Number((index as string).replace(/\[|]/gi, ''));
+
+        const res = _.cloneDeep(obj);
+        let parent: [] = _.get(res, path, []) || [];
+
+        const insertAt = (arr, idx, newItem) => [
+          ...arr.slice(0, idx),
+          newItem,
+          ...arr.slice(idx),
+        ];
+
+        insertAt(parent, index, value);
+        _.set(res, path, parent);
+
+        return res;
+      }
+
+      // const baseParentAddress = baseNodeAddress.split('.').pop();
+      // const destParentAddress = destNodeAddress.split('.').pop();
+
+      // const baseParentNode = _get(components, baseParentAddress, {});
+      // const destParentNode = _get(components, destParentAddress, {});
+
+      console.log('baseNodeAddress', baseNodeAddress, destNodeAddress);
+
+      // console.log('sdf', _omit(components, [destNodeAddress]));
+      let newComponents = removeAt(components, baseNodeAddress);
+      // let newComponents = removeAt(components, destNodeAddress);
+
+      console.log('sdf', newComponents);
+
+      setState((p) => ({ ...p, components: newComponents }));
     },
-    [handleDrop2]
-    [handleDrop2, components]
+    [components]
   );
 
   return (
@@ -556,7 +632,7 @@ const Core = (props) => {
           <AnimatePresence presenceAffectsLayout>
             {components?.map((i, idx) => (
               <motion.div
-                key={idx}
+                key={`${i.id}-${idx}`}
                 layout="position"
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
