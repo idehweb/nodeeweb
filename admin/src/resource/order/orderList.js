@@ -25,7 +25,7 @@ import React, { Fragment, useCallback, useEffect, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 
-import { downloadCSV } from 'react-admin/dist/index';
+import { downloadCSV } from 'react-admin';
 
 import {
   List,

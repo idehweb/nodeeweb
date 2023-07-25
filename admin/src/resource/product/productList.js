@@ -26,7 +26,7 @@ import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import { Button, Chip, Divider, Tab, Tabs } from '@mui/material';
 
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
-import { useListContext } from 'react-admin/dist/index';
+import { useListContext } from 'react-admin';
 import { makeStyles } from '@mui/styles/index';
 
 import {
