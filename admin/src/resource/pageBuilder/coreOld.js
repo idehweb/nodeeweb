@@ -16,12 +16,7 @@ import './../../assets/nodeeweb-page-builder.css';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
-import {
-  showNotification,
-  useForm,
-  useNotify,
-  useTranslate,
-} from 'react-admin';
+import { useNotify, useTranslate } from 'react-admin';
 
 import update from 'immutability-helper';
 

@@ -6,12 +6,10 @@ import {
   FormTab,
   SaveButton,
   SelectInput,
-  showNotification,
   SimpleFormIterator,
   TabbedForm,
   TextInput,
   Toolbar,
-  useForm,
   useTranslate,
 } from 'react-admin';
 
@@ -30,7 +28,6 @@ import {
   List,
   ProductType,
   ShowDescription,
-  showFiles,
   ShowLink,
   ShowOptions,
   ShowPictures,
