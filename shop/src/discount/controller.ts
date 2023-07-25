@@ -5,27 +5,43 @@ import {
 import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
 import { controllerRegister } from '@nodeeweb/core/src/handlers/controller.handler';
-import { AuthUserAccess } from '@nodeeweb/core/src/handlers/auth.handler';
-import Service from './service';
+import {
+  AdminAccess,
+  AuthUserAccess,
+} from '@nodeeweb/core/src/handlers/auth.handler';
+import discountService from './service';
 
 export default function registerController() {
-  const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
   // crud
   registerEntityCRUD(
     'discount',
     {
       create: {
         controller: {
-          access,
-          service(req, res) {
-            res.status(200).json(req[CRUD_DEFAULT_REQ_KEY]);
+          access: AdminAccess,
+        },
+        crud: {
+          executeQuery: true,
+          sendResponse: true,
+        },
+      },
+      getOne: {
+        controller: {
+          access: AuthUserAccess,
+        },
+        crud: {
+          parseFilter: discountService.getOneQueryParser,
+          executeQuery: true,
+          sendResponse: discountService.getOneTransform,
+          paramFields: {
+            id: 'discount',
           },
         },
-        crud: { executeQuery: true, sendResponse: true },
       },
+
       getCount: {
         controller: {
-          access,
+          access: AdminAccess,
           service: (req, res) => {
             res.json({
               success: true,
@@ -35,22 +51,9 @@ export default function registerController() {
         },
         crud: { executeQuery: true, sendResponse: false, saveToReq: true },
       },
-      getOne: {
-        controller: {
-          access,
-          service(req, res) {
-            res.json(req[CRUD_DEFAULT_REQ_KEY]);
-          },
-        },
-        crud: {
-          executeQuery: true,
-          saveToReq: true,
-        },
-      },
       getAll: {
         controller: {
-          access,
-          service: (req, res) => res.json(req[CRUD_DEFAULT_REQ_KEY]),
+          access: AdminAccess,
         },
         crud: {
           parseFilter(req) {
@@ -59,7 +62,7 @@ export default function registerController() {
             }
           },
           autoSetCount: true,
-          saveToReq: true,
+          sendResponse: true,
           executeQuery: true,
           paramFields: {
             limit: 'limit',
@@ -69,7 +72,7 @@ export default function registerController() {
       },
       updateOne: {
         controller: {
-          access,
+          access: AdminAccess,
           service(req, res) {
             res.json(req[CRUD_DEFAULT_REQ_KEY]);
           },
@@ -81,13 +84,7 @@ export default function registerController() {
       },
       deleteOne: {
         controller: {
-          access,
-          service(req, res) {
-            return res.status(204).json({
-              success: true,
-              message: 'Deleted!',
-            });
-          },
+          access: AdminAccess,
         },
         crud: {
           executeQuery: true,
@@ -96,17 +93,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/amin/discount', from: 'ShopEntity' }
-  );
-
-  // custom
-  controllerRegister(
-    {
-      url: '/set/:order_id/:id',
-      method: 'get',
-      access: AuthUserAccess,
-      service: Service.setDiscount,
-    },
-    { base_url: ['/customer', '/admin'], from: 'ShopEntity' }
+    { base_url: '/api/v1/discount', from: 'ShopEntity' }
   );
 }

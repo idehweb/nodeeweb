@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@nodeeweb/core": "file:../core/dist",
+    "@nodeeweb/core": "link:../core",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "moment": "^2.29.4",

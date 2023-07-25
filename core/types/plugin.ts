@@ -1,4 +1,4 @@
-export enum PluginType {
+export enum CorePluginType {
   SMS = 'sms',
 }
 export enum SMSPluginType {
@@ -22,4 +22,9 @@ export interface SMSPluginContent extends PluginContent {
   stack: [(args: SMSPluginArgs) => Promise<boolean | string>];
 }
 
-export type Plugin = () => { type: PluginType; content: PluginContent };
+export type PluginOut = {
+  type: CorePluginType | string;
+  content: PluginContent;
+};
+
+export type Plugin = () => PluginOut;

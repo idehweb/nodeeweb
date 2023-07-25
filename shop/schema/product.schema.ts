@@ -1,4 +1,17 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
+import { Types } from 'mongoose';
+
+export interface IProduct {
+  name: string;
+  image?: string;
+  price: number;
+  salePrice: number;
+  weight: number;
+  quantity: number;
+}
+
+export type ProductModel = Model<IProduct>;
+export type ProductDocument = Document<Types.ObjectId, {}, IProduct> & IProduct;
 
 const schema = new mongoose.Schema(
   {
@@ -16,10 +29,10 @@ const schema = new mongoose.Schema(
     labels: [],
     in_stock: { type: Boolean, default: false },
     story: { type: Boolean, default: false },
-    price: Number,
-    weight: Number,
-    quantity: Number,
-    salePrice: Number,
+    price: { type: Number, required: true },
+    weight: { type: Number, required: true },
+    quantity: { type: Number, required: true },
+    salePrice: { type: Number, required: true },
     data: {},
     sku: String,
     extra_button: String,
@@ -65,3 +78,8 @@ const schema = new mongoose.Schema(
 );
 
 export default schema;
+
+schema.pre('save', function (next) {
+  if (this.salePrice == undefined) this.salePrice = this.price;
+  return next();
+});

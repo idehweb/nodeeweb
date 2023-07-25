@@ -8,13 +8,13 @@ export const errorHandler: MiddleWareError = (error, req, res, next) => {
     message = error.message,
     err = error,
     extraProps: any = {};
-  if (Math.floor(code / 100) === 5) logger.error(error);
   if (error instanceof GeneralError) {
     code = error.code;
     extraProps.type = error.type;
     message = error.message;
     err = error;
   }
+  if (Math.floor(code / 100) === 5 || store.env.isLoc) logger.error(error);
 
   return res
     .status(code)

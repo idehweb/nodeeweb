@@ -9,20 +9,10 @@ import {
 } from './controller.handler';
 import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { isAsyncFunction } from 'util/types';
-import { BadRequestError, GeneralError } from '../../types/error';
-import { catchFn } from '../../utils/catchAsync';
+import { BadRequestError, GeneralError, NotFound } from '../../types/error';
 
 export class EntityCreator {
-  constructor(private modelName: string) {
-    // // catch fn
-    // [this.baseCreator, this.handleResult].forEach(
-    //   (fn) =>
-    //     (this[fn.name] = catchFn(fn, {
-    //       self: this,
-    //       onError: EntityCreator.onError,
-    //     }))
-    // );
-  }
+  constructor(private modelName: string) {}
   private get model() {
     return store.db.model(this.modelName);
   }
@@ -43,6 +33,9 @@ export class EntityCreator {
       httpCode: number;
     }
   ) {
+    if (!result && httpCode !== 204)
+      throw new NotFound(`${this.modelName} not found`);
+
     if (sendResponse && !saveToReq) {
       const data =
         typeof sendResponse === 'boolean'
@@ -72,7 +65,7 @@ export class EntityCreator {
     key: string,
     def: any
   ) {
-    for (const { reqKey, objKey } of objs) {
+    for (const { reqKey, objKey, ...others } of objs) {
       if (objKey?.[key]) return req[reqKey][objKey[key]];
     }
     return def;
@@ -120,7 +113,6 @@ export class EntityCreator {
       'limit',
       req.method === 'GET' ? 12 : 0
     );
-
     if (offset) query.skip(offset);
     if (limit) query.limit(limit);
 
@@ -132,10 +124,10 @@ export class EntityCreator {
 
     if (executeQuery) result = await query.exec();
     if (autoSetCount)
-      res.setHeader('X-Total-Count', await query.countDocuments());
+      res.setHeader('X-Total-Count', await query.clone().countDocuments());
 
     // handle result and output
-    this.handleResult(req, res, next, {
+    await this.handleResult(req, res, next, {
       result,
       saveToReq,
       sendResponse,
@@ -177,12 +169,7 @@ export class EntityCreator {
       });
     };
   }
-  getAllCreator({
-    filter,
-    parseFilter,
-    paramFields,
-    ...opt
-  }: CRUDCreatorOpt): MiddleWare {
+  getAllCreator({ filter, parseFilter, ...opt }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = filter ?? parseFilter ? parseFilter(req) : {};
       if (!opt.sort) opt.sort = { createdAt: -1 };
@@ -339,8 +326,10 @@ function translateCRUD2Url(
       return '/';
     case CRUD.GET_ALL:
       let extra = '';
-      if (opt.paramFields?.offset) extra += `/?:${opt.paramFields.offset}`;
-      if (opt.paramFields?.limit) extra += `/?:${opt.paramFields.limit}`;
+      if (opt.paramFields?.offset)
+        extra += `/:${opt.paramFields.offset}([0-9]+)?`;
+      if (opt.paramFields?.limit)
+        extra += `/:${opt.paramFields.limit}([0-9]+)?`;
       return `/${extra}`;
     case CRUD.GET_ONE:
     case CRUD.UPDATE_ONE:

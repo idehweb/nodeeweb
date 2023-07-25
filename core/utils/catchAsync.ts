@@ -1,12 +1,18 @@
 import { NextFunction, Response } from 'express';
 import { MiddleWare, MiddleWareError, Req } from '../types/global';
-import { isAsyncFunction } from 'util/types';
+import { axiosError2String } from './helpers';
 
-export function catchFn<F extends Function>(
+export const catchFn = <F extends Function>(
   fn: F,
-  { self, onError }: { self?: any; onError?: any } = {}
-) {
-  return (async (...args: any[]) => {
+  {
+    self,
+    onError,
+  }: {
+    self?: any;
+    onError?: Function;
+  } = {}
+) => {
+  const newFn = async (...args: any[]) => {
     try {
       let result = fn.call(self ?? this, ...args);
       while (result instanceof Promise) {
@@ -15,12 +21,21 @@ export function catchFn<F extends Function>(
       return result;
     } catch (err) {
       if (onError) {
-        // logger.error('#CatchError', err);
-        return onError(err, ...args);
+        const parsed = axiosError2String(err);
+        let newError: Error;
+        if (parsed.message) {
+          newError = new Error(parsed.message);
+          delete newError.stack;
+        } else {
+          newError = parsed.error;
+        }
+        return onError(newError, ...args);
       }
     }
-  }) as any as F;
-}
+  };
+
+  return newFn as any as F;
+};
 export const catchMiddleware = <F extends MiddleWare>(
   fn: F,
   {
@@ -31,23 +46,7 @@ export const catchMiddleware = <F extends MiddleWare>(
     onError?: MiddleWareError;
   } = {}
 ) => {
-  const catchFn: MiddleWare = async (req, res, next) => {
-    try {
-      let result = fn.call(self ?? this, req, res, next);
-      while (result instanceof Promise) {
-        result = await result;
-      }
-      return result;
-    } catch (err) {
-      if (onError) {
-        // logger.error('#CatchError', err);
-        return onError(err, req, res, next);
-      }
-      return next(err);
-    }
-  };
-
-  return catchFn as F;
+  return catchFn(fn, { self, onError }) as F;
 };
 
 export function classCatchBuilder<CustomClass>(
