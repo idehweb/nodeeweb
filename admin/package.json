@@ -33,7 +33,6 @@
     "grapesjs-preset-webpage": "^0.1.11",
     "immutability-helper": "^3.1.1",
     "jalali-moment": "^3.3.11",
-    "lodash": "^4.17.21",
     "notiflix": "^3.2.6",
     "ra-input-rich-text": "^4.12.2",
     "ra-language-farsi": "^4.1.0",
@@ -53,7 +52,6 @@
     "recharts": "^2.7.2",
     "redux": "^4.2.1",
     "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.4.2",
     "shards-react": "^1.0.3",
     "swiper": "^8.3.2"
   },
