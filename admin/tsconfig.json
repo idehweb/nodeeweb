@@ -20,9 +20,10 @@
       "@/*": ["./src/*"],
       "#c/*": ["./src/*"]
     },
-    "incremental": true
+    "incremental": true,
+    "checkJs": true
     // "tsBuildInfoFile": "./node_modules/.cache"
   },
   "include": ["src"],
-  "exclude": ["node_modules", "**/node_modules/*", "public"]
+  "exclude": ["node_modules", "**/node_modules/*", "public", "build"]
 }
