@@ -19,7 +19,7 @@ import CardActions from '@mui/material/CardActions';
 
 import React from 'react';
 
-import { useEditController } from 'react-admin/dist/index';
+import { useEditController } from 'react-admin';
 
 import {
   List,

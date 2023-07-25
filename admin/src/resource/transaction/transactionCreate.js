@@ -21,7 +21,7 @@ import {
 } from '@/components';
 import { dateFormat } from '@/functions';
 import API, { BASE_URL } from '@/functions/API';
-// import { useTranslate } from "react-admin/dist/index";
+// import { useTranslate } from "react-admin";
 
 const Form = ({ children, ...props }) => {
   const translate = useTranslate();
