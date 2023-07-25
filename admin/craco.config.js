@@ -11,7 +11,7 @@ process.env.REACT_APP_VERSION = now + ', ' + gitHash;
 
 const isDev = process.env.NODE_ENV === 'development';
 
-/** @type { import("@craco/craco").CracoConfig } */
+/** @type { import("@craco/types").CracoConfig } */
 const config = {
   eslint: {
     enable: isDev,
