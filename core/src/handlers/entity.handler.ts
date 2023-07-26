@@ -249,7 +249,9 @@ export class EntityCreator {
 
 export type EntityCRUDOpt = {
   crud: Omit<CRUDCreatorOpt, 'httpCode'>;
-  controller: Partial<ControllerSchema>;
+  controller: Partial<ControllerSchema> & {
+    beforeService?: MiddleWare | MiddleWare[];
+  };
 };
 export function registerEntityCRUD(
   modelName: string,
@@ -272,6 +274,7 @@ export function registerEntityCRUD(
       url: opt.controller.url ?? translateCRUD2Url(cName, opt.crud),
       access: opt.controller.access,
       service: [
+        ...[opt.controller.beforeService ?? []].flat(),
         creator[translateCRUD2Creator(cName)](opt.crud),
         ...[opt.controller.service ?? []].flat(),
       ],
