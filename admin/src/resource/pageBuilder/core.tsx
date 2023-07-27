@@ -6,7 +6,7 @@ import { useNotify, useTranslate } from 'react-admin';
 
 import _ from 'lodash';
 
-// import _omit from 'lodash/omit';
+import update from 'immutability-helper';
 
 import { LoadingContainer } from '@/components/global';
 import { Component, OptionBox } from '@/components/page-builder';
@@ -21,27 +21,12 @@ import {
 import Header from './Header';
 import Container from './Container';
 import Preview from './Preview';
-import { generateCompID } from './utils';
-
-const mergeObject = (obj, path) => {};
-
-const FindNodeAddress = (item, id, path = '') => {
-  let temp = '';
-  if (!item) return '';
-  else if (Array.isArray(item))
-    temp = item
-      .map((i, idx) => FindNodeAddress(i, id, `[${idx}]`))
-      .filter(Boolean)
-      .join('');
-  else if (item.id === id) return path;
-  else if (Array.isArray(item.children))
-    temp = item.children
-      .map((i, idx) => FindNodeAddress(i, id, `.children.[${idx}]`))
-      .filter(Boolean)
-      .join('');
-
-  return temp ? path + temp : '';
-};
+import {
+  generateCompID,
+  mergeObject,
+  FindNodeAddress,
+  DeleteItem,
+} from './utils';
 
 const Core = (props) => {
   const translate = useTranslate();
@@ -80,17 +65,15 @@ const Core = (props) => {
       })
       .finally(() => setLoading(false));
   }, [_id, model, dispatch]);
-  useEffect(() => {
-    console.log('useEffect');
-    LoadData();
 
+  useEffect(() => {
+    LoadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const SaveData = useCallback(
     (data = {}) => {
       setLoading(true);
-      console.log('SaveData');
       SaveBuilder(model, _id, { elements: data })
         .then((r) => {
           if (r._id)
@@ -179,100 +162,8 @@ const Core = (props) => {
 
   const handleDelete = useCallback(
     (id) => {
-      let tempArray = [];
-      components.forEach((comp, j) => {
-        let deleteItem = false;
-        if (id === comp.id) {
-          deleteItem = true;
-        }
-        if (comp.children && !deleteItem) {
-          let tempChildren = [];
-          comp.children.forEach((ch, j2) => {
-            let deleteItem2 = false;
-            if (id == ch.id) {
-              deleteItem2 = true;
-            }
-            if (ch.children && !deleteItem2) {
-              let tempChildren3 = [];
-              ch.children.forEach((ch3, j3) => {
-                let deleteItem3 = false;
-                if (id == ch3.id) {
-                  deleteItem3 = true;
-                }
-                if (ch3.children && !deleteItem3) {
-                  let tempChildren4 = [];
-                  ch3.children.forEach((ch4, j4) => {
-                    let deleteItem4 = false;
-                    if (id == ch4.id) {
-                      deleteItem4 = true;
-                    }
-                    if (ch4.children && !deleteItem4) {
-                      let tempChildren5 = [];
-                      ch4.children.forEach((ch5, j5) => {
-                        let deleteItem5 = false;
-                        if (id == ch5.id) {
-                          deleteItem5 = true;
-                        }
-                        if (ch5.children && !deleteItem5) {
-                          let tempChildren6 = [];
-                          ch5.children.forEach((ch6, j6) => {
-                            let deleteItem6 = false;
-                            if (id == ch6.id) {
-                              deleteItem6 = true;
-                            }
-
-                            if (ch6.children && !deleteItem6) {
-                              let tempChildren7 = [];
-                              ch6.children.forEach((ch7, j7) => {
-                                let deleteItem7 = false;
-                                if (id == ch7.id) {
-                                  deleteItem7 = true;
-                                }
-                                if (!deleteItem7) {
-                                  tempChildren7.push(ch7);
-                                }
-                              });
-                              ch6.children = tempChildren7;
-                            }
-
-                            if (!deleteItem6) {
-                              tempChildren6.push(ch6);
-                            }
-                          });
-                          ch5.children = tempChildren6;
-                        }
-                        if (!deleteItem5) {
-                          tempChildren5.push(ch5);
-                        }
-                      });
-                      ch4.children = tempChildren5;
-                    }
-
-                    if (!deleteItem4) {
-                      tempChildren4.push(ch4);
-                    }
-                  });
-                  ch3.children = tempChildren4;
-                }
-
-                if (!deleteItem3) {
-                  tempChildren3.push(ch3);
-                }
-              });
-              ch.children = tempChildren3;
-            }
-            if (!deleteItem2) tempChildren.push(ch);
-          });
-          comp.children = tempChildren;
-        }
-
-        if (!deleteItem) tempArray.push(comp);
-      });
-
-      let r = [...tempArray];
-      console.log('components out:', r);
-
-      setState((s) => ({ ...s, components: tempArray }));
+      let newComponents = DeleteItem(id, components);
+      setState((s) => ({ ...s, components: newComponents }));
     },
     [components]
   );
@@ -632,7 +523,7 @@ const Core = (props) => {
           <AnimatePresence presenceAffectsLayout>
             {components?.map((i, idx) => (
               <motion.div
-                key={`${i.id}-${idx}`}
+                key={`${i.id}`}
                 layout="position"
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -641,9 +532,7 @@ const Core = (props) => {
                 <Component
                   index={idx}
                   item={i}
-                  onDelete={(e) => {
-                    handleDelete(e || i.id);
-                  }}
+                  onDelete={handleDelete}
                   onAdd={toggleOptionBox}
                   onEdit={() => setEditItem(i)}
                   onDrop={handleDrop}
