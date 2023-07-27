@@ -23,7 +23,7 @@ export type Req = Request & {
   [CRUD_DEFAULT_REQ_KEY]: any;
 };
 
-export type Res = Express.Response;
+export type Res = Response;
 export type MiddleWare = (req: Req, res: Response, next: NextFunction) => any;
 export type MiddleWareError = (
   e: any,
