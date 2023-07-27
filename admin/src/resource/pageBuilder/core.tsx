@@ -21,12 +21,7 @@ import {
 import Header from './Header';
 import Container from './Container';
 import Preview from './Preview';
-import {
-  generateCompID,
-  mergeObject,
-  FindNodeAddress,
-  DeleteItem,
-} from './utils';
+import { makeAction, FindNodeAddress, DeleteItem, AddItem } from './utils';
 
 const Core = (props) => {
   const translate = useTranslate();
@@ -43,7 +38,7 @@ const Core = (props) => {
     components: [],
     optionBox: false,
     excludeArray: [],
-    sourceAddress: 'new',
+    sourceAddress: '',
     componentForSetting: {},
     componentOptionsBox: false,
   });
@@ -162,187 +157,20 @@ const Core = (props) => {
 
   const handleDelete = useCallback(
     (id) => {
-      let newComponents = DeleteItem(id, components);
+      const newComponents = DeleteItem(id, components);
       setState((s) => ({ ...s, components: newComponents }));
     },
     [components]
   );
 
-  const addToComponents = useCallback(
-    (element, extra) => {
-      let theNewComponents = components,
-        mainAddress = [];
-
-      if (sourceAddress) {
-        mainAddress = sourceAddress.split('_');
-      }
-
-      if (mainAddress[0] === 'new') {
-        theNewComponents.push({ ...element, id: generateCompID() });
-        setState((s) => ({ ...s, components: theNewComponents, ...extra }));
-      } else {
-        console.log('addToComponentaddToComponent: ', theNewComponents);
-        theNewComponents.forEach((compL1, indeL1) => {
-          if (compL1.id === sourceAddress) {
-            if (!theNewComponents[indeL1]['children']) {
-              theNewComponents[indeL1]['children'] = [];
-            }
-            theNewComponents[indeL1]['children'].push({
-              ...element,
-              id: generateCompID(),
-            });
-            setState((s) => ({
-              ...s,
-              components: theNewComponents,
-              ...extra,
-            }));
-            return;
-          }
-          if (compL1.children) {
-            compL1.children.forEach((compL2, indeL2) => {
-              if (compL2.id === sourceAddress) {
-                console.log(
-                  'we found it here level 1...',
-                  theNewComponents[indeL1]['children'][indeL2]
-                );
-                if (!theNewComponents[indeL1]['children'][indeL2]['children']) {
-                  theNewComponents[indeL1]['children'][indeL2]['children'] = [];
-                }
-                theNewComponents[indeL1]['children'][indeL2]['children'].push({
-                  ...element,
-                  id: generateCompID(),
-                });
-                setState((s) => ({
-                  ...s,
-                  components: theNewComponents,
-                  ...extra,
-                }));
-                return;
-              }
-              if (compL2.children) {
-                compL2.children.forEach((compL3, indeL3) => {
-                  if (compL3.id === sourceAddress) {
-                    if (
-                      !theNewComponents[indeL1]['children'][indeL2]['children'][
-                        indeL3
-                      ]['children']
-                    ) {
-                      theNewComponents[indeL1]['children'][indeL2]['children'][
-                        indeL3
-                      ]['children'] = [];
-                    }
-                    theNewComponents[indeL1]['children'][indeL2]['children'][
-                      indeL3
-                    ]['children'].push({
-                      ...element,
-                      id: generateCompID(),
-                    });
-                    setState((s) => ({
-                      ...s,
-                      components: theNewComponents,
-                      ...extra,
-                    }));
-                    return;
-                  }
-                  if (compL3.children) {
-                    compL3.children.forEach((compL4, indeL4) => {
-                      if (compL4.id === sourceAddress) {
-                        if (
-                          !theNewComponents[indeL1]['children'][indeL2][
-                            'children'
-                          ][indeL3]['children'][indeL4]['children']
-                        ) {
-                          theNewComponents[indeL1]['children'][indeL2][
-                            'children'
-                          ][indeL3]['children'][indeL4]['children'] = [];
-                        }
-                        theNewComponents[indeL1]['children'][indeL2][
-                          'children'
-                        ][indeL3]['children'][indeL4]['children'].push({
-                          ...element,
-                          id: generateCompID(),
-                        });
-                        setState((s) => ({
-                          ...s,
-                          components: theNewComponents,
-                          ...extra,
-                        }));
-                        return;
-                      }
-                      if (compL4.children) {
-                        compL4.children.forEach((compL5, indeL5) => {
-                          if (compL5.id === sourceAddress) {
-                            if (
-                              !theNewComponents[indeL1]['children'][indeL2][
-                                'children'
-                              ][indeL3]['children'][indeL4]['children'][indeL5][
-                                'children'
-                              ]
-                            ) {
-                              theNewComponents[indeL1]['children'][indeL2][
-                                'children'
-                              ][indeL3]['children'][indeL4]['children'][indeL5][
-                                'children'
-                              ] = [];
-                            }
-                            theNewComponents[indeL1]['children'][indeL2][
-                              'children'
-                            ][indeL3]['children'][indeL4]['children'][indeL5][
-                              'children'
-                            ].push({
-                              ...element,
-                              id: generateCompID(),
-                            });
-                            setState((s) => ({
-                              ...s,
-                              components: theNewComponents,
-                              ...extra,
-                            }));
-                            return;
-                          }
-                          if (compL5.children) {
-                            compL5.children.forEach((compL6, indeL6) => {
-                              if (compL6.id === sourceAddress) {
-                                if (
-                                  !theNewComponents[indeL1]['children'][indeL2][
-                                    'children'
-                                  ][indeL3]['children'][indeL4]['children'][
-                                    indeL5
-                                  ]['children'][indeL6]['children']
-                                ) {
-                                  theNewComponents[indeL1]['children'][indeL2][
-                                    'children'
-                                  ][indeL3]['children'][indeL4]['children'][
-                                    indeL5
-                                  ]['children'][indeL6]['children'] = [];
-                                }
-                                theNewComponents[indeL1]['children'][indeL2][
-                                  'children'
-                                ][indeL3]['children'][indeL4]['children'][
-                                  indeL5
-                                ]['children'][indeL6]['children'].push({
-                                  ...element,
-                                  id: generateCompID(),
-                                });
-                                setState((s) => ({
-                                  ...s,
-                                  components: theNewComponents,
-                                  ...extra,
-                                }));
-                                return;
-                              }
-                            });
-                          }
-                        });
-                      }
-                    });
-                  }
-                });
-              }
-            });
-          }
-        });
-      }
+  const handleAdd = useCallback(
+    (item) => {
+      const newComponents = AddItem(sourceAddress, components, item);
+      setState((s) => ({
+        ...s,
+        components: newComponents,
+        optionBox: false,
+      }));
     },
     [components, sourceAddress]
   );
@@ -510,7 +338,7 @@ const Core = (props) => {
         onAdd={() => {
           setState((p) => ({
             ...p,
-            sourceAddress: 'new',
+            sourceAddress: '',
             excludeArray: [],
             optionBox: !p.optionBox,
           }));
@@ -548,7 +376,7 @@ const Core = (props) => {
         onClose={(e) => toggleOptionBox({})}
         exclude={excludeArray}
         open={state.optionBox}
-        addToComponents={addToComponents}
+        onAdd={handleAdd}
       />
       <ComponentSetting
         component={editItem}

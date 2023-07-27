@@ -21,7 +21,7 @@ const Icon = ({ children }) => (
 export default function ModalOptions({
   open = false,
   onClose,
-  addToComponents,
+  onAdd,
   Options = [],
 }) {
   return (
@@ -44,9 +44,7 @@ export default function ModalOptions({
                 display: 'flex',
                 lineHeight: '60px',
               }}
-              onClick={(e) => {
-                addToComponents(i, { optionBox: false });
-              }}>
+              onClick={() => onAdd(i)}>
               <ShowElementIcon type={i.name} />
 
               <span

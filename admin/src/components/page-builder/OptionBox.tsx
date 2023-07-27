@@ -7,7 +7,7 @@ import ModalOptions from '@/components/ModalOptions';
 import FormOptions from './FormOptions';
 import DefaultOptions from './DefaultOptions';
 
-export default function OptionBox({ onClose, open, addToComponents, exclude }) {
+export default function OptionBox({ onClose, open, onAdd, exclude }) {
   const { model } = useParams();
 
   // @ts-ignore
@@ -41,7 +41,7 @@ export default function OptionBox({ onClose, open, addToComponents, exclude }) {
   return (
     <ModalOptions
       Options={Options}
-      addToComponents={addToComponents}
+      onAdd={onAdd}
       onClose={onClose}
       open={open}
     />
