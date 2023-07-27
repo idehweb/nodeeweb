@@ -1,13 +1,13 @@
 import mongoose, { Document, Model, Types } from 'mongoose';
 
-export interface IMedia {
+export interface IFile {
   title?: string;
   url: string;
   type: string;
 }
 
-export type MediaModel = Model<IMedia, {}, unknown>;
-export type MediaDocument = Document<Types.ObjectId, {}, IMedia> & IMedia;
+export type FileModel = Model<IFile, {}, unknown>;
+export type FileDocument = Document<Types.ObjectId, {}, IFile> & IFile;
 
 const schema = new mongoose.Schema(
   {

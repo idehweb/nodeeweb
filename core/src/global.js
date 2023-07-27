@@ -70,7 +70,7 @@ let global = {
           __dirname
         );
         global.updateFile(
-          './public_media/site_setting/',
+          './files/site_setting/',
           'config.js',
           "window.BASE_URL='" +
             process.env.BASE_URL +
@@ -115,7 +115,7 @@ let global = {
           __dirname
         );
         global.updateFile(
-          './public_media/site_setting/',
+          './files/site_setting/',
           'config.js',
           "window.BASE_URL='" +
             process.env.BASE_URL +

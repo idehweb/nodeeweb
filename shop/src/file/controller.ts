@@ -1,10 +1,4 @@
-import {
-  CRUD_DEFAULT_REQ_KEY,
-  PUBLIC_ACCESS,
-} from '@nodeeweb/core/src/constants/String';
-import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
-import { controllerRegister } from '@nodeeweb/core/src/handlers/controller.handler';
 import { uploadSingle } from '@nodeeweb/core/src/handlers/upload.handler';
 import { AdminAccess } from '@nodeeweb/core';
 import service from './service';
@@ -12,7 +6,7 @@ import service from './service';
 export default function registerController() {
   //  crud
   registerEntityCRUD(
-    'media',
+    'file',
     {
       getAll: {
         controller: {
@@ -46,7 +40,36 @@ export default function registerController() {
           parseBody: service.createBodyParser,
         },
       },
+      updateOne: {
+        controller: {
+          access: AdminAccess,
+          beforeService: uploadSingle({
+            type: 'all',
+            max_size_mb: 1024,
+            reduce: {
+              quality: 80,
+            },
+          }),
+          service: service.updateAfter,
+        },
+        crud: {
+          executeQuery: false,
+          saveToReq: true,
+          parseUpdate: service.updateBodyParser,
+        },
+      },
+      deleteOne: {
+        controller: {
+          access: AdminAccess,
+          service: service.deleteAfter,
+        },
+        crud: {
+          executeQuery: true,
+          saveToReq: true,
+          forceDelete: true,
+        },
+      },
     },
-    { base_url: '/api/v1/media', from: 'ShopEntity' }
+    { base_url: '/api/v1/file', from: 'ShopEntity' }
   );
 }

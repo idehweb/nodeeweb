@@ -139,14 +139,14 @@ export function authWithPass(opt: UserPassStrategyOpt) {
 }
 
 export function authWithToken(opt: JwtStrategyOpt) {
-  return async (req, res, next) => {
-    const admin = await store.db.model('admin').findOne();
-    req.user = admin;
-    return next();
-  };
-  // return passport
-  //   .use(opt.name, jwtStrategyBuilder(opt))
-  //   .authenticate(opt.name, { session: false });
+  // return async (req, res, next) => {
+  //   const admin = await store.db.model('admin').findOne();
+  //   req.user = admin;
+  //   return next();
+  // };
+  return passport
+    .use(opt.name, jwtStrategyBuilder(opt))
+    .authenticate(opt.name, { session: false });
 }
 
 export function authWithGoogle() {}

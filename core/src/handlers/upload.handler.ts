@@ -51,9 +51,7 @@ function getFileName(file: Express.Multer.File, custom_format?: string) {
 }
 
 function getDir(opt: UploadOptions) {
-  return (
-    opt.dir_path ?? join(getPublicDir('public_media', true)[0], 'customer')
-  );
+  return opt.dir_path ?? join(getPublicDir('files', true)[0], 'customer');
 }
 
 export function uploadSingle(opt: UploadOptions) {

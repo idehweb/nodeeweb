@@ -75,7 +75,7 @@ dist
 *.env
 env
 dist
-public_media
+files
 admin/*
 public/
 ############################

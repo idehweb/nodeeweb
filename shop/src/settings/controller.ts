@@ -112,10 +112,7 @@ export default function registerController() {
         service: [
           ...uploadSingle({
             type: 'all',
-            dir_path: join(
-              getPublicDir('public_media', true)[0],
-              'site_setting'
-            ),
+            dir_path: join(getPublicDir('files', true)[0], 'site_setting'),
             max_size_mb: 100,
             reduce: { quality: 0.8 },
           }),

@@ -10,7 +10,6 @@ dist
 
 ## public
 public/
-public_media
 
 ## shared
 shared/*

@@ -231,13 +231,15 @@ export class EntityCreator {
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = filter ??
-        parseFilter(req) ?? {
-          _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
-        };
+      const f =
+        filter ?? parseFilter
+          ? parseFilter(req)
+          : {
+              _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+            };
       const u = update ?? parseUpdate ? parseUpdate(req) : { active: false };
       const query = forceDelete
-        ? this.model.deleteOne(f)
+        ? this.model.findOneAndDelete(f)
         : this.model.findOneAndUpdate(f, u);
       return await this.baseCreator(query, req, res, next, {
         ...opt,

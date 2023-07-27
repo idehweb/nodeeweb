@@ -9,7 +9,7 @@ import registerDocument from './src/document';
 import registerEntry from './src/entry';
 import registerForm from './src/form';
 import registerGateway from './src/gateways';
-import registerMedia from './src/media';
+import registerFile from './src/file';
 import registerNotification from './src/notification';
 import registerOrder from './src/order';
 import registerModification from './src/modification';
@@ -36,7 +36,7 @@ async function deployShop() {
   registerEntry();
   registerForm();
   registerGateway();
-  registerMedia();
+  registerFile();
   registerNotification();
   registerOrder();
   registerModification();
