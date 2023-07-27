@@ -141,6 +141,7 @@ export default class Service {
   static update: MiddleWare = async (req, res) => {
     return this._notImplement(res);
   };
+
   static fileUpload: MiddleWare = async (req, res) => {
     if (!req.file_path)
       return res.status(400).json({ message: 'upload failed' });

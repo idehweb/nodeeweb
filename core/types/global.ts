@@ -17,12 +17,13 @@ export type Req = Request & {
   props: any;
   file_path?: string;
   old_file_path?: string;
+  file: Express.Multer.File;
   user?: Document & any;
   modelName?: string;
   [CRUD_DEFAULT_REQ_KEY]: any;
 };
 
-export type Res = Response;
+export type Res = Express.Response;
 export type MiddleWare = (req: Req, res: Response, next: NextFunction) => any;
 export type MiddleWareError = (
   e: any,
