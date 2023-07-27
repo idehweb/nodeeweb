@@ -43,9 +43,7 @@ const getOptAction = (t: ActionTypes, index, value) => {
       // add item at index
       return {
         $apply: function (x) {
-          console.log('before', x, index);
-          x = [...x.slice(0, index), value, ...x.slice(index)];
-          console.log('after', x);
+          return [...x.slice(0, index), value, ...x.slice(index)];
         },
       };
     case 'add':
@@ -75,7 +73,6 @@ export const makeAction = (path, opt: ActionTypes, value = undefined) => {
       if (opt === 'add' && idx === lastIndex)
         obj[key] = getOptAction(opt, index, value);
       else if (opt !== 'add' && idx === lastIndex - 1) {
-        console.log('last item');
         obj[key] = getOptAction(opt, index, value);
       }
 
@@ -85,10 +82,6 @@ export const makeAction = (path, opt: ActionTypes, value = undefined) => {
 
   return newObj;
 };
-
-const isSameLevel = (source, dest) => {};
-
-// const PushTo
 
 export const AddItem = (id, arr, value) => {
   let address = FindNodeAddress(arr, id);

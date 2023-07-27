@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 import { useNotify, useTranslate } from 'react-admin';
 
-import _ from 'lodash';
+import _get from 'lodash/get';
 
 import update from 'immutability-helper';
 
@@ -175,96 +175,6 @@ const Core = (props) => {
     [components, sourceAddress]
   );
 
-  const handleDrop2 = useCallback((id, dest, component) => {
-    let moveCurrentItem = [];
-    let pushCurrentItem = [];
-    let lastComponenet = [];
-
-    if (component) {
-      if (component.id === id) {
-        moveCurrentItem.push(component);
-      } else if (component.children) {
-        component.children.forEach((subCom) => {
-          if (subCom.id === id) {
-            moveCurrentItem.push(subCom);
-          } else if (subCom.children) {
-            subCom.children.forEach((subAny) => {
-              if (subAny.id === id) {
-                moveCurrentItem.push(subAny);
-              }
-            });
-          }
-        });
-      }
-
-      if (component.id === dest) {
-        pushCurrentItem.push(component);
-      } else if (component.children) {
-        component.children.forEach((child) => {
-          if (child.id === dest) {
-            pushCurrentItem.push(child);
-          } else if (child.children) {
-            child.children.forEach((subChild) => {
-              if (subChild.id === dest) {
-                pushCurrentItem.push(subChild);
-              }
-            });
-          }
-        });
-      }
-      let added;
-      if (pushCurrentItem) {
-        pushCurrentItem.forEach((i) => {
-          if (i.hasOwnProperty('children')) {
-            i.children.forEach((p) => {
-              if (p.id === id) {
-                added = false;
-              } else {
-                added = true;
-                i.children.push(moveCurrentItem[0]);
-              }
-            });
-            // if(added){
-            //   push.children.push(moveCurrentItem[0]);
-            // }
-
-            const deleteTarget =
-              component.children &&
-              component.children.findIndex((child) => {
-                child.children &&
-                  child.children.findIndex((chil) => {
-                    chil.children &&
-                      chil.children.findIndex((chi) => {
-                        if (chi && chi.id === id) {
-                          if (chil.id !== dest) {
-                            chil.children.splice(chi, 1);
-                          }
-                        }
-                      });
-                    if (chil && chil.id === id) {
-                      if (child.id !== dest) {
-                        child.children.splice(chil, 1);
-                      }
-                    }
-                  });
-                if (child && child.id === id) {
-                  if (component.children.id !== dest) {
-                    component.children.splice(child, 1);
-                  }
-                }
-              });
-          } else {
-            let temp = Object.assign(i, { children: lastComponenet });
-            console.log('asd', temp);
-            // component.splice(component.children.findIndex(a => a.id === id) , 1)
-          }
-        });
-      }
-    }
-
-    // setState((p) => ({ ...p, components: component }));
-  }, []);
-
   const handleDrop = useCallback(
     (source, dest) => {
       console.log({ components, source, dest });
@@ -272,58 +182,23 @@ const Core = (props) => {
       const baseNodeAddress = FindNodeAddress(components, source.id);
       const destNodeAddress = FindNodeAddress(components, dest.id);
 
-      function removeAt(obj, path) {
-        let arr = path.split('.');
-        arr.splice(-1);
-        let parentPath = arr.join('.');
-        let index: string | number = path.split('.').pop();
-        index = Number((index as string).replace(/\[|]/gi, ''));
+      console.group('here');
+      console.log('address', baseNodeAddress, destNodeAddress);
 
-        console.log('index', index, path, parentPath);
+      const baseNode = _get(components, baseNodeAddress, {});
 
-        const res = _.cloneDeep(obj);
-        let parent: [] = _.get(res, parentPath, []) || [];
-        console.log('parent', parent);
+      let newComponents = components;
+      newComponents = update(
+        newComponents,
+        makeAction(baseNodeAddress, 'remove')
+      );
+      newComponents = update(
+        newComponents,
+        makeAction(destNodeAddress, 'addToIndex', baseNode)
+      );
 
-        if (Array.isArray(parent)) {
-          parent.splice(index, 1);
-          _.set(res, parentPath, parent);
-          return res;
-        }
-        return obj;
-      }
-      function pushAt(obj, path, value) {
-        let index: string | number = path.split('.').pop();
-        index = Number((index as string).replace(/\[|]/gi, ''));
-
-        const res = _.cloneDeep(obj);
-        let parent: [] = _.get(res, path, []) || [];
-
-        const insertAt = (arr, idx, newItem) => [
-          ...arr.slice(0, idx),
-          newItem,
-          ...arr.slice(idx),
-        ];
-
-        insertAt(parent, index, value);
-        _.set(res, path, parent);
-
-        return res;
-      }
-
-      // const baseParentAddress = baseNodeAddress.split('.').pop();
-      // const destParentAddress = destNodeAddress.split('.').pop();
-
-      // const baseParentNode = _get(components, baseParentAddress, {});
-      // const destParentNode = _get(components, destParentAddress, {});
-
-      console.log('baseNodeAddress', baseNodeAddress, destNodeAddress);
-
-      // console.log('sdf', _omit(components, [destNodeAddress]));
-      let newComponents = removeAt(components, baseNodeAddress);
-      // let newComponents = removeAt(components, destNodeAddress);
-
-      console.log('sdf', newComponents);
+      console.log('result', newComponents);
+      console.groupEnd();
 
       setState((p) => ({ ...p, components: newComponents }));
     },
