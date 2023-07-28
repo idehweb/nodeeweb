@@ -43,7 +43,9 @@ const getOptAction = (t: ActionTypes, index, value) => {
       // add item at index
       return {
         $apply: function (x) {
-          return [...x.slice(0, index), value, ...x.slice(index)];
+          const start = x.slice(0, index) || [];
+          const end = x.slice(index) || [];
+          return [...start, value, ...end];
         },
       };
     case 'add':
