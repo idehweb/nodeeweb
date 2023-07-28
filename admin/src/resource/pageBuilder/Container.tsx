@@ -6,7 +6,9 @@ interface ComponentProps {
   isOver?: boolean;
 }
 
-export const Component = styled('main')<ComponentProps>(({ isOver }) => ({
+export const Component = styled('main', {
+  shouldForwardProp: (p: string) => !['isOver'].includes(p),
+})<ComponentProps>(({ isOver }) => ({
   minHeight: 'calc(100vh - 60px)',
   background: '#fff',
   paddingTop: '12px',
