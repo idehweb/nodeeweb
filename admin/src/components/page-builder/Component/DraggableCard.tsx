@@ -12,11 +12,16 @@ export const Component = styled('div')<ComponentProps>(
     margin: '8px 16px',
     borderRadius: 4,
     cursor: 'move',
+    borderStyle: 'dashed',
+    borderWidth: 1,
     '&:hover > div > .pb-actions': {
       opacity: 1,
     },
+    '&:hover': {
+      borderColor: '#29b6f6',
+    },
     opacity: isDragging ? 0.6 : 1,
-    border: isOver ? '1px dashed red' : '1px solid #ddd',
+    borderColor: isOver ? 'red' : '#ddd',
   })
 );
 
@@ -30,12 +35,18 @@ type DraggableProps = Omit<DraggableCardProps, 'canDrag'>;
 function Draggable({ item, onDropEnd, ...props }: DraggableProps) {
   const ref = useRef(null); // Initialize the reference
 
-  const [{ isOver }, drop] = useDrop({
+  const [{ isOver, canDrop }, drop] = useDrop({
     accept: 'ITEM',
-    drop: () => item,
-    canDrop: (i: any) => i?.addable,
+    drop(source, monitor) {
+      // already dropped
+      if (monitor.didDrop()) return;
+
+      onDropEnd(source, item);
+    },
+    canDrop: () => item?.addable,
     collect: (monitor) => ({
       isOver: !!monitor.isOver({ shallow: true }),
+      canDrop: monitor.canDrop(),
     }),
   });
 
@@ -46,9 +57,6 @@ function Draggable({ item, onDropEnd, ...props }: DraggableProps) {
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
-      end(source, monitor) {
-        onDropEnd(source, monitor.getDropResult());
-      },
     }),
     [item]
   );
@@ -57,7 +65,12 @@ function Draggable({ item, onDropEnd, ...props }: DraggableProps) {
   }, [drag, drop]);
 
   return (
-    <Component ref={ref} isDragging={isDragging} isOver={isOver} {...props} />
+    <Component
+      ref={ref}
+      isDragging={isDragging}
+      isOver={isOver && canDrop}
+      {...props}
+    />
   );
 }
 
