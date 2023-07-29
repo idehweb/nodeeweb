@@ -1,6 +1,5 @@
-import DefaultGeneral from './DefaultGeneral';
+import { fields, rules } from './DefaultGeneral';
 
-let { fields, rules } = DefaultGeneral;
 const FormOptions = [
   {
     label: 'Steps',
@@ -36,32 +35,21 @@ const FormOptions = [
     settings: {
       general: {
         fields: {
-          value: '',
+          text: '',
+          tag: 'p',
           direction: '',
-          target: '',
-          link: '',
           fontSize: '13px',
           lineHeight: '1',
-          iconImage: '',
-          iconFont: '',
-          iconPosition: 'top',
-          iconColor: '',
           fontWeight: 'normal',
           ...fields,
         },
         rules: [
-          { name: 'value', type: 'textarea' },
+          { name: 'text', type: 'textarea' },
+          { name: 'tag', type: 'string' },
           { name: 'direction', type: 'string' },
-          { name: 'target', type: 'string' },
-          { name: 'link', type: 'string' },
           { name: 'fontSize', type: 'string' },
           { name: 'lineHeight', type: 'string' },
-          { name: 'iconImage', type: 'image' },
-          { name: 'iconFont', type: 'string' },
-          { name: 'iconPosition', type: 'string' },
           { name: 'fontWeight', type: 'string' },
-          { name: 'iconColor', type: 'string' },
-
           ...rules,
         ],
       },
