@@ -26,7 +26,7 @@ export async function dbInit() {
     const adminModel = store.db.model('admin');
     const admin = await adminModel.findOne();
     if (!admin) {
-      logger.log('db is empty, let us import sample data...');
+      logger.log("there is not any admin, let's insert some...");
       await adminModel.create({
         email: store.env.ADMIN_EMAIL ?? 'admin@example.com',
         username: store.env.ADMIN_USERNAME ?? 'admin',
@@ -34,7 +34,14 @@ export async function dbInit() {
         password: store.env.ADMIN_PASSWORD ?? 'admin',
         role: 'owner',
       });
-      logger.log('admin created');
+    }
+
+    // check setting
+    const settingModel = store.db.model('setting');
+    const setting = await settingModel.findOne({});
+    if (!setting) {
+      logger.log("there is not any setting, let's insert some...");
+      await settingModel.create({});
     }
   })();
 }
