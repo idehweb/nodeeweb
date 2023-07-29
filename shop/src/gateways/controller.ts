@@ -95,6 +95,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/amin/gateway', from: 'ShopEntity' }
+    { base_url: '/admin/gateway', from: 'ShopEntity' }
   );
 }

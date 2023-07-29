@@ -5,7 +5,7 @@ import store from '@nodeeweb/core/store';
 
 export default class Service {
   static last: MiddleWare = async (req, res) => {
-    let Settings = store.db.model('Settings');
+    let Settings = store.db.model('setting');
 
     let offset = 0;
     if (req.params.offset) {
@@ -38,7 +38,7 @@ export default class Service {
     return this._notImplement(res);
   };
   static customerStatus: MiddleWare = async (req, res) => {
-    let Settings = store.db.model('Settings');
+    let Settings = store.db.model('setting');
 
     let offset = 0;
     if (req.params.offset) {
@@ -62,7 +62,7 @@ export default class Service {
     return 0;
   };
   static formStatus: MiddleWare = async (req, res) => {
-    let Settings = store.db.model('Settings');
+    let Settings = store.db.model('setting');
 
     let offset = 0;
     if (req.params.offset) {
@@ -85,7 +85,7 @@ export default class Service {
     return 0;
   };
   static configuration: MiddleWare = async (req, res) => {
-    let Settings = store.db.model('Settings');
+    let Settings = store.db.model('setting');
 
     const setting = await Settings.findOneAndUpdate({}, req.body, {
       new: true,
@@ -100,7 +100,7 @@ export default class Service {
     res.json({ success: true, setting });
   };
   static factore: MiddleWare = async (req, res) => {
-    let Settings = store.db.model('Settings');
+    let Settings = store.db.model('setting');
     let offset = 0;
     if (req.params.offset) {
       offset = parseInt(req.params.offset);
