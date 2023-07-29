@@ -105,6 +105,18 @@ export default function registerController() {
           saveToReq: true,
         },
       },
+      getOne: {
+        controller: {
+          access: AdminAccess,
+          service(req, res) {
+            return res.json(req.crud);
+          },
+        },
+        crud: {
+          executeQuery: true,
+          saveToReq: true,
+        },
+      },
       create: {
         controller: {
           access,
@@ -135,7 +147,7 @@ export default function registerController() {
         crud: {
           executeQuery: true,
           saveToReq: true,
-          update: { status: 'trash' },
+          parseUpdate: () => ({ status: 'trash' }),
         },
       },
     },
