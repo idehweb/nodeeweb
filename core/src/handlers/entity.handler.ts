@@ -41,9 +41,7 @@ export class EntityCreator {
       const data =
         typeof sendResponse === 'boolean'
           ? result
-          : isAsyncFunction(sendResponse)
-          ? await sendResponse(result)
-          : sendResponse(result);
+          : await call(sendResponse, result);
       return res.status(httpCode).json({ data });
     }
 
