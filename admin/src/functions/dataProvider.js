@@ -19,7 +19,10 @@ const httpClient = (url, options = {}) => {
     });
 
   // add your own headers here
-  options.headers.set('token', localStorage.getItem('token'));
+  options.headers.set(
+    'Authorization',
+    'Bearer ' + localStorage.getItem('token')
+  );
   return fetchUtils.fetchJson(url, options);
 };
 
