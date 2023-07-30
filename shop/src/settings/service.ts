@@ -99,6 +99,19 @@ export default class Service {
     }
     res.json({ success: true, setting });
   };
+  static getConfiguration: MiddleWare = async (req, res) => {
+    let Settings = store.db.model('setting');
+
+    const setting = await Settings.findOne({});
+
+    if (!setting) {
+      return res.status(404).json({
+        success: false,
+        message: 'error',
+      });
+    }
+    res.json({ success: true, setting });
+  };
   static factore: MiddleWare = async (req, res) => {
     let Settings = store.db.model('setting');
     let offset = 0;
@@ -167,7 +180,4 @@ export default class Service {
   static _notImplement = (res: Res) => {
     res.status(500).send('not implement yet!');
   };
-  static onError = serviceOnError('Setting');
 }
-
-classCatchBuilder(Service);

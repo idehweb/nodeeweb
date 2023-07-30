@@ -1,25 +1,31 @@
 import {
-  OPTIONAL_LOGIN,
+  CRUD_DEFAULT_REQ_KEY,
   PUBLIC_ACCESS,
 } from '@nodeeweb/core/src/constants/String';
 import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
-import Service from './service';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
-
-  // create , update , getAll  ,getOne
   registerEntityCRUD(
-    'page',
+    'customerGroup',
     {
+      create: {
+        controller: {
+          access,
+          service(req, res) {
+            res.status(200).json(req[CRUD_DEFAULT_REQ_KEY]);
+          },
+        },
+        crud: { executeQuery: true, sendResponse: true },
+      },
       getCount: {
         controller: {
           access,
           service: (req, res) => {
             res.json({
               success: true,
-              count: req.crud,
+              count: req[CRUD_DEFAULT_REQ_KEY],
             });
           },
         },
@@ -29,7 +35,7 @@ export default function registerController() {
         controller: {
           access,
           service(req, res) {
-            res.json(req.crud);
+            res.json(req[CRUD_DEFAULT_REQ_KEY]);
           },
         },
         crud: {
@@ -40,7 +46,7 @@ export default function registerController() {
       getAll: {
         controller: {
           access,
-          service: (req, res) => res.json(req.crud),
+          service: (req, res) => res.json(req[CRUD_DEFAULT_REQ_KEY]),
         },
         crud: {
           parseFilter(req) {
@@ -57,55 +63,35 @@ export default function registerController() {
           },
         },
       },
-      create: {
-        controller: {
-          access,
-          service: Service.createAfter,
-        },
-        crud: {
-          executeQuery: true,
-          saveToReq: true,
-        },
-      },
       updateOne: {
         controller: {
           access,
-          service: Service.updateAfter,
+          service(req, res) {
+            res.json(req[CRUD_DEFAULT_REQ_KEY]);
+          },
         },
         crud: {
           executeQuery: true,
           saveToReq: true,
         },
       },
-    },
-    { base_url: '/admin/page', from: 'ShopEntity' }
-  );
-
-  // get one
-  registerEntityCRUD(
-    'page',
-    {
-      getOne: {
+      deleteOne: {
         controller: {
-          access: [
-            {
-              role: OPTIONAL_LOGIN,
-              modelName: 'customer',
-            },
-            {
-              role: OPTIONAL_LOGIN,
-              modelName: 'admin',
-            },
-          ],
-          service: Service.getOneAfter,
+          access,
+          service(req, res) {
+            return res.status(204).json({
+              success: true,
+              message: 'Deleted!',
+            });
+          },
         },
         crud: {
           executeQuery: true,
           saveToReq: true,
-          parseFilter: Service.getOneFilterParser,
+          forceDelete: true,
         },
       },
     },
-    { base_url: '/customer/page', from: 'ShopEntity' }
+    { base_url: '/admin/customerGroup', from: 'ShopEntity' }
   );
 }

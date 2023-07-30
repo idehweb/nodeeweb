@@ -21,6 +21,7 @@ import registerSettings from './src/settings';
 import logger from './utils/log';
 import { store } from '@nodeeweb/core';
 import { handlePlugins } from './src/common/handlePlugins';
+import registerCustomerGroup from './src/customerGroup';
 
 async function deployShop() {
   await deployCore();
@@ -31,6 +32,7 @@ async function deployShop() {
   registerAttribute();
   registerCategory();
   registerCustomer();
+  registerCustomerGroup();
   registerDiscount();
   registerDocument();
   registerEntry();

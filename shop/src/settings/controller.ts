@@ -64,6 +64,12 @@ export default function registerController() {
         service: Service.configuration,
       },
       {
+        url: '/configuration',
+        method: 'get',
+        access,
+        service: Service.getConfiguration,
+      },
+      {
         url: '/factore',
         method: 'get',
         access,
@@ -144,5 +150,55 @@ export default function registerController() {
       base_url: '/customer/settings',
       from: 'ShopEntity',
     }
+  );
+
+  // crud
+  registerEntityCRUD(
+    'setting',
+    {
+      getOne: {
+        controller: {
+          access,
+          service(req, res) {
+            res.json(req.crud);
+          },
+        },
+        crud: {
+          saveToReq: true,
+          executeQuery: true,
+        },
+      },
+      getAll: {
+        controller: {
+          access,
+          service: (req, res) => res.json(req[CRUD_DEFAULT_REQ_KEY]),
+        },
+        crud: {
+          parseFilter(req) {
+            if (req.query.filter && typeof req.query.filter === 'string') {
+              return JSON.parse(req.query.filter);
+            }
+          },
+          autoSetCount: true,
+          saveToReq: true,
+          executeQuery: true,
+          paramFields: {
+            limit: 'limit',
+            offset: 'offset',
+          },
+        },
+      },
+      updateOne: {
+        controller: {
+          access,
+        },
+        crud: {
+          sendResponse: true,
+          executeQuery: true,
+        },
+      },
+    },
+
+    { base_url: '/admin/settings', from: 'ShopEntity' }
   );
 }
