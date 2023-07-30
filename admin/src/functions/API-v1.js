@@ -1,14 +1,12 @@
 import axios from 'axios';
 
 export const BASE_URL =
-  process.env.NODE_ENV === 'development'
+  (process.env.NODE_ENV === 'development'
     ? process.env.REACT_APP_API_BASE_URL_DEV
-    : window.origin;
-export const ADMIN_ROUTE = BASE_URL + '/admin';
-export const ShopURL = BASE_URL;  
+    : window.origin) + '/api/v1';
 
 export default axios.create({
-  baseURL: ADMIN_ROUTE,
+  baseURL: BASE_URL,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',

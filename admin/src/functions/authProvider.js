@@ -1,4 +1,4 @@
-import { BASE_URL } from './API_BASE_URL';
+import { BASE_URL } from './API-v1';
 const url = BASE_URL;
 
 export default {
