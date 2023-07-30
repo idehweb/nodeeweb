@@ -45,6 +45,10 @@ RUN cd /app/core && \
 
 FROM build as build-dev
 
+# Install Core Packages
+RUN cd /app/core && \
+    yarn install
+
 # Install Packages
 RUN cd /app/shop && \
     yarn install
