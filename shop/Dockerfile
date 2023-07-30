@@ -84,11 +84,8 @@ RUN cd /app/shop && \
 FROM base as dev
 ENV NODE_ENV "development"
 
-# Copy packages
-COPY --from=build-dev /app/shop/node_modules ./node_modules
-
 # Copy Build Files
-COPY --from=build-dev /app/shop/dist /app/shop/package.json /app/shop/tsconfig.json ./
+COPY --from=build-dev /app/shop ./
 
 # Copy Docker EntryPoint
 COPY shop/docker/docker-entrypoint-dev.sh /usr/local/bin
