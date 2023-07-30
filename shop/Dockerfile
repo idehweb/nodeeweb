@@ -84,11 +84,14 @@ RUN cd /app/shop && \
 FROM base as dev
 ENV NODE_ENV "development"
 
-# Copy Build Files
-COPY --from=build-dev /app/shop ./
+# Copy Files
+COPY --from=build-dev /app ./
 
 # Copy Docker EntryPoint
 COPY shop/docker/docker-entrypoint-dev.sh /usr/local/bin
+
+# Change workdir
+WORKDIR /app/shop
 
 ENTRYPOINT ["docker-entrypoint-dev.sh" ]
 CMD ["yarn","dev:start"]
