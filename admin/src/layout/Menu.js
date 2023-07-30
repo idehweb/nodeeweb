@@ -124,7 +124,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
         dense={dense}>
         <MenuItemLink
           to={{
-            pathname: '/media/create',
+            pathname: '/file/create',
             state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.addMedia`)}
