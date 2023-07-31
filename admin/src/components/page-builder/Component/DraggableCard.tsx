@@ -10,11 +10,13 @@ interface ComponentProps {
 export const Component = styled('div', {
   shouldForwardProp: (p: string) => !['isDragging', 'isOver'].includes(p),
 })<ComponentProps>(({ isDragging, isOver }) => ({
-  margin: '8px 16px',
   borderRadius: 4,
   cursor: 'move',
   borderStyle: 'dashed',
   borderWidth: 1,
+  width: '-webkit-fill-available',
+  display: 'flex',
+  flexDirection: 'column',
   '&:hover > div > .pb-actions': {
     opacity: 1,
   },

@@ -60,14 +60,20 @@ export const Header = styled('div')({
   fontSize: 11,
 });
 export const Content = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
   minHeight: 40,
+  padding: '8px 16px',
+  gap: 8,
 });
 
 export const Container = styled('div')({
   border: '1px solid #ddd',
-  marginBottom: 16,
   borderRadius: 4,
   cursor: 'move',
+  width: '-webkit-fill-available',
+  display: 'flex',
+  flexDirection: 'column',
   '&:hover > div > .pb-actions': {
     opacity: 1,
   },

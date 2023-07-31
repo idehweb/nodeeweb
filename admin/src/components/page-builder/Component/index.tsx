@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { EditIconSvg, CloseIconSvg, AddIconSvg } from '../base/Icon';
 
@@ -20,7 +21,7 @@ interface Props {
 const Component = ({ index, item, onDelete, onAdd, onEdit, onDrop }: Props) => {
   return (
     <DraggableCard
-      className={`name-${item.name}`}
+      className={`cp-${item.name}`}
       canDrag
       item={item}
       onDropEnd={onDrop}>
@@ -30,12 +31,7 @@ const Component = ({ index, item, onDelete, onAdd, onEdit, onDrop }: Props) => {
           <EditButton onClick={() => onEdit(item)}>
             <EditIconSvg />
           </EditButton>
-          <DeleteButton
-            onClick={(e) => {
-              e.preventDefault();
-
-              onDelete(item.id);
-            }}>
+          <DeleteButton onClick={() => onDelete(item.id)}>
             <CloseIconSvg width="20px" height="20px" background="#464D55" />
           </DeleteButton>
           {item.addable && (
@@ -57,18 +53,29 @@ const Component = ({ index, item, onDelete, onAdd, onEdit, onDrop }: Props) => {
         </Actions>
       </Header>
 
-      <Content>
-        {item.addable &&
-          item.children?.map((i, idx) => (
-            <Component
-              index={idx}
-              item={i}
-              onEdit={() => onEdit(i)}
-              onDelete={onDelete}
-              onAdd={onAdd}
-              onDrop={onDrop}
-            />
-          ))}
+      <Content className='content'>
+        <AnimatePresence presenceAffectsLayout>
+          {item.addable &&
+            item.children?.map((i, idx) => (
+              <motion.div
+                key={`${i.id}`}
+                layout="position"
+                className={`cont-${i.name}`}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+                transition={{ type: 'just' }}>
+                <Component
+                  index={idx}
+                  item={i}
+                  onEdit={() => onEdit(i)}
+                  onDelete={onDelete}
+                  onAdd={onAdd}
+                  onDrop={onDrop}
+                />
+              </motion.div>
+            ))}
+        </AnimatePresence>
       </Content>
     </DraggableCard>
   );
