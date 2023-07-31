@@ -53,7 +53,8 @@ export async function dbRegisterModels() {
     .readdirSync(schemaDir)
     .filter(
       (name) =>
-        !name.startsWith('_') && (store.env.isLoc || !name.endsWith('.ts'))
+        !name.startsWith('_') &&
+        (store.env.isLoc || store.env.isDev || !name.endsWith('.ts'))
     )
     .sort()
     .map((sp) => [sp.split('.')[0].split('-').pop(), join(schemaDir, sp)]);

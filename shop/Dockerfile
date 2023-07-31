@@ -30,9 +30,7 @@ HEALTHCHECK --interval=1m --timeout=15s --retries=3 --start-period=2m \
 # Change Work directory
 WORKDIR /app
 
-
-FROM base as build-dev
-
+FROM base as build
 # Copy packege json and package lock
 COPY shop/package.json shop/yarn.lock shop/
 
@@ -43,6 +41,22 @@ COPY core /app/core
 RUN cd /app/core && \
     mkdir -p dist && \
     cp -r scripts dist/scripts
+
+
+FROM build as build-dev
+
+# Install Core Packages
+RUN cd /app/core && \
+    yarn install
+
+# Install Packages
+RUN cd /app/shop && \
+    yarn install
+
+# Copy modules
+COPY shop /app/shop
+
+FROM build as build-pro
 
 # Build core
 RUN cd /app/core && \ 
@@ -67,14 +81,29 @@ RUN cd /app/shop && \
     yarn install --production && \
     yarn cache clean --force
 
-FROM base as production
+FROM base as dev
+ENV NODE_ENV "development"
+
+# Copy Files
+COPY --from=build-dev /app ./
+
+# Copy Docker EntryPoint
+COPY shop/docker/docker-entrypoint-dev.sh /usr/local/bin
+
+# Change workdir
+WORKDIR /app/shop
+
+ENTRYPOINT ["docker-entrypoint-dev.sh" ]
+CMD ["yarn","dev:start"]
+
+FROM base as pro
 ENV NODE_ENV "production"
 
 # Copy packages
-COPY --from=build-dev /app/shop/node_modules ./node_modules
+COPY --from=build-pro /app/shop/node_modules ./node_modules
 
 # Copy Build Files
-COPY --from=build-dev /app/shop/dist /app/shop/package.json /app/shop/tsconfig.json ./
+COPY --from=build-pro /app/shop/dist /app/shop/package.json /app/shop/tsconfig.json ./
 
 # Copy Docker EntryPoint
 COPY shop/docker/docker-entrypoint-pro.sh /usr/local/bin
