@@ -28,7 +28,7 @@
     "chart.js": "^3.7.1",
     "date-fns-jalali": "^2.30.0-0",
     "final-form": "^4.20.9",
-    "framer-motion": "^10.13.1",
+    "framer-motion": "^10.15.0",
     "grapesjs": "^0.19.5",
     "grapesjs-preset-webpage": "^0.1.11",
     "immutability-helper": "^3.1.1",
