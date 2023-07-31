@@ -18,6 +18,8 @@ export default class UserPassStrategy extends AuthStrategy {
     if (req.user) return req.user;
 
     const { username } = req.body.user;
+    if (!username) return;
+
     const model = store.db.model(req.modelName);
     const user: UserDocument = await model.findOne({ username }, '+password');
     if (!user && throwOnNotFound) throw new NotFound('user not found');

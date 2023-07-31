@@ -1,3 +1,5 @@
+import { AuthStrategyBody } from '../../dto/in/auth/index.dto';
+import { ControllerSchema } from '../../types/controller';
 import AuthGatewayStrategy from '../auth/authGateway.strategy';
 import { OtpStrategy } from '../auth/otp.strategy';
 import UserPassStrategy from '../auth/userPass.strategy';
@@ -35,7 +37,10 @@ export function activeAuthControllers() {
         service: gateway.signup.bind(gateway),
         url: '/auth/:strategyId/signup',
       },
-    ],
+    ].map((s: ControllerSchema) => ({
+      ...s,
+      validate: { dto: AuthStrategyBody, reqPath: 'body' },
+    })),
     {
       base_url: '/api/v1',
       from: 'CoreAuth',

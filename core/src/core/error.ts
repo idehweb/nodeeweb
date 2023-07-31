@@ -26,5 +26,8 @@ export const notFoundHandler: MiddleWare = (req, res, next) => {
 };
 
 export function setErrorPackage() {
-  store.errorPackage = { general: errorHandler, notFound: notFoundHandler };
+  store.globalMiddleware.error = {
+    general: errorHandler,
+    notFound: notFoundHandler,
+  };
 }

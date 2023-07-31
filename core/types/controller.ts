@@ -1,4 +1,5 @@
 import { MiddleWare } from './global';
+import { ValidateArgs } from './pipe';
 
 export type ControllerAccess = {
   modelName: string;
@@ -10,4 +11,5 @@ export type ControllerSchema = {
   method: 'get' | 'post' | 'put' | 'patch' | 'delete';
   access?: ControllerAccess | ControllerAccess[];
   service: MiddleWare | MiddleWare[];
+  validate?: ValidateArgs | ValidateArgs[];
 };
