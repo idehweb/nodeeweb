@@ -10,6 +10,7 @@ import {
 import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { isAsyncFunction } from 'util/types';
 import { BadRequestError, GeneralError, NotFound } from '../../types/error';
+import { call } from '../../utils/helpers';
 
 export class EntityCreator {
   constructor(private modelName: string) {}
@@ -40,9 +41,7 @@ export class EntityCreator {
       const data =
         typeof sendResponse === 'boolean'
           ? result
-          : isAsyncFunction(sendResponse)
-          ? await sendResponse(result)
-          : sendResponse(result);
+          : await call(sendResponse, result);
       return res.status(httpCode).json({ data });
     }
 
@@ -142,8 +141,7 @@ export class EntityCreator {
     project,
   }: CRUDCreatorOpt) {
     return async (req: Req, res: Response, next: NextFunction) => {
-      const body = parseBody ? parseBody(req) : req.body;
-
+      const body = parseBody ? await call(parseBody, req) : req.body;
       if (!body)
         return EntityCreator.onError(
           new BadRequestError('body must exist'),
@@ -169,75 +167,69 @@ export class EntityCreator {
       });
     };
   }
-  getAllCreator({ filter, parseFilter, ...opt }: CRUDCreatorOpt): MiddleWare {
+  getAllCreator({ parseFilter, ...opt }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = filter ?? parseFilter ? parseFilter(req) : {};
+      const f = parseFilter ? await call(parseFilter, req) : {};
       if (!opt.sort) opt.sort = { createdAt: -1 };
       const query = this.model.find(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
   getOneCreator({
-    filter,
     parseFilter,
     paramFields = { id: 'id' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f =
-        filter ?? parseFilter
-          ? parseFilter(req)
-          : {
-              _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
-            };
+      const f = parseFilter
+        ? await call(parseFilter, req)
+        : {
+            _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+          };
       const query = this.model.findOne(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
-  getCountCreator({ filter, parseFilter, ...opt }: CRUDCreatorOpt): MiddleWare {
+  getCountCreator({ parseFilter, ...opt }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = filter ?? parseFilter ? parseFilter(req) : {};
+      const f = parseFilter ? await call(parseFilter, req) : {};
       const query = this.model.countDocuments(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
   updateOneCreator({
-    filter,
     parseFilter,
-    update,
     parseUpdate,
     paramFields = { id: 'id' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f =
-        filter ?? parseFilter
-          ? parseFilter(req)
-          : {
-              _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
-            };
-      const u = update ?? parseUpdate ? parseUpdate(req) : req.body;
+      const f = parseFilter
+        ? await call(parseFilter, req)
+        : {
+            _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+          };
+      const u = parseUpdate ? await call(parseUpdate, req) : req.body;
       const query = this.model.findOneAndUpdate(f, u, { new: true });
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
   deleteOneCreator({
-    filter,
     parseFilter,
     forceDelete,
-    update,
     parseUpdate,
     paramFields = { id: 'id' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = filter ??
-        parseFilter(req) ?? {
-          _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
-        };
-      const u = update ?? parseUpdate ? parseUpdate(req) : { active: false };
+      const f = parseFilter
+        ? await call(parseFilter, req)
+        : {
+            _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+          };
+      const u = parseUpdate ? await call(parseUpdate, req) : { active: false };
       const query = forceDelete
-        ? this.model.deleteOne(f)
+        ? this.model.findOneAndDelete(f)
         : this.model.findOneAndUpdate(f, u);
       return await this.baseCreator(query, req, res, next, {
         ...opt,
@@ -249,7 +241,9 @@ export class EntityCreator {
 
 export type EntityCRUDOpt = {
   crud: Omit<CRUDCreatorOpt, 'httpCode'>;
-  controller: Partial<ControllerSchema>;
+  controller: Partial<ControllerSchema> & {
+    beforeService?: MiddleWare | MiddleWare[];
+  };
 };
 export function registerEntityCRUD(
   modelName: string,
@@ -272,6 +266,7 @@ export function registerEntityCRUD(
       url: opt.controller.url ?? translateCRUD2Url(cName, opt.crud),
       access: opt.controller.access,
       service: [
+        ...[opt.controller.beforeService ?? []].flat(),
         creator[translateCRUD2Creator(cName)](opt.crud),
         ...[opt.controller.service ?? []].flat(),
       ],

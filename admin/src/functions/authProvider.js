@@ -1,13 +1,16 @@
-const url = window.ADMIN_ROUTE;
+import { BASE_URL } from './API-v1';
+const url = BASE_URL;
 
 export default {
   // called when the user attempts to log in
   login: ({ username, password }) => {
-    const request = new Request(url + '/admin/login', {
+    const request = new Request(url + '/auth/user-pass/login', {
       method: 'POST',
       body: JSON.stringify({
-        identifier: username,
-        password: password,
+        // identifier: username,
+        // password: password,
+        userType: 'admin',
+        user: { username, password },
       }),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     });
@@ -18,13 +21,14 @@ export default {
         }
         return response.json();
       })
-      .then((obj) => {
-        // console.log('obj', obj.user.token);
+      .then((res) => {
+        const { data: obj } = res;
+        console.log('res',obj)
         localStorage.setItem('email', obj.user.email);
         localStorage.setItem('active', obj.user.active);
         localStorage.setItem('nickname', obj.user.nickname);
         localStorage.setItem('username', obj.user.username);
-        localStorage.setItem('token', obj.user.token);
+        localStorage.setItem('token', obj.token);
         localStorage.setItem('user_id', obj.user._id);
         return Promise.resolve();
       });

@@ -77,7 +77,7 @@ const morganStream = {
 
     // ip , agent
     if (!store.env.isLoc) {
-      final_msg += `${ip} ${agent}`;
+      final_msg += `${ip} ${agent} `;
     }
 
     // method
@@ -99,10 +99,10 @@ const morganStream = {
       default:
         method_color = 'White';
     }
-    final_msg += ' ' + color(method_color, method.toUpperCase());
+    final_msg += color(method_color, method.toUpperCase()) + ' ';
 
     // url
-    final_msg += ' ' + url;
+    final_msg += url + ' ';
 
     // code
     let status_color: keyof typeof Colors;
@@ -124,10 +124,12 @@ const morganStream = {
         status_color = 'Magenta';
         break;
     }
-    final_msg += ' ' + color(status_color, String(status));
+    final_msg +=
+      ' ' + color(status_color, status ? String(status) : 'disconnect');
 
     // time
-    final_msg += ' - ' + response_time.toFixed(2) + 'ms';
+    if (response_time)
+      final_msg += ' - ' + Number(response_time).toFixed(2) + 'ms';
 
     // content length
     if (content_length) final_msg += ' - ' + content_length;

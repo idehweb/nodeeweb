@@ -9,7 +9,7 @@ import registerDocument from './src/document';
 import registerEntry from './src/entry';
 import registerForm from './src/form';
 import registerGateway from './src/gateways';
-import registerMedia from './src/media';
+import registerFile from './src/file';
 import registerNotification from './src/notification';
 import registerOrder from './src/order';
 import registerModification from './src/modification';
@@ -21,6 +21,7 @@ import registerSettings from './src/settings';
 import logger from './utils/log';
 import { store } from '@nodeeweb/core';
 import { handlePlugins } from './src/common/handlePlugins';
+import registerCustomerGroup from './src/customerGroup';
 
 async function deployShop() {
   await deployCore();
@@ -31,12 +32,13 @@ async function deployShop() {
   registerAttribute();
   registerCategory();
   registerCustomer();
+  registerCustomerGroup();
   registerDiscount();
   registerDocument();
   registerEntry();
   registerForm();
   registerGateway();
-  registerMedia();
+  registerFile();
   registerNotification();
   registerOrder();
   registerModification();

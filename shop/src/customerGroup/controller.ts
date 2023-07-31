@@ -4,14 +4,11 @@ import {
 } from '@nodeeweb/core/src/constants/String';
 import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
-import { controllerRegister } from '@nodeeweb/core/src/handlers/controller.handler';
-import Service from './service';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
-  // crud
   registerEntityCRUD(
-    'gateway',
+    'customerGroup',
     {
       create: {
         controller: {
@@ -95,6 +92,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/admin/gateway', from: 'ShopEntity' }
+    { base_url: '/admin/customerGroup', from: 'ShopEntity' }
   );
 }

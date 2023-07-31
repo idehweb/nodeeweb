@@ -1,4 +1,5 @@
 import {
+  AdminAccess,
   ControllerAccess,
   PUBLIC_ACCESS,
   controllersBatchRegister,
@@ -30,6 +31,47 @@ export default function registerController() {
   registerEntityCRUD(
     'admin',
     {
+      getOne: {
+        controller: {
+          access: AdminAccess,
+          service(req, res) {
+            res.json(req.crud);
+          },
+        },
+        crud: {
+          saveToReq: true,
+          executeQuery: true,
+        },
+      },
+      getAll: {
+        controller: {
+          access: AdminAccess,
+          service(req, res) {
+            res.json(req.crud);
+          },
+        },
+        crud: {
+          autoSetCount: true,
+          executeQuery: true,
+          saveToReq: true,
+          paramFields: {
+            limit: 'limit',
+            offset: 'offset',
+          },
+        },
+      },
+      getCount: {
+        controller: {
+          access: AdminAccess,
+          service(req, res) {
+            res.json(req.crud);
+          },
+        },
+        crud: {
+          executeQuery: true,
+          saveToReq: true,
+        },
+      },
       create: {
         controller: {
           access,
@@ -43,12 +85,21 @@ export default function registerController() {
       updateOne: {
         controller: {
           access,
-          url: '/',
         },
         crud: {
           sendResponse: true,
           executeQuery: true,
-          parseFilter: (req) => ({ _id: req.user._id }),
+          // parseFilter: (req) => ({ _id: req.user._id }),
+        },
+      },
+      deleteOne: {
+        controller: {
+          access,
+        },
+        crud: {
+          sendResponse: true,
+          executeQuery: true,
+          forceDelete: true,
         },
       },
     },

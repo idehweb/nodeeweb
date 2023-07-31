@@ -45,9 +45,6 @@ export class Service {
         $options: 'i',
       };
     }
-    if (req.query) {
-      console.log(req.query);
-    }
 
     let thef = req.query;
     if (

@@ -63,7 +63,7 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@nodeeweb/admin-build@^0.0.2":
+"@nodeeweb/admin-build@*":
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/@nodeeweb/admin-build/-/admin-build-0.0.2.tgz#a55c8f34ef69bfe0c93c4aed8131e33c1b2601e9"
   integrity sha512-CnluGx1h1mF638/ibmGOyQGohm/4NNyvSG0hR9Lj+uZ8IrwCQmQHwYkOLYYAPLMxWyV1gG00TFc/HZ3FcbGcbg==
@@ -583,10 +583,15 @@ destroy@1.2.0:
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.2.0.tgz#4803735509ad8be552934c67df614f94e66fa015"
   integrity sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==
 
-detect-libc@^2.0.0, detect-libc@^2.0.1:
+detect-libc@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-2.0.1.tgz#e1897aa88fa6ad197862937fbc0441ef352ee0cd"
   integrity sha512-463v3ZeIrcWtdgIg6vI6XUncguvr2TnGl4SzDXinkt9mSLpBJKXT3mW6xT3VQdDN11+WVs29pgvivTc4Lp8v+w==
+
+detect-libc@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-2.0.2.tgz#8ccf2ba9315350e1241b88d0ac3b0e1fbd99605d"
+  integrity sha512-UX6sGumvvqSaXgdKGUsgZWqcUyIXZ/vZTrlRT/iobiKhGL0zL4d3osHj3uqllWJK+i+sixDS/3COVEOFbupFyw==
 
 diff@^4.0.1:
   version "4.0.2"
@@ -648,9 +653,9 @@ expand-template@^2.0.3:
   integrity sha512-XYfuKMvj4O35f/pOXLObndIRvyQ+/+6AhODh+OKWj9S9498pHHn/IMszH+gt0fBCRWMNfk1ZSp5x3AifmnI2vg==
 
 express-rate-limit@^6.7.1:
-  version "6.8.0"
-  resolved "https://registry.yarnpkg.com/express-rate-limit/-/express-rate-limit-6.8.0.tgz#4f1f8238ba209caee2a43be921813f1b70e29beb"
-  integrity sha512-yVeDWczkh8qgo9INJB1tT4j7LFu+n6ei/oqSMsqpsUIGYjTM+gk+Q3wv19TMUdo8chvus8XohAuOhG7RYRM9ZQ==
+  version "6.8.1"
+  resolved "https://registry.yarnpkg.com/express-rate-limit/-/express-rate-limit-6.8.1.tgz#f614bc3a7040fe6f75dc3198536f4cc13526f989"
+  integrity sha512-xJyudsE60CsDShK74Ni1MxsldYaIoivmG3ieK2tAckMsYCBewEuGalss6p/jHmFFnqM9xd5ojE0W2VlanxcOKg==
 
 express-sitemap-xml@^3.0.1:
   version "3.0.1"
@@ -1692,12 +1697,12 @@ setprototypeof@1.2.0:
   integrity sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==
 
 sharp@^0.32.1:
-  version "0.32.3"
-  resolved "https://registry.yarnpkg.com/sharp/-/sharp-0.32.3.tgz#fd6f5227c5a6cb2a020836617243effe68ceb731"
-  integrity sha512-i1gFPiNqyqxC4ouVvCKj5G8WfPIMeeSxpKcMrjic6NY4e8zktW7bIdqHPc3FCG+pNKU/XCEabKA57hhvZi8UmQ==
+  version "0.32.4"
+  resolved "https://registry.yarnpkg.com/sharp/-/sharp-0.32.4.tgz#0354653b7924f2520b2264ac9bcd10a58bf411b6"
+  integrity sha512-exUnZewqVZC6UXqXuQ8fyJJv0M968feBi04jb9GcUHrWtkRoAKnbJt8IfwT4NJs7FskArbJ14JAFGVuooszoGg==
   dependencies:
     color "^4.2.3"
-    detect-libc "^2.0.1"
+    detect-libc "^2.0.2"
     node-addon-api "^6.1.0"
     prebuild-install "^7.1.1"
     semver "^7.5.4"

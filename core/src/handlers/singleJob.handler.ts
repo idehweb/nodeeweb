@@ -7,10 +7,7 @@ import logger from './log.handler';
 export type SingleJob = () => void | Promise<void>;
 
 export class SingleJobProcess {
-  constructor(
-    private id: string,
-    private job: SingleJob
-  ) {}
+  constructor(private id: string, private job: SingleJob) {}
 
   static builderAsync(id: string, job: SingleJob): () => Promise<void> {
     const jp = new SingleJobProcess(id, async () => {
@@ -62,5 +59,14 @@ export class SingleJobProcess {
 
     // failed to execute job
     if (error) throw error;
+  }
+}
+
+export function clearAllLockFiles() {
+  try {
+    fs.rmSync(getSharedPath('.'), { recursive: true, force: true });
+    logger.log('remove shared dir');
+  } catch (err) {
+    logger.warn('shared dir removed before!');
   }
 }

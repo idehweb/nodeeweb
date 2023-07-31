@@ -63,7 +63,7 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@nodeeweb/admin-build@^0.0.2":
+"@nodeeweb/admin-build@*":
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/@nodeeweb/admin-build/-/admin-build-0.0.2.tgz#a55c8f34ef69bfe0c93c4aed8131e33c1b2601e9"
   integrity sha512-CnluGx1h1mF638/ibmGOyQGohm/4NNyvSG0hR9Lj+uZ8IrwCQmQHwYkOLYYAPLMxWyV1gG00TFc/HZ3FcbGcbg==

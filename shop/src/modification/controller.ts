@@ -49,6 +49,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/amin/action', from: 'ShopEntity' }
+    { base_url: '/admin/action', from: 'ShopEntity' }
   );
 }

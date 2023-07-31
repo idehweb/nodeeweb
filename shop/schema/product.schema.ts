@@ -6,7 +6,7 @@ export interface IProduct {
   image?: string;
   price: number;
   salePrice: number;
-  weight: number;
+  weight?: number;
   quantity: number;
 }
 
@@ -30,8 +30,8 @@ const schema = new mongoose.Schema(
     in_stock: { type: Boolean, default: false },
     story: { type: Boolean, default: false },
     price: { type: Number, required: true },
-    weight: { type: Number, required: true },
-    quantity: { type: Number, required: true },
+    weight: { type: Number, default: 0 },
+    quantity: { type: Number, default: 1 },
     salePrice: { type: Number, required: true },
     data: {},
     sku: String,

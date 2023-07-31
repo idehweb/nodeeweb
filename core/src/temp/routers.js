@@ -1,8 +1,6 @@
 import store from '../../store';
 
 export async function getTheme(mode = 'admin', req, res, next) {
-  // console.log('get theme settings... ', mode);
-  // return;
   const Settings = store.db.model('setting');
   const Template = store.db.model('template');
   const Page = store.db.model('page');
@@ -136,8 +134,7 @@ export async function getTheme(mode = 'admin', req, res, next) {
     // lastObj["models"] = global.models();
     // lastObj["rules"] = JSON.parse(JSON.stringify(rules));
   }
-  if (res) return res.json(lastObj);
-  else return resolve(lastObj);
+  return res.json(lastObj);
 }
 
 export async function getAuth(req, res, next) {

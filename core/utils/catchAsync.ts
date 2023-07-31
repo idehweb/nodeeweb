@@ -1,6 +1,7 @@
 import { NextFunction, Response } from 'express';
 import { MiddleWare, MiddleWareError, Req } from '../types/global';
 import { axiosError2String } from './helpers';
+import store from '../store';
 
 export const catchFn = <F extends Function>(
   fn: F,
@@ -14,7 +15,7 @@ export const catchFn = <F extends Function>(
 ) => {
   const newFn = async (...args: any[]) => {
     try {
-      let result = fn.call(self ?? this, ...args);
+      let result = fn.call(self, ...args);
       while (result instanceof Promise) {
         result = await result;
       }
@@ -30,11 +31,16 @@ export const catchFn = <F extends Function>(
           newError = parsed.error;
         }
         return onError(newError, ...args);
+      } else {
+        store.systemLogger.error('#Unhandled Error cath\n', err);
       }
     }
   };
 
   return newFn as any as F;
+};
+const middlewareError: MiddleWareError = (err, req, res, next) => {
+  return next(err);
 };
 export const catchMiddleware = <F extends MiddleWare>(
   fn: F,
@@ -46,7 +52,10 @@ export const catchMiddleware = <F extends MiddleWare>(
     onError?: MiddleWareError;
   } = {}
 ) => {
-  return catchFn(fn, { self, onError }) as F;
+  return catchFn(fn, {
+    self,
+    onError: onError ?? middlewareError,
+  }) as F;
 };
 
 export function classCatchBuilder<CustomClass>(

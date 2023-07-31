@@ -6,7 +6,10 @@ import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
 import { controllersBatchRegister } from '@nodeeweb/core/src/handlers/controller.handler';
 import Service from './service';
-import { AuthUserAccess } from '@nodeeweb/core/src/handlers/auth.handler';
+import {
+  AdminAccess,
+  AuthUserAccess,
+} from '@nodeeweb/core/src/handlers/auth.handler';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
@@ -73,6 +76,47 @@ export default function registerController() {
   registerEntityCRUD(
     'product',
     {
+      getAll: {
+        controller: {
+          access: AdminAccess,
+          service: (req, res) => {
+            res.json(req.crud);
+          },
+        },
+        crud: {
+          autoSetCount: true,
+          executeQuery: true,
+          saveToReq: true,
+          paramFields: {
+            offset: 'offset',
+            limit: 'limit',
+          },
+        },
+      },
+      getCount: {
+        controller: {
+          access: AdminAccess,
+          service: (req, res) => {
+            res.json(req.crud);
+          },
+        },
+        crud: {
+          executeQuery: true,
+          saveToReq: true,
+        },
+      },
+      getOne: {
+        controller: {
+          access: AdminAccess,
+          service(req, res) {
+            return res.json(req.crud);
+          },
+        },
+        crud: {
+          executeQuery: true,
+          saveToReq: true,
+        },
+      },
       create: {
         controller: {
           access,
@@ -103,7 +147,7 @@ export default function registerController() {
         crud: {
           executeQuery: true,
           saveToReq: true,
-          update: { status: 'trash' },
+          parseUpdate: () => ({ status: 'trash' }),
         },
       },
     },

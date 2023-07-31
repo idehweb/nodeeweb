@@ -17,6 +17,7 @@ export type Req = Request & {
   props: any;
   file_path?: string;
   old_file_path?: string;
+  file: Express.Multer.File;
   user?: Document & any;
   modelName?: string;
   [CRUD_DEFAULT_REQ_KEY]: any;
@@ -32,13 +33,17 @@ export type MiddleWareError = (
 ) => any;
 
 export type CRUDCreatorOpt = {
-  filter?: mongoose.FilterQuery<any>;
-  parseFilter?: (req: Req) => mongoose.FilterQuery<any>;
-  update?: mongoose.UpdateQuery<any> | mongoose.UpdateWithAggregationPipeline;
+  parseFilter?: (
+    req: Req
+  ) => mongoose.FilterQuery<any> | Promise<mongoose.FilterQuery<any>>;
   parseUpdate?: (
     req: Req
-  ) => mongoose.UpdateQuery<any> | mongoose.UpdateWithAggregationPipeline;
-  parseBody?: (req: Req) => any;
+  ) =>
+    | mongoose.UpdateQuery<any>
+    | Promise<mongoose.UpdateQuery<any>>
+    | mongoose.UpdateWithAggregationPipeline
+    | Promise<mongoose.UpdateWithAggregationPipeline>;
+  parseBody?: (req: Req) => any | Promise<any>;
   paramFields?: {
     id?: string;
     offset?: string;

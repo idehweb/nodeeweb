@@ -55,38 +55,35 @@ function createPublicDir() {
 }
 
 function createPublicMediaFolder() {
-  const [public_mediaPath] = getPublicDir('public_media', true);
-  const public_media_customerPath = path.join(public_mediaPath, 'customer');
-  const public_media_siteSettingPath = path.join(
-    public_mediaPath,
-    'site_setting'
-  );
-  if (fs.existsSync(public_mediaPath)) {
-    logger.log('public_mediaPath exist...');
-    if (fs.existsSync(public_media_customerPath)) {
-      logger.log('public_media_customerPath exist...');
+  const [filesPath] = getPublicDir('files', true);
+  const files_customerPath = path.join(filesPath, 'customer');
+  const files_siteSettingPath = path.join(filesPath, 'site_setting');
+  if (fs.existsSync(filesPath)) {
+    logger.log('filesPath exist...');
+    if (fs.existsSync(files_customerPath)) {
+      logger.log('files_customerPath exist...');
     } else {
-      fs.mkdir(public_media_customerPath, () => {
-        logger.log('we created public_media_customerPath');
+      fs.mkdir(files_customerPath, () => {
+        logger.log('we created files_customerPath');
       });
     }
-    if (fs.existsSync(public_media_siteSettingPath)) {
-      logger.log('public_media_siteSettingPath exist...');
+    if (fs.existsSync(files_siteSettingPath)) {
+      logger.log('files_siteSettingPath exist...');
     } else {
-      fs.mkdir(public_media_siteSettingPath, () => {
-        logger.log('we created public_media_siteSettingPath');
+      fs.mkdir(files_siteSettingPath, () => {
+        logger.log('we created files_siteSettingPath');
       });
     }
   } else {
-    logger.log('we should create public_mediaPath');
+    logger.log('we should create filesPath');
 
-    fs.mkdir(public_mediaPath, () => {
-      logger.log('we created public_mediaPath');
-      fs.mkdir(public_media_customerPath, () => {
-        logger.log('we created public_media_customerPath');
+    fs.mkdir(filesPath, () => {
+      logger.log('we created filesPath');
+      fs.mkdir(files_customerPath, () => {
+        logger.log('we created files_customerPath');
       });
-      fs.mkdir(public_media_siteSettingPath, () => {
-        logger.log('we created public_media_siteSettingPath');
+      fs.mkdir(files_siteSettingPath, () => {
+        logger.log('we created files_siteSettingPath');
       });
     });
   }

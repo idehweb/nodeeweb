@@ -343,6 +343,16 @@ export default class Service {
     if (req.body.type == 'normal') {
       delete req.body.combinations;
     }
+
+    // parse to number
+    ['price', 'salePrice', 'quantity', 'weight'].forEach((k) => {
+      if (req.body[k] === '') delete req.body[k];
+      else req.body[k] = +req.body[k];
+    });
+
+    if (req.body.in_stock !== undefined)
+      req.body.in_stock = Boolean(req.body.in_stock);
+
     return req.body;
   };
 
@@ -391,6 +401,12 @@ export default class Service {
     if (!req.body.status || req.body.status == '') {
       req.body.status = 'processings';
     }
+
+    // parse to number
+    ['price', 'salePrice', 'quantity', 'weight'].forEach((k) => {
+      if (req.body[k] === '') delete req.body[k];
+      else req.body[k] = +req.body[k];
+    });
 
     return req.body;
   };

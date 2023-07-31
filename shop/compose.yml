@@ -2,10 +2,11 @@ version: '3'
 
 services:
   shop:
-    image: nodeeweb-shop:0.0.1
+    image: nodeeweb-shop:dev-0.0.1
     build:
       context: ..
       dockerfile: shop/Dockerfile
+      target: dev
     container_name: nodeeweb-shop
     deploy:
       replicas: 1
@@ -23,9 +24,9 @@ services:
     env_file:
       - .env.local
     volumes:
-      - /var/instances/nwi-shop/shared:/app/shared
-      - /var/instances/nwi-shop/logs:/app/logs
-      - /var/instances/nwi-shop/public:/app/public
+      - /var/instances/nwi-shop/shared:/app/shop/shared/
+      - /var/instances/nwi-shop/logs:/app/shop/logs/
+      - /var/instances/nwi-shop/public:/app/shop/public/
 
 networks:
   mongonet:

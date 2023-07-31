@@ -7,9 +7,21 @@ import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
 import { controllerRegister } from '@nodeeweb/core/src/handlers/controller.handler';
 import { uploadSingle } from '@nodeeweb/core/src/handlers/upload.handler';
 import Service from './service';
+import { AuthUserAccess } from '@nodeeweb/core';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
+
+  // add Entry
+  controllerRegister(
+    {
+      url: '/entry/:form',
+      method: 'post',
+      access: AuthUserAccess,
+      service: Service.addEntry,
+    },
+    { base_url: '/customer/form', from: 'ShopEntity' }
+  );
 
   //  crud
   registerEntityCRUD(
