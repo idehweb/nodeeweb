@@ -1,0 +1,22 @@
+{
+  "appId": "com.nodeeweb.front",
+  "appName": "nodeeweb",
+  "bundledWebRuntime": false,
+  "npmClient": "yarn",
+  "webDir": "build",
+  "hideLogs": true,
+  "allowMixedContent": true,
+  "server": {
+    "iosScheme": "https",
+    "cleartext": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "ios": {
+    "backgroundColor": "#ffffff"
+  },
+  "cordova": {}
+}
