@@ -21,8 +21,8 @@ export enum ErrorType {
 }
 
 export type ErrorPackageFn = {
-  general: MiddleWareError;
-  notFound: MiddleWare;
+  general?: MiddleWareError;
+  notFound?: MiddleWare;
 };
 
 export class GeneralError extends Error {

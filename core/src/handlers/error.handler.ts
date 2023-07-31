@@ -2,8 +2,8 @@ import store from '../../store';
 import { MiddleWare, MiddleWareError } from '../../types/global';
 
 export function errorHandlerRegister(
-  errorKey: keyof typeof store.errorPackage,
+  errorKey: keyof typeof store.globalMiddleware.error,
   fn: MiddleWareError | MiddleWare
 ) {
-  store.errorPackage[errorKey] = fn as any;
+  store.globalMiddleware.error[errorKey] = fn as any;
 }
