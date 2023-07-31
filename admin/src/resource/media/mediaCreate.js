@@ -1,4 +1,4 @@
-import { Create, required } from 'react-admin';
+import { Create, required, Toolbar, SaveButton } from 'react-admin';
 
 import {
   CustomFileField,
@@ -8,9 +8,15 @@ import {
   UploaderField,
 } from '@/components';
 
+// const PostCreateToolbar = () => (
+//   <Toolbar>
+//     <SaveButton label="Save" onClick={() => alert('Saving...')} />
+//   </Toolbar>
+// );
+
 const create = (props) => (
   <Create {...props}>
-    <SimpleForm>
+    <SimpleForm toolbar={null}>
       <UploaderField
         label="Course Audio or video"
         source="files"
