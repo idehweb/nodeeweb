@@ -26,8 +26,8 @@ export class CoreValidationPipe implements ValidatePipe {
     }
     return filteredErrors;
   }
-  private async transform(value: any, metatype: ClassConstructor<unknown>) {
-    if (!metatype || !this.toValidate(metatype)) return value;
+  async transform<C>(value: any, metatype: ClassConstructor<C>) {
+    if (!metatype || !this.toValidate(metatype)) return value as C;
 
     const object = (plainToInstance(metatype, value, {
       enableImplicitConversion: true,
@@ -46,7 +46,7 @@ export class CoreValidationPipe implements ValidatePipe {
         }, '')
       );
     }
-    return object;
+    return object as C;
   }
   private toValidate(metatype: ClassConstructor<unknown>): boolean {
     return !this.types.includes(metatype);

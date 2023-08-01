@@ -8,7 +8,8 @@ export interface IAdminMethods {
 export interface IAdmin {
   email?: string;
   username?: string;
-  nickname?: string;
+  firstName?: string;
+  lastName?: string;
   password?: string;
   role: string;
   active: boolean;
@@ -21,6 +22,12 @@ export type AdminModel = Model<IAdmin, {}, IAdminMethods>;
 
 const schema = new mongoose.Schema(
   {
+    firstName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
     email: {
       type: String,
       unique: true,
@@ -39,9 +46,6 @@ const schema = new mongoose.Schema(
       sparse: true,
       trim: true,
     },
-    nickname: {
-      type: String,
-    },
     password: {
       type: String,
       select: false,
@@ -50,7 +54,7 @@ const schema = new mongoose.Schema(
       type: Date,
       select: false,
     },
-    role: { type: String, default: 'user' },
+    role: { type: String, default: 'admin' },
     active: { type: Boolean, default: true },
   },
   { timestamps: true }
