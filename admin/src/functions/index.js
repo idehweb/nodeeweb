@@ -10,8 +10,8 @@ import data from './dataProvider';
 
 // import {MainUrl, savePost} from "../../../main/src/client/functions";
 import API from './API';
-import API_BASE_URL from './API_BASE_URL';
-import { BASE_URL } from './API-v1';
+import API_BASE_URL, { BASE_URL } from './API_BASE_URL';
+// import { BASE_URL } from './API-v1';
 
 const ADMIN_ROUTE = window.ADMIN_ROUTE;
 export const MainUrl = window.BASE_URL;
