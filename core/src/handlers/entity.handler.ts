@@ -11,6 +11,7 @@ import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { isAsyncFunction } from 'util/types';
 import { BadRequestError, GeneralError, NotFound } from '../../types/error';
 import { call } from '../../utils/helpers';
+import { CrudParamDto } from '../../dto/in/crud.dto';
 
 export class EntityCreator {
   constructor(private modelName: string) {}
@@ -270,6 +271,9 @@ export function registerEntityCRUD(
         creator[translateCRUD2Creator(cName)](opt.crud),
         ...[opt.controller.service ?? []].flat(),
       ],
+      validate: canUseDefaultParamValidation(cName, opt)
+        ? { reqPath: 'params', dto: CrudParamDto }
+        : opt.controller.validate,
     });
   }
 
@@ -333,4 +337,11 @@ function translateCRUD2Url(
     default:
       throw new Error(`Invalid CRUD name : ${name}`);
   }
+}
+
+function canUseDefaultParamValidation(name: CRUD, opt: EntityCRUDOpt) {
+  return (
+    !opt.controller.validate &&
+    [CRUD.UPDATE_ONE, CRUD.DELETE_ONE, CRUD.GET_ONE].includes(name)
+  );
 }
