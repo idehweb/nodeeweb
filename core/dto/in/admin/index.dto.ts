@@ -11,4 +11,14 @@ export class AdminUpdateBody {
   @IsOptional()
   @IsString()
   password?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  firstName?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  lastName?: string;
 }
