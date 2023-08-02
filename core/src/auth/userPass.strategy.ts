@@ -1,12 +1,6 @@
 import { NextFunction } from 'express';
 import store from '../../store';
-import {
-  AuthStrategy,
-  IUser,
-  UserModel,
-  IUserMethods,
-  UserDocument,
-} from '../../types/auth';
+import { AuthStrategy } from '../../types/auth';
 import { Req, Res } from '../../types/global';
 import { setToCookie, signToken } from '../handlers/auth.handler';
 import { ForbiddenError, NotFound, ValidationError } from '../../types/error';
@@ -15,6 +9,7 @@ import {
   UserPassUserLogin,
   UserPassUserSignup,
 } from '../../dto/in/auth/index.dto';
+import { IUser, UserDocument, UserModel } from '../../types/user';
 
 export const USER_PASS_STRATEGY = 'user-pass';
 export default class UserPassStrategy extends AuthStrategy {

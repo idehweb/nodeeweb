@@ -1,7 +1,7 @@
 import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
 import store from '@nodeeweb/core/store';
 import { MiddleWare, Req, Res } from '@nodeeweb/core/types/global';
-import mongoose from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
 
 export class Service {
   static getMe: MiddleWare = (req, res, next) => {
@@ -116,6 +116,18 @@ export class Service {
 
     return res.json(Object.values(obj));
   };
+
+  static updateOneParseFilter(req: Req) {
+    if (req.modelName === 'customer') return { _id: req.user._id };
+    return { _id: req.params.id };
+  }
+  static updateOneParseUpdate(req: Req) {
+    let body: any;
+    if (req.modelName === 'customer') body = { address: req.body.address };
+    else body = req.body;
+
+    return body;
+  }
 
   static updateStatus: MiddleWare = async (req, res) => {
     const customer = await store.db.model('customer').findByIdAndUpdate(

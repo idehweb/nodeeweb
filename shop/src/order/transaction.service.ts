@@ -20,7 +20,6 @@ import { MAXIMUM_NEED_TO_PAY_TRANSACTION } from '../../constants/limit';
 import { FilterQuery, Types } from 'mongoose';
 import { DiscountDocument, DiscountModel } from '../../schema/discount.schema';
 import { roundPrice } from '../../utils/helpers';
-import { UserDocument } from '@nodeeweb/core/types/auth';
 import { INACTIVE_PRODUCT_TIME } from '../../constants/limit';
 import utils from './utils.service';
 import { PaymentVerifyStatus, ShopCallbackStatus } from '../../types/order';

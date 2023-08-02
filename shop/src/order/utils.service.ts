@@ -1,4 +1,3 @@
-import { UserDocument } from '@nodeeweb/core/types/auth';
 import { OrderDocument, OrderStatus } from '../../schema/order.schema';
 import { store } from '@nodeeweb/core';
 import {

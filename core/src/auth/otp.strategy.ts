@@ -1,5 +1,5 @@
 import { NextFunction } from 'express';
-import { AuthStrategy, UserDocument, UserModel } from '../../types/auth';
+import { AuthStrategy } from '../../types/auth';
 import { Req, Res } from '../../types/global';
 import store from '../../store';
 import {
@@ -26,6 +26,7 @@ import {
   OtpUserLogin,
   OtpUserSignup,
 } from '../../dto/in/auth/index.dto';
+import { UserDocument } from '../../types/user';
 
 export enum SmsSendType {
   Send_Before = 'send_before',

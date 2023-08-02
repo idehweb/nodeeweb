@@ -139,14 +139,9 @@ export function authWithPass(opt: UserPassStrategyOpt) {
 }
 
 export function authWithToken(opt: JwtStrategyOpt) {
-  return async (req, res, next) => {
-    const admin = await store.db.model('admin').findOne();
-    req.user = admin;
-    return next();
-  };
-  // return passport
-  //   .use(opt.name, jwtStrategyBuilder(opt))
-  //   .authenticate(opt.name, { session: false });
+  return passport
+    .use(opt.name, jwtStrategyBuilder(opt))
+    .authenticate(opt.name, { session: false });
 }
 
 export function authWithGoogle() {}
@@ -169,7 +164,7 @@ export function authorizeWithToken(
 }
 export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
   return (req, res, next) => {
-    const modelName = req.user?.['constructor']?.modelName;
+    const modelName = req.user?.['constructor']?.['modelName'];
     // not login and there is optional login role
     if (!modelName && accesses.map((a) => a.role).includes(OPTIONAL_LOGIN))
       return next();
