@@ -16,3 +16,8 @@ function getRealRoot(filePath: string) {
   }
   return null;
 }
+
+export const CORE_NODE_MODULE_PATH_RELATIVE = `./${join(
+  './node_modules',
+  info.name
+)}`;

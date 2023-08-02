@@ -1,6 +1,9 @@
 import { spawn } from 'child_process';
+import logger from '../src/handlers/log.handler';
+import { color } from './color';
 
 export default function exec(cmd: string) {
+  logger.log(color('Yellow', cmd));
   const sp = spawn(cmd, {
     shell: true,
     stdio: [process.stdin, process.stdout, process.stderr],

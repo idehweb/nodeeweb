@@ -14,7 +14,7 @@ import logger from '../handlers/log.handler';
 import { isExistsSync } from '../../utils/helpers';
 import exec from '../../utils/exec';
 import { color } from '../../utils/color';
-import { APP_INFO } from '../../utils/package';
+import { APP_INFO, CORE_NODE_MODULE_PATH_RELATIVE } from '../../utils/package';
 
 export default async function prepare() {
   // install requirements
@@ -38,12 +38,23 @@ async function installRequirements() {
 
   const packageInfo = await import(APP_INFO);
 
-  const requirements = ['mongoose', 'bcrypt'].filter(
-    (pack) => !packageInfo.dependencies[pack]
-  );
+  const requirements = [
+    'mongoose',
+    'bcrypt',
+    'reflect-metadata',
+    'class-transformer',
+    'class-validator',
+  ].filter((pack) => !packageInfo.dependencies[pack]);
   if (!requirements.length) return;
   logger.log(color('Green', `## Install ${requirements.join(', ')} ##`));
-  await exec(`npm i ${requirements.join(' ')}`);
+  await exec(
+    `yarn add ${requirements
+      .map(
+        (pn) =>
+          `link:./${join(CORE_NODE_MODULE_PATH_RELATIVE, 'node_modules', pn)}`
+      )
+      .join(' ')}`
+  );
 }
 
 function createSharedDir() {
