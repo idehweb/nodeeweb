@@ -23,6 +23,13 @@ const httpClient = (url, options = {}) => {
     'Authorization',
     'Bearer ' + localStorage.getItem('token')
   );
+  const v1_apies = ['/file'];
+  const isV1 = v1_apies.some((i) => url.includes(i));
+  if (isV1) {
+    const splitUrl = url.split('/');
+    splitUrl.splice(3, 0, '/api/v1/');
+    return fetchUtils.fetchJson(splitUrl.join(''), options);
+  }
   return fetchUtils.fetchJson(url, options);
 };
 

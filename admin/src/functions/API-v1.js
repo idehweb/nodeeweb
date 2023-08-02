@@ -15,7 +15,7 @@ export default axios.create({
   // add Authorization token to header
   transformRequest: [
     (data, headers) => {
-      headers.Authorization = localStorage.getItem('token') || '';
+      headers.Authorization = 'Bearer ' + localStorage.getItem('token') || '';
       return data;
     },
   ],
