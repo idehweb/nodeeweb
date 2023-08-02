@@ -4,6 +4,7 @@ import store from '../../store';
 import { USE_ENV } from '../../types/global';
 import { CORE_NODE_MODULE_PATH } from '../../utils/package';
 import _ from 'lodash';
+import { BASE_API_URL } from '../constants/String';
 
 export default function setCustomEnv() {
   const appDirectory = fs.realpathSync(process.cwd());
@@ -28,6 +29,9 @@ export default function setCustomEnv() {
   store.env.logIntoFile = store.env.LOG_TO_FILE
     ? store.env.LOG_TO_FILE !== 'false'
     : !store.env.isLoc;
+
+  // base url
+  if (!store.env.BASE_API_URL) store.env.BASE_API_URL = BASE_API_URL;
 }
 
 setCustomEnv();

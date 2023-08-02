@@ -27,14 +27,22 @@ export default function registerController() {
       },
       getOne: {
         controller: {
-          access,
-          service(req, res) {
-            res.json(req.crud);
-          },
+          access: [
+            {
+              role: OPTIONAL_LOGIN,
+              modelName: 'customer',
+            },
+            {
+              role: OPTIONAL_LOGIN,
+              modelName: 'admin',
+            },
+          ],
+          service: Service.getOneAfter,
         },
         crud: {
           executeQuery: true,
           saveToReq: true,
+          parseFilter: Service.getOneFilterParser,
         },
       },
       getAll: {
@@ -78,34 +86,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/admin/page', from: 'ShopEntity' }
-  );
-
-  // get one
-  registerEntityCRUD(
-    'page',
-    {
-      getOne: {
-        controller: {
-          access: [
-            {
-              role: OPTIONAL_LOGIN,
-              modelName: 'customer',
-            },
-            {
-              role: OPTIONAL_LOGIN,
-              modelName: 'admin',
-            },
-          ],
-          service: Service.getOneAfter,
-        },
-        crud: {
-          executeQuery: true,
-          saveToReq: true,
-          parseFilter: Service.getOneFilterParser,
-        },
-      },
-    },
-    { base_url: '/customer/page', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

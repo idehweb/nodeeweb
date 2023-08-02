@@ -93,6 +93,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/api/v1/discount', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

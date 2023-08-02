@@ -77,6 +77,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/admin/form', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

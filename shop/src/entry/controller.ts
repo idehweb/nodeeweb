@@ -48,6 +48,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/admin/entry', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

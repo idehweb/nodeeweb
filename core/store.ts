@@ -29,6 +29,7 @@ export class Store {
     SMS_USERNAME?: string;
     SMS_PASSWORD?: string;
     BASE_URL: string;
+    BASE_API_URL: string;
   } & { [k: string]: string };
   db: typeof mongoose;
   dirs: string[];

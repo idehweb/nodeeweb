@@ -70,6 +70,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/api/v1/file', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

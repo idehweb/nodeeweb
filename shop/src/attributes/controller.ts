@@ -92,6 +92,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/admin/attributes', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

@@ -104,7 +104,6 @@ export default function registerController() {
       },
     },
     {
-      base_url: '/api/v1/order',
       from: 'ShopEntity',
     }
   );

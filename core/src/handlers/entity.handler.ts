@@ -7,12 +7,12 @@ import {
   ControllerRegisterOptions,
   controllerRegister,
 } from './controller.handler';
-import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
+import { BASE_API_URL, CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { isAsyncFunction } from 'util/types';
 import { BadRequestError, GeneralError, NotFound } from '../../types/error';
 import { call } from '../../utils/helpers';
 import { CrudParamDto } from '../../dto/in/crud.dto';
-import { orderBy } from 'lodash';
+import { lowerFirst, orderBy } from 'lodash';
 
 export class EntityCreator {
   constructor(private modelName: string) {}
@@ -264,6 +264,11 @@ export function registerEntityCRUD(
   const creator = new EntityCreator(modelName);
   const ordered =
     registerOpt.order || registerOpt.order == undefined ? order(opts) : opts;
+  const base_url =
+    registerOpt.base_url === undefined
+      ? `${store.env.BASE_API_URL}/${lowerFirst(modelName)}`
+      : registerOpt.base_url;
+
   for (const [name, opt] of Object.entries(ordered).filter(([k, v]) => v)) {
     const cName = name as CRUD;
     schemas.push({
@@ -281,7 +286,7 @@ export function registerEntityCRUD(
     });
   }
 
-  schemas.forEach((s) => controllerRegister(s, registerOpt));
+  schemas.forEach((s) => controllerRegister(s, { ...registerOpt, base_url }));
 }
 
 function translateCRUD2Creator(name: CRUD): keyof EntityCreator {

@@ -92,6 +92,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/admin/customerGroup', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }
