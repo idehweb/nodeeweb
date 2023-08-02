@@ -1,5 +1,3 @@
-import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
-import { serviceOnError } from '../common/service';
 import { MiddleWare, Req } from '@nodeeweb/core/types/global';
 import store from '@nodeeweb/core/store';
 import { show, submitAction } from '../common/mustImplement';
@@ -447,7 +445,4 @@ export default class Service {
   static rewriteProductsImages: MiddleWare = async (req, res) => {
     return res.status(500).send('not implement yet!');
   };
-  static onError = serviceOnError('Product');
 }
-
-classCatchBuilder(Service);

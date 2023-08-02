@@ -1,6 +1,4 @@
 import { MiddleWare } from '@nodeeweb/core/types/global';
-import { serviceOnError } from '../common/service';
-import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
 import store from '@nodeeweb/core/store';
 
 export default class Service {
@@ -31,7 +29,4 @@ export default class Service {
       message: 'submitted successfully!',
     });
   };
-  static onError = serviceOnError('Form');
 }
-
-classCatchBuilder(Service);

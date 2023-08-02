@@ -1,5 +1,3 @@
-import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
-import { serviceOnError } from '../common/service';
 import { MiddleWare } from '@nodeeweb/core/types/global';
 import store from '@nodeeweb/core/store';
 import axios from 'axios';
@@ -87,6 +85,4 @@ export default class Service {
       await Promise.all(promises);
     }
   };
-  static onError = serviceOnError('Notification');
 }
-classCatchBuilder(Service);
