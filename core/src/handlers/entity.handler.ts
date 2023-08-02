@@ -341,7 +341,7 @@ function translateCRUD2Url(
 
 function canUseDefaultParamValidation(name: CRUD, opt: EntityCRUDOpt) {
   return (
-    !opt.controller.validate &&
+    opt.controller.validate === undefined &&
     [CRUD.UPDATE_ONE, CRUD.DELETE_ONE, CRUD.GET_ONE].includes(name)
   );
 }

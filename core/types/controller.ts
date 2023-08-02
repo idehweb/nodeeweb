@@ -11,5 +11,5 @@ export type ControllerSchema = {
   method: 'get' | 'post' | 'put' | 'patch' | 'delete';
   access?: ControllerAccess | ControllerAccess[];
   service: MiddleWare | MiddleWare[];
-  validate?: ValidateArgs | ValidateArgs[];
+  validate?: ValidateArgs | ValidateArgs[] | null;
 };
