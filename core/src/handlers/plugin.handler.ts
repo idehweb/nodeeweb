@@ -7,6 +7,7 @@ import { PluginContent, CorePluginType, PluginOut } from '../../types/plugin';
 import store from '../../store';
 import { color } from '../../utils/color';
 import { catchFn } from '../../utils/catchAsync';
+import { RegisterOptions } from '../../types/register';
 
 export default async function handlePlugin() {
   const __dirname = path.resolve();
@@ -30,13 +31,13 @@ export default async function handlePlugin() {
 export function registerPlugin(
   type: PluginOut['type'],
   content: PluginOut['content'],
-  from?: string
+  { from, logger = store.systemLogger }: RegisterOptions
 ) {
   // catch
   content.stack = content.stack.map((cb) =>
     catchFn(cb, {
       onError(err: any) {
-        store.systemLogger.error(
+        logger.error(
           color(
             'Red',
             `## ${from ? `${from} ` : ''}${type}:${content.name} Plugin ##\n`
@@ -48,7 +49,7 @@ export function registerPlugin(
   );
 
   store.plugins.set(type, content);
-  store.systemLogger.log(
+  logger.log(
     color(
       'Yellow',
       `## ${from ? `${from} ` : ''}Register ${type}:${content.name} Plugin ##`

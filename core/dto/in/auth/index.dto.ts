@@ -46,7 +46,6 @@ export class UserPassUserLogin {
 
   @Expose()
   @IsString()
-  @Length(8, 20)
   password: string;
 }
 export class UserPassUserSignup {
@@ -56,7 +55,7 @@ export class UserPassUserSignup {
 
   @Expose()
   @IsString()
-  @Length(8, 20)
+  @Length(8)
   password: string;
 
   @Expose()

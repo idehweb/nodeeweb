@@ -53,7 +53,8 @@ async function installRequirements() {
         (pn) =>
           `link:./${join(CORE_NODE_MODULE_PATH_RELATIVE, 'node_modules', pn)}`
       )
-      .join(' ')}`
+      .join(' ')}`,
+    { logger }
   );
 }
 

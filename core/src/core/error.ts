@@ -5,17 +5,16 @@ import { errorDetector } from '../../utils/error';
 import logger from '../handlers/log.handler';
 
 export const errorHandler: MiddleWareError = (error, req, res, next) => {
+  console.log('code is here');
   const ge = errorDetector(error);
   if (Math.floor(ge.code / 100) === 5 || store.env.isLoc) logger.error(ge);
 
-  return res
-    .status(ge.code)
-    .json({
-      status: 'error',
-      message: ge.message,
-      type: ge.type,
-      error: store.env.isPro ? undefined : ge,
-    });
+  return res.status(ge.code).json({
+    status: 'error',
+    message: ge.message,
+    type: ge.type,
+    error: store.env.isPro ? undefined : ge,
+  });
 };
 
 export const notFoundHandler: MiddleWare = (req, res, next) => {

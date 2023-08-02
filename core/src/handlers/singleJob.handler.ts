@@ -2,12 +2,23 @@ import fs from 'fs';
 import { isAsyncFunction } from 'util/types';
 import { wait } from '../../utils/helpers';
 import { getSharedPath } from '../../utils/path';
-import logger from './log.handler';
+import { Logger } from './log.handler';
+import { RegisterOptions } from '../../types/register';
+import store from '../../store';
 
 export type SingleJob = () => void | Promise<void>;
 
 export class SingleJobProcess {
-  constructor(private id: string, private job: SingleJob) {}
+  from?: string;
+  logger: Logger;
+  constructor(
+    private id: string,
+    private job: SingleJob,
+    { from, logger = store.systemLogger }: RegisterOptions = {}
+  ) {
+    this.logger = logger;
+    this.from = from;
+  }
 
   static builderAsync(id: string, job: SingleJob): () => Promise<void> {
     const jp = new SingleJobProcess(id, async () => {
@@ -36,7 +47,7 @@ export class SingleJobProcess {
     try {
       fs.rmSync(this.file_name);
     } catch (err) {
-      logger.error('single job free error', err);
+      this.logger.error('single job free error', err);
     }
   }
   async runTask() {
@@ -65,8 +76,8 @@ export class SingleJobProcess {
 export function clearAllLockFiles() {
   try {
     fs.rmSync(getSharedPath('.'), { recursive: true, force: true });
-    logger.log('remove shared dir');
+    this.logger.log('remove shared dir');
   } catch (err) {
-    logger.warn('shared dir removed before!');
+    this.logger.warn('shared dir removed before!');
   }
 }

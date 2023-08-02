@@ -87,7 +87,7 @@ export default class Service {
     if (thef && thef != '') search = thef;
     let q: any;
     if (search['productCategory.slug']) {
-      const ProductCategory = store.db.model('ProductCategory');
+      const ProductCategory = store.db.model('productCategory');
       const productcategory = await ProductCategory.findOne({
         slug: search['productCategory.slug'],
       });

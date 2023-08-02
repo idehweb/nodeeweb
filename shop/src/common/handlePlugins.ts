@@ -6,6 +6,6 @@ export function handlePlugins() {
   const bankP = bankGatewayPlugin();
   const postP = postGatewayPlugin();
 
-  registerPlugin(bankP.type, bankP.content, 'ShopPlugins');
-  registerPlugin(postP.type, postP.content, 'ShopPlugins');
+  registerPlugin(bankP.type, bankP.content, { from: 'ShopPlugins' });
+  registerPlugin(postP.type, postP.content, { from: 'ShopPlugins' });
 }
