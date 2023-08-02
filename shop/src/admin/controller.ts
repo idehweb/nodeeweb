@@ -33,6 +33,15 @@ export default function registerController() {
   registerEntityCRUD(
     'admin',
     {
+      getCount: {
+        controller: {
+          access: AdminAccess,
+        },
+        crud: {
+          executeQuery: true,
+          sendResponse: true,
+        },
+      },
       getOne: {
         controller: {
           access: AdminAccess,
@@ -60,18 +69,6 @@ export default function registerController() {
             limit: 'limit',
             offset: 'offset',
           },
-        },
-      },
-      getCount: {
-        controller: {
-          access: AdminAccess,
-          service(req, res) {
-            res.json(req.crud);
-          },
-        },
-        crud: {
-          executeQuery: true,
-          saveToReq: true,
         },
       },
       create: {
