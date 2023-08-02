@@ -13,10 +13,10 @@ const schema = new mongoose.Schema(
     source: String,
     customerGroup: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'CustomerGroup',
+      ref: 'customerGroup',
     },
     type: String,
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }, //category_id
+    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' }, //category_id
   },
   { timestamps: true }
 );

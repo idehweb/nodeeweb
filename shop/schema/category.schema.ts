@@ -14,7 +14,7 @@ const schema = new mongoose.Schema({
   image: String,
   data: {},
   values: [],
-  parent: { type: mongoose.Schema.Types.ObjectId, ref: 'ProductCategory' }, //category_id
+  parent: { type: mongoose.Schema.Types.ObjectId, ref: 'productCategory' }, //category_id
 });
 
 export default schema;

@@ -37,13 +37,13 @@ const schema = new mongoose.Schema(
       default: 'user',
     },
     contacts: [
-      { _id: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' } },
+      { _id: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' } },
     ],
     wishlist: [
-      { _id: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' } },
+      { _id: { type: mongoose.Schema.Types.ObjectId, ref: 'product' } },
     ],
     customerGroup: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'CustomerGroup' },
+      { type: mongoose.Schema.Types.ObjectId, ref: 'customerGroup' },
     ],
     password: String,
     age: { type: Number },
@@ -67,7 +67,7 @@ const schema = new mongoose.Schema(
         createdAt: { type: Date, default: Date.now },
         description: String,
         status: String,
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'admin' },
       },
     ],
     photos: [

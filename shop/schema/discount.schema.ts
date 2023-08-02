@@ -25,7 +25,7 @@ const schema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
-    consumers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
+    consumers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'customer' }],
     amount: Number,
     maxAmount: { type: Number, default: Number.MAX_SAFE_INTEGER },
     percentage: Number,
@@ -34,17 +34,17 @@ const schema = new mongoose.Schema(
     description: String,
     active: { type: Boolean, default: true },
     excludeDiscount: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'Discount' },
+      { type: mongoose.Schema.Types.ObjectId, ref: 'discount' },
     ],
     excludeDiscountCategory: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'DiscountCategory' },
+      { type: mongoose.Schema.Types.ObjectId, ref: 'discountCategory' },
     ],
 
     includeDiscount: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'Discount' },
+      { type: mongoose.Schema.Types.ObjectId, ref: 'discount' },
     ],
     includeDiscountCategory: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'DiscountCategory' },
+      { type: mongoose.Schema.Types.ObjectId, ref: 'discountCategory' },
     ],
 
     expire: { type: Date },
