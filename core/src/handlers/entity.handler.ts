@@ -36,8 +36,7 @@ export class EntityCreator {
       httpCode: number;
     }
   ) {
-    if (!result && httpCode !== 204)
-      throw new NotFound(`${this.modelName} not found`);
+    if (!result) throw new NotFound(`${this.modelName} not found`);
 
     if (sendResponse && !saveToReq) {
       const data =
