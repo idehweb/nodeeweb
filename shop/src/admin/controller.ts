@@ -5,7 +5,9 @@ import {
   controllersBatchRegister,
   registerEntityCRUD,
 } from '@nodeeweb/core';
+import { plainToInstance } from 'class-transformer';
 import Service from './service';
+import { CreateAdminBody, UpdateAdminBody } from '../../dto/in/admin';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
@@ -75,6 +77,7 @@ export default function registerController() {
       create: {
         controller: {
           access,
+          validate: { reqPath: 'body', dto: CreateAdminBody },
         },
         crud: {
           sendResponse: true,
@@ -85,6 +88,7 @@ export default function registerController() {
       updateOne: {
         controller: {
           access,
+          validate: { reqPath: 'body', dto: UpdateAdminBody },
         },
         crud: {
           sendResponse: true,
