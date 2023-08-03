@@ -73,13 +73,14 @@ export default function registerController() {
       updateOne: {
         controller: {
           access: AdminAccess,
-          service(req, res) {
-            res.json(req[CRUD_DEFAULT_REQ_KEY]);
-          },
         },
         crud: {
+          parseFilter: discountService.updateOneParseFilter,
           executeQuery: true,
-          saveToReq: true,
+          sendResponse: true,
+          paramFields: {
+            id: 'discount',
+          },
         },
       },
       deleteOne: {
