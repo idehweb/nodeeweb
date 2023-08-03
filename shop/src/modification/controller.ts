@@ -37,10 +37,6 @@ export default function registerController() {
               path: 'user',
               select: 'username _id nickname',
             },
-            {
-              path: '',
-              select: '',
-            },
           ],
           paramFields: {
             limit: 'limit',
