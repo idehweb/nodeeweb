@@ -58,7 +58,7 @@ export type CRUDCreatorOpt = {
   sort?: { [k: string]: mongoose.SortValues };
   project?: mongoose.ProjectionType<any>;
   executeQuery?: boolean;
-  sendResponse?: boolean | ((result: any) => any | Promise<any>);
+  sendResponse?: boolean | ((result: any, req: Req) => any | Promise<any>);
   saveToReq?: boolean | string;
   httpCode?: number;
   forceDelete?: boolean;

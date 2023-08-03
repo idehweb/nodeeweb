@@ -42,7 +42,7 @@ export class EntityCreator {
       const data =
         typeof sendResponse === 'boolean'
           ? result
-          : await call(sendResponse, result);
+          : await call(sendResponse, result, req);
       return res.status(httpCode).json({ data });
     }
 
