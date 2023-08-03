@@ -3,6 +3,7 @@ import {
   BadRequestError,
   CRUD_DEFAULT_REQ_KEY,
   MiddleWare,
+  NotFound,
   Req,
 } from '@nodeeweb/core';
 import { FileDocument, IFile } from '../../schema/file.schema';
@@ -41,7 +42,10 @@ export class Service {
     const query = req[CRUD_DEFAULT_REQ_KEY] as Query<FileDocument, IFile>;
     query.setOptions({ new: false });
     const u = Object.fromEntries(Object.entries(query.getUpdate()));
+
     const oldDoc = await query.exec();
+    if (!oldDoc) throw new NotFound('file not found');
+
     const newDoc = { ...oldDoc.toObject(), ...u };
     const oldPath = join(getPublicDir('files')[0], oldDoc.url);
     if (!req.file_path) return res.status(200).json({ data: newDoc });
