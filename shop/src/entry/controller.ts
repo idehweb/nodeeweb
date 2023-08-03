@@ -1,35 +1,16 @@
-import {
-  CRUD_DEFAULT_REQ_KEY,
-  PUBLIC_ACCESS,
-} from '@nodeeweb/core/src/constants/String';
-import { ControllerAccess } from '@nodeeweb/core/types/controller';
+import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
-import { controllerRegister } from '@nodeeweb/core/src/handlers/controller.handler';
-import { uploadSingle } from '@nodeeweb/core/src/handlers/upload.handler';
 import Service from './service';
-import { AuthUserAccess } from '@nodeeweb/core';
+import { AdminAccess, AuthUserAccess } from '@nodeeweb/core';
 
 export default function registerController() {
-  const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
-
-  // add Entry
-  controllerRegister(
-    {
-      url: '/entry/:form',
-      method: 'post',
-      access: AuthUserAccess,
-      service: Service.addEntry,
-    },
-    { base_url: '/customer/form', from: 'ShopEntity' }
-  );
-
   //  crud
   registerEntityCRUD(
     'entry',
     {
       getAll: {
         controller: {
-          access,
+          access: AdminAccess,
           service(req, res) {
             return res.json(req[CRUD_DEFAULT_REQ_KEY]);
           },
@@ -45,6 +26,17 @@ export default function registerController() {
             limit: 'limit',
             offset: 'offset',
           },
+        },
+      },
+      create: {
+        controller: {
+          url: '/:form',
+          access: AuthUserAccess,
+        },
+        crud: {
+          executeQuery: true,
+          sendResponse: true,
+          parseBody: Service.createOneBodyParser,
         },
       },
     },

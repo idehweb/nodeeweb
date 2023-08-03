@@ -1,6 +1,9 @@
 import { MiddleWare, Req } from '@nodeeweb/core/types/global';
 import mongoose from 'mongoose';
 import store from '@nodeeweb/core/store';
+import { NotFound } from '@nodeeweb/core';
+import { randomInt } from 'crypto';
+import { promisify } from 'util';
 
 export default class Service {
   static getAllQuery(req: Req) {
@@ -36,31 +39,20 @@ export default class Service {
     return search;
   }
 
-  static addEntry: MiddleWare = async (req, res) => {
+  static async createOneBodyParser(req: Req) {
     const Form = store.db.model('form');
-    const Entry = store.db.model('entry');
 
     const form = await Form.findById(req.params.form, '_id');
 
     if (!form) {
-      return res.status(404).json({
-        success: false,
-        message: 'not found',
-      });
+      throw new NotFound('form not found');
     }
+    const trackingCode = +(await promisify(randomInt)(90_000)) + 10_000;
 
-    const trackingCode = Math.floor(10000 + Math.random() * 90000);
-
-    await Entry.create({
+    return {
       form: form._id,
-      trackingCode: trackingCode,
+      trackingCode,
       data: req.body,
-    });
-
-    return res.status(201).json({
-      success: true,
-      trackingCode: trackingCode,
-      message: 'submitted successfully!',
-    });
-  };
+    };
+  }
 }
