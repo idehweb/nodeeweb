@@ -126,7 +126,9 @@ export function controllersBatchRegister(
 function translateAccess(accesses: ControllerAccess[]): MiddleWare[] {
   const opt: Partial<JwtStrategyOpt> = {};
 
-  if (accesses.find(({ role }) => role === OPTIONAL_LOGIN)) opt.notThrow = true;
+  if (accesses.find(({ role }) => role === OPTIONAL_LOGIN)) {
+    opt.notThrow = true;
+  }
 
   return [
     ...authorizeWithToken(_.uniq(accesses.map((a) => a.modelName)), opt),

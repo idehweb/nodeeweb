@@ -8,7 +8,7 @@ import store from '../../store';
 import { ForbiddenError, UnauthorizedError } from '../../types/error';
 import AdminSchema from '../../schema/admin.schema';
 import CustomerSchema from '../../schema/customer.schema';
-import { MiddleWare } from '../../types/global';
+import { MiddleWare, Req } from '../../types/global';
 import { Query } from 'mongoose';
 import { CookieOptions, Response } from 'express';
 import { OPTIONAL_LOGIN, PUBLIC_ACCESS } from '../constants/String';
@@ -16,6 +16,7 @@ import { AuthStrategy } from '../../types/auth';
 import logger from './log.handler';
 import { color } from '../../utils/color';
 import _ from 'lodash';
+import { isJWT } from 'class-validator';
 
 const jwtStrategyMap = new Map<string, Strategy>();
 
@@ -26,6 +27,17 @@ export const AuthUserAccess: ControllerAccess[] = [
   },
   {
     role: PUBLIC_ACCESS,
+    modelName: 'admin',
+  },
+];
+
+export const OptUserAccess: ControllerAccess[] = [
+  {
+    role: OPTIONAL_LOGIN,
+    modelName: 'customer',
+  },
+  {
+    role: OPTIONAL_LOGIN,
     modelName: 'admin',
   },
 ];
@@ -54,13 +66,11 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
 
   strategy = new JwtStrategy(
     {
-      jwtFromRequest: (req) =>
-        ExtractJwt.fromAuthHeaderAsBearerToken()(req) ||
-        (opt.cookieName && req.cookies[opt.cookieName]),
+      jwtFromRequest: (req) => extractToken(req as Req, opt.cookieName),
       secretOrKey: store.env.AUTH_SECRET,
       passReqToCallback: true,
     },
-    async (req, { id, iat }, done) => {
+    async (req: Req, { id, iat }, done) => {
       iat = iat * 1000;
       const models = Array.isArray(opt.model) ? opt.model : [opt.model];
       const query = (model: string) =>
@@ -79,9 +89,7 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
       }
 
       if (opt.notThrow) return done(null, {});
-      return done(
-        new UnauthorizedError('token is valid but access to user failed')
-      );
+      return done(new UnauthorizedError());
     }
   );
 
@@ -151,13 +159,17 @@ export function authorizeWithToken(
   opt: Partial<JwtStrategyOpt> = {}
 ): MiddleWare[] {
   return [
-    authWithToken({
-      name: `jwt-${modelNames.join('-')}-${JSON.stringify(opt)}`,
-      ...opt,
-      model: modelNames,
-    }),
     (req, res, next) => {
-      if (!req.user._id) delete req.user;
+      if (opt.notThrow && !isJWT(extractToken(req, opt.cookieName)))
+        return next();
+      return authWithToken({
+        name: `jwt-${modelNames.join('-')}-${JSON.stringify(opt)}`,
+        ...opt,
+        model: modelNames,
+      })(req, res, next);
+    },
+    (req, res, next) => {
+      if (!req.user?._id) delete req.user;
       return next();
     },
   ];
@@ -241,5 +253,12 @@ export function unregisterAuthStrategy(id: string, from?: string) {
         id
       )} AuthStrategy ##`
     )
+  );
+}
+
+function extractToken(req: Req, cookieName?: string) {
+  return (
+    ExtractJwt.fromAuthHeaderAsBearerToken()(req) ||
+    (cookieName && req.cookies[cookieName])
   );
 }
