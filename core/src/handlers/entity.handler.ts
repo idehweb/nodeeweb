@@ -350,7 +350,8 @@ function translateCRUD2Url(
 function canUseDefaultParamValidation(name: CRUD, opt: EntityCRUDOpt) {
   return (
     opt.controller.validate === undefined &&
-    [CRUD.UPDATE_ONE, CRUD.DELETE_ONE, CRUD.GET_ONE].includes(name)
+    [CRUD.UPDATE_ONE, CRUD.DELETE_ONE, CRUD.GET_ONE].includes(name) &&
+    (!opt.crud.paramFields || opt.crud.paramFields.id === 'id')
   );
 }
 
