@@ -19,19 +19,18 @@ class OrderService {
   }
   getOneFilterParser(req: Req) {
     const base = {
-      _id: req.params.id,
+      _id: req.params.order,
     };
 
     if (req.modelName === 'customer') {
       base['active'] = true;
       base['customer._id'] = req.user._id;
     }
-
     return base;
   }
   updateOneFilterParser(req: Req) {
     return {
-      _id: req.params.id,
+      _id: req.params.order,
       status: OrderStatus.Posting,
       active: true,
     };

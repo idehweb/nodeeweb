@@ -49,7 +49,7 @@ export interface IOrder {
   };
   products: {
     _id: Types.ObjectId;
-    name: string;
+    title: { [key: string]: string };
     image?: string;
     price: number;
     salePrice: number;
@@ -134,7 +134,7 @@ const schema = new mongoose.Schema(
     products: [
       {
         _id: { type: Schema.Types.ObjectId, required: true },
-        name: { type: String, required: true },
+        title: { type: mongoose.Schema.Types.Mixed, required: true },
         image: String,
         price: { type: Number, required: true },
         salePrice: { type: Number, required: true },

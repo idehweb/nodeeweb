@@ -381,7 +381,7 @@ class TransactionService {
     // }
 
     const description = `برای خرید محصولات ${products
-      .map(({ name }) => name)
+      .map(({ title }) => title.fa ?? title.en ?? Object.values(title)[0])
       .join(' ، ')} از فروشگاه ${store.env.APP_NAME}`;
 
     return await bankPlugin.stack[0]({

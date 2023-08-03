@@ -2,7 +2,7 @@ import mongoose, { Document, Model } from 'mongoose';
 import { Types } from 'mongoose';
 
 export interface IProduct {
-  name: string;
+  title: { [key: string]: string };
   image?: string;
   price: number;
   salePrice: number;
