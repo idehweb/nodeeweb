@@ -20,5 +20,11 @@ export function registerDefaultControllers() {
   });
 
   //   register
-  controllerStack.map((schema) => controllerRegister(schema, { logger }));
+  controllerStack.map((schema) =>
+    controllerRegister(schema, {
+      logger,
+      base_url: '/api/v1',
+      from: 'CoreController',
+    })
+  );
 }
