@@ -37,10 +37,10 @@ export default class Service {
 
   static getOneFilterParser(req: Req) {
     const obj = {};
-    if (store.db.isValidObjectId(req.params.id)) {
-      obj['_id'] = req.params.id;
+    if (store.db.isValidObjectId(req.params.page)) {
+      obj['_id'] = req.params.page;
     } else {
-      obj['slug'] = req.params.id;
+      obj['slug'] = req.params.page;
     }
 
     return obj;
