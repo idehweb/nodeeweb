@@ -14,28 +14,6 @@ import {
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
 
-  // custom admin controllers
-  controllersBatchRegister(
-    [
-      {
-        url: '/rewriteProducts',
-        method: 'post',
-        access,
-        service: Service.rewriteProducts,
-      },
-      {
-        url: '/rewriteProductsImages',
-        method: 'post',
-        access,
-        service: Service.rewriteProductsImages,
-      },
-    ],
-    {
-      base_url: '/api/v1/product',
-      from: 'ShopEntity',
-    }
-  );
-
   // custom simple controllers
   controllersBatchRegister(
     [

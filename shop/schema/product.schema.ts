@@ -78,8 +78,3 @@ const schema = new mongoose.Schema(
 );
 
 export default schema;
-
-schema.pre('save', function (next) {
-  if (this.salePrice == undefined) this.salePrice = this.price;
-  return next();
-});

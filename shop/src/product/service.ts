@@ -344,9 +344,11 @@ export default class Service {
 
     // parse to number
     ['price', 'salePrice', 'quantity', 'weight'].forEach((k) => {
-      if (req.body[k] === '') delete req.body[k];
+      if (req.body[k] === '' || req.body[k] === undefined) delete req.body[k];
       else req.body[k] = +req.body[k];
     });
+
+    if (!req.body.salePrice) req.body.salePrice = req.body.price;
 
     if (req.body.in_stock !== undefined)
       req.body.in_stock = Boolean(req.body.in_stock);
@@ -402,7 +404,7 @@ export default class Service {
 
     // parse to number
     ['price', 'salePrice', 'quantity', 'weight'].forEach((k) => {
-      if (req.body[k] === '') delete req.body[k];
+      if (req.body[k] === '' || req.body[k] === undefined) delete req.body[k];
       else req.body[k] = +req.body[k];
     });
 
@@ -421,7 +423,7 @@ export default class Service {
       product: product._id,
     };
     submitAction(action);
-    res.status(201).json(product);
+    res.status(200).json(product);
   };
   static deleteAfter: MiddleWare = async (req, res) => {
     const product = req[CRUD_DEFAULT_REQ_KEY];
