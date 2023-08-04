@@ -18,8 +18,8 @@ import { useSelector } from 'react-redux';
 import { Block } from 'notiflix/build/notiflix-block-aio';
 
 import { dateFormat, dateFormatter, getDays, jToM } from '@/functions';
-import OrderDateChartFilters from '#c/components/dashboard/OrderDateChartFilters';
-import API from '#c/functions/API';
+import OrderDateChartFilters from '@/components/dashboard/OrderDateChartFilters';
+import API from '@/functions/API';
 
 const OrderChartDemo = (props) => {
   const lastDay = new Date();

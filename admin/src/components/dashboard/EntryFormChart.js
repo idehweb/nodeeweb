@@ -18,8 +18,8 @@ import { useSelector } from 'react-redux';
 import { Block } from 'notiflix/build/notiflix-block-aio';
 
 import { dateFormat, jToM, getDays } from '@/functions';
-import EntryFormChartFilters from '#c/components/dashboard/EntryFormChartFilters';
-import API from '#c/functions/API';
+import EntryFormChartFilters from '@/components/dashboard/EntryFormChartFilters';
+import API from '@/functions/API';
 
 const aMonthAgo = subDays(new Date(), 30);
 console.log('aMonthAgo', aMonthAgo);

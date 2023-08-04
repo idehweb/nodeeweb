@@ -18,7 +18,7 @@ import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import NoteAltIcon from '@mui/icons-material/NoteAlt';
 import React from 'react';
-import { downloadCSV } from 'react-admin/dist/index';
+import { downloadCSV } from 'react-admin';
 
 import {
   CatRefField,
@@ -26,7 +26,6 @@ import {
   FileChips,
   List,
   ShowDescription,
-  showFiles,
   ShowLink,
   ShowOptions,
   ShowPictures,

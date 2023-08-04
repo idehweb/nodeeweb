@@ -10,14 +10,14 @@ import {
 } from 'chart.js';
 import { useDataProvider, useTranslate } from 'react-admin';
 
-import Welcome from '#c/components/dashboard/Welcome';
-import { BASE_URL } from '#c/functions/API';
-import CustomerChart from '#c/components/dashboard/CustomerChart';
-import ProductOrdersTable from '#c/components/dashboard/ProductOrdersTable';
-import EntryFormChart from '#c/components/dashboard/EntryFormChart';
-import OrderChartDemo from '#c/components/dashboard/OrderChartDemo';
-import OrderChart from '#c/components/dashboard/OrderChart';
-import DragDropTest from '#c/components/dashboard/base/DragDropTest';
+import Welcome from '@/components/dashboard/Welcome';
+import { BASE_URL } from '@/functions/API';
+import CustomerChart from '@/components/dashboard/CustomerChart';
+import ProductOrdersTable from '@/components/dashboard/ProductOrdersTable';
+import EntryFormChart from '@/components/dashboard/EntryFormChart';
+import OrderChartDemo from '@/components/dashboard/OrderChartDemo';
+import OrderChart from '@/components/dashboard/OrderChart';
+import DragDropTest from '@/components/dashboard/base/DragDropTest';
 
 const Spacer = () => <span style={{ width: '1em' }} />;
 const VerticalSpacer = () => <span style={{ height: '1em' }} />;

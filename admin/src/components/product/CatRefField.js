@@ -4,7 +4,7 @@ import { useInput, useRecordContext } from 'react-admin';
 import Select from 'react-select';
 
 import API from '@/functions/API';
-// import { useRecordContext } from "react-admin/dist/index";
+// import { useRecordContext } from "react-admin";
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 let ckjhg = {};
