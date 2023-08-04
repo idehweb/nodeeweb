@@ -12,7 +12,7 @@ export const Component = styled('main')(() => ({
     display: 'flex',
     flexWrap: 'wrap',
     flexDirection: 'row',
-    gap: 12,
+    gap: 4,
     '& > ': {
       '&:not(.cont-col)': {
         width: '100%',

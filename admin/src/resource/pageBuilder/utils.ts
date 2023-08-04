@@ -29,7 +29,7 @@ export const FindNodeAddress = (item, id, path = '') => {
   return temp ? path + temp : '';
 };
 
-type ActionTypes = 'remove' | 'add' | 'addToIndex';
+type ActionTypes = 'remove' | 'push' | 'addToIndex';
 
 const getOptAction = (t: ActionTypes, index, value) => {
   switch (t) {
@@ -48,7 +48,7 @@ const getOptAction = (t: ActionTypes, index, value) => {
           return [...start, value, ...end];
         },
       };
-    case 'add':
+    case 'push':
       return { $push: [value] };
     default:
       return {};
@@ -66,15 +66,16 @@ export const makeAction = (path, opt: ActionTypes, value = undefined) => {
   else {
     arr.reduce((obj, i, idx) => {
       let key = i;
+      // if we have index like [0] then get index => 0
       if (/^\[\d\]$/i.test(key)) {
         key = key.replace(/\[|]/gi, '');
         key = Number(key);
       }
       obj[key] = {};
 
-      if (opt === 'add' && idx === lastIndex)
+      if (opt === 'push' && idx === lastIndex)
         obj[key] = getOptAction(opt, index, value);
-      else if (opt !== 'add' && idx === lastIndex - 1) {
+      else if (opt !== 'push' && idx === lastIndex - 1) {
         obj[key] = getOptAction(opt, index, value);
       }
 
@@ -82,6 +83,7 @@ export const makeAction = (path, opt: ActionTypes, value = undefined) => {
     }, newObj);
   }
 
+  console.log('newObj', newObj);
   return newObj;
 };
 
@@ -94,6 +96,42 @@ export const AddNewItem = (id, arr, item) => {
     children: [],
     id: generateCompID(),
   });
+
+  return update(arr, action);
+};
+
+export const PushItem = (id, arr, item) => {
+  const address = FindNodeAddress(arr, id);
+  let action = null;
+
+  if (address === '') action = makeAction(address, 'push', item);
+  else action = makeAction(address, 'addToIndex', item);
+
+  console.log('PushItem', address);
+
+  return update(arr, action);
+};
+
+export const AddToIndex = (id, arr, item) => {
+  const address = FindNodeAddress(arr, id);
+  console.log('AddToIndex', address);
+  const action = makeAction(address, 'addToIndex', item);
+  return update(arr, action);
+};
+export const AddInside = (id, arr, item) => {
+  let address = FindNodeAddress(arr, id);
+  let action = null;
+
+  // already have child
+  if (address.endsWith('.children'))
+    action = makeAction(address, 'addToIndex', item);
+  else {
+    // we add new child
+    if (address !== '') address += '.children';
+    action = makeAction(address, 'push', item);
+  }
+
+  console.log('AddInside', address);
 
   return update(arr, action);
 };

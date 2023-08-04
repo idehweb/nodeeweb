@@ -9,8 +9,9 @@ import { LoadingContainer } from '@/components/global';
 import { OptionBox } from '@/components/page-builder';
 
 import ComponentSetting from '@/components/page-builder/Component/Setting';
-import AnimationComponent, {
-  EmptyAnimationCard,
+import {
+  AnimatedComponent,
+  AnimatedEmptyDropSlot,
 } from '@/components/page-builder/Component/AnimationComponent';
 import {
   ItemType,
@@ -33,6 +34,7 @@ import {
   AddNewItem,
   PushItem,
   AddToIndex,
+  AddInside,
 } from './utils';
 
 interface StateType {
@@ -216,12 +218,12 @@ const Core = (props) => {
 
       if (order) {
         if (order === 'last') {
-          newComponents = PushItem(dest.id, components, baseNode);
+          newComponents = PushItem(dest.id, newComponents, baseNode);
         } else if (order === 'middle') {
-          newComponents = AddToIndex(dest.id, components, baseNode);
+          newComponents = AddToIndex(dest.id, newComponents, baseNode);
         }
       } else {
-        newComponents = AddToIndex(dest.id, components, baseNode);
+        newComponents = AddInside(dest.id, newComponents, baseNode);
       }
 
       console.log('newComponents', newComponents);
@@ -254,15 +256,14 @@ const Core = (props) => {
           <AnimatePresence presenceAffectsLayout>
             {components?.map((i, idx) => (
               <Fragment key={idx}>
-                <EmptyAnimationCard
-                  key={`${i.id}-middle`}
+                <AnimatedEmptyDropSlot
                   item={i}
                   onDropEnd={handleDrop}
                   order="middle"
                 />
 
-                <AnimationComponent
-                  key={`${i.id}`}
+                <AnimatedComponent
+                  animationKey={`${i.id}`}
                   index={idx}
                   item={i}
                   onDelete={handleDelete}
@@ -272,8 +273,7 @@ const Core = (props) => {
                 />
 
                 {idx === components.length - 1 ? (
-                  <EmptyAnimationCard
-                    key={`${i.id}-last`}
+                  <AnimatedEmptyDropSlot
                     item={i}
                     onDropEnd={handleDrop}
                     order="last"

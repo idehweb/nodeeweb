@@ -1,5 +1,5 @@
-import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Fragment, memo } from 'react';
+import { AnimatePresence } from 'framer-motion';
 
 import { EditIconSvg, CloseIconSvg, AddIconSvg } from '../base/Icon';
 
@@ -13,6 +13,7 @@ import {
 } from './components';
 import DraggableCard from './DraggableCard';
 import { ItemType, OnDropType } from './types';
+import { AnimatedComponent, AnimatedEmptyDropSlot } from './AnimationComponent';
 
 export interface ComponentProps {
   index: number;
@@ -21,7 +22,7 @@ export interface ComponentProps {
   onAdd: (payload: any) => void;
   onEdit: (item: ItemType) => void;
   onDrop: OnDropType;
-  key?: React.Key;
+  animationKey?: React.Key;
 }
 
 const Component = ({
@@ -67,18 +68,18 @@ const Component = ({
       </Header>
 
       <Content className="content">
-        <AnimatePresence presenceAffectsLayout>
-          {item.addable &&
-            item.children?.map((i, idx) => (
-              <motion.div
-                key={`${i.id}`}
-                layout="position"
-                className={`cont-${i.name}`}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.5, opacity: 0 }}
-                transition={{ type: 'just' }}>
-                <Component
+        {item.addable && (
+          <AnimatePresence presenceAffectsLayout>
+            {item.children?.map((i, idx) => (
+              <Fragment key={idx}>
+                <AnimatedEmptyDropSlot
+                  item={i}
+                  onDropEnd={onDrop}
+                  order="middle"
+                />
+
+                <AnimatedComponent
+                  animationKey={`${i.id}`}
                   index={idx}
                   item={i}
                   onEdit={() => onEdit(i)}
@@ -86,9 +87,18 @@ const Component = ({
                   onAdd={onAdd}
                   onDrop={onDrop}
                 />
-              </motion.div>
+
+                {idx === item.children.length - 1 ? (
+                  <AnimatedEmptyDropSlot
+                    item={i}
+                    onDropEnd={onDrop}
+                    order="last"
+                  />
+                ) : null}
+              </Fragment>
             ))}
-        </AnimatePresence>
+          </AnimatePresence>
+        )}
       </Content>
     </DraggableCard>
   );
