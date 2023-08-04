@@ -71,7 +71,7 @@ const Component = ({
         {item.addable && (
           <AnimatePresence presenceAffectsLayout>
             {item.children?.map((i, idx) => (
-              <Fragment key={idx}>
+              <Fragment key={i.id}>
                 <AnimatedEmptyDropSlot
                   item={i}
                   onDropEnd={onDrop}

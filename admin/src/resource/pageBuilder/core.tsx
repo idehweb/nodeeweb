@@ -242,7 +242,7 @@ const Core = (props) => {
         {tabValue === 0 && (
           <AnimatePresence presenceAffectsLayout>
             {components?.map((i, idx) => (
-              <Fragment key={idx}>
+              <Fragment key={i.id}>
                 <AnimatedEmptyDropSlot
                   item={i}
                   onDropEnd={handleDrop}

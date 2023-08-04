@@ -31,7 +31,7 @@ export default function EmptyDropSlot({
   order,
   ...props
 }: EmptyDropSlotProps) {
-  const [{ isOver }, drop] = useDrop({
+  const [{ isOverAndCanDrop }, drop] = useDrop({
     accept: 'ITEM',
     drop(source: ItemType, monitor) {
       // already dropped
@@ -39,12 +39,18 @@ export default function EmptyDropSlot({
 
       onDropEnd(source, item, order);
     },
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver({ shallow: true }),
+    canDrop: (i) => i.id !== item.id,
+    collect: (m) => ({
+      isOverAndCanDrop: m.isOver({ shallow: true }) && m.canDrop(),
     }),
   });
 
   return (
-    <Component className="cp-slot" ref={drop} isOver={isOver} {...props} />
+    <Component
+      className="cp-slot"
+      ref={drop}
+      isOver={isOverAndCanDrop}
+      {...props}
+    />
   );
 }
