@@ -113,7 +113,7 @@ class CreateForm extends React.Component {
               className={'MGD ' + field.className}>
               <label htmlFor="feLastName">{field.label}</label>
 
-              {/*<YMaps query={{apikey: "cbb54d12-0750-4af8-ba24-f434b692963b",lang: 'en_US' }}>*/}
+              {/*<YMaps query={{apikey: "",lang: 'en_US' }}>*/}
                 {/*<div style={{width: '100%'}} className={'locationabrel'}>*/}
                   {/*<Map instanceRef={ref => (myMap = ref)} onLoad={(e) => {*/}
                     {/*console.log('e', e);*/}

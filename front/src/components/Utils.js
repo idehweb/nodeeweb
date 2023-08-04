@@ -5,7 +5,7 @@ export const subscribeTokenToTopic = (token, topic) => {
     headers: {
       "Content-Type": "application/json",
       Authorization:
-        "key=AAAAz_K81P8:APA91bGyInzAS1R0NRXJIlYKiI2sq4qv91hsGuc223J6g5SWpVPX2dU9Z0FYCls2B04L9o5DOZh-lzWHQRF7LCgvHUcntk3Zr8xDvfG8UqK0ZpScB43SVlVpQP7kJXcR0JzbHv1FKFax"
+        "key="
     }
   })
     .then(res => {
