@@ -83,7 +83,6 @@ export const makeAction = (path, opt: ActionTypes, value = undefined) => {
     }, newObj);
   }
 
-  console.log('newObj', newObj);
   return newObj;
 };
 
@@ -101,20 +100,22 @@ export const AddNewItem = (id, arr, item) => {
 };
 
 export const PushItem = (id, arr, item) => {
-  const address = FindNodeAddress(arr, id);
+  let address = FindNodeAddress(arr, id);
   let action = null;
 
-  if (address === '') action = makeAction(address, 'push', item);
-  else action = makeAction(address, 'addToIndex', item);
-
-  console.log('PushItem', address);
+  // get parent node address
+  if (address !== '') {
+    let temp = address.split('.');
+    temp.pop();
+    address = temp.join('.');
+  }
+  action = makeAction(address, 'push', item);
 
   return update(arr, action);
 };
 
 export const AddToIndex = (id, arr, item) => {
   const address = FindNodeAddress(arr, id);
-  console.log('AddToIndex', address);
   const action = makeAction(address, 'addToIndex', item);
   return update(arr, action);
 };
@@ -130,8 +131,6 @@ export const AddInside = (id, arr, item) => {
     if (address !== '') address += '.children';
     action = makeAction(address, 'push', item);
   }
-
-  console.log('AddInside', address);
 
   return update(arr, action);
 };

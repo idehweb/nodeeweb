@@ -200,21 +200,12 @@ const Core = (props) => {
 
   const handleDrop = useCallback<OnDropType>(
     (source, dest, order) => {
-      console.log({ components, source, dest, order });
-
       const sourceNodeAddress = FindNodeAddress(components, source.id);
-      const destNodeAddress = FindNodeAddress(components, dest.id);
-
-      console.group('here');
-      console.log('address', sourceNodeAddress);
-      console.log('address2', destNodeAddress);
-
       const baseNode = _get(components, sourceNodeAddress, {});
 
       let newComponents = JSON.parse(JSON.stringify(components));
 
       newComponents = DeleteItem(source.id, newComponents);
-      console.log('DeleteItem', newComponents);
 
       if (order) {
         if (order === 'last') {
@@ -225,10 +216,6 @@ const Core = (props) => {
       } else {
         newComponents = AddInside(dest.id, newComponents, baseNode);
       }
-
-      console.log('newComponents', newComponents);
-
-      console.groupEnd();
 
       setState((p) => ({ ...p, components: newComponents }));
     },
