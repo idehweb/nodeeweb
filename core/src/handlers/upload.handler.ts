@@ -5,6 +5,7 @@ import sharp from 'sharp';
 import { getPublicDir } from '../../utils/path';
 import { MiddleWare, Req } from '../../types/global';
 import { isExist } from '../../utils/helpers';
+import { BadRequestError } from '../../types/error';
 
 export type UploadOptions = {
   file_key?: string;
@@ -23,9 +24,15 @@ export type UploadOptions = {
 const IMAGE_FORMATS = [];
 
 function isReducibleFormat(format = '') {
-  return ['jpeg', 'png', 'webp', 'avif', 'tiff', 'svg'].includes(
+  return ['jpeg', 'jp2', 'jxl', 'png', 'webp', 'avif', 'tiff', 'jpg'].includes(
     format.toLowerCase()
   );
+}
+
+function convertToSharpFormat(format = '') {
+  format = format.toLowerCase();
+  if (format === 'jpg') format = 'jpeg';
+  return isReducibleFormat(format) ? format : 'webp';
 }
 
 function getFormat(name = '') {
@@ -44,9 +51,7 @@ function getFileName(file: Express.Multer.File, custom_format?: string) {
 }
 
 function getDir(opt: UploadOptions) {
-  return (
-    opt.dir_path ?? join(getPublicDir('public_media', true)[0], 'customer')
-  );
+  return opt.dir_path ?? join(getPublicDir('files', true)[0], 'customer');
 }
 
 export function uploadSingle(opt: UploadOptions) {
@@ -68,7 +73,7 @@ export function uploadSingle(opt: UploadOptions) {
         return cb(null, true);
 
       return cb(
-        new Error(
+        new BadRequestError(
           `Mime Type not accept\received:${file.mimetype}\nexpected:${opt.type}\\*`
         )
       );
@@ -78,6 +83,7 @@ export function uploadSingle(opt: UploadOptions) {
       : multer.diskStorage({
           destination: dir_path,
           filename(req: any, file, callback) {
+            if (!file) return;
             const fn = opt.out_name ?? getFileName(file);
             req.file_path = join(dir_path, fn);
             return callback(null, fn);
@@ -85,7 +91,7 @@ export function uploadSingle(opt: UploadOptions) {
         }),
   });
   const mw: MiddleWare[] = [upload.single(opt.file_key ?? 'file')];
-  if (opt.reduce && opt.type === 'image') mw.push(reduceSingle(opt));
+  if (opt.reduce) mw.push(reduceSingle(opt));
 
   return mw;
 }
@@ -109,18 +115,24 @@ async function removeTempFile(req: Req) {
 
 function reduceSingle(opt: UploadOptions): MiddleWare {
   return async (req, res, next) => {
+    // there is not any file
+    if (!req.file_path && !req.file) return next();
+
     // file saved before and format is not reducible
     if (req.file_path && !isReducibleFormat(getFormat(req.file_path)))
       return next();
 
-    let format = opt.reduce.format ?? 'webp';
+    let format: any = convertToSharpFormat(
+      opt.reduce.format ??
+        getFormat(req.file_path ?? req.file?.originalname) ??
+        'webp'
+    );
     const file_path = join(
       getDir(opt),
       opt.out_name ?? getFileName(req.file, format)
     );
 
     let s = sharp(await getFileBuffer(req));
-
     if (opt.reduce.width || opt.reduce.height) {
       s = s.resize({
         fit: 'cover',

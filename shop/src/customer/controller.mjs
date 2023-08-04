@@ -42,7 +42,7 @@ var self = {
       };
     }
     if (req.query) {
-      console.log(req.query);
+      // console.log(req.query);
     }
 
     let thef = req.query;

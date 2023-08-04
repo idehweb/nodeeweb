@@ -14,7 +14,7 @@ import logger from '../handlers/log.handler';
 import { isExistsSync } from '../../utils/helpers';
 import exec from '../../utils/exec';
 import { color } from '../../utils/color';
-import { APP_INFO } from '../../utils/package';
+import { APP_INFO, CORE_NODE_MODULE_PATH_RELATIVE } from '../../utils/package';
 
 export default async function prepare() {
   // install requirements
@@ -38,12 +38,24 @@ async function installRequirements() {
 
   const packageInfo = await import(APP_INFO);
 
-  const requirements = ['mongoose', 'bcrypt'].filter(
-    (pack) => !packageInfo.dependencies[pack]
-  );
+  const requirements = [
+    'mongoose',
+    'bcrypt',
+    'reflect-metadata',
+    'class-transformer',
+    'class-validator',
+  ].filter((pack) => !packageInfo.dependencies[pack]);
   if (!requirements.length) return;
   logger.log(color('Green', `## Install ${requirements.join(', ')} ##`));
-  await exec(`npm i ${requirements.join(' ')}`);
+  await exec(
+    `yarn add ${requirements
+      .map(
+        (pn) =>
+          `link:./${join(CORE_NODE_MODULE_PATH_RELATIVE, 'node_modules', pn)}`
+      )
+      .join(' ')}`,
+    { logger }
+  );
 }
 
 function createSharedDir() {
@@ -55,38 +67,35 @@ function createPublicDir() {
 }
 
 function createPublicMediaFolder() {
-  const [public_mediaPath] = getPublicDir('public_media', true);
-  const public_media_customerPath = path.join(public_mediaPath, 'customer');
-  const public_media_siteSettingPath = path.join(
-    public_mediaPath,
-    'site_setting'
-  );
-  if (fs.existsSync(public_mediaPath)) {
-    logger.log('public_mediaPath exist...');
-    if (fs.existsSync(public_media_customerPath)) {
-      logger.log('public_media_customerPath exist...');
+  const [filesPath] = getPublicDir('files', true);
+  const files_customerPath = path.join(filesPath, 'customer');
+  const files_siteSettingPath = path.join(filesPath, 'site_setting');
+  if (fs.existsSync(filesPath)) {
+    logger.log('filesPath exist...');
+    if (fs.existsSync(files_customerPath)) {
+      logger.log('files_customerPath exist...');
     } else {
-      fs.mkdir(public_media_customerPath, () => {
-        logger.log('we created public_media_customerPath');
+      fs.mkdir(files_customerPath, () => {
+        logger.log('we created files_customerPath');
       });
     }
-    if (fs.existsSync(public_media_siteSettingPath)) {
-      logger.log('public_media_siteSettingPath exist...');
+    if (fs.existsSync(files_siteSettingPath)) {
+      logger.log('files_siteSettingPath exist...');
     } else {
-      fs.mkdir(public_media_siteSettingPath, () => {
-        logger.log('we created public_media_siteSettingPath');
+      fs.mkdir(files_siteSettingPath, () => {
+        logger.log('we created files_siteSettingPath');
       });
     }
   } else {
-    logger.log('we should create public_mediaPath');
+    logger.log('we should create filesPath');
 
-    fs.mkdir(public_mediaPath, () => {
-      logger.log('we created public_mediaPath');
-      fs.mkdir(public_media_customerPath, () => {
-        logger.log('we created public_media_customerPath');
+    fs.mkdir(filesPath, () => {
+      logger.log('we created filesPath');
+      fs.mkdir(files_customerPath, () => {
+        logger.log('we created files_customerPath');
       });
-      fs.mkdir(public_media_siteSettingPath, () => {
-        logger.log('we created public_media_siteSettingPath');
+      fs.mkdir(files_siteSettingPath, () => {
+        logger.log('we created files_siteSettingPath');
       });
     });
   }

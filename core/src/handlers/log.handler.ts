@@ -7,18 +7,24 @@ import { Colors, color, yellow } from '../../utils/color';
 import bfs from '../../utils/bfs';
 
 export class Logger {
-  constructor(
-    private logger: winston.Logger,
-    private label?: string
-  ) {}
+  constructor(private logger: winston.Logger, private label?: string) {}
 
   private convert(a: any) {
-    const msgs: string[] = [];
-    bfs(a, ({ value, key }) => {
-      if (value === undefined) return;
-      msgs.push(key && key !== 'message' ? `${key} : ${value}` : value);
-    });
-    return msgs.join('\n');
+    if (typeof a === 'object') {
+      Object.getOwnPropertyNames(a).forEach((key) => {
+        const temp = a[key];
+        delete a[key];
+        a[key] = temp;
+      });
+      return JSON.stringify(a, null, '  ');
+    }
+    return a?.toString() ?? String(a);
+    // const msgs: string[] = [];
+    // bfs(a, ({ value, key }) => {
+    //   if (value === undefined) return;
+    //   msgs.push(key && key !== 'message' ? `${key} : ${value}` : value);
+    // });
+    // return msgs.join('\n');
   }
 
   log(...args: any[]) {
@@ -71,7 +77,7 @@ const morganStream = {
 
     // ip , agent
     if (!store.env.isLoc) {
-      final_msg += `${ip} ${agent}`;
+      final_msg += `${ip} ${agent} `;
     }
 
     // method
@@ -93,10 +99,10 @@ const morganStream = {
       default:
         method_color = 'White';
     }
-    final_msg += ' ' + color(method_color, method.toUpperCase());
+    final_msg += color(method_color, method.toUpperCase()) + ' ';
 
     // url
-    final_msg += ' ' + url;
+    final_msg += url + ' ';
 
     // code
     let status_color: keyof typeof Colors;
@@ -118,10 +124,12 @@ const morganStream = {
         status_color = 'Magenta';
         break;
     }
-    final_msg += ' ' + color(status_color, String(status));
+    final_msg +=
+      ' ' + color(status_color, status ? String(status) : 'disconnect');
 
     // time
-    final_msg += ' - ' + response_time.toFixed(2) + 'ms';
+    if (response_time)
+      final_msg += ' - ' + Number(response_time).toFixed(2) + 'ms';
 
     // content length
     if (content_length) final_msg += ' - ' + content_length;

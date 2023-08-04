@@ -1,47 +1,80 @@
-import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
-import { serviceOnError } from '../common/service';
-import { MiddleWare } from '@nodeeweb/core/types/global';
+import { MiddleWare, Req } from '@nodeeweb/core/types/global';
 import store from '@nodeeweb/core/store';
+import { DiscountDocument, DiscountModel } from '../../schema/discount.schema';
+import { CRUD_DEFAULT_REQ_KEY, NotFound, createLogger } from '@nodeeweb/core';
 
-class Service {
-  static setDiscount: MiddleWare = async (req, res) => {
-    const Discount = store.db.model('discount');
+class DiscountService {
+  get discountModel() {
+    return store.db.model('discount') as DiscountModel;
+  }
 
-    const discount = await Discount.findOne({ slug: req.params.id });
-    if (!discount)
-      return res.status(404).json({
-        success: false,
-        message: 'did not find any discount!',
-        id: req.params.id,
-      });
+  async consumeDiscount(req: Req) {
+    const query = this.getOneQueryParser(req);
 
-    if (discount.count < 1) {
-      return res.status(403).json({
-        success: false,
-        message: 'discount is done!',
-      });
-    }
-    if (!discount.customer) {
-      discount.customer = [];
-    }
+    const discount = await this.discountModel.findOneAndUpdate(
+      query,
+      {
+        $inc: {
+          usageLimit: -1,
+        },
+        $push: {
+          consumers: req.user._id,
+        },
+      },
+      { new: true }
+    );
+    if (!discount) throw new NotFound('discount not found');
 
-    if (discount.customer && discount.customer.length > 0) {
-      var isInArray = (discount.customer as any[]).some(function (cus) {
-        return cus.equals(req.user._id);
-      });
+    return discount;
+  }
 
-      if (isInArray && discount.customerLimit) {
-        return res.status(403).json({
-          success: false,
-          message: 'you have used this discount once!',
-        });
-      }
-    }
-    return res.status(200).json(discount);
+  getOne(req: Req) {
+    return this.discountModel.findOne(this.getOneQueryParser(req, false));
+  }
+
+  getOneQueryParser(req: Req, effectAdmin = true) {
+    const userId = req.user._id;
+    const discountCode =
+      req.params.discount || req.query.discount || req.body.discount;
+    return req.modelName === 'admin' && effectAdmin
+      ? {
+          code: discountCode,
+        }
+      : {
+          $and: [
+            {
+              code: discountCode,
+              active: true,
+              consumers: {
+                $ne: userId,
+              },
+              usageLimit: { $gt: 0 },
+            },
+            {
+              // expired at
+              $or: [
+                { expiredAt: { $exists: false } },
+                { expiredAt: { $gte: new Date() } },
+              ],
+            },
+          ],
+        };
+  }
+  getOneTransform(discount: DiscountDocument, req: Req) {
+    return req.modelName === 'admin'
+      ? discount
+      : {
+          code: discount.code,
+          amount: discount.amount,
+          maxAmount: discount.maxAmount,
+          percentage: discount.percentage,
+          expiredAt: discount.expiredAt,
+        };
+  }
+  updateOneParseFilter = (req: Req) => {
+    return this.getOneQueryParser(req, false);
   };
-  static onError = serviceOnError('Discount');
 }
 
-classCatchBuilder(Service);
-
-export default Service;
+const discountService = new DiscountService();
+export default discountService;

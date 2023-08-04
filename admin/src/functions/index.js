@@ -8,15 +8,15 @@ import authProvider from './authProvider';
 import theme from './theme';
 import data from './dataProvider';
 
-
 // import {MainUrl, savePost} from "../../../main/src/client/functions";
 import API from './API';
-import API_BASE_URL from './API_BASE_URL';
-
+import API_BASE_URL, { BASE_URL } from './API_BASE_URL';
+// import { BASE_URL } from './API-v1';
 
 const ADMIN_ROUTE = window.ADMIN_ROUTE;
 export const MainUrl = window.BASE_URL;
-const dataProvider = data(ADMIN_ROUTE);
+
+const dataProvider = data(BASE_URL);
 
 export { dataProvider, authProvider, theme };
 
@@ -231,7 +231,7 @@ export const uploadMedia = (file = {}, onUploadProgress, id) => {
     const config = {
       headers: {
         'content-type': 'multipart/form-data',
-        token: localStorage.getItem('token'),
+        Authorization: localStorage.getItem('token'),
       },
       cancelToken: new axios.CancelToken((c) => {
         cancel = c;

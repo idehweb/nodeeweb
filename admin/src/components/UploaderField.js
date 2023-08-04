@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { LinearProgress } from '@mui/material';
-import { ImageField, ImageInput, useInput } from 'react-admin';
+import CircularProgress from '@mui/material/CircularProgress';
+import {
+  ImageField,
+  ImageInput,
+  useInput,
+  useNotify,
+  SaveButton,
+  LoadingComponent,
+} from 'react-admin';
 
 import { useWatch } from 'react-hook-form';
 
 import API, { BASE_URL } from '@/functions/API';
+
+import Api from '@/functions/API-v1';
 import { TheImages } from '@/components';
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
@@ -14,6 +24,8 @@ export default (props) => {
   // console.log("props", props);
   let valuesphotos = useWatch({ name: 'photos' });
   let valuesthumbnail = useWatch({ name: 'thumbnail' });
+  const [loading, setLoading] = useState(false);
+  const notify = useNotify();
 
   // let {values} = useFormState();
   let { field } = useInput(props);
@@ -22,6 +34,7 @@ export default (props) => {
   const [gallery, setGallery] = useState(valuesphotos || []);
   const [counter, setCounter] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [files, setFiles] = useState();
   // console.log('props.photos',valuesthumbnail);
 
   const [v, setV] = useState(valuesthumbnail || '');
@@ -31,8 +44,8 @@ export default (props) => {
   //   console.log("React.useEffect UploaderField");
   //   if (field.value) setV(field.value);
   // }, []);
-
-  const handleUpload = (files) => {
+  // notify('File saved successfully', 'success');
+  const handleUpload = () => {
     let GalleryTemp = gallery;
     // console.log("hanfleUpload");
     let file = files[0];
@@ -42,7 +55,8 @@ export default (props) => {
     let formData = new FormData();
     formData.append('file', file);
     formData.append('type', file.type);
-    API.post('/media/fileUpload', formData, {
+    setLoading(true);
+    Api.post('/file', formData, {
       onUploadProgress: (e) => {
         let p = Math.floor((e.loaded * 100) / e.total);
         setProgress(p);
@@ -67,11 +81,12 @@ export default (props) => {
               // console.log('res ',res);
             });
           }
-          // console.log('props',props);
         }
+        setLoading(false);
+        notify('File saved successfully', 'success');
       })
       .catch((err) => {
-        // console.log("error", err);
+        notify(err, 'error');
         setProgress(0);
       });
   };
@@ -115,7 +130,7 @@ export default (props) => {
         onBlur={field.onBlur}
         accept={props.accept}
         options={{
-          onDrop: handleUpload,
+          onDrop: (files) => setFiles(files),
         }}>
         <ImageField source="src" title="title" />
       </ImageInput>
@@ -129,6 +144,20 @@ export default (props) => {
       {progress ? (
         <LinearProgress variant="determinate" value={progress} />
       ) : null}
+      <br />
+      <br />
+      <div>
+        <SaveButton
+          type="button"
+          label="Save"
+          endIcon={loading ? <CircularProgress size={13} /> : null}
+          disabled={loading}
+          onClick={(e) => {
+            e.preventDefault();
+            handleUpload();
+          }}
+        />
+      </div>
     </>
   );
 };

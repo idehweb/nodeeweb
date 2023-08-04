@@ -86,10 +86,6 @@ const Login = () => {
   const handleSubmit = (auth) => {
     console.log('handleSubmit');
     setLoading(true);
-    // if(location.state && location.state.nextPathname){
-    console.log('location.state.nextPathname', location.state.nextPathname);
-
-    // }
     let urltoRedirect = location.state ? location.state.nextPathname : '/';
     console.log('urltoRedirect', urltoRedirect);
     if (urltoRedirect == '/logout') {

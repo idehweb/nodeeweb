@@ -9,8 +9,7 @@ dist
 .env.local
 
 ## public
-public/
-public_media
+public/*
 
 ## shared
 shared/*

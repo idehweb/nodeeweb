@@ -188,7 +188,7 @@ export default function App() {
         {...User}
       />
       <Resource
-        name="media"
+        name="file"
         options={{ label: translate('pos.menu.medias') }}
         {...Media}
       />

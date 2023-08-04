@@ -3,9 +3,11 @@ import path, { join } from 'path';
 import fs from 'fs';
 import logger from './log.handler';
 import { isAsyncFunction } from 'util/types';
-import { PluginContent, PluginType } from '../../types/plugin';
+import { PluginContent, CorePluginType, PluginOut } from '../../types/plugin';
 import store from '../../store';
 import { color } from '../../utils/color';
+import { catchFn } from '../../utils/catchAsync';
+import { RegisterOptions } from '../../types/register';
 
 export default async function handlePlugin() {
   const __dirname = path.resolve();
@@ -27,10 +29,25 @@ export default async function handlePlugin() {
 }
 
 export function registerPlugin(
-  type: PluginType,
-  content: PluginContent,
-  from?: string
+  type: PluginOut['type'],
+  content: PluginOut['content'],
+  { from, logger = store.systemLogger }: RegisterOptions
 ) {
+  // catch
+  content.stack = content.stack.map((cb) =>
+    catchFn(cb, {
+      onError(err: any) {
+        logger.error(
+          color(
+            'Red',
+            `## ${from ? `${from} ` : ''}${type}:${content.name} Plugin ##\n`
+          ),
+          err
+        );
+      },
+    })
+  );
+
   store.plugins.set(type, content);
   logger.log(
     color(
@@ -40,7 +57,7 @@ export function registerPlugin(
   );
 }
 
-export function unregisterPlugin(type: PluginType, from?: string) {
+export function unregisterPlugin(type: CorePluginType, from?: string) {
   const existBefore = store.plugins.delete(type);
   if (!existBefore) return;
 

@@ -6,12 +6,16 @@ function getEntries(obj: any) {
 }
 
 export default function bfs(target: any, cb: (info: BFSInfo) => void) {
+  const recorded = new Map();
   const stack: BFSInfo[] = [{ parent: null, key: null, value: target }];
   do {
     const { parent, key, value } = stack.pop();
+    if (recorded.get(value)) continue;
+    recorded.set(value, true);
+
     if (Array.isArray(value)) {
       stack.push(...value.map((c, i) => ({ parent: value, key: i, value: c })));
-    } else if (typeof value === 'object') {
+    } else if (typeof value === 'object' && value !== null) {
       stack.push(
         ...getEntries(value).map(([k, v]) => ({
           parent: value,

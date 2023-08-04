@@ -124,7 +124,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
         dense={dense}>
         <MenuItemLink
           to={{
-            pathname: '/media/create',
+            pathname: '/file/create',
             state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.addMedia`)}
@@ -133,14 +133,14 @@ const Menu = ({ onMenuClick, dense = false }) => {
         />
         <MenuItemLink
           to={{
-            pathname: '/media',
+            pathname: '/file',
             state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allMedias`)}
           leftIcon={<Media.icon />}
           dense={dense}
         />
-        <MenuItemLink
+        {/* <MenuItemLink
           to={{
             pathname: '/document/create',
             state: { _scrollToTop: true },
@@ -157,7 +157,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
           primaryText={translate(`pos.menu.allDocuments`)}
           leftIcon={<Document.icon />}
           dense={dense}
-        />
+        /> */}
       </SubMenu>
       <SubMenu
         handleToggle={() => handleToggle('menuForm')}

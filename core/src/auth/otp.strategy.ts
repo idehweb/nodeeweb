@@ -1,5 +1,5 @@
 import { NextFunction } from 'express';
-import { AuthStrategy, UserDocument, UserModel } from '../../types/auth';
+import { AuthStrategy } from '../../types/auth';
 import { Req, Res } from '../../types/global';
 import store from '../../store';
 import {
@@ -10,15 +10,23 @@ import {
   NotImplement,
   SendSMSError,
   UnauthorizedError,
+  ValidationError,
 } from '../../types/error';
 import {
-  PluginType,
+  CorePluginType,
   SMSPluginContent,
   SMSPluginType,
 } from '../../types/plugin';
 import randomNumber from 'random-number-csprng';
 import { setToCookie, signToken } from '../handlers/auth.handler';
 import { Document, Model } from 'mongoose';
+import { CoreValidationPipe } from '../core/validate';
+import {
+  OtpUserDetect,
+  OtpUserLogin,
+  OtpUserSignup,
+} from '../../dto/in/auth/index.dto';
+import { UserDocument } from '../../types/user';
 
 export enum SmsSendType {
   Send_Before = 'send_before',
@@ -28,10 +36,27 @@ export enum SmsSendType {
 export const OTP_STRATEGY = 'otp';
 export class OtpStrategy extends AuthStrategy {
   strategyId = OTP_STRATEGY;
+
+  private get validation() {
+    return (store.globalMiddleware.pipes['validation'] ??
+      new CoreValidationPipe()) as CoreValidationPipe;
+  }
+
+  private transformDetect(body: any) {
+    return this.validation.transform(body, OtpUserDetect);
+  }
+  private transformLogin(body: any) {
+    return this.validation.transform(body, OtpUserLogin);
+  }
+  private transformSignup(body: any) {
+    return this.validation.transform(body, OtpUserSignup);
+  }
+
   private async exportUser(req: Req, throwOnNotfound = true) {
     if (req.user) return req.user;
 
-    const { phone } = req.body.user;
+    const { phone } = req.body.user as OtpUserDetect;
+
     const model = store.db.model(req.modelName);
     const user: UserDocument = await model.findOne({ phone });
     if (!user && throwOnNotfound)
@@ -70,7 +95,7 @@ export class OtpStrategy extends AuthStrategy {
       userExists = Boolean(req.user);
 
     // send code
-    const smsPlugin = store.plugins.get(PluginType.SMS) as SMSPluginContent;
+    const smsPlugin = store.plugins.get(CorePluginType.SMS) as SMSPluginContent;
     if (!smsPlugin) throw new NotImplement('sms plugin not found');
 
     // save to db
@@ -138,6 +163,8 @@ export class OtpStrategy extends AuthStrategy {
   }
 
   async detect(req: Req, res: Res, next: NextFunction) {
+    req.body.user = await this.transformDetect(req.body.user);
+
     const { login, signup } = req.body;
 
     // export user
@@ -151,6 +178,8 @@ export class OtpStrategy extends AuthStrategy {
     return res.json({ data: { userExists: Boolean(req.user) } });
   }
   async login(req: Req, res: Res) {
+    req.body.user = await this.transformLogin(req.body.user);
+
     const user = await this.exportUser(req);
 
     // verify code
@@ -169,6 +198,8 @@ export class OtpStrategy extends AuthStrategy {
   }
 
   async signup(req: Req, res: Res, next: NextFunction) {
+    req.body.user = await this.transformSignup(req.body.user);
+
     const codeDoc = await this.verify(req.body.user.phone, req.body.user.code);
 
     delete req.body.user.code;
@@ -190,7 +221,5 @@ export class OtpStrategy extends AuthStrategy {
       await this.codeRevert(codeDoc);
       throw err;
     }
-
-    // token
   }
 }

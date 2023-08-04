@@ -8,7 +8,7 @@ import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
   registerEntityCRUD(
-    'attribute',
+    'attributes',
     {
       create: {
         controller: {
@@ -92,6 +92,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/amin/attribute', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

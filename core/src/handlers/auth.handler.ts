@@ -8,7 +8,7 @@ import store from '../../store';
 import { ForbiddenError, UnauthorizedError } from '../../types/error';
 import AdminSchema from '../../schema/admin.schema';
 import CustomerSchema from '../../schema/customer.schema';
-import { MiddleWare } from '../../types/global';
+import { MiddleWare, Req } from '../../types/global';
 import { Query } from 'mongoose';
 import { CookieOptions, Response } from 'express';
 import { OPTIONAL_LOGIN, PUBLIC_ACCESS } from '../constants/String';
@@ -16,6 +16,7 @@ import { AuthStrategy } from '../../types/auth';
 import logger from './log.handler';
 import { color } from '../../utils/color';
 import _ from 'lodash';
+import { isJWT } from 'class-validator';
 
 const jwtStrategyMap = new Map<string, Strategy>();
 
@@ -30,6 +31,22 @@ export const AuthUserAccess: ControllerAccess[] = [
   },
 ];
 
+export const OptUserAccess: ControllerAccess[] = [
+  {
+    role: OPTIONAL_LOGIN,
+    modelName: 'customer',
+  },
+  {
+    role: OPTIONAL_LOGIN,
+    modelName: 'admin',
+  },
+];
+
+export const AdminAccess: ControllerAccess = {
+  modelName: 'admin',
+  role: PUBLIC_ACCESS,
+};
+
 export type UserPassStrategyOpt = {
   model: string;
   query?: (body: any) => Query<any, any>;
@@ -37,7 +54,7 @@ export type UserPassStrategyOpt = {
   name: string;
 };
 export type JwtStrategyOpt = {
-  model: string;
+  model: string | string[];
   notThrow?: boolean;
   name: string;
   cookieName?: string;
@@ -49,25 +66,30 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
 
   strategy = new JwtStrategy(
     {
-      jwtFromRequest: (req) =>
-        ExtractJwt.fromAuthHeaderAsBearerToken()(req) ||
-        (opt.cookieName && req.cookies[opt.cookieName]),
+      jwtFromRequest: (req) => extractToken(req as Req, opt.cookieName),
       secretOrKey: store.env.AUTH_SECRET,
-      passReqToCallback: false,
+      passReqToCallback: true,
     },
-    async ({ id, iat }, done) => {
+    async (req: Req, { id, iat }, done) => {
       iat = iat * 1000;
-      const user = await store.db.model(opt.model).findOne({
-        _id: id,
-        passwordChangeAt: { $lte: new Date(iat) },
-        active: true,
-      });
+      const models = Array.isArray(opt.model) ? opt.model : [opt.model];
+      const query = (model: string) =>
+        store.db.model(model).findOne({
+          _id: id,
+          passwordChangeAt: { $lte: new Date(iat) },
+          active: true,
+        });
 
-      if (!user && !opt.notThrow)
-        return done(
-          new UnauthorizedError('token is valid but access to user failed')
-        );
-      done(null, user);
+      for (const model of models) {
+        const user = await query(model);
+        if (user) {
+          req.modelName = model;
+          return done(null, user);
+        }
+      }
+
+      if (opt.notThrow) return done(null, {});
+      return done(new UnauthorizedError());
     }
   );
 
@@ -136,31 +158,29 @@ export function authorizeWithToken(
   modelNames: string[],
   opt: Partial<JwtStrategyOpt> = {}
 ): MiddleWare[] {
-  // add passport middleware
-  const mw = modelNames
-    //   change to passport middleware
-    .map((name, i) =>
-      authWithToken({
-        model: name,
-        notThrow: i === modelNames.length - 1,
-        name: `jwt-${name}-${i === modelNames.length - 1}`,
+  return [
+    (req, res, next) => {
+      if (opt.notThrow && !isJWT(extractToken(req, opt.cookieName)))
+        return next();
+      return authWithToken({
+        name: `jwt-${modelNames.join('-')}-${JSON.stringify(opt)}`,
         ...opt,
-      })
-    )
-    //   add checker
-    .map((fn) => {
-      const checkedMiddleware: MiddleWare = (req, res, next) => {
-        if (req.user) return next();
-        return fn(req, res, next);
-      };
-      return checkedMiddleware;
-    });
-
-  return mw;
+        model: modelNames,
+      })(req, res, next);
+    },
+    (req, res, next) => {
+      if (!req.user?._id) delete req.user;
+      return next();
+    },
+  ];
 }
 export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
   return (req, res, next) => {
-    const modelName = req.user['constructor'].modelName;
+    const modelName = req.user?.['constructor']?.['modelName'];
+    // not login and there is optional login role
+    if (!modelName && accesses.map((a) => a.role).includes(OPTIONAL_LOGIN))
+      return next();
+
     const allowedRoles = accesses
       .filter((access) => access.modelName === modelName)
       .map((access) => access.role);
@@ -168,7 +188,7 @@ export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
       !(
         allowedRoles.includes(PUBLIC_ACCESS) ||
         allowedRoles.includes(OPTIONAL_LOGIN) ||
-        allowedRoles.includes(req.user.role)
+        allowedRoles.includes(req.user?.role)
       )
     )
       return next(new ForbiddenError('user can not access'));
@@ -233,5 +253,12 @@ export function unregisterAuthStrategy(id: string, from?: string) {
         id
       )} AuthStrategy ##`
     )
+  );
+}
+
+function extractToken(req: Req, cookieName?: string) {
+  return (
+    ExtractJwt.fromAuthHeaderAsBearerToken()(req) ||
+    (cookieName && req.cookies[cookieName])
   );
 }

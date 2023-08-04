@@ -8,7 +8,6 @@ export default class AuthGatewayStrategy extends AuthStrategy {
   exportModelName(req: Req) {
     if (req.modelName) return req.modelName;
     req.modelName = String(req.body.userType);
-    delete req.body.userType;
     return req.modelName;
   }
 
