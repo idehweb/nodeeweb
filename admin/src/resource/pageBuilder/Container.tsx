@@ -1,7 +1,6 @@
-import { memo } from 'react';
 import { styled } from '@mui/material';
 
-export const Component = styled('main')(() => ({
+export default styled('main')(() => ({
   minHeight: 'calc(100vh - 60px)',
   background: '#fff',
   padding: '8px 16px',
@@ -21,8 +20,12 @@ export const Component = styled('main')(() => ({
         flex: 1,
         display: 'flex',
       },
+      '& .cont-slot': {
+        width: 16,
+        '& > div': {
+          height: '100%',
+        },
+      },
     },
   },
 }));
-
-export default memo(Component);

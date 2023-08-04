@@ -4,7 +4,7 @@ export type ItemType = {
   name: string;
   addable: boolean;
   children: Array<ItemType>;
-  setting: {
+  settings: {
     general: {
       fields: any;
       rules: Array<any>;

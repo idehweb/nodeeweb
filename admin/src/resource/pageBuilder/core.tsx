@@ -280,7 +280,8 @@ const Core = (props) => {
         onAdd={handleAdd}
       />
       <ComponentSetting
-        component={editItem}
+        // @ts-ignore
+        component={editItem || {}}
         open={Boolean(editItem)}
         onClose={() => setEditItem(null)}
         onSubmit={changeComponentSetting}

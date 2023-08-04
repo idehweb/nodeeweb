@@ -4,8 +4,14 @@ import CreateForm from '@/components/form/CreateForm';
 import Modal from '@/components/global/Modal';
 
 import useStyles from './styles';
+import { ItemType } from './types';
 
-const ComponentSetting = ({ component = {}, open, onClose, onSubmit }) => {
+const ComponentSetting = ({
+  component = {} as ItemType,
+  open,
+  onClose,
+  onSubmit,
+}) => {
   const cls = useStyles();
 
   return (

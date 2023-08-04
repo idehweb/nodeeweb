@@ -10,6 +10,7 @@ export function AnimatedComponent({ animationKey, ...props }: ComponentProps) {
   return (
     <motion.div
       layout
+      className={`cont-${props.item.name}`}
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: 1, height: 'auto' }}
       exit={{ opacity: 0, height: 0 }}
@@ -23,6 +24,7 @@ export function AnimatedComponent({ animationKey, ...props }: ComponentProps) {
 export function AnimatedEmptyDropSlot(props: EmptyDropSlotProps) {
   return (
     <motion.div
+      className="cont-slot"
       layout
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: 1, height: 'auto' }}

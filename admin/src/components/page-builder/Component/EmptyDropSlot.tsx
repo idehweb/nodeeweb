@@ -45,12 +45,5 @@ export default function EmptyDropSlot({
     }),
   });
 
-  return (
-    <Component
-      className="cp-slot"
-      ref={drop}
-      isOver={isOverAndCanDrop}
-      {...props}
-    />
-  );
+  return <Component ref={drop} isOver={isOverAndCanDrop} {...props} />;
 }
