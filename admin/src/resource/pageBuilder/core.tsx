@@ -1,4 +1,4 @@
-import { useEffect, useState, memo, useCallback } from 'react';
+import { useEffect, useState, memo, useCallback, Fragment } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch } from 'react-redux';
@@ -10,6 +10,9 @@ import update from 'immutability-helper';
 
 import { LoadingContainer } from '@/components/global';
 import { Component, OptionBox } from '@/components/page-builder';
+import EmptyDropCard, {
+  OrderType,
+} from '@/components/page-builder/Component/EmptyCard';
 import ComponentSetting from '@/components/page-builder/Component/Setting';
 import {
   changeThemeData,
@@ -176,28 +179,23 @@ const Core = (props) => {
   );
 
   const handleDrop = useCallback(
-    (source, dest) => {
-      console.log({ components, source, dest });
+    (source, dest, order: OrderType) => {
+      console.log({ components, source, dest, order });
 
-      const baseNodeAddress = FindNodeAddress(components, source.id);
+      const sourceNodeAddress = FindNodeAddress(components, source.id);
       const destNodeAddress = FindNodeAddress(components, dest.id);
 
       console.group('here');
-      console.log('address', baseNodeAddress, destNodeAddress);
+      console.log('address', sourceNodeAddress);
+      console.log('address2', destNodeAddress);
 
-      const baseNode = _get(components, baseNodeAddress, {});
+      const baseNode = _get(components, sourceNodeAddress, {});
 
-      let newComponents = components;
-      newComponents = update(
-        newComponents,
-        makeAction(baseNodeAddress, 'remove')
-      );
-      newComponents = update(
-        newComponents,
-        makeAction(destNodeAddress, 'addToIndex', baseNode)
-      );
+      let newComponents = JSON.parse(JSON.stringify(components));
 
-      console.log('result', newComponents);
+      newComponents = DeleteItem(source.id, newComponents);
+      console.log('DeleteItem', newComponents);
+
       console.groupEnd();
 
       setState((p) => ({ ...p, components: newComponents }));
@@ -222,25 +220,45 @@ const Core = (props) => {
       />
 
       <Container onDrop={handleDrop}>
+      <Container>
         {tabValue === 0 && (
           <AnimatePresence presenceAffectsLayout>
             {components?.map((i, idx) => (
-              <motion.div
-                key={`${i.id}`}
-                layout="position"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.5, opacity: 0 }}
-                transition={{ type: 'just' }}>
-                <Component
-                  index={idx}
-                  item={i}
-                  onDelete={handleDelete}
-                  onAdd={toggleOptionBox}
-                  onEdit={() => setEditItem(i)}
-                  onDrop={handleDrop}
-                />
-              </motion.div>
+              <Fragment key={idx}>
+                <motion.div layout="position" key={`${i.id}-middle`}>
+                  <EmptyDropCard
+                    item={i}
+                    onDropEnd={handleDrop}
+                    order="middle"
+                  />
+                </motion.div>
+                <motion.div
+                  key={`${i.id}`}
+                  layout="position"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.5, opacity: 0 }}
+                  transition={{ type: 'just' }}>
+                  <Component
+                    index={idx}
+                    item={i}
+                    onDelete={handleDelete}
+                    onAdd={toggleOptionBox}
+                    onEdit={() => setEditItem(i)}
+                    onDrop={handleDrop}
+                  />
+                </motion.div>
+
+                {idx === components.length - 1 ? (
+                  <motion.div layout="position" key={`${i.id}-last`}>
+                    <EmptyDropCard
+                      item={i}
+                      onDropEnd={handleDrop}
+                      order="last"
+                    />
+                  </motion.div>
+                ) : null}
+              </Fragment>
             ))}
           </AnimatePresence>
         )}

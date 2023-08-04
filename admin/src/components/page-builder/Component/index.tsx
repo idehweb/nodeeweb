@@ -53,7 +53,7 @@ const Component = ({ index, item, onDelete, onAdd, onEdit, onDrop }: Props) => {
         </Actions>
       </Header>
 
-      <Content className='content'>
+      <Content className="content">
         <AnimatePresence presenceAffectsLayout>
           {item.addable &&
             item.children?.map((i, idx) => (

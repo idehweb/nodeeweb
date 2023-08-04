@@ -85,12 +85,12 @@ export const makeAction = (path, opt: ActionTypes, value = undefined) => {
   return newObj;
 };
 
-export const AddItem = (id, arr, value) => {
+export const AddNewItem = (id, arr, item) => {
   let address = FindNodeAddress(arr, id);
   if (address !== '') address += '.children';
 
-  const action = makeAction(address, 'add', {
-    ...value,
+  const action = makeAction(address, 'push', {
+    ...item,
     children: [],
     id: generateCompID(),
   });
