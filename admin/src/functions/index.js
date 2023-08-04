@@ -13,7 +13,7 @@ import API from './API';
 import API_BASE_URL, { BASE_URL } from './API_BASE_URL';
 // import { BASE_URL } from './API-v1';
 
-const ADMIN_ROUTE = window.ADMIN_ROUTE;
+const ADMIN_ROUTE = window.BASE_URL;
 export const MainUrl = window.BASE_URL;
 
 const dataProvider = data(BASE_URL);
