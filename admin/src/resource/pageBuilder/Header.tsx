@@ -35,6 +35,7 @@ const Component = styled('header')({
   justifyContent: 'space-between',
   padding: '8px 16px',
   position: 'relative',
+  borderBottom: '1px solid #ddd',
 });
 
 const Header = ({ tabValue, setTabValue, onAdd, onSave }) => {
