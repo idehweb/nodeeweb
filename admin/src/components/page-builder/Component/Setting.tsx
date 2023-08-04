@@ -5,12 +5,7 @@ import Modal from '@/components/global/Modal';
 
 import useStyles from './styles';
 
-const ComponentSetting = ({
-  component,
-  open,
-  onClose,
-  onSubmit,
-}) => {
+const ComponentSetting = ({ component = {}, open, onClose, onSubmit }) => {
   const cls = useStyles();
 
   return (

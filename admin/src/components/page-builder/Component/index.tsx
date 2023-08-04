@@ -12,13 +12,26 @@ import {
   Content,
 } from './components';
 import DraggableCard from './DraggableCard';
+import { ItemType, OnDropType } from './types';
 
-interface Props {
+export interface ComponentProps {
   index: number;
-  [key: string]: any;
+  item: ItemType;
+  onDelete: (id: string) => void;
+  onAdd: (payload: any) => void;
+  onEdit: (item: ItemType) => void;
+  onDrop: OnDropType;
+  key?: React.Key;
 }
 
-const Component = ({ index, item, onDelete, onAdd, onEdit, onDrop }: Props) => {
+const Component = ({
+  index,
+  item,
+  onDelete,
+  onAdd,
+  onEdit,
+  onDrop,
+}: ComponentProps) => {
   return (
     <DraggableCard
       className={`cp-${item.name}`}

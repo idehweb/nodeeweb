@@ -2,6 +2,8 @@ import { HTMLAttributes, useRef, useLayoutEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { styled } from '@mui/material';
 
+import { OnDropType, ItemType } from './types';
+
 interface ComponentProps {
   isDragging?: boolean;
   isOver?: boolean;
@@ -28,9 +30,9 @@ export const Component = styled('div', {
 }));
 
 interface DraggableCardProps extends HTMLAttributes<HTMLDivElement> {
-  item: any;
+  item: ItemType;
   canDrag: boolean;
-  onDropEnd(a: any, b: any): void;
+  onDropEnd: OnDropType;
 }
 type DraggableProps = Omit<DraggableCardProps, 'canDrag'>;
 
@@ -39,7 +41,7 @@ function Draggable({ item, onDropEnd, ...props }: DraggableProps) {
 
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: 'ITEM',
-    drop(source, monitor) {
+    drop(source: ItemType, monitor) {
       // already dropped
       if (monitor.didDrop()) return;
 

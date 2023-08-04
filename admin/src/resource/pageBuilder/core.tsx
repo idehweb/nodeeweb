@@ -1,19 +1,22 @@
 import { useEffect, useState, memo, useCallback, Fragment } from 'react';
 import { useParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 import { useNotify, useTranslate } from 'react-admin';
-
 import _get from 'lodash/get';
 
-import update from 'immutability-helper';
-
 import { LoadingContainer } from '@/components/global';
-import { Component, OptionBox } from '@/components/page-builder';
-import EmptyDropCard, {
-  OrderType,
-} from '@/components/page-builder/Component/EmptyCard';
+import { OptionBox } from '@/components/page-builder';
+
 import ComponentSetting from '@/components/page-builder/Component/Setting';
+import AnimationComponent, {
+  EmptyAnimationCard,
+} from '@/components/page-builder/Component/AnimationComponent';
+import {
+  ItemType,
+  OnDropType,
+} from '@/components/page-builder/Component/types';
+
 import {
   changeThemeData,
   changeThemeDataFunc,
@@ -24,7 +27,22 @@ import {
 import Header from './Header';
 import Container from './Container';
 import Preview from './Preview';
-import { makeAction, FindNodeAddress, DeleteItem, AddItem } from './utils';
+import {
+  FindNodeAddress,
+  DeleteItem,
+  AddNewItem,
+  PushItem,
+  AddToIndex,
+} from './utils';
+
+interface StateType {
+  components: Array<ItemType>;
+  optionBox: boolean;
+  excludeArray: Array<any>;
+  sourceAddress: string;
+  componentForSetting: any;
+  componentOptionsBox: boolean;
+}
 
 const Core = (props) => {
   const translate = useTranslate();
@@ -35,9 +53,9 @@ const Core = (props) => {
   const [loading, setLoading] = useState(true);
 
   const [tabValue, setTabValue] = useState(0);
-  const [editItem, setEditItem] = useState<any>({});
+  const [editItem, setEditItem] = useState<ItemType | null>();
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<StateType>({
     components: [],
     optionBox: false,
     excludeArray: [],
@@ -168,7 +186,7 @@ const Core = (props) => {
 
   const handleAdd = useCallback(
     (item) => {
-      const newComponents = AddItem(sourceAddress, components, item);
+      const newComponents = AddNewItem(sourceAddress, components, item);
       setState((s) => ({
         ...s,
         components: newComponents,
@@ -178,8 +196,8 @@ const Core = (props) => {
     [components, sourceAddress]
   );
 
-  const handleDrop = useCallback(
-    (source, dest, order: OrderType) => {
+  const handleDrop = useCallback<OnDropType>(
+    (source, dest, order) => {
       console.log({ components, source, dest, order });
 
       const sourceNodeAddress = FindNodeAddress(components, source.id);
@@ -195,6 +213,18 @@ const Core = (props) => {
 
       newComponents = DeleteItem(source.id, newComponents);
       console.log('DeleteItem', newComponents);
+
+      if (order) {
+        if (order === 'last') {
+          newComponents = PushItem(dest.id, components, baseNode);
+        } else if (order === 'middle') {
+          newComponents = AddToIndex(dest.id, components, baseNode);
+        }
+      } else {
+        newComponents = AddToIndex(dest.id, components, baseNode);
+      }
+
+      console.log('newComponents', newComponents);
 
       console.groupEnd();
 
@@ -219,44 +249,35 @@ const Core = (props) => {
         onSave={() => SaveData(components)}
       />
 
-      <Container onDrop={handleDrop}>
       <Container>
         {tabValue === 0 && (
           <AnimatePresence presenceAffectsLayout>
             {components?.map((i, idx) => (
               <Fragment key={idx}>
-                <motion.div layout="position" key={`${i.id}-middle`}>
-                  <EmptyDropCard
-                    item={i}
-                    onDropEnd={handleDrop}
-                    order="middle"
-                  />
-                </motion.div>
-                <motion.div
+                <EmptyAnimationCard
+                  key={`${i.id}-middle`}
+                  item={i}
+                  onDropEnd={handleDrop}
+                  order="middle"
+                />
+
+                <AnimationComponent
                   key={`${i.id}`}
-                  layout="position"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.5, opacity: 0 }}
-                  transition={{ type: 'just' }}>
-                  <Component
-                    index={idx}
-                    item={i}
-                    onDelete={handleDelete}
-                    onAdd={toggleOptionBox}
-                    onEdit={() => setEditItem(i)}
-                    onDrop={handleDrop}
-                  />
-                </motion.div>
+                  index={idx}
+                  item={i}
+                  onDelete={handleDelete}
+                  onAdd={toggleOptionBox}
+                  onEdit={() => setEditItem(i)}
+                  onDrop={handleDrop}
+                />
 
                 {idx === components.length - 1 ? (
-                  <motion.div layout="position" key={`${i.id}-last`}>
-                    <EmptyDropCard
-                      item={i}
-                      onDropEnd={handleDrop}
-                      order="last"
-                    />
-                  </motion.div>
+                  <EmptyAnimationCard
+                    key={`${i.id}-last`}
+                    item={i}
+                    onDropEnd={handleDrop}
+                    order="last"
+                  />
                 ) : null}
               </Fragment>
             ))}
@@ -273,8 +294,8 @@ const Core = (props) => {
       />
       <ComponentSetting
         component={editItem}
-        open={Boolean(editItem.id)}
-        onClose={() => setEditItem({})}
+        open={Boolean(editItem)}
+        onClose={() => setEditItem(null)}
         onSubmit={changeComponentSetting}
       />
     </LoadingContainer>
