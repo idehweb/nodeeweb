@@ -1,23 +1,36 @@
 import { NextFunction } from 'express';
 import store from '../../store';
-import {
-  AuthStrategy,
-  IUser,
-  UserModel,
-  IUserMethods,
-  UserDocument,
-} from '../../types/auth';
+import { AuthStrategy } from '../../types/auth';
 import { Req, Res } from '../../types/global';
 import { setToCookie, signToken } from '../handlers/auth.handler';
-import { ForbiddenError, NotFound } from '../../types/error';
+import { ForbiddenError, NotFound, ValidationError } from '../../types/error';
+import { CoreValidationPipe } from '../core/validate';
+import {
+  UserPassUserLogin,
+  UserPassUserSignup,
+} from '../../dto/in/auth/index.dto';
+import { IUser, UserDocument, UserModel } from '../../types/user';
 
 export const USER_PASS_STRATEGY = 'user-pass';
 export default class UserPassStrategy extends AuthStrategy {
   strategyId = USER_PASS_STRATEGY;
+
+  private get validation() {
+    return (store.globalMiddleware.pipes['validation'] ??
+      new CoreValidationPipe()) as CoreValidationPipe;
+  }
+  private transformLogin(user: any) {
+    return this.validation.transform(user, UserPassUserLogin);
+  }
+  private transformSignup(user: any) {
+    return this.validation.transform(user, UserPassUserSignup);
+  }
   async exportUser(req: Req, throwOnNotFound = true) {
     if (req.user) return req.user;
 
     const { username } = req.body.user;
+    if (!username) return;
+
     const model = store.db.model(req.modelName);
     const user: UserDocument = await model.findOne({ username }, '+password');
     if (!user && throwOnNotFound) throw new NotFound('user not found');
@@ -37,7 +50,9 @@ export default class UserPassStrategy extends AuthStrategy {
   }
 
   async login(req: Req, res: Res) {
-    const { password } = req.body.user;
+    const userBody = await this.transformLogin(req.body.user);
+    const { password } = userBody;
+
     const user = await this.exportUser(req);
     if (!user || !(await user.passwordVerify(password)))
       return res.status(400).json({ message: 'username or password is wrong' });
@@ -58,9 +73,9 @@ export default class UserPassStrategy extends AuthStrategy {
   async signup(req: Req, res: Res) {
     const userModel = store.db.model<IUser, UserModel>(req.modelName);
 
-    // TODO validate body
+    const userBody = await this.transformSignup(req.body.user);
 
-    const user = await userModel.create(req.body.user);
+    const user = await userModel.create(userBody);
     const token = signToken(user.id);
     setToCookie(res, token, 'authToken');
     return res.status(201).json({

@@ -13,7 +13,7 @@ const schema = new mongoose.Schema({
   },
   data: {},
   values: [],
-  parent: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomerGroup' }, //category_id
+  parent: { type: mongoose.Schema.Types.ObjectId, ref: 'customerGroup' }, //category_id
 });
 
 export default schema;

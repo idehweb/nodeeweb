@@ -20,7 +20,6 @@ import { MAXIMUM_NEED_TO_PAY_TRANSACTION } from '../../constants/limit';
 import { FilterQuery, Types } from 'mongoose';
 import { DiscountDocument, DiscountModel } from '../../schema/discount.schema';
 import { roundPrice } from '../../utils/helpers';
-import { UserDocument } from '@nodeeweb/core/types/auth';
 import { INACTIVE_PRODUCT_TIME } from '../../constants/limit';
 import utils from './utils.service';
 import { PaymentVerifyStatus, ShopCallbackStatus } from '../../types/order';
@@ -382,7 +381,7 @@ class TransactionService {
     // }
 
     const description = `برای خرید محصولات ${products
-      .map(({ name }) => name)
+      .map(({ title }) => title.fa ?? title.en ?? Object.values(title)[0])
       .join(' ، ')} از فروشگاه ${store.env.APP_NAME}`;
 
     return await bankPlugin.stack[0]({

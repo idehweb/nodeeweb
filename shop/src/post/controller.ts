@@ -92,6 +92,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/admin/post', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

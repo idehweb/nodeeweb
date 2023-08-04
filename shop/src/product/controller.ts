@@ -14,28 +14,6 @@ import {
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
 
-  // custom admin controllers
-  controllersBatchRegister(
-    [
-      {
-        url: '/rewriteProducts',
-        method: 'post',
-        access,
-        service: Service.rewriteProducts,
-      },
-      {
-        url: '/rewriteProductsImages',
-        method: 'post',
-        access,
-        service: Service.rewriteProductsImages,
-      },
-    ],
-    {
-      base_url: '/admin/product',
-      from: 'ShopEntity',
-    }
-  );
-
   // custom simple controllers
   controllersBatchRegister(
     [
@@ -53,26 +31,7 @@ export default function registerController() {
     { base_url: '/product', from: 'ShopEntity' }
   );
 
-  // customer crud
-  registerEntityCRUD(
-    'product',
-    {
-      getOne: {
-        controller: {
-          access: AuthUserAccess,
-          service: Service.getOneAfter,
-        },
-        crud: {
-          executeQuery: true,
-          saveToReq: true,
-          parseFilter: Service.getOneFilterParser,
-        },
-      },
-    },
-    { base_url: '/customer/product', from: 'ShopEntity' }
-  );
-
-  // admin crud
+  // crud
   registerEntityCRUD(
     'product',
     {
@@ -107,14 +66,13 @@ export default function registerController() {
       },
       getOne: {
         controller: {
-          access: AdminAccess,
-          service(req, res) {
-            return res.json(req.crud);
-          },
+          access: AuthUserAccess,
+          service: Service.getOneAfter,
         },
         crud: {
           executeQuery: true,
           saveToReq: true,
+          parseFilter: Service.getOneFilterParser,
         },
       },
       create: {
@@ -151,6 +109,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/admin/product', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

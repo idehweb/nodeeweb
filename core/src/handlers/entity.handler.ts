@@ -7,10 +7,12 @@ import {
   ControllerRegisterOptions,
   controllerRegister,
 } from './controller.handler';
-import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
+import { BASE_API_URL, CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { isAsyncFunction } from 'util/types';
 import { BadRequestError, GeneralError, NotFound } from '../../types/error';
 import { call } from '../../utils/helpers';
+import { CrudParamDto } from '../../dto/in/crud.dto';
+import { lowerFirst, orderBy } from 'lodash';
 
 export class EntityCreator {
   constructor(private modelName: string) {}
@@ -34,14 +36,13 @@ export class EntityCreator {
       httpCode: number;
     }
   ) {
-    if (!result && httpCode !== 204)
-      throw new NotFound(`${this.modelName} not found`);
+    if (!result) throw new NotFound(`${this.modelName} not found`);
 
     if (sendResponse && !saveToReq) {
       const data =
         typeof sendResponse === 'boolean'
           ? result
-          : await call(sendResponse, result);
+          : await call(sendResponse, result, req);
       return res.status(httpCode).json({ data });
     }
 
@@ -245,21 +246,29 @@ export type EntityCRUDOpt = {
     beforeService?: MiddleWare | MiddleWare[];
   };
 };
+type EntityOpts = {
+  [CRUD.CREATE]?: EntityCRUDOpt;
+  [CRUD.GET_ALL]?: EntityCRUDOpt;
+  [CRUD.GET_ONE]?: EntityCRUDOpt;
+  [CRUD.UPDATE_ONE]?: EntityCRUDOpt;
+  [CRUD.DELETE_ONE]?: EntityCRUDOpt;
+  [CRUD.GET_COUNT]?: EntityCRUDOpt;
+};
 export function registerEntityCRUD(
   modelName: string,
-  opts: {
-    [CRUD.CREATE]?: EntityCRUDOpt;
-    [CRUD.GET_ALL]?: EntityCRUDOpt;
-    [CRUD.GET_ONE]?: EntityCRUDOpt;
-    [CRUD.UPDATE_ONE]?: EntityCRUDOpt;
-    [CRUD.DELETE_ONE]?: EntityCRUDOpt;
-    [CRUD.GET_COUNT]?: EntityCRUDOpt;
-  },
-  registerOpt: ControllerRegisterOptions
+  opts: EntityOpts,
+  registerOpt: ControllerRegisterOptions & { order?: boolean }
 ) {
   const schemas: ControllerSchema[] = [];
   const creator = new EntityCreator(modelName);
-  for (const [name, opt] of Object.entries(opts).filter(([k, v]) => v)) {
+  const ordered =
+    registerOpt.order || registerOpt.order == undefined ? order(opts) : opts;
+  const base_url =
+    registerOpt.base_url === undefined
+      ? `${store.env.BASE_API_URL}/${lowerFirst(modelName)}`
+      : registerOpt.base_url;
+
+  for (const [name, opt] of Object.entries(ordered).filter(([k, v]) => v)) {
     const cName = name as CRUD;
     schemas.push({
       method: opt.controller.method ?? translateCRUD2Method(cName),
@@ -270,10 +279,13 @@ export function registerEntityCRUD(
         creator[translateCRUD2Creator(cName)](opt.crud),
         ...[opt.controller.service ?? []].flat(),
       ],
+      validate: canUseDefaultParamValidation(cName, opt)
+        ? { reqPath: 'params', dto: CrudParamDto }
+        : opt.controller.validate,
     });
   }
 
-  schemas.forEach((s) => controllerRegister(s, registerOpt));
+  schemas.forEach((s) => controllerRegister(s, { ...registerOpt, base_url }));
 }
 
 function translateCRUD2Creator(name: CRUD): keyof EntityCreator {
@@ -333,4 +345,44 @@ function translateCRUD2Url(
     default:
       throw new Error(`Invalid CRUD name : ${name}`);
   }
+}
+
+function canUseDefaultParamValidation(name: CRUD, opt: EntityCRUDOpt) {
+  return (
+    opt.controller.validate === undefined &&
+    [CRUD.UPDATE_ONE, CRUD.DELETE_ONE, CRUD.GET_ONE].includes(name) &&
+    (!opt.crud.paramFields || opt.crud.paramFields.id === 'id')
+  );
+}
+
+function order(opts: EntityOpts): EntityOpts {
+  return Object.fromEntries(
+    Object.entries(opts)
+      .map(([k, v]) => {
+        let score: number;
+        switch (k) {
+          case CRUD.CREATE:
+            score = 0;
+            break;
+          case CRUD.GET_COUNT:
+            score = 1;
+            break;
+          case CRUD.GET_ONE:
+            score = 2;
+            break;
+          case CRUD.GET_ALL:
+            score = 3;
+            break;
+          case CRUD.UPDATE_ONE:
+            score = 4;
+            break;
+          case CRUD.DELETE_ONE:
+            score = 5;
+            break;
+        }
+        v['score'] = score;
+        return [k, v] as [string, EntityCRUDOpt];
+      })
+      .sort(([, v1], [, v2]) => v1['score'] - v2['score'])
+  );
 }

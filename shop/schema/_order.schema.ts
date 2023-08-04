@@ -28,7 +28,7 @@ const schema = new mongoose.Schema(
     card: [
       {
         _id: String,
-        seller: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
+        seller: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' },
         price: Number,
         salePrice: Number,
         count: Number,
@@ -58,9 +58,9 @@ const schema = new mongoose.Schema(
     paymentStatus: { type: String, default: 'notpaid' },
 
     // kind: {type: String, default: 'post'},
-    transaction: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' }],
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
-    agent: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
+    transaction: [{ type: mongoose.Schema.Types.ObjectId, ref: 'transaction' }],
+    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' },
+    agent: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' },
 
     refunded: {
       type: 'Boolean',

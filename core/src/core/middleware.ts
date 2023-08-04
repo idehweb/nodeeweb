@@ -77,8 +77,10 @@ export function commonMiddleware(): (
   }
 
   // insert error packages
-  mw.push(store.errorPackage.notFound);
-  mw.push(store.errorPackage.general);
+  if (store.globalMiddleware.error) {
+    mw.push(store.globalMiddleware.error.notFound);
+    mw.push(store.globalMiddleware.error.general);
+  }
 
   return mw;
 }

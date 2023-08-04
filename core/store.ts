@@ -1,11 +1,12 @@
 import mongoose from 'mongoose';
-import { ENV, USE_ENV } from './types/global';
+import { ENV, MiddleWare, USE_ENV } from './types/global';
 import { Application } from 'express';
 import { ErrorPackageFn } from './types/error';
 import { Server } from 'http';
 import { AdminViewSchema } from './types/view';
 import { AuthStrategy } from './types/auth';
 import { PluginOut } from './types/plugin';
+import { Pipe } from './types/pipe';
 export class Store {
   env: {
     APP_NAME: string;
@@ -28,11 +29,15 @@ export class Store {
     SMS_USERNAME?: string;
     SMS_PASSWORD?: string;
     BASE_URL: string;
+    BASE_API_URL: string;
   } & { [k: string]: string };
   db: typeof mongoose;
   dirs: string[];
   app: Application;
-  errorPackage: ErrorPackageFn;
+  globalMiddleware: {
+    error: ErrorPackageFn;
+    pipes: { [key: string]: Pipe<unknown> };
+  };
   server: Server;
   systemLogger: any;
   adminViews: AdminViewSchema[] = [];
@@ -57,6 +62,7 @@ export class Store {
     }
 
     this.settings = { taxRate: 0.25 };
+    this.globalMiddleware = { pipes: {}, error: {} };
   }
 }
 

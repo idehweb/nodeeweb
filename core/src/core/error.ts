@@ -1,24 +1,19 @@
 import store from '../../store';
 import { ErrorType, GeneralError } from '../../types/error';
 import { MiddleWare, MiddleWareError } from '../../types/global';
+import { errorDetector } from '../../utils/error';
 import logger from '../handlers/log.handler';
 
 export const errorHandler: MiddleWareError = (error, req, res, next) => {
-  let code = 500,
-    message = error.message,
-    err = error,
-    extraProps: any = {};
-  if (error instanceof GeneralError) {
-    code = error.code;
-    extraProps.type = error.type;
-    message = error.message;
-    err = error;
-  }
-  if (Math.floor(code / 100) === 5 || store.env.isLoc) logger.error(error);
+  const ge = errorDetector(error);
+  if (Math.floor(ge.code / 100) === 5 || store.env.isLoc) logger.error(ge);
 
-  return res
-    .status(code)
-    .json({ status: 'error', ...extraProps, message, error: err });
+  return res.status(ge.code).json({
+    status: 'error',
+    message: ge.message,
+    type: ge.type,
+    error: store.env.isPro ? undefined : ge,
+  });
 };
 
 export const notFoundHandler: MiddleWare = (req, res, next) => {
@@ -26,5 +21,8 @@ export const notFoundHandler: MiddleWare = (req, res, next) => {
 };
 
 export function setErrorPackage() {
-  store.errorPackage = { general: errorHandler, notFound: notFoundHandler };
+  store.globalMiddleware.error = {
+    general: errorHandler,
+    notFound: notFoundHandler,
+  };
 }

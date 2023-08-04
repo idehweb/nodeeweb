@@ -73,6 +73,9 @@ export default function registerController() {
           parseFilter: orderService.getOneFilterParser,
           sendResponse: true,
           executeQuery: true,
+          paramFields: {
+            id: 'order',
+          },
         },
       },
       getAll: {
@@ -100,11 +103,13 @@ export default function registerController() {
           parseUpdate: orderService.updateOneParseBody,
           saveToReq: true,
           executeQuery: true,
+          paramFields: {
+            id: 'order',
+          },
         },
       },
     },
     {
-      base_url: '/api/v1/order',
       from: 'ShopEntity',
     }
   );

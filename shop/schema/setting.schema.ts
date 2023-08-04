@@ -41,7 +41,7 @@ const schema = new mongoose.Schema(
     textColor: String,
     bgColor: String,
     footerBgColor: String,
-    activeCategory: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
+    activeCategory: [{ type: mongoose.Schema.Types.ObjectId, ref: 'category' }],
     customerStatus: [],
     formStatus: [],
     currency: { type: String, default: 'Toman' },

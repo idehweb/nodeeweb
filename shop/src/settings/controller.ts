@@ -199,6 +199,6 @@ export default function registerController() {
       },
     },
 
-    { base_url: '/admin/settings', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

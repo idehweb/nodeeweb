@@ -78,20 +78,14 @@ export default function registerController() {
       deleteOne: {
         controller: {
           access,
-          service(req, res) {
-            return res.status(204).json({
-              success: true,
-              message: 'Deleted!',
-            });
-          },
         },
         crud: {
           executeQuery: true,
-          saveToReq: true,
+          sendResponse: true,
           forceDelete: true,
         },
       },
     },
-    { base_url: '/admin/customerGroup', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

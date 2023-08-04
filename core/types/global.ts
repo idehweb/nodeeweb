@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose, { Document, Model, ObjectId } from 'mongoose';
 import { CRUD_DEFAULT_REQ_KEY } from '../src/constants/String';
+import { UserDocument } from './user';
 
 export enum ENV {
   PRO = 'production',
@@ -18,7 +19,7 @@ export type Req = Request & {
   file_path?: string;
   old_file_path?: string;
   file: Express.Multer.File;
-  user?: Document & any;
+  user?: UserDocument;
   modelName?: string;
   [CRUD_DEFAULT_REQ_KEY]: any;
 };
@@ -57,7 +58,7 @@ export type CRUDCreatorOpt = {
   sort?: { [k: string]: mongoose.SortValues };
   project?: mongoose.ProjectionType<any>;
   executeQuery?: boolean;
-  sendResponse?: boolean | ((result: any) => any | Promise<any>);
+  sendResponse?: boolean | ((result: any, req: Req) => any | Promise<any>);
   saveToReq?: boolean | string;
   httpCode?: number;
   forceDelete?: boolean;

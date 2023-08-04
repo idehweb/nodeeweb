@@ -5,17 +5,16 @@ import {
 import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
 import Service from './service';
+import { AdminAccess, OptUserAccess } from '@nodeeweb/core';
 
 export default function registerController() {
-  const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
-
   // create , update , getAll  ,getOne
   registerEntityCRUD(
     'page',
     {
       getCount: {
         controller: {
-          access,
+          access: AdminAccess,
           service: (req, res) => {
             res.json({
               success: true,
@@ -27,19 +26,21 @@ export default function registerController() {
       },
       getOne: {
         controller: {
-          access,
-          service(req, res) {
-            res.json(req.crud);
-          },
+          access: OptUserAccess,
+          service: Service.getOneAfter,
         },
         crud: {
           executeQuery: true,
           saveToReq: true,
+          parseFilter: Service.getOneFilterParser,
+          paramFields: {
+            id: 'page',
+          },
         },
       },
       getAll: {
         controller: {
-          access,
+          access: AdminAccess,
           service: (req, res) => res.json(req.crud),
         },
         crud: {
@@ -59,7 +60,7 @@ export default function registerController() {
       },
       create: {
         controller: {
-          access,
+          access: AdminAccess,
           service: Service.createAfter,
         },
         crud: {
@@ -69,7 +70,7 @@ export default function registerController() {
       },
       updateOne: {
         controller: {
-          access,
+          access: AdminAccess,
           service: Service.updateAfter,
         },
         crud: {
@@ -78,34 +79,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/admin/page', from: 'ShopEntity' }
-  );
-
-  // get one
-  registerEntityCRUD(
-    'page',
-    {
-      getOne: {
-        controller: {
-          access: [
-            {
-              role: OPTIONAL_LOGIN,
-              modelName: 'customer',
-            },
-            {
-              role: OPTIONAL_LOGIN,
-              modelName: 'admin',
-            },
-          ],
-          service: Service.getOneAfter,
-        },
-        crud: {
-          executeQuery: true,
-          saveToReq: true,
-          parseFilter: Service.getOneFilterParser,
-        },
-      },
-    },
-    { base_url: '/customer/page', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

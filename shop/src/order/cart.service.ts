@@ -65,11 +65,7 @@ export default class CartService {
       const order = await CartService.orderModel.create({
         customer: {
           ...req.user.toObject(),
-          firstName:
-            req.user.firstName ??
-            req.user.nickname ??
-            req.user.username ??
-            req.user.email,
+          firstName: req.user.firstName,
         },
         products: [
           {

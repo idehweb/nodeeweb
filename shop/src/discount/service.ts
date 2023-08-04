@@ -1,9 +1,7 @@
-import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
-import { serviceOnError } from '../common/service';
 import { MiddleWare, Req } from '@nodeeweb/core/types/global';
 import store from '@nodeeweb/core/store';
 import { DiscountDocument, DiscountModel } from '../../schema/discount.schema';
-import { CRUD_DEFAULT_REQ_KEY, NotFound } from '@nodeeweb/core';
+import { CRUD_DEFAULT_REQ_KEY, NotFound, createLogger } from '@nodeeweb/core';
 
 class DiscountService {
   get discountModel() {
@@ -31,42 +29,51 @@ class DiscountService {
   }
 
   getOne(req: Req) {
-    return this.discountModel.findOne(this.getOneQueryParser(req));
+    return this.discountModel.findOne(this.getOneQueryParser(req, false));
   }
 
-  getOneQueryParser(req: Req) {
+  getOneQueryParser(req: Req, effectAdmin = true) {
     const userId = req.user._id;
     const discountCode =
       req.params.discount || req.query.discount || req.body.discount;
-    return {
-      $and: [
-        {
+    return req.modelName === 'admin' && effectAdmin
+      ? {
           code: discountCode,
-          active: true,
-          consumers: {
-            $ne: userId,
-          },
-          usageLimit: { $gt: 0 },
-        },
-        {
-          // expired at
-          $or: [
-            { expiredAt: { $exists: false } },
-            { expiredAt: { $gte: new Date() } },
+        }
+      : {
+          $and: [
+            {
+              code: discountCode,
+              active: true,
+              consumers: {
+                $ne: userId,
+              },
+              usageLimit: { $gt: 0 },
+            },
+            {
+              // expired at
+              $or: [
+                { expiredAt: { $exists: false } },
+                { expiredAt: { $gte: new Date() } },
+              ],
+            },
           ],
-        },
-      ],
-    };
+        };
   }
-  getOneTransform(discount: DiscountDocument) {
-    return {
-      code: discount.code,
-      amount: discount.amount,
-      maxAmount: discount.maxAmount,
-      percentage: discount.percentage,
-      expiredAt: discount.expiredAt,
-    };
+  getOneTransform(discount: DiscountDocument, req: Req) {
+    return req.modelName === 'admin'
+      ? discount
+      : {
+          code: discount.code,
+          amount: discount.amount,
+          maxAmount: discount.maxAmount,
+          percentage: discount.percentage,
+          expiredAt: discount.expiredAt,
+        };
   }
+  updateOneParseFilter = (req: Req) => {
+    return this.getOneQueryParser(req, false);
+  };
 }
 
 const discountService = new DiscountService();

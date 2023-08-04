@@ -1,5 +1,3 @@
-import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
-import { serviceOnError } from '../common/service';
 import { MiddleWare, Req } from '@nodeeweb/core/types/global';
 import { submitAction, updateThemeConfig } from '../common/mustImplement';
 import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
@@ -39,10 +37,10 @@ export default class Service {
 
   static getOneFilterParser(req: Req) {
     const obj = {};
-    if (store.db.isValidObjectId(req.params.id)) {
-      obj['_id'] = req.params.id;
+    if (store.db.isValidObjectId(req.params.page)) {
+      obj['_id'] = req.params.page;
     } else {
-      obj['slug'] = req.params.id;
+      obj['slug'] = req.params.page;
     }
 
     return obj;
@@ -62,8 +60,4 @@ export default class Service {
     }
     return res.json(menu);
   };
-
-  static onError = serviceOnError('Page');
 }
-
-classCatchBuilder(Service);

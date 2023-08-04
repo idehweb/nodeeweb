@@ -31,6 +31,7 @@ export default function registerController() {
             max_size_mb: 1024,
             reduce: {
               quality: 80,
+              format: 'webp',
             },
           }),
         },
@@ -48,6 +49,7 @@ export default function registerController() {
             max_size_mb: 1024,
             reduce: {
               quality: 80,
+              format: 'webp',
             },
           }),
           service: service.updateAfter,
@@ -70,6 +72,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/api/v1/file', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }
