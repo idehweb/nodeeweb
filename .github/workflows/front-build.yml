@@ -17,11 +17,12 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: ls -alh
-      - run: cd front
-      - run: ls -alh
-      - run: npm i --legacy-peer-deps
-      - run: npm run build
+      - name: 'Install'
+        working-directory: ./front
+        run: npm i --legacy-peer-deps
+      - name: 'Build'
+        working-directory: ./front
+        run: npm run build
 
   publish-npm:
     needs: build
@@ -32,6 +33,10 @@ jobs:
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org/
-      - run: npm run publish
+
+      - name: 'Publish'
+        working-directory: ./front
+        run: npm run publish
+
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
