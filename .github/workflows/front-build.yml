@@ -25,6 +25,10 @@ jobs:
         run: npm run build
         env:
           CI: 'false'
+      - uses: actions/upload-artifact@master
+        with:
+          name: build
+          path: ./front/build
 
   publish-npm:
     needs: build
@@ -35,6 +39,11 @@ jobs:
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org/
+
+      - uses: actions/download-artifact@master
+        with:
+          name: build
+          path: ./front/build
 
       - name: 'Publish'
         working-directory: ./front
