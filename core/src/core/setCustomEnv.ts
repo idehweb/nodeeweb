@@ -1,5 +1,5 @@
 import fs from 'fs';
-import path from 'path';
+import path, { join } from 'path';
 import store from '../../store';
 import { USE_ENV } from '../../types/global';
 import { CORE_NODE_MODULE_PATH, NODE_MODULE_PATH } from '../../utils/package';
@@ -22,7 +22,9 @@ export default function setCustomEnv() {
     [
       appDirectory,
       ...env_dirs,
-      store.env.USE_ENV === USE_ENV.NPM ? CORE_NODE_MODULE_PATH : '',
+      store.env.USE_ENV === USE_ENV.NPM
+        ? join(CORE_NODE_MODULE_PATH, '..')
+        : '',
     ].filter((d) => d)
   );
 
