@@ -10,6 +10,7 @@ import { registerDefaultControllers } from './controller';
 import { activeAuthControllers } from './auth';
 import registerDefaultPlugins from './plugin';
 import { registerValidationPipe } from '../handlers/validate.handler';
+import { renderViewControllers } from './view';
 
 const app = express();
 
@@ -41,6 +42,9 @@ export default async function buildApp() {
       app.use(w[0], w[1]);
     } else app.use(w);
   });
+
+  // view
+  renderViewControllers();
 
   // plugins
   // await handlePlugin();
