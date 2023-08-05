@@ -14,7 +14,8 @@
     "eject": "react-scripts eject",
     "deploy": "node deploy",
     "build:d": "yarn build && yarn deploy",
-    "anal": "export ANALYZE=true && set ANALYZE=true && yarn build"
+    "anal": "export ANALYZE=true && set ANALYZE=true && yarn build",
+    "publish": "./publish.sh"
   },
   "dependencies": {
     "@date-io/date-fns-jalali": "^2.16.0",
