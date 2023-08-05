@@ -5,7 +5,7 @@ on:
     branches:
       - releases/**
     paths:
-      - "admin/**"
+      - 'admin/**'
 
 jobs:
   build:
@@ -15,9 +15,16 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: cd admin
-      - run: npm i --legacy-peer-deps
-      - run: npm run build
+
+      - name: 'Install'
+        working-directory: ./admin
+        run: npm i --legacy-peer-deps
+
+      - name: 'Build'
+        working-directory: ./admin
+        run: npm run build
+        env:
+          CI: 'false'
 
   publish-npm:
     needs: build
@@ -28,6 +35,8 @@ jobs:
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org/
-      - run: npm run publish
+      - name: 'Publish'
+        working-directory: ./admin
+        run: npm run publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
