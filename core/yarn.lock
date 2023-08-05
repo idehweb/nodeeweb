@@ -68,8 +68,10 @@
   resolved "https://registry.yarnpkg.com/@nodeeweb/admin-build/-/admin-build-0.0.2.tgz#a55c8f34ef69bfe0c93c4aed8131e33c1b2601e9"
   integrity sha512-CnluGx1h1mF638/ibmGOyQGohm/4NNyvSG0hR9Lj+uZ8IrwCQmQHwYkOLYYAPLMxWyV1gG00TFc/HZ3FcbGcbg==
 
-"@nodeeweb/front-build@file:../front/build":
+"@nodeeweb/front-build@^0.0.1":
   version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@nodeeweb/front-build/-/front-build-0.0.1.tgz#67ef6ae5da1bebbd8b66fa89626b6410177192a5"
+  integrity sha512-UVbRojpLvpYMAt+Z9hoFPCnhI4BWcE1RMLEajmglVtNrLn4R0X/sO7hdLpAKPyvl4A67pgqdOQYsJy0fx/y4uQ==
 
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
