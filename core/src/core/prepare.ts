@@ -27,6 +27,7 @@ export default async function prepare() {
 
   // copy public files
   await copyPublicFiles('admin');
+  await copyPublicFiles('front');
 
   // copy static dirs
   await copyStaticFiles('schema');
@@ -49,10 +50,7 @@ async function installRequirements() {
   logger.log(color('Green', `## Install ${requirements.join(', ')} ##`));
   await exec(
     `yarn add ${requirements
-      .map(
-        (pn) =>
-          `link:./${join(CORE_NODE_MODULE_PATH_RELATIVE, 'node_modules', pn)}`
-      )
+      .map((pn) => `link:./${join(CORE_NODE_MODULE_PATH_RELATIVE, pn)}`)
       .join(' ')}`,
     { logger }
   );
