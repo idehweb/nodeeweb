@@ -26,6 +26,11 @@ jobs:
         env:
           CI: 'false'
 
+      - uses: actions/upload-artifact@master
+        with:
+          name: build
+          path: ./admin/build
+
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
@@ -35,6 +40,12 @@ jobs:
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org/
+
+      - uses: actions/download-artifact@master
+        with:
+          name: build
+          path: ./admin/build
+
       - name: 'Publish'
         working-directory: ./admin
         run: npm run publish

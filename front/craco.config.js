@@ -17,7 +17,6 @@ module.exports = {
     },
     configure: (webpackConfig, { env, paths }) => {
       if (env === 'development') return webpackConfig;
-      console.log(webpackConfig.output.path);
       webpackConfig.output = {
         ...webpackConfig.output,
         filename: 'static/js/bundle.js',
