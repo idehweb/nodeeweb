@@ -14,7 +14,7 @@
   "dependencies": {
     "@godaddy/terminus": "^4.12.1",
     "@nodeeweb/admin-build": "*",
-    "@nodeeweb/front-build": "^0.0.1",
+    "@nodeeweb/front-build": "^0.0.2",
     "@types/morgan": "^1.9.4",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",

@@ -43,9 +43,6 @@ export default async function buildApp() {
     } else app.use(w);
   });
 
-  // view
-  renderViewControllers();
-
   // plugins
   // await handlePlugin();
 
@@ -54,6 +51,9 @@ export default async function buildApp() {
 
   // default controller
   registerDefaultControllers();
+
+  // view
+  renderViewControllers();
 
   // default plugins
   registerDefaultPlugins();
