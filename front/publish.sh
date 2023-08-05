@@ -3,6 +3,7 @@ set -e
 
 echo "## Copy pakcage.build.json ##"
 ls -alh
+pwd
 
 ls build -alh
 
