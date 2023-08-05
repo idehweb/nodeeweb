@@ -1,9 +1,11 @@
 name: Front Build
 
 on:
-  push:
+  pull_request:
     branches:
       - theme-setting
+      - main
+      - 'releases/**'
     paths:
       - 'front/**'
 
