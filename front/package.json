@@ -57,6 +57,7 @@
     "dev": "craco start",
     "start": "craco start",
     "build": "craco build",
+    "publish": "./publish.sh",
     "test": "craco test",
     "eject": "react-scripts eject",
     "deploy": "node deploy",
