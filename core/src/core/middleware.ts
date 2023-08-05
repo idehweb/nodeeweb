@@ -68,11 +68,11 @@ export function commonMiddleware(): (
   ) {
     const filesFolder = getPublicDir('files', true)[0];
     const adminFolder = getPublicDir('admin', true)[0];
-    const themeFolder = getPublicDir('theme', true)[0];
+    const frontFolder = getPublicDir('front', true)[0];
 
     mw.push(express.static(filesFolder, { maxAge: '1y' }));
-    mw.push(['/site_setting', express.static(themeFolder + '/site_setting')]);
-    mw.push(['/static', express.static(themeFolder + '/static')]);
+    mw.push(['/site_setting', express.static(frontFolder + '/site_setting')]);
+    mw.push(['/static', express.static(frontFolder + '/static')]);
     mw.push(['/admin', express.static(adminFolder)]);
   }
 
