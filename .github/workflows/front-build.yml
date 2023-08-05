@@ -23,6 +23,8 @@ jobs:
       - name: 'Build'
         working-directory: ./front
         run: npm run build
+        env:
+          CI: 'false'
 
   publish-npm:
     needs: build
@@ -37,6 +39,5 @@ jobs:
       - name: 'Publish'
         working-directory: ./front
         run: npm run publish
-
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
