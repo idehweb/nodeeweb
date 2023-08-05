@@ -15,8 +15,9 @@ module.exports = {
     alias: {
       '#c': path.resolve(__dirname, 'src/'),
     },
-    configure: (webpackConfig, {env, paths}) => {
+    configure: (webpackConfig, { env, paths }) => {
       if (env === 'development') return webpackConfig;
+      console.log(webpackConfig.output.path);
       webpackConfig.output = {
         ...webpackConfig.output,
         filename: 'static/js/bundle.js',
@@ -37,21 +38,20 @@ module.exports = {
       //     console.log('hi',JSON.stringify(plugin)+'\n\n\n\n')
       //   // }
       // })
-      webpackConfig.plugins[5] =
-        new MiniCssExtractPlugin({
-          // Options similar to the same options in webpackOptions.output
-          // both options are optional
-          filename: 'static/css/bundle.css',
-          chunkFilename: 'static/css/[name].chunk.css',
-        });
-      webpackConfig.plugins.push(new webpack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1
-      }))
+      webpackConfig.plugins[5] = new MiniCssExtractPlugin({
+        // Options similar to the same options in webpackOptions.output
+        // both options are optional
+        filename: 'static/css/bundle.css',
+        chunkFilename: 'static/css/[name].chunk.css',
+      });
+      webpackConfig.plugins.push(
+        new webpack.optimize.LimitChunkCountPlugin({
+          maxChunks: 1,
+        }),
+      );
 
       // console.log('akbar => ', webpackConfig.optimization);
       return webpackConfig;
-    }
-
+    },
   },
-
 };
