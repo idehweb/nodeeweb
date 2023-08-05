@@ -17,7 +17,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - run: ls -alh
       - run: cd front
+      - run: ls -alh
       - run: npm i --legacy-peer-deps
       - run: npm run build
 
