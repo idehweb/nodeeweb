@@ -3,7 +3,7 @@ name: Front Build
 on:
   push:
     branches:
-      - releases/**
+      - theme-setting
     paths:
       - 'front/**'
 
