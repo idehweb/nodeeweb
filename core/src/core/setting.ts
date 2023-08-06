@@ -2,19 +2,21 @@ import store from '../../store';
 import { MiddleWare } from '../../types/global';
 
 export class SettingService {
-  getTheme: MiddleWare = (req, res, next) => {
+  getTheme: MiddleWare = async (req, res, next) => {
     const isAdmin = req.modelName === 'admin';
+    const setting = await this.settingPromise;
+
     return res.status(200).json({
-      taxAmount: 0,
-      tax: true,
-      currency: 'Toman',
-      header: {},
+      taxAmount: setting.taxAmount,
+      tax: setting.tax,
+      currency: setting.currency,
+      header: setting.header ?? {},
       body: [
         {
           name: 'MainContent',
         },
       ],
-      footer: {},
+      footer: setting.footer ?? {},
       routes: [
         {
           path: '/',
@@ -28,11 +30,17 @@ export class SettingService {
           access: 'customer_all',
         },
       ],
-      components: [],
-      models: [],
       rules: isAdmin ? store.adminViews : undefined,
     });
   };
+
+  get model() {
+    return store.db.model('setting');
+  }
+
+  get settingPromise() {
+    return this.model.findOne();
+  }
 }
 
 const settingService = new SettingService();

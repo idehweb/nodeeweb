@@ -1,4 +1,5 @@
 import { ControllerSchema } from '../../types/controller';
+import { OptUserAccess } from '../handlers/auth.handler';
 import {
   controllerRegister,
   controllersBatchRegister,
@@ -14,6 +15,7 @@ export function registerDefaultControllers() {
   controllerStack.push({
     method: 'get',
     url: '/theme',
+    access: OptUserAccess,
     service: settingService.getTheme,
   });
 

@@ -40,7 +40,8 @@ export class Store {
   };
   server: Server;
   systemLogger: any;
-  adminViews: AdminViewSchema[] = [];
+  adminViews: { [key: AdminViewSchema['name']]: AdminViewSchema['content'] } =
+    {};
   strategies = new Map<string, AuthStrategy>();
   plugins = new Map<PluginOut['type'], PluginOut['content']>();
   settings: {

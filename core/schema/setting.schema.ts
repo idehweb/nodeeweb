@@ -1,4 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model, Types } from 'mongoose';
+
+export interface ISetting {}
+
+export type SettingModel = Model<ISetting>;
+export type SettingDocument = Document<Types.ObjectId, {}, ISetting> & ISetting;
 
 const schema = new mongoose.Schema(
   {

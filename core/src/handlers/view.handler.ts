@@ -8,7 +8,7 @@ export function registerAdminView(
   view: AdminViewSchema,
   { from, logger = store.systemLogger }: RegisterOptions
 ) {
-  store.adminViews.push(view);
+  store.adminViews[view.name] = view.content;
   logger.log(
     color(
       'Magenta',
