@@ -1,5 +1,6 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import { MiddleWare, MiddleWareError } from '../../types/global';
 import bodyParser from 'body-parser';
 import store from '../../store';
@@ -10,25 +11,6 @@ import { getViewHandler } from './view';
 import { color } from '../../utils/color';
 import { getName } from '../../utils/helpers';
 import { join } from 'path';
-
-export const headerMiddleware: MiddleWare = (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader(
-    'Access-Control-Allow-Methods',
-    'GET, POST, OPTIONS, PUT, PATCH, DELETE'
-  );
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'Content-Type,response, Authorization, Content-Length, X-Requested-With, shared_key, token , _id , lan , fields'
-  );
-  res.setHeader('Access-Control-Expose-Headers', 'X-Total-Count');
-  if (!req.headers.lan) {
-    req.headers.lan = process.env.defaultLanguage || 'fa';
-  }
-  res.setHeader('Content-Language', 'fa');
-
-  next();
-};
 
 export function commonMiddleware(): (
   | MiddleWare
@@ -41,8 +23,14 @@ export function commonMiddleware(): (
     | [string, MiddleWare | MiddleWareError]
   )[] = [];
 
-  // header
-  mw.push(headerMiddleware);
+  // cors
+  mw.push(
+    cors({
+      allowedHeaders:
+        'Content-Type,response, Authorization, Content-Length, X-Requested-With, shared_key, token , _id , lan , fields',
+      exposedHeaders: ['X-Total-Count'],
+    })
+  );
 
   // logger
   mw.push(expressLogger);
@@ -117,6 +105,6 @@ export function registerCommonHandlers() {
     if (Array.isArray(w)) {
       store.app.use(w[0], w[1]);
     } else store.app.use(w);
-    logger.log(color('Cyan', `## CoreMiddleware USE ${getName(w)} ##`));
+    logger.log(color('Cyan', `## CoreMiddleware Register ${getName(w)} ##`));
   });
 }
