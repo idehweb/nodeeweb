@@ -6,6 +6,8 @@ import {
   TextInput,
   Toolbar,
   useTranslate,
+  useNotify,
+  useRedirect,
 } from 'react-admin';
 import React from 'react';
 
@@ -32,9 +34,17 @@ const PostEditToolbar = () => (
 const Form = ({ children, ...rest }) => {
   const cls = useStyles();
   const translate = useTranslate();
+  const notify = useNotify();
+  const redirect = useRedirect();
+  const onSuccess = () => {
+    notify('Added successfully');
+    redirect('/customerGroup');
+  };
   // {...rest}
   return (
-    <SimpleForm toolbar={<PostEditToolbar />} onSubmit={(v) => save(v)}>
+    <SimpleForm
+      toolbar={<PostEditToolbar />}
+      onSubmit={(v) => save(v, onSuccess)}>
       {children}
       <TextInput
         source={'name.' + translate('lan')}
@@ -68,12 +78,7 @@ const Form = ({ children, ...rest }) => {
   );
 };
 
-function save(record) {
-  console.log('save', record, theID);
-
-  // if (record.plusx) {
-  let type = null,
-    number = 0;
+function save(record, onSuccess) {
   if (record.parent == '') {
     delete record.parent;
     //     type = 'plusx';
@@ -82,14 +87,7 @@ function save(record) {
 
   API.post('/customerGroup/', JSON.stringify(record))
     .then(({ data = {} }) => {
-      // const refresh = useRefresh();
-      // refresh();
-      // alert("it is ok");
-      // window.location.reload();
-      // if (data.success) {
-      //     values = [];
-      //     valuess = [];
-      // }
+      onSuccess();
     })
     .catch((err) => {
       console.log('error', err);
@@ -100,10 +98,12 @@ function save(record) {
   // return 0;
 }
 
-const create = (props) => (
-  <Create {...props}>
-    <Form />
-  </Create>
-);
+const create = (props) => {
+  return (
+    <Create {...props} redirect="list">
+      <Form />
+    </Create>
+  );
+};
 
 export default create;

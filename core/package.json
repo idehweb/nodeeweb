@@ -13,8 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "@godaddy/terminus": "^4.12.1",
-    "@nodeeweb/admin-build": "*",
-    "@nodeeweb/front-build": "^0.0.2",
+    "@nodeeweb/admin-build": "latest",
+    "@nodeeweb/front-build": "latest",
     "@types/morgan": "^1.9.4",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
