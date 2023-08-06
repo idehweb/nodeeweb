@@ -1,7 +1,11 @@
 import { ControllerSchema } from '../../types/controller';
-import { controllerRegister } from '../handlers/controller.handler';
+import {
+  controllerRegister,
+  controllersBatchRegister,
+} from '../handlers/controller.handler';
 import logger from '../handlers/log.handler';
-import { getAuth, getTheme, mockTheme } from '../temp/routers';
+import { getAuth, mockTheme } from '../temp/routers';
+import { getViewHandler } from './view';
 export function registerDefaultControllers() {
   const controllerStack: ControllerSchema[] = [];
 
@@ -21,11 +25,20 @@ export function registerDefaultControllers() {
   });
 
   //   register
-  controllerStack.map((schema) =>
-    controllerRegister(schema, {
-      logger,
-      base_url: '/api/v1',
-      from: 'CoreController',
-    })
+  controllersBatchRegister(controllerStack, {
+    logger,
+    base_url: '/api/v1',
+    from: 'CoreController',
+  });
+
+  // view
+  const [viewPath, viewService] = getViewHandler();
+  controllerRegister(
+    {
+      method: 'get',
+      service: viewService,
+      url: viewPath,
+    },
+    { base_url: '/', from: 'CoreController', logger }
   );
 }

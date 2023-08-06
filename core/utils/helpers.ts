@@ -1,5 +1,6 @@
 import { join } from 'path';
 import * as fs from 'fs';
+import _ from 'lodash';
 
 export function wait(sec: number) {
   return new Promise((resolve) => setTimeout(resolve, sec * 1000));
@@ -56,4 +57,13 @@ export async function call<A extends Array<any>, R>(
     result = await result;
   }
   return result as R;
+}
+
+export function getName(f: any, capitalize = true) {
+  const name: string =
+    (typeof f === 'string' ? f : f?.shadowName || f?.name) ?? '';
+  return name
+    .split(' ')
+    .map((word, i) => (i == 0 && capitalize ? _.capitalize(word) : word))
+    .join(' ');
 }

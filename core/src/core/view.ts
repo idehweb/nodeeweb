@@ -3,11 +3,14 @@ import store from '../../store';
 import { getPublicDir } from '../../utils/path';
 import logger from '../handlers/log.handler';
 import { color } from '../../utils/color';
+import { MiddleWare } from '../../types/global';
 
-export function renderViewControllers() {
+export function getViewHandler(): [string, MiddleWare] {
   const allPathExceptApi = '/:start(?!api):path(*)';
-  store.app.use(allPathExceptApi, (req, res, next) => {
-    res.sendFile(join(getPublicDir('front', true)[0], 'index.html'));
-  });
-  logger.log(color('Blue', `## CoreView ALL ${allPathExceptApi} ##`));
+  return [
+    allPathExceptApi,
+    (_, res) => {
+      res.sendFile(join(getPublicDir('front', true)[0], 'index.html'));
+    },
+  ];
 }

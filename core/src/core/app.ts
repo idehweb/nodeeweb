@@ -1,6 +1,6 @@
 import express from 'express';
 import 'reflect-metadata';
-import { commonMiddleware, headerMiddleware } from './middleware';
+import { registerCommonHandlers } from './middleware';
 import prepare from './prepare';
 import { dbRegisterModels } from './db';
 import store from '../../store';
@@ -10,7 +10,6 @@ import { registerDefaultControllers } from './controller';
 import { activeAuthControllers } from './auth';
 import registerDefaultPlugins from './plugin';
 import { registerValidationPipe } from '../handlers/validate.handler';
-import { renderViewControllers } from './view';
 
 const app = express();
 
@@ -34,14 +33,8 @@ export default async function buildApp() {
   // validate
   registerValidationPipe();
 
-  // middleware
-  app.use(headerMiddleware);
-  const mw = commonMiddleware();
-  mw.forEach((w) => {
-    if (Array.isArray(w)) {
-      app.use(w[0], w[1]);
-    } else app.use(w);
-  });
+  // common
+  registerCommonHandlers();
 
   // plugins
   // await handlePlugin();
@@ -51,9 +44,6 @@ export default async function buildApp() {
 
   // default controller
   registerDefaultControllers();
-
-  // view
-  renderViewControllers();
 
   // default plugins
   registerDefaultPlugins();

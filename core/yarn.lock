@@ -63,10 +63,10 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@nodeeweb/admin-build@*":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@nodeeweb/admin-build/-/admin-build-0.0.2.tgz#a55c8f34ef69bfe0c93c4aed8131e33c1b2601e9"
-  integrity sha512-CnluGx1h1mF638/ibmGOyQGohm/4NNyvSG0hR9Lj+uZ8IrwCQmQHwYkOLYYAPLMxWyV1gG00TFc/HZ3FcbGcbg==
+"@nodeeweb/admin-build@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@nodeeweb/admin-build/-/admin-build-0.0.3.tgz#f48fc62a9128800c154ed7d7adf71f96e62b02f6"
+  integrity sha512-ocIFkPr2eR4no+cuDU1IA3sOAqUDoEq02dkpZeEhq0NS2rvTfZ/gnfMDG8q9qZa2kk6m9Wm3eLlIYXPnksgSng==
 
 "@nodeeweb/front-build@^0.0.2":
   version "0.0.2"
