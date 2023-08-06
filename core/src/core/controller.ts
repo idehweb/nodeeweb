@@ -5,6 +5,7 @@ import {
 } from '../handlers/controller.handler';
 import logger from '../handlers/log.handler';
 import { getAuth, mockTheme } from '../temp/routers';
+import settingService from './setting';
 import { getViewHandler } from './view';
 export function registerDefaultControllers() {
   const controllerStack: ControllerSchema[] = [];
@@ -13,8 +14,7 @@ export function registerDefaultControllers() {
   controllerStack.push({
     method: 'get',
     url: '/theme',
-    // service: getTheme.bind(null, 'admin'),
-    service: (req, res) => res.json(mockTheme()),
+    service: settingService.getTheme,
   });
 
   // auth

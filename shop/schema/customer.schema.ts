@@ -35,6 +35,11 @@ const schema = new mongoose.Schema(
       type: Date,
       select: false,
     },
+    credentialChangeAt: {
+      type: Date,
+      default: Date.now,
+      select: false,
+    },
     expire: Date,
     birth_day: String,
     birth_month: String,
@@ -104,6 +109,7 @@ schema.pre('save', async function (next) {
 
   user.password = await bcrypt.hash(user.password, 12);
   user.passwordChangeAt = new Date();
+  user.credentialChangeAt = user.passwordChangeAt;
 
   return next();
 });
@@ -119,6 +125,7 @@ schema.pre('findOneAndUpdate', async function (next) {
     addFields.password = await bcrypt.hash(addFields.password, 12);
     // update change at
     addFields.passwordChangeAt = new Date();
+    addFields.credentialChangeAt = addFields.passwordChangeAt;
   } else {
     const password = update.$set?.password ?? update.password;
     if (!password) return next();
@@ -130,6 +137,7 @@ schema.pre('findOneAndUpdate', async function (next) {
     update.$set.password = await bcrypt.hash(password, 12);
     // update change at
     update.$set.passwordChangeAt = new Date();
+    update.$set.credentialChangeAt = update.$set.passwordChangeAt;
   }
 
   return next();
