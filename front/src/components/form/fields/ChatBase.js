@@ -247,7 +247,6 @@ const ChatContent =   (props) =>{
             }
             setMessages(messages => [...messages,messageObjClient] );
             console.log('AxiosVaslue',messageObjClient);
-            // ApiUrl/cUSTOMER
             await axios.post('https://idehweb.com/chatgpt/index.php', messageObjClient,{headers}).then((res)=>{
                 console.log('Reeeeeeeeees',res);
                 if(res){

@@ -30,12 +30,11 @@ if (isClient) {
   // import { createContext } from "react";
 }
 // export const MainUrl = "http://localhost:3003";
-export const ApiUrl = CONFIG.BASE_URL + '/customer';
+export const ApiUrl = CONFIG.BASE_URL;
 export const AdminRoute = CONFIG.BASE_URL + '/admin';
 export const InstanceManagerUrl = 'https://instancemanager.nodeeweb.com/api/v1';
-export const THEME_URL = CONFIG.THEME_URL || CONFIG.BASE_URL + 'customer';
-// console.log("REACT_APP_FRONT_ROUTE",process.env);
-// export const ApiUrl = "http://localhost:3003/customer";
+export const THEME_URL = CONFIG.THEME_URL || CONFIG.BASE_URL;
+
 export const token =
   typeof window === 'undefined' ? null : store.getState().store.user.token;
 export const admin_token =
@@ -1284,7 +1283,7 @@ export const addBookmark = (_id) => {
         message: 'You need to sign in!',
       });
     }
-    postData(`${ApiUrl}/customer/wishlist/${_id}`, {}, true)
+    postData(`${ApiUrl}/wishlist/${_id}`, {}, true)
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success)
@@ -1317,7 +1316,7 @@ export const getBookmarks = () => {
     //     message: "You need to sign in!"
     //   });
     // }
-    getData(`${ApiUrl}/customer/wishlist`, {}, true)
+    getData(`${ApiUrl}/wishlist`, {}, true)
       .then((data) => {
         let mainD = data['data'];
 
@@ -1334,7 +1333,7 @@ export const getBookmarks = () => {
 };
 export const updateNotifToken = (_id) => {
   return new Promise(function (resolve, reject) {
-    //  postData(`${ApiUrl}/customer/updateNotifToken/${_id}`, {}, false)
+    //  postData(`${ApiUrl}/updateNotifToken/${_id}`, {}, false)
     //  .then((data) => {
     //  let mainD = data['data'];
 
@@ -2163,7 +2162,7 @@ export const register = (number, fd, method = 'sms') => {
     countryCode: fd,
     method: method,
   };
-  return postData(`${ApiUrl}/customer/authCustomer`, userObj)
+  return postData(`${ApiUrl}/authCustomer`, userObj)
     .then(({ data }) => {
       user = { ...user, ...{ phoneNumber: number, countryCode: fd } };
       if (data.success) SaveData({ user: user });
@@ -2204,7 +2203,7 @@ export const loginAdmin = (username, password) => {
 };
 export const authCustomerForgotPass = (number, fd, method = 'sms') => {
   let { user } = store.getState().store;
-  return postData(`${ApiUrl}/customer/authCustomerForgotPass`, {
+  return postData(`${ApiUrl}/authCustomerForgotPass`, {
     phoneNumber: number,
     countryCode: fd,
     method: method,
@@ -2225,7 +2224,7 @@ export const authCustomerForgotPass = (number, fd, method = 'sms') => {
 export const setPassWithPhoneNumber = (data) => {
   return new Promise(function (resolve, reject) {
     let { user } = store.getState().store;
-    postData(`${ApiUrl}/customer/setPassword`, data, true)
+    postData(`${ApiUrl}/setPassword`, data, true)
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success) {
@@ -2254,7 +2253,7 @@ export const updateAddress = (data) => {
       address = [];
     }
     address.push(data);
-    putData(`${ApiUrl}/customer/updateAddress`, { address: address }, true)
+    putData(`${ApiUrl}/updateAddress`, { address: address }, true)
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success) {
@@ -2364,7 +2363,7 @@ export const getTheChaparPrice = (destination = 0, value = 0, weight = 1) => {
 export const changeAddressArr = (data) => {
   return new Promise(function (resolve, reject) {
     let { user } = store.getState().store;
-    putData(`${ApiUrl}/customer/updateAddress`, { address: data }, true)
+    putData(`${ApiUrl}/updateAddress`, { address: data }, true)
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success) {
@@ -2389,7 +2388,7 @@ export const authCustomerWithPassword = (data) => {
   // console.log('==> authCustomerWithPassword()');
   return new Promise(function (resolve, reject) {
     let { user } = store.getState().store;
-    postData(`${ApiUrl}/customer/authCustomerWithPassword`, data)
+    postData(`${ApiUrl}/authCustomerWithPassword`, data)
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success) {
@@ -2413,7 +2412,7 @@ export const submitProfile = (obj) => {
   return new Promise(function (resolve, reject) {
     let { user } = store.getState().store;
 
-    putData(`${ApiUrl}/customer`, obj, true)
+    putData(`${ApiUrl}/`, obj, true)
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success) {
@@ -2431,7 +2430,7 @@ export const submitProfile = (obj) => {
 };
 
 export const active = (req) => {
-  return postData(`${ApiUrl}/customer/activateCustomer`, req)
+  return postData(`${ApiUrl}/activateCustomer`, req)
     .then(({ data = {} }) => {
       let { user } = store.getState().store;
       // console.log('data', data);

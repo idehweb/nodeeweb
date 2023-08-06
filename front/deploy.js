@@ -25,7 +25,7 @@ ftpDeploy
   .deploy(config)
   .then((res) => {
     return axios
-      .get(`${process.env.PUBLIC_URL}/customer/settings/reset`, {}, {})
+      .get(`${process.env.PUBLIC_URL}/settings/reset`, {}, {})
       .then((res) => {
         console.log('finished ;)\n',res.data)
         // return res.data;
