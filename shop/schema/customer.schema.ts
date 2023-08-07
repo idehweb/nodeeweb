@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
+export enum CustomerSource {
+  Web = 'WEBSITE',
+  Panel = 'CRM',
+}
+
 const schema = new mongoose.Schema(
   {
     firstName: {
@@ -11,21 +16,21 @@ const schema = new mongoose.Schema(
     },
     email: {
       type: String,
+      trim: true,
       unique: true,
       sparse: true,
-      trim: true,
     },
     username: {
       type: String,
+      trim: true,
       unique: true,
       sparse: true,
-      trim: true,
     },
-    phone: {
+    phoneNumber: {
       type: String,
+      trim: true,
       unique: true,
       sparse: true,
-      trim: true,
     },
     password: {
       type: String,
@@ -43,12 +48,12 @@ const schema = new mongoose.Schema(
     expire: Date,
     birth_day: String,
     birth_month: String,
-    birthday: String,
+    birthday: Date,
     birthdate: { type: Date },
     internationalCode: String,
     sex: String,
     extra: { type: String },
-    source: { type: String, default: 'WEBSITE' },
+    source: { type: String, enum: CustomerSource, default: CustomerSource.Web },
     bankData: {},
     data: {},
     type: {
@@ -67,7 +72,6 @@ const schema = new mongoose.Schema(
     ],
     age: { type: Number },
     whatsapp: { type: Boolean, default: false },
-    active: { type: Boolean, default: true },
     activationCode: Number,
     notificationTokens: [
       { token: String, updatedAt: { type: Date, default: Date.now } },
@@ -95,8 +99,10 @@ const schema = new mongoose.Schema(
       },
     ],
     role: { type: String, default: 'user' },
+    active: { type: Boolean, default: true },
     address: [],
     companyName: String,
+    companyTelNumber: String,
   },
   { timestamps: true }
 );
@@ -112,6 +118,12 @@ schema.pre('save', async function (next) {
   user.credentialChangeAt = user.passwordChangeAt;
 
   return next();
+});
+
+schema.post('save', function (doc, next) {
+  doc.credentialChangeAt = undefined;
+  doc.passwordChangeAt = undefined;
+  next();
 });
 
 schema.pre('findOneAndUpdate', async function (next) {

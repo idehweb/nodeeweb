@@ -78,6 +78,11 @@ schema.pre('save', async function (next) {
 
   return next();
 });
+schema.post('save', function (doc, next) {
+  doc.credentialChangeAt = undefined;
+  doc.passwordChangeAt = undefined;
+  next();
+});
 
 schema.pre('findOneAndUpdate', async function (next) {
   const update = this.getUpdate();

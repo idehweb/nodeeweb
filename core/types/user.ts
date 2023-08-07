@@ -4,6 +4,11 @@ export interface IUserMethods {
   passwordVerify: (password: string) => Promise<boolean>;
 }
 
+export enum UserSex {
+  Male = 'male',
+  Female = 'female',
+}
+
 export interface IUser {
   email?: string;
   username?: string;

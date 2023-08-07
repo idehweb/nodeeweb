@@ -2,6 +2,7 @@ import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
 import store from '@nodeeweb/core/store';
 import { MiddleWare, Req, Res } from '@nodeeweb/core/types/global';
 import mongoose, { FilterQuery } from 'mongoose';
+import { CustomerSource } from '../../schema/customer.schema';
 
 export class Service {
   static getMe: MiddleWare = (req, res, next) => {
@@ -149,5 +150,23 @@ export class Service {
       post: customer,
     });
   };
+
+  static createParseBody(req: Req) {
+    return { ...req.body, source: CustomerSource.Panel };
+  }
+  static deleteParseUpdate() {
+    return [
+      {
+        $addFields: {
+          username: { $concat: ['$username', '-deleted', `-${Date.now()}`] },
+          phoneNumber: {
+            $concat: ['$phoneNumber', '-deleted', `-${Date.now()}`],
+          },
+          email: { $concat: ['$email', '-deleted', `-${Date.now()}`] },
+          active: false,
+        },
+      },
+    ];
+  }
 }
 export default Service;
