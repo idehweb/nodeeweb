@@ -1,13 +1,31 @@
 import mongoose, { Document, Model } from 'mongoose';
 import { Types } from 'mongoose';
+import { MultiLang, PublishStatus } from './_base.schema';
+
+export enum PriceType {
+  Normal = 'normal',
+  Variable = 'variable',
+}
 
 export interface IProduct {
   title: { [key: string]: string };
-  image?: string;
-  price: number;
-  salePrice: number;
-  weight?: number;
-  quantity: number;
+  miniTitle: { [key: string]: string };
+  thumbnail?: string;
+  type: PriceType;
+  details: {
+    options?: { [key: string]: string };
+    price: number;
+    salePrice: number;
+    weight?: number;
+    quantity: number;
+    in_stock: boolean;
+    sku?: string;
+  }[];
+  options: {
+    _id: string;
+    name: string;
+    values: { name: string }[];
+  }[];
 }
 
 export type ProductModel = Model<IProduct>;
@@ -22,27 +40,32 @@ const schema = new mongoose.Schema(
     attributes: [
       {
         attribute: { type: mongoose.Schema.Types.ObjectId, ref: 'attributes' },
-        values: [],
+        values: { type: [String] },
       },
     ],
-    sources: [],
-    labels: [],
-    in_stock: { type: Boolean, default: false },
-    story: { type: Boolean, default: false },
-    price: { type: Number, required: true },
-    weight: { type: Number, default: 0 },
-    quantity: { type: Number, default: 1 },
-    salePrice: { type: Number, required: true },
+    labels: [{ title: String }],
+    details: [
+      {
+        _id: false,
+        options: {},
+        price: { type: Number, required: true },
+        weight: { type: Number, default: 0 },
+        quantity: { type: Number, default: 1 },
+        salePrice: { type: Number, required: true },
+        sku: String,
+        in_stock: { type: Boolean, default: true },
+      },
+    ],
     data: {},
-    sku: String,
-    extra_button: String,
-    miniTitle: {},
-    excerpt: {},
+    miniTitle: MultiLang,
+    excerpt: MultiLang,
     options: [],
-    extra_attr: [],
-    combinations: [],
-    sections: [],
-    countries: [],
+    extra_attr: [
+      {
+        title: { type: String, required: true },
+        des: { type: String, required: true },
+      },
+    ],
     like: [
       {
         customer: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' },
@@ -50,16 +73,12 @@ const schema = new mongoose.Schema(
         createdAt: { type: Date, default: Date.now },
       },
     ],
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' },
-    type: { type: String, default: 'normal' },
-    description: {},
-    requireWarranty: {},
-
+    price_type: { type: String, enum: PriceType, default: PriceType.Normal },
+    description: MultiLang,
     views: [],
-    addToCard: [],
-    title: {},
-    metatitle: {},
-    metadescription: {},
+    title: MultiLang,
+    metatitle: MultiLang,
+    metadescription: MultiLang,
     keywords: {},
     slug: {
       type: String,
@@ -68,11 +87,13 @@ const schema = new mongoose.Schema(
       trim: true,
     },
     thumbnail: String,
-    status: { type: String, default: 'processing' },
-    transaction: [{ type: mongoose.Schema.Types.ObjectId, ref: 'transaction' }],
+    status: {
+      type: String,
+      enum: PublishStatus,
+      default: PublishStatus.Processing,
+    },
     relatedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'product' }],
-    photos: [],
-    postNumber: String,
+    photos: [String],
   },
   { timestamps: true }
 );
