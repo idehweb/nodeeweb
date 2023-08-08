@@ -51,7 +51,7 @@ export class Store {
   };
 
   constructor() {
-    this.env = process.env as any;
+    this.env = { ...process.env } as any;
     switch (this.env.NODE_ENV) {
       case ENV.DEV:
         this.env.isDev = true;
