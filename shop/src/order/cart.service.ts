@@ -6,12 +6,21 @@ import {
   ForbiddenError,
   LimitError,
   BadRequestError,
+  ValidationError,
 } from '@nodeeweb/core';
-import { OrderModel, OrderStatus } from '../../schema/order.schema';
-import { ProductModel } from '../../schema/product.schema';
-import { DEFAULT_CART_LIMIT } from '../../constants/limit';
+import {
+  OrderDocument,
+  OrderModel,
+  OrderStatus,
+} from '../../schema/order.schema';
+import { ProductDocument, ProductModel } from '../../schema/product.schema';
 import { Types } from 'mongoose';
-import logger from '../../utils/log';
+import {
+  AddToCartBody,
+  ProductBody,
+  UpdateCartBody,
+} from '../../dto/in/order/cart';
+import { UserDocument } from '@nodeeweb/core/types/user';
 
 export default class CartService {
   static get orderModel() {
@@ -19,6 +28,121 @@ export default class CartService {
   }
   static get productModel() {
     return store.db.model('product') as ProductModel;
+  }
+
+  static checkProductQuantity({
+    product,
+    productDoc,
+  }: {
+    product: ProductBody;
+    productDoc: ProductDocument;
+  }) {
+    const productDetailsInDoc = productDoc.details;
+
+    product.details.forEach((details) => {
+      const docDetails = productDetailsInDoc.find(
+        ({ _id }) => _id === details._id
+      );
+      if (!docDetails.in_stock)
+        throw new ValidationError(`${product._id.toString()} is'nt in stock`);
+      if (docDetails.quantity < details.quantity)
+        throw new ValidationError(
+          `product ${product._id.toString()} in ${
+            docDetails._id
+          } details quantity is not enough`
+        );
+    });
+  }
+
+  static async _checkProduct({
+    product,
+    type,
+    user,
+    order,
+  }: {
+    type: 'add' | 'edit';
+    order?: OrderDocument;
+    product: {
+      _id: Types.ObjectId;
+      details: {
+        _id: string;
+        quantity: number;
+      }[];
+    };
+    user: UserDocument;
+  }) {
+    // existence
+    const productDoc = await this.productModel.findOne({
+      _id: product._id,
+      active: true,
+    });
+    const orderDoc =
+      order === undefined
+        ? await this.orderModel.findOne({
+            'customer._id': user._id,
+            status: OrderStatus.Cart,
+            active: true,
+          })
+        : order;
+
+    const productInOrder = orderDoc?.products.find(({ _id }) =>
+      product._id.equals(_id)
+    );
+    const productDetailsInOrder = productInOrder?.details.filter(({ _id }) =>
+      product.details.find(({ _id: mId }) => mId === _id)
+    );
+    const productDetailsInDoc = productDoc?.details.filter(({ _id }) =>
+      product.details.find(({ _id: mId }) => mId === _id)
+    );
+
+    if (!productDoc) throw new NotFound('Product not found');
+    if (type === 'edit') {
+      if (!orderDoc) throw new NotFound('Order not found');
+      if (!productInOrder) throw new NotFound('Product in order must exist');
+      if (productDetailsInOrder?.length !== product.details.length)
+        throw new NotFound('Some product details not exits');
+    } else {
+      if (productDetailsInDoc?.length !== product.details.length)
+        throw new NotFound('Some product details not exits');
+    }
+
+    // quantity rules
+    this.checkProductQuantity({ product, productDoc });
+
+    // restrict rules
+    if (type === 'add' && orderDoc) {
+      if (orderDoc.products.length + 1 > store.settings.MAX_PRODUCTS_IN_CART)
+        throw new LimitError('products in order limit exceeded');
+
+      if (productInOrder)
+        throw new DuplicateError('Can not add product in cart twice');
+    }
+  }
+  static pDoc2pCart(
+    product: ProductDocument | OrderDocument['products'][0],
+    productsBody: ProductBody[]
+  ): OrderDocument['products'][0] {
+    const productInBody = productsBody.find((product) =>
+      product._id.equals(product._id)
+    );
+
+    if (!productInBody) return product as OrderDocument['products'][0];
+
+    const mergedDetails = productInBody.details.map((d) => ({
+      weight: 0,
+      ...(product as ProductDocument).details.find(
+        (details) => d._id === details._id
+      ),
+      ...d,
+    }));
+
+    return {
+      _id: product._id,
+      details: mergedDetails,
+      miniTitle: product.miniTitle,
+      title: product.title,
+      image: product['image'] ?? product['thumbnail'],
+    };
   }
 
   static getCart: MiddleWare = async (req, res) => {
@@ -39,20 +163,7 @@ export default class CartService {
     });
   };
   static addToCart: MiddleWare = async (req, res) => {
-    const quantity = +req.body.product?.quantity || 1;
-    const productId = req.body.product?.id;
-    const product = await CartService.productModel.findOne({
-      _id: productId,
-      active: true,
-    });
-
-    if (!product) throw new NotFound('Product not found');
-
-    // quantity limit
-    if (product.quantity < quantity)
-      throw new BadRequestError(
-        `there is not enough product , product available quantity : ${product.quantity}`
-      );
+    const body: AddToCartBody = req.body;
 
     const order = await CartService.orderModel.findOne({
       'customer._id': req.user._id,
@@ -60,43 +171,38 @@ export default class CartService {
       active: true,
     });
 
+    // validate
+    for (const product of body.products) {
+      await CartService._checkProduct({
+        type: 'add',
+        product,
+        user: req.user,
+        order,
+      });
+    }
+
+    const products = (
+      await this.productModel.find({
+        _id: { $in: body.products.map((p) => p._id) },
+      })
+    ).map((p) => this.pDoc2pCart(p, body.products));
+
     if (!order) {
       // create order
       const order = await CartService.orderModel.create({
-        customer: {
-          ...req.user.toObject(),
-          firstName: req.user.firstName,
-        },
-        products: [
-          {
-            ...product.toObject(),
-            salePrice: product.salePrice ?? product.price,
-            quantity,
-          },
-        ],
+        customer: req.user.toObject(),
+        products,
       });
       return res.status(201).json({
         data: order,
       });
     } else {
-      //  same product id
-      if (order.products.find((doc) => doc._id.equals(productId)))
-        throw new DuplicateError('Can not add product in cart twice');
-
-      // cart limit
-      if (order.products.length + 1 > DEFAULT_CART_LIMIT)
-        throw new LimitError('max products in cart');
-
       // push to cart
       const newOrder = await CartService.orderModel.findOneAndUpdate(
         { _id: order._id },
         {
           $push: {
-            products: {
-              ...product.toObject(),
-              salePrice: product.salePrice ?? product.price,
-              quantity,
-            },
+            products,
           },
         }
       );
@@ -104,41 +210,36 @@ export default class CartService {
       return res.json({ data: newOrder });
     }
   };
-  static editCart: MiddleWare = async (req, res) => {
-    const quantity = +req.body.product.quantity;
-    const productId = req.body.product.id;
-    if (!quantity) throw new BadRequestError('quantity must be grater than 0');
 
-    const product = await CartService.productModel.findOne({
-      _id: productId,
+  static editCart: MiddleWare = async (req, res) => {
+    const body: UpdateCartBody = req.body;
+    const order = await CartService.orderModel.findOne({
+      'customer._id': req.user._id,
+      status: OrderStatus.Cart,
       active: true,
     });
 
-    if (!product) throw new NotFound('Product not found');
+    // validate
+    for (const product of body.products) {
+      await CartService._checkProduct({
+        type: 'edit',
+        product,
+        user: req.user,
+        order,
+      });
+    }
 
-    // quantity limit
-    if (product.quantity < quantity)
-      throw new BadRequestError(
-        `there is not enough product , product available quantity : ${product.quantity}`
-      );
-
-    const order = await CartService.orderModel.findOneAndUpdate(
-      {
-        'customer._id': req.user.id,
-        'products._id': req.body.product.id,
-        status: OrderStatus.Cart,
-
-        active: true,
-      },
-      {
-        $set: {
-          'products.$.quantity': quantity,
-        },
-      }
+    // merge products
+    const products = order.products.map((p) =>
+      this.pDoc2pCart(p, body.products)
     );
 
-    if (!order) throw new NotFound('order not found');
-    return res.json({ data: order });
+    const newOrder = await this.orderModel.findOneAndUpdate(
+      { _id: order._id },
+      { products },
+      { new: true }
+    );
+    return res.json({ data: newOrder });
   };
   static removeFromCart: MiddleWare = async (req, res) => {
     const order = await CartService.orderModel.updateOne(

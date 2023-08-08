@@ -46,6 +46,8 @@ export class Store {
   plugins = new Map<PluginOut['type'], PluginOut['content']>();
   settings: {
     taxRate: number;
+  } & {
+    [key: string]: any;
   };
 
   constructor() {

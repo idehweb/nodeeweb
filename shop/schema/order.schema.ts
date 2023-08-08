@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import mongoose, { Document, Model, Schema, Types } from 'mongoose';
+import { MultiLang } from './_base.schema';
 
 export enum OrderStatus {
   Cart = 'cart',
@@ -50,11 +51,16 @@ export interface IOrder {
   products: {
     _id: Types.ObjectId;
     title: { [key: string]: string };
+    miniTitle: { [key: string]: string };
     image?: string;
-    price: number;
-    salePrice: number;
-    quantity: number;
-    weight: number;
+    details: {
+      _id: string;
+      options?: { [key: string]: string };
+      price: number;
+      salePrice: number;
+      quantity: number;
+      weight: number;
+    }[];
   }[];
   discount?: {
     code: string;
@@ -134,12 +140,19 @@ const schema = new mongoose.Schema(
     products: [
       {
         _id: { type: Schema.Types.ObjectId, required: true },
-        title: { type: mongoose.Schema.Types.Mixed, required: true },
+        title: { type: MultiLang, required: true },
+        miniTitle: { type: MultiLang, required: true },
         image: String,
-        price: { type: Number, required: true },
-        salePrice: { type: Number, required: true },
-        quantity: { type: Number, required: true },
-        weight: { type: Number, required: true },
+        details: [
+          {
+            _id: { type: String, required: true },
+            options: {},
+            price: { type: Number, required: true },
+            salePrice: { type: Number, required: true },
+            quantity: { type: Number, required: true },
+            weight: { type: Number, required: true },
+          },
+        ],
       },
     ],
     discount: {

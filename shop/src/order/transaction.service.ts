@@ -212,7 +212,8 @@ class TransactionService {
   private productCheck(order: OrderDocument, products: ProductDocument[]) {
     let activeCheck: Types.ObjectId[] = [],
       priceCheck: Types.ObjectId[] = [],
-      quantityCheck: Types.ObjectId[] = [];
+      quantityCheck: Types.ObjectId[] = [],
+      inStockCheck: Types.ObjectId[] = [];
 
     const productMap = new Map(products.map((p) => [p._id.toString(), p]));
     // active
@@ -227,11 +228,23 @@ class TransactionService {
     order.products.forEach((p) => {
       const mp = productMap.get(p._id.toString());
       if (!mp) return;
-      if (mp.salePrice !== p.salePrice) priceCheck.push(p._id);
-      if (mp.quantity - p.quantity < 0) quantityCheck.push(p._id);
+
+      p.details.forEach((details) => {
+        const productDetail = mp.details.find((d) => d._id === details._id);
+        if (!productDetail.in_stock) inStockCheck.push(p._id);
+        if (productDetail.salePrice !== details.salePrice)
+          priceCheck.push(p._id);
+        if (productDetail.quantity - details.quantity < 0)
+          quantityCheck.push(p._id);
+      });
     });
 
-    const errors = [activeCheck, priceCheck, quantityCheck].flat();
+    const errors = [
+      activeCheck,
+      priceCheck,
+      quantityCheck,
+      inStockCheck,
+    ].flat();
     if (errors.length)
       throw new BadRequestError(
         `these products must be change\n${[
@@ -249,7 +262,12 @@ class TransactionService {
     ) as PostGatewayPluginContent;
     if (!postPlugin) return 0;
 
-    return (await postPlugin.stack[1]({ products, address })).price;
+    return (
+      await postPlugin.stack[1]({
+        products: products.flatMap((p) => p.details),
+        address,
+      })
+    ).price;
   }
 
   private submitPostReq(order: OrderDocument): Promise<IOrder['post']> {
@@ -260,7 +278,7 @@ class TransactionService {
 
     return postPlugin.stack[0]({
       address: order.address,
-      products: order.products,
+      products: order.products.flatMap((p) => p.details),
     });
   }
 
@@ -299,7 +317,12 @@ class TransactionService {
       productsPrice
         ? productsPrice
         : roundPrice(
-            products.reduce((acc, { salePrice }) => acc + salePrice, 0)
+            products.reduce(
+              (acc, { details }) =>
+                acc +
+                details.reduce((acc, { salePrice }) => acc + salePrice, 0),
+              0
+            )
           );
     const _total_before_tax = async () => {
       if (totalPrice_before_taxes !== undefined) return totalPrice_before_taxes;
@@ -446,12 +469,14 @@ class TransactionService {
 
       // rollback products
       await this.productModel.bulkWrite(
-        order.products.map((p) => ({
-          updateOne: {
-            filter: { _id: p._id },
-            update: { $inc: { quantity: p.quantity } },
-          },
-        })),
+        order.products.flatMap((p) =>
+          p.details.map((d) => ({
+            updateOne: {
+              filter: { _id: p._id, 'details._id': d._id },
+              update: { $inc: { 'details.$.quantity': d.quantity } },
+            },
+          }))
+        ),
         { ordered: false }
       );
 
@@ -525,16 +550,14 @@ class TransactionService {
     if (clear) {
       // inactive products
       await this.productModel.bulkWrite(
-        order.products.map((p) => ({
-          updateOne: {
-            filter: { _id: p._id },
-            update: {
-              $inc: {
-                quantity: -p.quantity,
-              },
+        order.products.flatMap((p) =>
+          p.details.map((d) => ({
+            updateOne: {
+              filter: { _id: p._id, 'details._id': d._id },
+              update: { $inc: { 'details.$.quantity': -d.quantity } },
             },
-          },
-        })),
+          }))
+        ),
         { ordered: false }
       );
     }

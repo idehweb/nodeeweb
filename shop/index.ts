@@ -22,11 +22,17 @@ import logger from './utils/log';
 import { store } from '@nodeeweb/core';
 import { handlePlugins } from './src/common/handlePlugins';
 import registerCustomerGroup from './src/customerGroup';
+import {
+  DEFAULT_PRODUCTS_IN_CART,
+  DEFAULT_PRODUCT_QUANTITY_IN_CART,
+} from './constants/limit';
 
 async function deployShop() {
   await deployCore();
   store.systemLogger = logger;
-
+  store.settings.MAX_PRODUCTS_IN_CART = DEFAULT_PRODUCTS_IN_CART;
+  store.settings.MAX_PRODUCT_QUANTITY_IN_CART =
+    DEFAULT_PRODUCT_QUANTITY_IN_CART;
   // register entity
   registerAdmin();
   registerAttribute();

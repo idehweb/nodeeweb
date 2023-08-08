@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import mongoose, { Document, Model } from 'mongoose';
 import { Types } from 'mongoose';
 import { MultiLang, PublishStatus } from './_base.schema';
@@ -13,6 +14,7 @@ export interface IProduct {
   thumbnail?: string;
   type: PriceType;
   details: {
+    _id: string;
     options?: { [key: string]: string };
     price: number;
     salePrice: number;
@@ -26,6 +28,7 @@ export interface IProduct {
     name: string;
     values: { name: string }[];
   }[];
+  active: boolean;
 }
 
 export type ProductModel = Model<IProduct>;
@@ -46,7 +49,7 @@ const schema = new mongoose.Schema(
     labels: [{ title: String }],
     details: [
       {
-        _id: false,
+        _id: { type: String, default: () => crypto.randomUUID() },
         options: {},
         price: { type: Number, required: true },
         weight: { type: Number, default: 0 },
@@ -59,7 +62,13 @@ const schema = new mongoose.Schema(
     data: {},
     miniTitle: MultiLang,
     excerpt: MultiLang,
-    options: [],
+    options: [
+      {
+        _id: String,
+        name: String,
+        values: [{ name: String, _id: false }],
+      },
+    ],
     extra_attr: [
       {
         title: { type: String, required: true },
