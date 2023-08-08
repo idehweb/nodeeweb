@@ -14,7 +14,8 @@ import { ToID } from '../../utils/validation';
 export class CrudParamDto {
   @Expose()
   @ToID()
-  @Allow()
+  @IsOptional()
+  @IsMongoId()
   id?: Types.ObjectId;
 
   @Expose()

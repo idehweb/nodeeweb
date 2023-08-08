@@ -11,8 +11,13 @@ export enum PriceType {
 export interface IProduct {
   title: { [key: string]: string };
   miniTitle: { [key: string]: string };
+  metatitle?: { [key: string]: string };
+  metadescription?: { [key: string]: string };
+  keywords?: any;
+  slug: string;
+  excerpt?: { [key: string]: string };
+  description?: { [key: string]: string };
   thumbnail?: string;
-  type: PriceType;
   combinations: {
     _id: string;
     options?: { [key: string]: string };
@@ -28,6 +33,15 @@ export interface IProduct {
     name: string;
     values: { name: string }[];
   }[];
+  productCategory: Types.ObjectId[];
+  attributes: { attribute: Types.ObjectId; values: string[] }[];
+  labels: { title: string }[];
+  data?: any;
+  extra_attr: { title: string; des: string }[];
+  price_type: PriceType;
+  status: PublishStatus;
+  relatedProducts: Types.ObjectId[];
+  photos: { _id: Types.ObjectId; url: string }[];
   active: boolean;
 }
 
@@ -102,7 +116,15 @@ const schema = new mongoose.Schema(
       default: PublishStatus.Processing,
     },
     relatedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'product' }],
-    photos: [String],
+    photos: [
+      {
+        type: {
+          _id: { type: mongoose.Schema.Types.ObjectId, ref: 'file' },
+          url: { type: String, required: true },
+        },
+        required: true,
+      },
+    ],
   },
   { timestamps: true }
 );

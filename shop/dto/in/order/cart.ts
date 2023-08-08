@@ -37,7 +37,7 @@ class ProductCombinations {
 export class ProductBody {
   @Expose()
   @ToID()
-  @Allow()
+  @IsMongoId()
   _id: Types.ObjectId;
 
   @Expose()
