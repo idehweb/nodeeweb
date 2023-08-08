@@ -53,7 +53,7 @@ export interface IOrder {
     title: { [key: string]: string };
     miniTitle: { [key: string]: string };
     image?: string;
-    details: {
+    combinations: {
       _id: string;
       options?: { [key: string]: string };
       price: number;
@@ -143,7 +143,7 @@ const schema = new mongoose.Schema(
         title: { type: MultiLang, required: true },
         miniTitle: { type: MultiLang, required: true },
         image: String,
-        details: [
+        combinations: [
           {
             _id: { type: String, required: true },
             options: {},

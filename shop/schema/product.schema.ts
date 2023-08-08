@@ -13,12 +13,12 @@ export interface IProduct {
   miniTitle: { [key: string]: string };
   thumbnail?: string;
   type: PriceType;
-  details: {
+  combinations: {
     _id: string;
     options?: { [key: string]: string };
     price: number;
     salePrice: number;
-    weight?: number;
+    weight: number;
     quantity: number;
     in_stock: boolean;
     sku?: string;
@@ -47,7 +47,7 @@ const schema = new mongoose.Schema(
       },
     ],
     labels: [{ title: String }],
-    details: [
+    combinations: [
       {
         _id: { type: String, default: () => crypto.randomUUID() },
         options: {},

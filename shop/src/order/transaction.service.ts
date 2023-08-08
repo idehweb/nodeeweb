@@ -83,7 +83,7 @@ class TransactionService {
     });
     if (!order) throw new NotFound('order not found');
 
-    // 3. check product details
+    // 3. check product combinations
     const products = await this.productModel.find({
       _id: { $in: order.products.map((p) => p._id) },
       active: true,
@@ -229,12 +229,14 @@ class TransactionService {
       const mp = productMap.get(p._id.toString());
       if (!mp) return;
 
-      p.details.forEach((details) => {
-        const productDetail = mp.details.find((d) => d._id === details._id);
-        if (!productDetail.in_stock) inStockCheck.push(p._id);
-        if (productDetail.salePrice !== details.salePrice)
+      p.combinations.forEach((combinations) => {
+        const productcombination = mp.combinations.find(
+          (d) => d._id === combinations._id
+        );
+        if (!productcombination.in_stock) inStockCheck.push(p._id);
+        if (productcombination.salePrice !== combinations.salePrice)
           priceCheck.push(p._id);
-        if (productDetail.quantity - details.quantity < 0)
+        if (productcombination.quantity - combinations.quantity < 0)
           quantityCheck.push(p._id);
       });
     });
@@ -264,7 +266,7 @@ class TransactionService {
 
     return (
       await postPlugin.stack[1]({
-        products: products.flatMap((p) => p.details),
+        products: products.flatMap((p) => p.combinations),
         address,
       })
     ).price;
@@ -278,7 +280,7 @@ class TransactionService {
 
     return postPlugin.stack[0]({
       address: order.address,
-      products: order.products.flatMap((p) => p.details),
+      products: order.products.flatMap((p) => p.combinations),
     });
   }
 
@@ -318,9 +320,9 @@ class TransactionService {
         ? productsPrice
         : roundPrice(
             products.reduce(
-              (acc, { details }) =>
+              (acc, { combinations }) =>
                 acc +
-                details.reduce((acc, { salePrice }) => acc + salePrice, 0),
+                combinations.reduce((acc, { salePrice }) => acc + salePrice, 0),
               0
             )
           );
@@ -445,7 +447,6 @@ class TransactionService {
         },
         $unset: { 'transaction.expiredAt': '' },
       };
-      console.log('call', update);
       order = await this.orderModel.findOneAndUpdate(
         { _id: order._id },
         update,
@@ -470,10 +471,10 @@ class TransactionService {
       // rollback products
       await this.productModel.bulkWrite(
         order.products.flatMap((p) =>
-          p.details.map((d) => ({
+          p.combinations.map((d) => ({
             updateOne: {
-              filter: { _id: p._id, 'details._id': d._id },
-              update: { $inc: { 'details.$.quantity': d.quantity } },
+              filter: { _id: p._id, 'combinations._id': d._id },
+              update: { $inc: { 'combinations.$.quantity': d.quantity } },
             },
           }))
         ),
@@ -545,16 +546,15 @@ class TransactionService {
       watchers_timeout?: number;
     }
   ) {
-    console.log(watchers_timeout);
     // clear
     if (clear) {
       // inactive products
       await this.productModel.bulkWrite(
         order.products.flatMap((p) =>
-          p.details.map((d) => ({
+          p.combinations.map((d) => ({
             updateOne: {
-              filter: { _id: p._id, 'details._id': d._id },
-              update: { $inc: { 'details.$.quantity': -d.quantity } },
+              filter: { _id: p._id, 'combinations._id': d._id },
+              update: { $inc: { 'combinations.$.quantity': -d.quantity } },
             },
           }))
         ),

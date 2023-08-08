@@ -1,17 +1,20 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import {
+  Allow,
   IsInt,
   IsMongoId,
   IsNumber,
   IsOptional,
   IsPositive,
+  isMongoId,
 } from 'class-validator';
 import { Types } from 'mongoose';
+import { ToID } from '../../utils/validation';
 
 export class CrudParamDto {
   @Expose()
-  @IsOptional()
-  @IsMongoId()
+  @ToID()
+  @Allow()
   id?: Types.ObjectId;
 
   @Expose()

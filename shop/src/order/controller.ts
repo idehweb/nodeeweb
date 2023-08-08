@@ -9,6 +9,7 @@ import CartService from './cart.service';
 import { AuthUserAccess } from '@nodeeweb/core';
 import transactionService from './transaction.service';
 import orderService from './order.service';
+import { AddToCartBody, UpdateCartBody } from '../../dto/in/order/cart';
 
 export default function registerController() {
   // api
@@ -24,12 +25,14 @@ export default function registerController() {
       url: '/cart',
       service: CartService.addToCart,
       access: AuthUserAccess,
+      validate: { dto: AddToCartBody, reqPath: 'body' },
     },
     {
       method: 'put',
       url: '/cart',
       service: CartService.editCart,
       access: AuthUserAccess,
+      validate: { dto: UpdateCartBody, reqPath: 'body' },
     },
     {
       method: 'delete',

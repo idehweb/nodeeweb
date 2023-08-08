@@ -1,6 +1,8 @@
-import { store } from '@nodeeweb/core';
-import { Expose, Transform } from 'class-transformer';
+import { ValidationError, store } from '@nodeeweb/core';
+import { ToID } from '@nodeeweb/core/utils/validation';
+import { Expose, Transform, Type } from 'class-transformer';
 import {
+  Allow,
   ArrayUnique,
   IsInt,
   IsMongoId,
@@ -12,7 +14,7 @@ import {
 } from 'class-validator';
 import { Types } from 'mongoose';
 
-class ProductDetails {
+class ProductCombinations {
   @Expose()
   @IsString()
   _id: string;
@@ -21,25 +23,33 @@ class ProductDetails {
   @IsNumber()
   @IsPositive()
   @IsInt()
-  @Max(store.settings.MAX_PRODUCT_QUANTITY_IN_CART)
+  @Transform(({ value }) => {
+    const q = +value;
+    if (q > store.settings.MAX_PRODUCT_QUANTITY_IN_CART)
+      throw new ValidationError(
+        `quantity must be less than ${store.settings.MAX_PRODUCT_QUANTITY_IN_CART}`
+      );
+    return q;
+  })
   quantity: number;
 }
 
 export class ProductBody {
   @Expose()
-  @IsMongoId()
+  @ToID()
+  @Allow()
   _id: Types.ObjectId;
 
   @Expose()
-  @Transform(() => ProductDetails)
+  @Type(() => ProductCombinations)
   @ValidateNested({ each: true })
-  details: ProductDetails[];
+  combinations: ProductCombinations[];
 }
 
 export class AddToCartBody {
   @Expose()
-  @Transform(() => ProductBody)
-  @ArrayUnique((product: ProductBody) => product._id.toString())
+  @Type(() => ProductBody)
+  @ArrayUnique<ProductBody>((product) => product._id.toString())
   @ValidateNested({ each: true })
   products: ProductBody[];
 }

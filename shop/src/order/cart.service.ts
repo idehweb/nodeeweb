@@ -21,6 +21,7 @@ import {
   UpdateCartBody,
 } from '../../dto/in/order/cart';
 import { UserDocument } from '@nodeeweb/core/types/user';
+import logger from '../../utils/log';
 
 export default class CartService {
   static get orderModel() {
@@ -37,19 +38,19 @@ export default class CartService {
     product: ProductBody;
     productDoc: ProductDocument;
   }) {
-    const productDetailsInDoc = productDoc.details;
+    const productCombinationsInDoc = productDoc.combinations;
 
-    product.details.forEach((details) => {
-      const docDetails = productDetailsInDoc.find(
-        ({ _id }) => _id === details._id
+    product.combinations.forEach((combinations) => {
+      const docCombinations = productCombinationsInDoc.find(
+        ({ _id }) => _id === combinations._id
       );
-      if (!docDetails.in_stock)
+      if (!docCombinations.in_stock)
         throw new ValidationError(`${product._id.toString()} is'nt in stock`);
-      if (docDetails.quantity < details.quantity)
+      if (docCombinations.quantity < combinations.quantity)
         throw new ValidationError(
-          `product ${product._id.toString()} in ${
-            docDetails._id
-          } details quantity is not enough`
+          `product with ID ${product._id.toString()} in combination with ID ${
+            docCombinations._id
+          } has insufficient quantity`
         );
     });
   }
@@ -64,7 +65,7 @@ export default class CartService {
     order?: OrderDocument;
     product: {
       _id: Types.ObjectId;
-      details: {
+      combinations: {
         _id: string;
         quantity: number;
       }[];
@@ -88,22 +89,22 @@ export default class CartService {
     const productInOrder = orderDoc?.products.find(({ _id }) =>
       product._id.equals(_id)
     );
-    const productDetailsInOrder = productInOrder?.details.filter(({ _id }) =>
-      product.details.find(({ _id: mId }) => mId === _id)
+    const productCombinationsInOrder = productInOrder?.combinations.filter(
+      ({ _id }) => product.combinations.find(({ _id: mId }) => mId === _id)
     );
-    const productDetailsInDoc = productDoc?.details.filter(({ _id }) =>
-      product.details.find(({ _id: mId }) => mId === _id)
+    const ProductCombinationsInDoc = productDoc?.combinations.filter(
+      ({ _id }) => product.combinations.find(({ _id: mId }) => mId === _id)
     );
 
     if (!productDoc) throw new NotFound('Product not found');
     if (type === 'edit') {
       if (!orderDoc) throw new NotFound('Order not found');
       if (!productInOrder) throw new NotFound('Product in order must exist');
-      if (productDetailsInOrder?.length !== product.details.length)
-        throw new NotFound('Some product details not exits');
+      if (productCombinationsInOrder?.length !== product.combinations.length)
+        throw new NotFound('Some product combinations not exits');
     } else {
-      if (productDetailsInDoc?.length !== product.details.length)
-        throw new NotFound('Some product details not exits');
+      if (ProductCombinationsInDoc?.length !== product.combinations.length)
+        throw new NotFound('Some product combinations not exits');
     }
 
     // quantity rules
@@ -122,23 +123,28 @@ export default class CartService {
     product: ProductDocument | OrderDocument['products'][0],
     productsBody: ProductBody[]
   ): OrderDocument['products'][0] {
-    const productInBody = productsBody.find((product) =>
-      product._id.equals(product._id)
-    );
+    const productInBody = productsBody.find((p) => {
+      return p._id.equals(product._id);
+    });
 
     if (!productInBody) return product as OrderDocument['products'][0];
+    const mergedCombinations = productInBody.combinations.map((d) => {
+      let productCombination = product.combinations.find(
+        (combinations) => d._id === combinations._id
+      );
 
-    const mergedDetails = productInBody.details.map((d) => ({
-      weight: 0,
-      ...(product as ProductDocument).details.find(
-        (details) => d._id === details._id
-      ),
-      ...d,
-    }));
+      if (productCombination['_doc'])
+        productCombination = productCombination['_doc'];
+
+      return {
+        ...productCombination,
+        ...d,
+      };
+    });
 
     return {
       _id: product._id,
-      details: mergedDetails,
+      combinations: mergedCombinations,
       miniTitle: product.miniTitle,
       title: product.title,
       image: product['image'] ?? product['thumbnail'],
@@ -164,7 +170,6 @@ export default class CartService {
   };
   static addToCart: MiddleWare = async (req, res) => {
     const body: AddToCartBody = req.body;
-
     const order = await CartService.orderModel.findOne({
       'customer._id': req.user._id,
       status: OrderStatus.Cart,
@@ -204,10 +209,11 @@ export default class CartService {
           $push: {
             products,
           },
-        }
+        },
+        { new: true }
       );
 
-      return res.json({ data: newOrder });
+      return res.status(201).json({ data: newOrder });
     }
   };
 
