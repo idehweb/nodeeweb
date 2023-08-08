@@ -10,6 +10,7 @@ import {
   AdminAccess,
   AuthUserAccess,
 } from '@nodeeweb/core/src/handlers/auth.handler';
+import { CreateProductBody } from '../../dto/in/product';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
@@ -78,6 +79,10 @@ export default function registerController() {
       create: {
         controller: {
           access,
+          validate: {
+            dto: CreateProductBody,
+            reqPath: 'body',
+          },
           service: Service.createAfter,
         },
         crud: {

@@ -88,7 +88,7 @@ export class CreateCustomerBody {
 
   @Expose()
   @IsOptional()
-  @ToID(true)
+  @ToID()
   @IsMongoId({ each: true })
   customerGroup?: Types.ObjectId[];
 }
@@ -166,6 +166,7 @@ export class UpdateCustomerBody {
 
   @Expose()
   @IsOptional()
-  @ToID(true)
+  @ToID()
+  @IsMongoId({ each: true })
   customerGroup?: Types.ObjectId[];
 }
