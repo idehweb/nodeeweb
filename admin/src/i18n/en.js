@@ -194,6 +194,8 @@ const customEnglishMessages = {
       nickname: 'nickname',
       password: 'password',
       username: 'username',
+      firstName: 'firstname',
+      lastName: 'lastname',
     },
 
     attributes: {

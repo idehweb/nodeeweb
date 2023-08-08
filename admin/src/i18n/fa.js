@@ -301,6 +301,8 @@ const customFarsiMessages = {
       lastName: 'نام خانوادگی',
       nickname: 'لقب',
       username: 'نام کاربری',
+      firstName: 'نام',
+      lastName: 'نام خانوادگی',
       difference: 'تفاوت داده ها',
       createdAt: 'در تاریخ',
     },
