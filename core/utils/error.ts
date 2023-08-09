@@ -16,7 +16,7 @@ export function errorDetector(err: any): GeneralError {
 
   if (
     (message ?? '').startsWith('ValidationError') ||
-    (message ?? ''.search('validation failed')) !== -1
+    (message ?? '').search('validation failed') !== -1
   )
     return new ValidationError(message, ErrorType.DB, stack);
 

@@ -1,22 +1,45 @@
-import mongoose from 'mongoose';
+import { SmsSendStatus } from '@nodeeweb/core/types/plugin';
+import mongoose, { Document, Model, Types } from 'mongoose';
+import { CustomerSource } from './customer.schema';
+
+interface INotification {
+  title: string;
+  message: string;
+  status: SmsSendStatus;
+  response?: { message?: string; at: Date };
+  phoneNumber?: string;
+  source?: CustomerSource;
+  customerGroup?: Types.ObjectId;
+  from?: string;
+}
+export type NotificationModel = Model<INotification>;
+export type NotificationDocument = Document<Types.ObjectId, {}, INotification> &
+  INotification;
 
 const schema = new mongoose.Schema(
   {
-    message: String,
-    title: String,
-    status: { type: String, default: 'unsend' },
+    title: { type: String, required: true },
+    message: { type: String, required: true },
+    status: {
+      type: String,
+      enum: SmsSendStatus,
+      default: SmsSendStatus.Send_Processing,
+    },
+    response: {
+      type: {
+        _id: false,
+        message: String,
+        at: { type: Date, required: true },
+      },
+      required: false,
+    },
     phoneNumber: String,
-    limit: Number,
-    offset: Number,
-    to: [],
-    from: String,
     source: String,
     customerGroup: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'customerGroup',
     },
-    type: String,
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' }, //category_id
+    from: String,
   },
   { timestamps: true }
 );

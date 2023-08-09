@@ -14,12 +14,31 @@ export type SMSPluginArgs = {
   text?: string;
   type: SMSPluginType;
 };
+export type SMSPluginResponse = Promise<{
+  from: string;
+  at: Date;
+  status: SmsSendStatus;
+  message?: string;
+}>;
+
+export type SMSPluginSendBulkArgs = {
+  pattern?: {
+    id: string;
+    values: string[];
+  };
+  type: SMSPluginType;
+  content: { to: string; text: string }[];
+};
+
 export interface PluginContent {
   name: string;
   stack: ((...args: any) => Promise<boolean | any>)[];
 }
 export interface SMSPluginContent extends PluginContent {
-  stack: [(args: SMSPluginArgs) => Promise<boolean | string>];
+  stack: [
+    (args: SMSPluginArgs) => SMSPluginResponse,
+    (args: SMSPluginSendBulkArgs) => SMSPluginResponse
+  ];
 }
 
 export type PluginOut = {
@@ -28,3 +47,10 @@ export type PluginOut = {
 };
 
 export type Plugin = () => PluginOut;
+
+export enum SmsSendStatus {
+  Send_Processing = 'send_processing',
+  Send_Failed = 'send_failed',
+  Send_Before = 'send_before',
+  Send_Success = 'send_success',
+}

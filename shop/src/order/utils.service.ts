@@ -9,6 +9,7 @@ import {
   ORDER_STATUS_CHANGE_MESSAGE,
   TRANSACTION_ON_EXPIRE_MESSAGE,
 } from '../../constants/String';
+import { replaceValue } from '../../utils/helpers';
 
 export class Utils {
   get smsPlugin() {
@@ -37,25 +38,19 @@ export class Utils {
         orderStatus = 'منقضی شده';
         break;
     }
-    const values = {
-      ...Object.fromEntries(
-        Object.entries(store.env).map(([k, v]) => [`%${k}%`, v])
-      ),
-      '%ORDER_STATUS%': orderStatus,
-      '%ORDER_ID%': order._id,
-      '%CUSTOMER_FIRST_NAME%': order.customer.firstName,
-      '%CUSTOMER_LAST_NAME%': order.customer.lastName,
-    };
-
-    let newMsg = msg;
-    const pattern = /(%[^% ]+%)/g;
-    let value = pattern.exec(msg);
-    while (value) {
-      if (values[value[0]])
-        newMsg = newMsg.replace(new RegExp(value[0], 'g'), values[value[0]]);
-      value = pattern.exec(msg);
-    }
-    return newMsg;
+    return replaceValue({
+      data: [
+        store.env,
+        store.settings,
+        {
+          ORDER_STATUS: orderStatus,
+          ORDER_ID: order._id,
+          CUSTOMER_FIRST_NAME: order.customer.firstName,
+          CUSTOMER_LAST_NAME: order.customer.lastName,
+        },
+      ],
+      text: msg,
+    });
   }
 
   async sendOnStateChange(order: OrderDocument) {

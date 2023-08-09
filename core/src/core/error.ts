@@ -6,7 +6,11 @@ import logger from '../handlers/log.handler';
 
 export const errorHandler: MiddleWareError = (error, req, res, next) => {
   const ge = errorDetector(error);
-  if (Math.floor(ge.code / 100) === 5 || store.env.isLoc) logger.error(ge);
+  const isClosed = res.closed;
+  if (Math.floor(ge.code / 100) === 5 || store.env.isLoc || isClosed)
+    logger.error(ge);
+
+  if (isClosed) return;
 
   return res.status(ge.code).json({
     status: 'error',

@@ -114,7 +114,7 @@ class TransactionService {
       order._id,
       totalPrice,
       products,
-      req.user.phone
+      req.user.phoneNumber
     );
 
     // 7. post if not payment issue

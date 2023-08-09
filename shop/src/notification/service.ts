@@ -1,88 +1,90 @@
 import { MiddleWare } from '@nodeeweb/core/types/global';
 import store from '@nodeeweb/core/store';
 import axios from 'axios';
+import {
+  NotificationDocument,
+  NotificationModel,
+} from '../../schema/notification.schema';
+import {
+  CorePluginType,
+  SMSPluginContent,
+  SMSPluginType,
+  SmsSendStatus,
+} from '@nodeeweb/core/types/plugin';
+import { CustomerDocument, CustomerModel } from '../../schema/customer.schema';
+import { replaceValue } from '../../utils/helpers';
 
 export default class Service {
-  static create: MiddleWare = async (req, res) => {
-    const Notification = store.db.model('notification');
-    const Setting = store.db.model('setting');
-    const Gateway = store.db.model('gateway');
-    delete req.body._id;
-    if (!req.body.message) {
-      return res.status(400).json({
-        success: false,
-        message: 'enter message!',
-      });
-    }
-    const obj = {
-      message: req.body.message,
-    };
-    if (req.body.limit) {
-      obj['limit'] = req.body.limit;
-    }
-    if (req.body.customerGroup) {
-      obj['customerGroup'] = req.body.customerGroup;
-    }
-    if (req.body.source) {
-      obj['source'] = req.body.source;
-    }
-    if (req.body.offset) {
-      obj['offset'] = req.body.offset;
-    }
-    if (req.body.phoneNumber) {
-      obj['phoneNumber'] = req.body.phoneNumber;
-    }
-    const notification = await Notification.create(obj);
-    const setting = await Setting.findOne({}, 'defaultSmsGateway');
+  static get customerModel(): CustomerModel {
+    return store.db.model('customer');
+  }
 
-    if (!setting || !setting.defaultSmsGateway)
-      //send with default gateway
-      return res.status(400).json({ message: 'send with default gateway' });
+  static get notificationModel(): NotificationModel {
+    return store.db.model('notification');
+  }
 
-    const gateway = await Gateway.findById(setting.defaultSmsGateway);
+  static replaceValue(customer: CustomerDocument, text: string) {
+    return replaceValue({ data: [store.settings, customer.toObject()], text });
+  }
 
-    if (!gateway || !gateway.request) {
-      //send with default gateway
-      return res.status(404).json({
-        success: false,
-        gateway: gateway,
-      });
-    }
+  static afterCreate: MiddleWare = async (req, res) => {
+    const notif: NotificationDocument = req.crud;
 
-    if (req.body.phoneNumber && !req.body.source) {
-      let m = gateway.request;
-      if (req.body.message) m = m.replaceAll('%message%', req.body.message);
-      if (req.body.phoneNumber)
-        m = m.replaceAll('%phoneNumber%', req.body.phoneNumber);
+    // send response to user
+    res.status(202).json({ data: notif });
 
-      const theReq = JSON.parse(m);
-      const data = await axios(theReq);
-      return res.status(201).json(notification);
-    }
-
-    if (!req.body.phoneNumber && req.body.source) {
-      const Customer = store.db.model('Customer');
-      const customers = await Customer.find({ source: req.body.source })
-        .skip(req.body.offset || 0)
-        .limit(req.body.limit || 1000);
-
-      const promises = customers.map(async function (customer, i) {
-        let m = gateway.request;
-        if (req.body.message) m = m.replaceAll('%message%', req.body.message);
-        console.log('phoneNumber', customer.phoneNumber);
-        if (customer.phoneNumber)
-          m = m.replaceAll('%phoneNumber%', customer.phoneNumber);
-        if (customer.firstName) {
-          m = m.replaceAll('%firstName%', customer.firstName);
+    const smsPlugin = store.plugins.get(CorePluginType.SMS) as SMSPluginContent;
+    if (!smsPlugin) {
+      return await this.notificationModel.updateOne(
+        { _id: notif._id },
+        {
+          $set: {
+            status: SmsSendStatus.Send_Failed,
+            response: {
+              at: new Date(),
+              message: `send failed because system could'nt find any registered ${CorePluginType.SMS} plugin`,
+            },
+          },
         }
-        if (!customer.firstName) {
-          m = m.replaceAll('%firstName%', 'دوست');
-        }
-
-        const theReq = JSON.parse(m);
-        const data = await axios(theReq);
-      });
-      await Promise.all(promises);
+      );
     }
+
+    // fetch targets
+    const targets = await this.customerModel.find({
+      $and: [
+        Object.fromEntries(
+          Object.entries({
+            customerGroup: notif.customerGroup,
+            phoneNumber: notif.phoneNumber,
+            source: notif.source,
+          }).filter(([k, v]) => v)
+        ),
+        { phoneNumber: { $exists: true }, active: true },
+      ],
+    });
+
+    // send sms
+    const response = await smsPlugin.stack[1]({
+      type: SMSPluginType.Reg,
+      content: targets.map((customer) => ({
+        to: customer.phoneNumber,
+        text: this.replaceValue(customer, notif.message),
+      })),
+    });
+
+    // save notif
+    await this.notificationModel.updateOne(
+      { _id: notif._id },
+      {
+        $set: {
+          from: response.from,
+          response: {
+            at: response.at,
+            message: response.message,
+          },
+          status: response.status,
+        },
+      }
+    );
   };
 }
