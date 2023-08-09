@@ -1,5 +1,5 @@
 import { ValidationError, store } from '@nodeeweb/core';
-import { ToID } from '@nodeeweb/core/utils/validation';
+import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
 import { Expose, Transform, Type } from 'class-transformer';
 import {
   Allow,
@@ -36,8 +36,8 @@ class ProductCombinations {
 
 export class ProductBody {
   @Expose()
-  @ToID()
-  @IsMongoId()
+  @ToMongoID()
+  @IsMongoID()
   _id: Types.ObjectId;
 
   @Expose()

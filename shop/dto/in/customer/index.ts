@@ -1,6 +1,6 @@
 import { ValidationError } from '@nodeeweb/core';
 import { UserSex } from '@nodeeweb/core/types/user';
-import { ToID } from '@nodeeweb/core/utils/validation';
+import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
 import { Expose, Transform, Type } from 'class-transformer';
 import {
   IsString,
@@ -87,9 +87,9 @@ export class CreateCustomerBody {
   birthday?: Date;
 
   @Expose()
+  @ToMongoID()
   @IsOptional()
-  @ToID()
-  @IsMongoId({ each: true })
+  @IsMongoID({ each: true })
   customerGroup?: Types.ObjectId[];
 }
 
@@ -166,7 +166,7 @@ export class UpdateCustomerBody {
 
   @Expose()
   @IsOptional()
-  @ToID()
-  @IsMongoId({ each: true })
+  @ToMongoID()
+  @IsMongoID({ each: true })
   customerGroup?: Types.ObjectId[];
 }

@@ -14,7 +14,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { ToID } from '@nodeeweb/core/utils/validation';
+import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
 import { Types } from 'mongoose';
 import { PriceType } from '../../../schema/product.schema';
 import { PublishStatus } from '../../../schema/_base.schema';
@@ -35,8 +35,8 @@ class Labels {
 }
 class Attributes {
   @Expose()
-  @ToID()
-  @IsMongoId()
+  @ToMongoID()
+  @IsMongoID()
   attribute: Types.ObjectId;
 
   @Expose()
@@ -151,8 +151,8 @@ export class CreateProductBody {
 
   @Expose()
   @IsOptional()
-  @ToID()
-  @IsMongoId({ each: true })
+  @ToMongoID()
+  @IsMongoID({ each: true })
   productCategory?: Types.ObjectId[];
 
   @Expose()
@@ -184,15 +184,15 @@ export class CreateProductBody {
   status: PublishStatus;
 
   @Expose()
+  @ToMongoID()
   @IsOptional()
-  @ToID()
-  @IsMongoId({ each: true })
+  @IsMongoID({ each: true })
   relatedProducts?: Types.ObjectId[];
 
   @Expose()
+  @ToMongoID()
   @IsOptional()
-  @ToID()
-  @IsMongoId({ each: true })
+  @IsMongoID({ each: true })
   photos?: Types.ObjectId[];
 
   @Expose()
