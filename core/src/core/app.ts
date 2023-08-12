@@ -10,6 +10,7 @@ import { registerDefaultControllers } from './controller';
 import { activeAuthControllers } from './auth';
 import registerDefaultPlugins from './plugin';
 import { registerValidationPipe } from '../handlers/validate.handler';
+import { registerDefaultConfig } from './config';
 
 const app = express();
 
@@ -20,6 +21,9 @@ store.app = app;
 export default async function buildApp() {
   // prepare , create dirs
   await prepare();
+
+  // register config
+  registerDefaultConfig();
 
   // register models
   await dbRegisterModels();

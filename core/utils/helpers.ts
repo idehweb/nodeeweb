@@ -61,7 +61,9 @@ export async function call<A extends Array<any>, R>(
 
 export function getName(f: any, capitalize = true) {
   const name: string =
-    (typeof f === 'string' ? f : f?.shadowName || f?.name) ?? '';
+    (typeof f === 'string'
+      ? f
+      : f?.shadowName || f?.name || f?.constructor?.name) ?? '';
   return name
     .split(' ')
     .map((word, i) => (i == 0 && capitalize ? _.capitalize(word) : word))

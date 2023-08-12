@@ -7,6 +7,7 @@ import { AdminViewSchema } from './types/view';
 import { AuthStrategy } from './types/auth';
 import { PluginOut } from './types/plugin';
 import { Pipe } from './types/pipe';
+import { ConfigType } from './types/config';
 export class Store {
   env: {
     APP_NAME: string;
@@ -30,6 +31,11 @@ export class Store {
     SMS_PASSWORD?: string;
     BASE_URL: string;
     BASE_API_URL: string;
+    RESTART_WEBHOOK?: string;
+    RESTART_WEBHOOK_AUTH_TOKEN?: string;
+    RESTART_POLICY: 'internal' | 'external';
+    RESTART_COUNT: string;
+    RESTARTING: string;
   } & { [k: string]: string };
   db: typeof mongoose;
   dirs: string[];
@@ -44,11 +50,7 @@ export class Store {
     {};
   strategies = new Map<string, AuthStrategy>();
   plugins = new Map<PluginOut['type'], PluginOut['content']>();
-  settings: {
-    taxRate: number;
-  } & {
-    [key: string]: any;
-  };
+  config: ConfigType;
 
   constructor() {
     this.env = { ...process.env } as any;
@@ -63,8 +65,7 @@ export class Store {
         this.env.isLoc = true;
         break;
     }
-
-    this.settings = { taxRate: 0.25 };
+    if (!this.env.RESTART_POLICY) this.env.RESTART_POLICY = 'external';
     this.globalMiddleware = { pipes: {}, error: {} };
   }
 }
