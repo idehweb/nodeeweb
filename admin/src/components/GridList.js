@@ -42,7 +42,7 @@ const times = (nbChildren, fn) =>
   Array.from({ length: nbChildren }, (_, key) => fn(key));
 
 const LoadingGridList = (props) => {
-  const { width, nbItems = 20 } = props;
+  const { width, nbItems } = props;
   const classes = useStyles();
   return times(nbItems, (key) => (
     <ImageListItem key={key} className={'media_ImageListItem notLoaded'}>
