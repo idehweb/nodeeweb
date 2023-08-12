@@ -4,7 +4,7 @@ export const BASE_URL =
   (process.env.NODE_ENV === 'development'
     ? process.env.REACT_APP_API_BASE_URL_DEV
     : window.origin) + '/api/v1';
-export const ADMIN_ROUTE = BASE_URL + '/admin';
+export const ADMIN_ROUTE = BASE_URL + '/aadmin';
 export const ShopURL = BASE_URL;
 
 export default axios.create({
