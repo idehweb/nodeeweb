@@ -26,7 +26,7 @@ export class Config<C extends CoreConfigDto> {
   }
   protected _validate(value: any): void {
     const errors = validateSync(value);
-    if (errors)
+    if (errors.length)
       throw new Error(
         `config validation failed:\n${errors
           .map((e) => e.toString())
@@ -91,11 +91,13 @@ export class Config<C extends CoreConfigDto> {
     this._merge(JSON.parse(fs.readFileSync(this._path, 'utf-8')));
     SingleJobProcess.builderAsync('write-config', () => {
       this._write();
+      console.log('after _write');
     })().then();
   }
 
   private _write(config = this._config) {
     fs.writeFileSync(this._path, JSON.stringify(config, null, '  '), 'utf-8');
+    console.log('after write');
   }
 
   public async change(

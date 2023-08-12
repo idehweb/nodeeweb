@@ -12,8 +12,11 @@ export function registerConfig<
   store.config = config as any;
   logger.log(
     color(
-      'White',
-      `## ${from ? `${from} ` : ''}Register Config ${getName(config, true)} ##`
+      'Yellow',
+      `## ${from ? `[${from}] ` : ''}Register Config => ${getName(
+        config,
+        false
+      )} ##`
     )
   );
 }
