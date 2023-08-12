@@ -13,8 +13,7 @@ import {
   TextField,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
-import { ThemeProvider } from '@material-ui/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import LockIcon from '@mui/icons-material/Lock';
 import {
   Notification,
@@ -24,7 +23,7 @@ import {
   useNotify,
 } from 'react-admin';
 
-import { lightTheme } from './../layout/themes';
+import { lightTheme } from '@/layout/themes';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -150,7 +149,7 @@ const Logout = () => {
 // Because otherwise the useStyles() hook used in Login won't get
 // the right theme
 const LogoutWithTheme = (props) => (
-  <ThemeProvider theme={createTheme(lightTheme)}>
+  <ThemeProvider theme={lightTheme}>
     <Logout {...props} />
   </ThemeProvider>
 );

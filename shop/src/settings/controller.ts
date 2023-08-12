@@ -8,7 +8,7 @@ import { controllersBatchRegister } from '@nodeeweb/core/src/handlers/controller
 import { AuthUserAccess } from '@nodeeweb/core/src/handlers/auth.handler';
 import Service from './service';
 import { uploadSingle } from '@nodeeweb/core/src/handlers/upload.handler';
-import { getStaticDir } from '@nodeeweb/core/utils/path';
+import { getPublicDir } from '@nodeeweb/core/utils/path';
 import { join } from 'path';
 
 export default function registerController() {
@@ -64,6 +64,12 @@ export default function registerController() {
         service: Service.configuration,
       },
       {
+        url: '/configuration',
+        method: 'get',
+        access,
+        service: Service.getConfiguration,
+      },
+      {
         url: '/factore',
         method: 'get',
         access,
@@ -112,10 +118,7 @@ export default function registerController() {
         service: [
           ...uploadSingle({
             type: 'all',
-            dir_path: join(
-              getStaticDir('public_media', true)[0],
-              'site_setting'
-            ),
+            dir_path: join(getPublicDir('files', true)[0], 'site_setting'),
             max_size_mb: 100,
             reduce: { quality: 0.8 },
           }),
@@ -147,5 +150,55 @@ export default function registerController() {
       base_url: '/customer/settings',
       from: 'ShopEntity',
     }
+  );
+
+  // crud
+  registerEntityCRUD(
+    'setting',
+    {
+      getOne: {
+        controller: {
+          access,
+          service(req, res) {
+            res.json(req.crud);
+          },
+        },
+        crud: {
+          saveToReq: true,
+          executeQuery: true,
+        },
+      },
+      getAll: {
+        controller: {
+          access,
+          service: (req, res) => res.json(req[CRUD_DEFAULT_REQ_KEY]),
+        },
+        crud: {
+          parseFilter(req) {
+            if (req.query.filter && typeof req.query.filter === 'string') {
+              return JSON.parse(req.query.filter);
+            }
+          },
+          autoSetCount: true,
+          saveToReq: true,
+          executeQuery: true,
+          paramFields: {
+            limit: 'limit',
+            offset: 'offset',
+          },
+        },
+      },
+      updateOne: {
+        controller: {
+          access,
+        },
+        crud: {
+          sendResponse: true,
+          executeQuery: true,
+        },
+      },
+    },
+
+    { from: 'ShopEntity' }
   );
 }

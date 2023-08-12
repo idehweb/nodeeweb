@@ -22,7 +22,7 @@ import {
   slideOffer7Img,
   slideOffer8Img,
   valentineDays,
-} from '#c/assets/index';
+} from '@/assets/index';
 import {
   enableAdmin,
   enableAgent,
@@ -37,9 +37,9 @@ import {
   loadProducts,
   SaveData,
   setCountry,
-} from '#c/functions/index';
-import { ProductsSliderServer } from '#c/components/components-overview/ProductsSlider';
-import { PostSliderServer } from '#c/components/components-overview/PostSlider';
+} from '@/functions/index';
+import { ProductsSliderServer } from '@/components/components-overview/ProductsSlider';
+import { PostSliderServer } from '@/components/components-overview/PostSlider';
 
 
 const boxStyle = {

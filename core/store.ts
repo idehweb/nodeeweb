@@ -1,13 +1,15 @@
 import mongoose from 'mongoose';
-import { ENV, USE_ENV } from './types/global';
+import { ENV, MiddleWare, USE_ENV } from './types/global';
 import { Application } from 'express';
 import { ErrorPackageFn } from './types/error';
 import { Server } from 'http';
 import { AdminViewSchema } from './types/view';
 import { AuthStrategy } from './types/auth';
-import { PluginContent, PluginType } from './types/plugin';
+import { PluginOut } from './types/plugin';
+import { Pipe } from './types/pipe';
 export class Store {
   env: {
+    APP_NAME: string;
     MONGO_URL: string;
     PORT?: string;
     DB_NAME: string;
@@ -26,16 +28,24 @@ export class Store {
     LOG_TO_FILE: string;
     SMS_USERNAME?: string;
     SMS_PASSWORD?: string;
+    BASE_URL: string;
+    BASE_API_URL: string;
   } & { [k: string]: string };
   db: typeof mongoose;
   dirs: string[];
   app: Application;
-  errorPackage: ErrorPackageFn;
+  globalMiddleware: {
+    error: ErrorPackageFn;
+    pipes: { [key: string]: Pipe<unknown> };
+  };
   server: Server;
   systemLogger: any;
   adminViews: AdminViewSchema[] = [];
   strategies = new Map<string, AuthStrategy>();
-  plugins = new Map<PluginType, PluginContent>();
+  plugins = new Map<PluginOut['type'], PluginOut['content']>();
+  settings: {
+    taxRate: number;
+  };
 
   constructor() {
     this.env = process.env as any;
@@ -50,6 +60,9 @@ export class Store {
         this.env.isLoc = true;
         break;
     }
+
+    this.settings = { taxRate: 0.25 };
+    this.globalMiddleware = { pipes: {}, error: {} };
   }
 }
 

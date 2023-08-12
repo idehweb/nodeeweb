@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const schema = new mongoose.Schema(
   {
     active: { type: Boolean, default: true },
-    category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
+    category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'category' }],
     data: {},
     description: {},
     excerpt: {},

@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import path, { join } from 'path';
 import {
-  PACKAGE_PREFIX,
   getBuildDir,
+  getPublicDir,
   getScriptFile,
   getSharedPath,
   getStaticDir,
@@ -14,6 +14,7 @@ import logger from '../handlers/log.handler';
 import { isExistsSync } from '../../utils/helpers';
 import exec from '../../utils/exec';
 import { color } from '../../utils/color';
+import { APP_INFO, CORE_NODE_MODULE_PATH_RELATIVE } from '../../utils/package';
 
 export default async function prepare() {
   // install requirements
@@ -21,73 +22,86 @@ export default async function prepare() {
 
   // create directories
   createSharedDir();
+  createPublicDir();
   createPublicMediaFolder();
 
-  // link
-  await createAndCopyBuildDir('admin');
+  // copy public files
+  await copyPublicFiles('admin');
 
-  const staticDirs = ['plugins'];
-  // run this command only if npm i @nodeeweb/core
-  if (store.env.USE_ENV === USE_ENV.NPM) staticDirs.push('schema', 'theme');
-  await Promise.all(staticDirs.map(createAndCopyStaticDir));
+  // copy static dirs
+  await copyStaticFiles('schema');
 }
 
 async function installRequirements() {
   if (store.env.NOT_INSTALL_REQUIREMENTS || store.env.USE_ENV !== USE_ENV.NPM)
     return;
 
-  const packageInfo = await import(path.join(path.resolve(), 'package.json'));
-  const requirements = ['mongoose', 'bcrypt'].filter(
-    (pack) => !packageInfo.dependencies[pack]
-  );
+  const packageInfo = await import(APP_INFO);
+
+  const requirements = [
+    'mongoose',
+    'bcrypt',
+    'reflect-metadata',
+    'class-transformer',
+    'class-validator',
+  ].filter((pack) => !packageInfo.dependencies[pack]);
   if (!requirements.length) return;
   logger.log(color('Green', `## Install ${requirements.join(', ')} ##`));
-  await exec(`npm i ${requirements.join(' ')}`);
+  await exec(
+    `yarn add ${requirements
+      .map(
+        (pn) =>
+          `link:./${join(CORE_NODE_MODULE_PATH_RELATIVE, 'node_modules', pn)}`
+      )
+      .join(' ')}`,
+    { logger }
+  );
 }
 
 function createSharedDir() {
   if (!fs.existsSync(getSharedPath('.'))) fs.mkdirSync(getSharedPath('.'));
 }
+function createPublicDir() {
+  if (!fs.existsSync(getPublicDir('.', true)[0]))
+    fs.mkdirSync(getPublicDir('.', true)[0]);
+}
 
 function createPublicMediaFolder() {
-  const [public_mediaPath] = getStaticDir('public_media', true);
-  const public_media_customerPath = path.join(public_mediaPath, 'customer');
-  const public_media_siteSettingPath = path.join(
-    public_mediaPath,
-    'site_setting'
-  );
-  if (fs.existsSync(public_mediaPath)) {
-    logger.log('public_mediaPath exist...');
-    if (fs.existsSync(public_media_customerPath)) {
-      logger.log('public_media_customerPath exist...');
+  const [filesPath] = getPublicDir('files', true);
+  const files_customerPath = path.join(filesPath, 'customer');
+  const files_siteSettingPath = path.join(filesPath, 'site_setting');
+  if (fs.existsSync(filesPath)) {
+    logger.log('filesPath exist...');
+    if (fs.existsSync(files_customerPath)) {
+      logger.log('files_customerPath exist...');
     } else {
-      fs.mkdir(public_media_customerPath, () => {
-        logger.log('we created public_media_customerPath');
+      fs.mkdir(files_customerPath, () => {
+        logger.log('we created files_customerPath');
       });
     }
-    if (fs.existsSync(public_media_siteSettingPath)) {
-      logger.log('public_media_siteSettingPath exist...');
+    if (fs.existsSync(files_siteSettingPath)) {
+      logger.log('files_siteSettingPath exist...');
     } else {
-      fs.mkdir(public_media_siteSettingPath, () => {
-        logger.log('we created public_media_siteSettingPath');
+      fs.mkdir(files_siteSettingPath, () => {
+        logger.log('we created files_siteSettingPath');
       });
     }
   } else {
-    logger.log('we should create public_mediaPath');
+    logger.log('we should create filesPath');
 
-    fs.mkdir(public_mediaPath, () => {
-      logger.log('we created public_mediaPath');
-      fs.mkdir(public_media_customerPath, () => {
-        logger.log('we created public_media_customerPath');
+    fs.mkdir(filesPath, () => {
+      logger.log('we created filesPath');
+      fs.mkdir(files_customerPath, () => {
+        logger.log('we created files_customerPath');
       });
-      fs.mkdir(public_media_siteSettingPath, () => {
-        logger.log('we created public_media_siteSettingPath');
+      fs.mkdir(files_siteSettingPath, () => {
+        logger.log('we created files_siteSettingPath');
       });
     });
   }
 }
 
-async function createAndCopyStaticDir(name: string) {
+async function copyStaticFiles(name: string) {
   const [dirLocalPath] = getStaticDir(name, true);
   const dirModulePath = getStaticDir(name, false).slice(1).filter(isExistsSync);
 
@@ -120,8 +134,8 @@ async function createAndCopyStaticDir(name: string) {
   logger.log(name, 'folder:', dirLocalPath);
 }
 
-async function createAndCopyBuildDir(name: string) {
-  const [dirLocalPath] = getStaticDir(name, true);
+async function copyPublicFiles(name: string) {
+  const [dirLocalPath] = getPublicDir(name, true);
   const dirModulePath = getBuildDir(name);
 
   // check if directory exist before

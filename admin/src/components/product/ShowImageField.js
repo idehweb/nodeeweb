@@ -4,7 +4,6 @@ import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import API, { BASE_URL } from '@/functions/API';
-import { showFiles } from '@/components';
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 

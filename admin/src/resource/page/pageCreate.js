@@ -5,7 +5,6 @@ import {
   SelectInput,
   TextInput,
   Toolbar,
-  useForm,
   useRecordContext,
   useTranslate,
 } from 'react-admin';
@@ -22,7 +21,6 @@ import {
   FileChips,
   List,
   ShowDescription,
-  showFiles,
   ShowLink,
   ShowOptions,
   ShowPictures,
@@ -33,7 +31,6 @@ import {
 import { Val } from '@/Utils';
 
 import Form from './pageForm';
-
 
 const create = (props) => (
   <Create {...props}>

@@ -1,5 +1,5 @@
 import React from 'react';
-// import { useRecordContext } from "react-admin/dist/index";
+// import { useRecordContext } from "react-admin";
 import {
   ArrayInput,
   FormDataConsumer,

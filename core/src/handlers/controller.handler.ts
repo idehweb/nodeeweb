@@ -13,6 +13,7 @@ import { color } from '../../utils/color';
 import { RegisterOptions } from '../../types/register';
 import { OPTIONAL_LOGIN } from '../constants/String';
 import { catchMiddleware } from '../../utils/catchAsync';
+import { validateCreator } from '../core/validate';
 
 export function getUrlFromBaseUrl(url: string, base_url?: string) {
   return join(base_url ?? '', url).replace(/\\/g, '/');
@@ -50,7 +51,7 @@ function popErrorHandlers() {
   // filter layers
   store.app._router.stack = (store.app._router.stack as any[]).filter(
     (layer) => {
-      if (Object.values(store.errorPackage).includes(layer.handle)) {
+      if (Object.values(store.globalMiddleware.error).includes(layer.handle)) {
         errorLayers.push(layer);
         return false;
       }
@@ -82,6 +83,11 @@ export function controllerRegister(
 
   if (schema.access) {
     mw.push(...translateAccess(schema.access as []));
+  }
+
+  // validate
+  if (schema.validate) {
+    mw.push(validateCreator(schema.validate));
   }
 
   if (!Array.isArray(schema.service)) schema.service = [schema.service];
@@ -120,7 +126,9 @@ export function controllersBatchRegister(
 function translateAccess(accesses: ControllerAccess[]): MiddleWare[] {
   const opt: Partial<JwtStrategyOpt> = {};
 
-  if (accesses.find(({ role }) => role === OPTIONAL_LOGIN)) opt.notThrow = true;
+  if (accesses.find(({ role }) => role === OPTIONAL_LOGIN)) {
+    opt.notThrow = true;
+  }
 
   return [
     ...authorizeWithToken(_.uniq(accesses.map((a) => a.modelName)), opt),

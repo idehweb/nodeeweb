@@ -37,10 +37,6 @@ export default function registerController() {
               path: 'user',
               select: 'username _id nickname',
             },
-            {
-              path: '',
-              select: '',
-            },
           ],
           paramFields: {
             limit: 'limit',
@@ -49,6 +45,6 @@ export default function registerController() {
         },
       },
     },
-    { base_url: '/amin/action', from: 'ShopEntity' }
+    { from: 'ShopEntity' }
   );
 }

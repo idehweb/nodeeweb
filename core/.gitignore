@@ -9,7 +9,7 @@ dist
 .env.local
 
 ## public
-public_media
+files
 
 ## shared
 shared/*
@@ -18,4 +18,7 @@ shared/*
 logs/*
 
 ## assets
-admin/*
+public/*
+
+# VS
+.vscode

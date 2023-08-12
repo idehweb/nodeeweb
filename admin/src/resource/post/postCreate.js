@@ -5,7 +5,6 @@ import {
   SelectInput,
   TextInput,
   Toolbar,
-  useForm,
   useRecordContext,
   useTranslate,
 } from 'react-admin';
@@ -22,7 +21,6 @@ import {
   FileChips,
   List,
   ShowDescription,
-  showFiles,
   ShowLink,
   ShowOptions,
   ShowPictures,
@@ -31,11 +29,9 @@ import {
   UploaderField,
 } from '@/components';
 
-
 import { Val } from '@/Utils';
 
 import Form from './postForm';
-
 
 const create = (props) => (
   <Create {...props}>

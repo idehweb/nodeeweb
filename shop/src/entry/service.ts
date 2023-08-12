@@ -1,8 +1,9 @@
-import { Req } from '@nodeeweb/core/types/global';
-import { serviceOnError } from '../common/service';
-import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
+import { MiddleWare, Req } from '@nodeeweb/core/types/global';
 import mongoose from 'mongoose';
 import store from '@nodeeweb/core/store';
+import { NotFound } from '@nodeeweb/core';
+import { randomInt } from 'crypto';
+import { promisify } from 'util';
 
 export default class Service {
   static getAllQuery(req: Req) {
@@ -37,7 +38,21 @@ export default class Service {
     }
     return search;
   }
-  static onError = serviceOnError('Entry');
-}
 
-classCatchBuilder(Service);
+  static async createOneBodyParser(req: Req) {
+    const Form = store.db.model('form');
+
+    const form = await Form.findById(req.params.form, '_id');
+
+    if (!form) {
+      throw new NotFound('form not found');
+    }
+    const trackingCode = +(await promisify(randomInt)(90_000)) + 10_000;
+
+    return {
+      form: form._id,
+      trackingCode,
+      data: req.body,
+    };
+  }
+}

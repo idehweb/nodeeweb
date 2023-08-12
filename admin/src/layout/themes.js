@@ -1,4 +1,6 @@
-export const darkTheme = {
+import { createTheme } from '@mui/material/styles';
+
+export const darkTheme = createTheme({
   palette: {
     primary: {
       main: '#90caf9',
@@ -6,7 +8,7 @@ export const darkTheme = {
     secondary: {
       main: '#FBBA72',
     },
-    type: 'dark', // Switching the dark mode on is a single property value change.
+    mode: 'dark', // Switching the dark mode on is a single property value change.
   },
   sidebar: {
     width: 200,
@@ -45,9 +47,9 @@ export const darkTheme = {
       disableRipple: true,
     },
   },
-};
+});
 
-export const lightTheme = {
+export const lightTheme = createTheme({
   palette: {
     primary: {
       main: '#4f3cc9',
@@ -61,7 +63,7 @@ export const lightTheme = {
     background: {
       default: '#fcfcfe',
     },
-    type: 'light',
+    mode: 'light',
   },
   shape: {
     borderRadius: 10,
@@ -148,4 +150,4 @@ export const lightTheme = {
       disableRipple: true,
     },
   },
-};
+});

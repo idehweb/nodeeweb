@@ -21,9 +21,7 @@ import languageReducer from './languageReducer';
 
 import Login from './layout/Login';
 
-
 import { changeThemeData, changeThemeDataFunc } from './functions/index';
-
 
 import '@/assets/global.css';
 import { MainLayout } from './layout';
@@ -266,11 +264,12 @@ export default function App() {
       />
       {themeData &&
         themeData.models &&
-        themeData.models.map((model, m) => {
+        themeData.models.map((model, idx) => {
           if (exclude.indexOf(model.toLowerCase()) == -1) {
             let modelName = model.toLowerCase();
             return (
               <Resource
+                key={idx}
                 name={modelName}
                 options={{ label: translate('pos.menu.' + modelName) }}
                 {...Dynamic}

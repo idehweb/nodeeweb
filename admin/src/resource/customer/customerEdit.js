@@ -9,7 +9,7 @@ import {
   TextInput,
 } from 'react-admin';
 
-import { useTranslate } from 'react-admin/dist/index';
+import { useTranslate } from 'react-admin';
 
 import { dateFormat } from '@/functions';
 import { List, ReactAdminJalaliDateInput, SimpleForm } from '@/components';

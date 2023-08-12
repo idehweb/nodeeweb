@@ -1,26 +1,47 @@
 import { NextFunction, Response } from 'express';
 import { MiddleWare, MiddleWareError, Req } from '../types/global';
-import { isAsyncFunction } from 'util/types';
+import { axiosError2String } from './helpers';
+import store from '../store';
 
-export function catchFn<F extends Function>(
+export const catchFn = <F extends Function>(
   fn: F,
-  { self, onError }: { self?: any; onError?: any } = {}
-) {
-  return (async (...args: any[]) => {
+  {
+    self,
+    onError,
+  }: {
+    self?: any;
+    onError?: Function;
+  } = {}
+) => {
+  const newFn = async (...args: any[]) => {
     try {
-      let result = fn.call(self ?? this, ...args);
+      let result = fn.call(self, ...args);
       while (result instanceof Promise) {
         result = await result;
       }
       return result;
     } catch (err) {
       if (onError) {
-        // logger.error('#CatchError', err);
-        return onError(err, ...args);
+        const parsed = axiosError2String(err);
+        let newError: Error;
+        if (parsed.message) {
+          newError = new Error(parsed.message);
+          delete newError.stack;
+        } else {
+          newError = parsed.error;
+        }
+        return onError(newError, ...args);
+      } else {
+        store.systemLogger.error('#Unhandled Error cath\n', err);
       }
     }
-  }) as any as F;
-}
+  };
+
+  return newFn as any as F;
+};
+const middlewareError: MiddleWareError = (err, req, res, next) => {
+  return next(err);
+};
 export const catchMiddleware = <F extends MiddleWare>(
   fn: F,
   {
@@ -31,23 +52,10 @@ export const catchMiddleware = <F extends MiddleWare>(
     onError?: MiddleWareError;
   } = {}
 ) => {
-  const catchFn: MiddleWare = async (req, res, next) => {
-    try {
-      let result = fn.call(self ?? this, req, res, next);
-      while (result instanceof Promise) {
-        result = await result;
-      }
-      return result;
-    } catch (err) {
-      if (onError) {
-        // logger.error('#CatchError', err);
-        return onError(err, req, res, next);
-      }
-      return next(err);
-    }
-  };
-
-  return catchFn as F;
+  return catchFn(fn, {
+    self,
+    onError: onError ?? middlewareError,
+  }) as F;
 };
 
 export function classCatchBuilder<CustomClass>(

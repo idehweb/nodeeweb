@@ -2,15 +2,16 @@ import { createTerminus } from '@godaddy/terminus';
 import mongoose from 'mongoose';
 import logger from '../handlers/log.handler';
 import store from '../../store';
+import { clearAllLockFiles } from '../handlers/singleJob.handler';
 
 export function handleUncaughtException() {
   process.once('uncaughtException', (err) => {
     logger.error('#uncaughtException:', err);
-    shutdown();
+    shutdown(1);
   });
   process.once('unhandledRejection', (err) => {
     logger.error('#unhandledRejection:', err);
-    shutdown();
+    shutdown(1);
   });
 }
 
@@ -23,12 +24,13 @@ export function gracefullyShutdown() {
   });
 }
 
-function shutdown() {
+function shutdown(code = 0) {
   store.server?.close(async () => {
     try {
       await onSignal();
+      clearAllLockFiles();
     } catch (err) {}
-    process.exit(1);
+    process.exit(code);
   });
 }
 async function onSignal() {

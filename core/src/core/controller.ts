@@ -1,5 +1,6 @@
 import { ControllerSchema } from '../../types/controller';
 import { controllerRegister } from '../handlers/controller.handler';
+import logger from '../handlers/log.handler';
 import { getAuth, getTheme } from '../temp/routers';
 export function registerDefaultControllers() {
   const controllerStack: ControllerSchema[] = [];
@@ -19,5 +20,11 @@ export function registerDefaultControllers() {
   });
 
   //   register
-  controllerStack.map((schema) => controllerRegister(schema));
+  controllerStack.map((schema) =>
+    controllerRegister(schema, {
+      logger,
+      base_url: '/api/v1',
+      from: 'CoreController',
+    })
+  );
 }

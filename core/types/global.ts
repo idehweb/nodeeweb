@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose, { Document, Model, ObjectId } from 'mongoose';
 import { CRUD_DEFAULT_REQ_KEY } from '../src/constants/String';
+import { UserDocument } from './user';
 
 export enum ENV {
   PRO = 'production',
@@ -17,7 +18,8 @@ export type Req = Request & {
   props: any;
   file_path?: string;
   old_file_path?: string;
-  user?: Document & any;
+  file: Express.Multer.File;
+  user?: UserDocument;
   modelName?: string;
   [CRUD_DEFAULT_REQ_KEY]: any;
 };
@@ -32,13 +34,17 @@ export type MiddleWareError = (
 ) => any;
 
 export type CRUDCreatorOpt = {
-  filter?: mongoose.FilterQuery<any>;
-  parseFilter?: (req: Req) => mongoose.FilterQuery<any>;
-  update?: mongoose.UpdateQuery<any> | mongoose.UpdateWithAggregationPipeline;
+  parseFilter?: (
+    req: Req
+  ) => mongoose.FilterQuery<any> | Promise<mongoose.FilterQuery<any>>;
   parseUpdate?: (
     req: Req
-  ) => mongoose.UpdateQuery<any> | mongoose.UpdateWithAggregationPipeline;
-  parseBody?: (req: Req) => any;
+  ) =>
+    | mongoose.UpdateQuery<any>
+    | Promise<mongoose.UpdateQuery<any>>
+    | mongoose.UpdateWithAggregationPipeline
+    | Promise<mongoose.UpdateWithAggregationPipeline>;
+  parseBody?: (req: Req) => any | Promise<any>;
   paramFields?: {
     id?: string;
     offset?: string;
@@ -52,7 +58,7 @@ export type CRUDCreatorOpt = {
   sort?: { [k: string]: mongoose.SortValues };
   project?: mongoose.ProjectionType<any>;
   executeQuery?: boolean;
-  sendResponse?: boolean | ((result: any) => any | Promise<any>);
+  sendResponse?: boolean | ((result: any, req: Req) => any | Promise<any>);
   saveToReq?: boolean | string;
   httpCode?: number;
   forceDelete?: boolean;

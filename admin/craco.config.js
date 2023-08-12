@@ -11,7 +11,8 @@ process.env.REACT_APP_VERSION = now + ', ' + gitHash;
 
 const isDev = process.env.NODE_ENV === 'development';
 
-module.exports = {
+/** @type { import("@craco/types").CracoConfig } */
+const config = {
   eslint: {
     enable: isDev,
   },
@@ -20,11 +21,7 @@ module.exports = {
       '#c': path.resolve(__dirname, 'src/'),
       '@': path.resolve(__dirname, 'src/'),
     },
-    configure: (
-      /** @type {import('webpack/types').Configuration} */
-      webpackConfig,
-      { env }
-    ) => {
+    configure: (webpackConfig, { env }) => {
       if (env === 'development') return webpackConfig;
 
       webpackConfig.optimization = {
@@ -62,3 +59,5 @@ module.exports = {
       : [['transform-remove-console', { exclude: ['error', 'warn'] }]],
   },
 };
+
+module.exports = config;

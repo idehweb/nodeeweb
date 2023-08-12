@@ -13,8 +13,7 @@ import {
   TextField,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
-import { ThemeProvider } from '@material-ui/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import LockIcon from '@mui/icons-material/Lock';
 import { Notification, useTranslate, useLogin, useNotify } from 'react-admin';
 
@@ -192,7 +191,7 @@ Login.propTypes = {
 // Because otherwise the useStyles() hook used in Login won't get
 // the right theme
 const LoginWithTheme = (props) => (
-  <ThemeProvider theme={createTheme(lightTheme)}>
+  <ThemeProvider theme={lightTheme}>
     <Login {...props} />
   </ThemeProvider>
 );

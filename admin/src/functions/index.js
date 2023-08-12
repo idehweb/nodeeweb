@@ -19,9 +19,7 @@ export const MainUrl = window.BASE_URL;
 const dataProvider = data(BASE_URL);
 
 export { dataProvider, authProvider, theme };
-export const ItemTypes = {
-  KNIGHT: 'knight',
-};
+
 export const getDays = (startDate, endDate) => {
   let dates = [];
   if (startDate) {

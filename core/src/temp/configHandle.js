@@ -9,7 +9,7 @@ import siteMapHandle from '../app/siteMapHandle.mjs';
 
 const __dirname = path.resolve();
 
-const public_mediaFolder = path.join(__dirname, './public_media');
+const filesFolder = path.join(__dirname, './files');
 const adminFolder = path.join(__dirname, './admin');
 const themeFolder = path.join(__dirname, './theme');
 
@@ -148,7 +148,7 @@ export default configHandle;
 
 const updatePublicMediaConfig = function () {
   global.updateFile(
-    './public_media/site_setting/',
+    './files/site_setting/',
     'config.js',
     "window.BASE_URL='" +
       process.env.BASE_URL +

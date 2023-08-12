@@ -1,26 +1,50 @@
-import mongoose from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
+import { Document } from 'mongoose';
+
+export interface IDiscount {
+  code: string;
+  description?: string;
+  consumers: Types.ObjectId[];
+  amount?: number;
+  maxAmount: number;
+  percentage?: number;
+  usageLimit: number;
+  expiredAt?: Date;
+  active: boolean;
+}
+
+export type DiscountModel = Model<IDiscount>;
+export type DiscountDocument = Document<Types.ObjectId, {}, IDiscount> &
+  IDiscount;
 
 const schema = new mongoose.Schema(
   {
-    name: {},
-    slug: {
+    code: {
       type: String,
       required: false,
       trim: true,
+      unique: true,
     },
-    price: Number,
-    percent: Number,
-    customerLimit: Number,
-    count: Number,
-    customer: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
-    excludeProduct: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-    excludeProductCategory: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'ProductCategory' },
+    consumers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'customer' }],
+    amount: Number,
+    maxAmount: { type: Number, default: Number.MAX_SAFE_INTEGER },
+    percentage: Number,
+    expiredAt: Date,
+    usageLimit: { type: Number, default: 1 },
+    description: String,
+    active: { type: Boolean, default: true },
+    excludeDiscount: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'discount' },
+    ],
+    excludeDiscountCategory: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'discountCategory' },
     ],
 
-    includeProduct: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-    includeProductCategory: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'ProductCategory' },
+    includeDiscount: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'discount' },
+    ],
+    includeDiscountCategory: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'discountCategory' },
     ],
 
     expire: { type: Date },

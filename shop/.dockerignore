@@ -1,0 +1,104 @@
+############################
+# OS
+############################
+
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+
+############################
+# IDE - VSCode
+############################
+
+.vscode
+
+############################
+# Packages
+############################
+
+*.7z
+*.csv
+*.dat
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.seed
+*.so
+*.swo
+*.swp
+*.swn
+*.swm
+*.out
+*.pid
+
+############################
+# Logs
+############################
+
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+
+
+############################
+# Node.js
+############################
+
+lib-cov
+lcov.info
+pids
+logs
+results
+node_modules
+.node_history
+dist
+*.env
+env
+dist
+files
+admin/*
+public/
+############################
+# docker
+############################
+
+*.yml
+
+############################
+# Git
+###########################
+
+.git
+.gitignore
+
+
+############################
+# Babel
+############################
+
+.bundle.js
+
+############################
+# Shared
+############################
+shared

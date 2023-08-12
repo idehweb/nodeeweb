@@ -1,5 +1,3 @@
-import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
-import { serviceOnError } from '../common/service';
 import { MiddleWare, Req } from '@nodeeweb/core/types/global';
 import store from '@nodeeweb/core/store';
 import { show, submitAction } from '../common/mustImplement';
@@ -87,7 +85,7 @@ export default class Service {
     if (thef && thef != '') search = thef;
     let q: any;
     if (search['productCategory.slug']) {
-      const ProductCategory = store.db.model('ProductCategory');
+      const ProductCategory = store.db.model('productCategory');
       const productcategory = await ProductCategory.findOne({
         slug: search['productCategory.slug'],
       });
@@ -343,6 +341,18 @@ export default class Service {
     if (req.body.type == 'normal') {
       delete req.body.combinations;
     }
+
+    // parse to number
+    ['price', 'salePrice', 'quantity', 'weight'].forEach((k) => {
+      if (req.body[k] === '' || req.body[k] === undefined) delete req.body[k];
+      else req.body[k] = +req.body[k];
+    });
+
+    if (!req.body.salePrice) req.body.salePrice = req.body.price;
+
+    if (req.body.in_stock !== undefined)
+      req.body.in_stock = Boolean(req.body.in_stock);
+
     return req.body;
   };
 
@@ -392,6 +402,12 @@ export default class Service {
       req.body.status = 'processings';
     }
 
+    // parse to number
+    ['price', 'salePrice', 'quantity', 'weight'].forEach((k) => {
+      if (req.body[k] === '' || req.body[k] === undefined) delete req.body[k];
+      else req.body[k] = +req.body[k];
+    });
+
     return req.body;
   };
 
@@ -407,7 +423,7 @@ export default class Service {
       product: product._id,
     };
     submitAction(action);
-    res.status(201).json(product);
+    res.status(200).json(product);
   };
   static deleteAfter: MiddleWare = async (req, res) => {
     const product = req[CRUD_DEFAULT_REQ_KEY];
@@ -431,7 +447,4 @@ export default class Service {
   static rewriteProductsImages: MiddleWare = async (req, res) => {
     return res.status(500).send('not implement yet!');
   };
-  static onError = serviceOnError('Product');
 }
-
-classCatchBuilder(Service);

@@ -1,11 +1,9 @@
-import { classCatchBuilder } from '@nodeeweb/core/utils/catchAsync';
-import { serviceOnError } from '../common/service';
 import { MiddleWare, Res } from '@nodeeweb/core/types/global';
 import store from '@nodeeweb/core/store';
 
 export default class Service {
   static last: MiddleWare = async (req, res) => {
-    let Settings = store.db.model('Settings');
+    let Settings = store.db.model('setting');
 
     let offset = 0;
     if (req.params.offset) {
@@ -38,7 +36,7 @@ export default class Service {
     return this._notImplement(res);
   };
   static customerStatus: MiddleWare = async (req, res) => {
-    let Settings = store.db.model('Settings');
+    let Settings = store.db.model('setting');
 
     let offset = 0;
     if (req.params.offset) {
@@ -62,7 +60,7 @@ export default class Service {
     return 0;
   };
   static formStatus: MiddleWare = async (req, res) => {
-    let Settings = store.db.model('Settings');
+    let Settings = store.db.model('setting');
 
     let offset = 0;
     if (req.params.offset) {
@@ -85,7 +83,7 @@ export default class Service {
     return 0;
   };
   static configuration: MiddleWare = async (req, res) => {
-    let Settings = store.db.model('Settings');
+    let Settings = store.db.model('setting');
 
     const setting = await Settings.findOneAndUpdate({}, req.body, {
       new: true,
@@ -99,8 +97,21 @@ export default class Service {
     }
     res.json({ success: true, setting });
   };
+  static getConfiguration: MiddleWare = async (req, res) => {
+    let Settings = store.db.model('setting');
+
+    const setting = await Settings.findOne({});
+
+    if (!setting) {
+      return res.status(404).json({
+        success: false,
+        message: 'error',
+      });
+    }
+    res.json({ success: true, setting });
+  };
   static factore: MiddleWare = async (req, res) => {
-    let Settings = store.db.model('Settings');
+    let Settings = store.db.model('setting');
     let offset = 0;
     if (req.params.offset) {
       offset = parseInt(req.params.offset);
@@ -141,6 +152,7 @@ export default class Service {
   static update: MiddleWare = async (req, res) => {
     return this._notImplement(res);
   };
+
   static fileUpload: MiddleWare = async (req, res) => {
     if (!req.file_path)
       return res.status(400).json({ message: 'upload failed' });
@@ -166,7 +178,4 @@ export default class Service {
   static _notImplement = (res: Res) => {
     res.status(500).send('not implement yet!');
   };
-  static onError = serviceOnError('Setting');
 }
-
-classCatchBuilder(Service);

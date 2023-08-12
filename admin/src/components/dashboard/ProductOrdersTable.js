@@ -12,7 +12,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Block } from 'notiflix/build/notiflix-block-aio';
 
-import API from '#c/functions/API';
+import API from '@/functions/API';
 
 const ProductOrdersTable = (props) => {
   const translate = useTranslate();

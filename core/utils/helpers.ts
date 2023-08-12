@@ -7,24 +7,27 @@ export function wait(sec: number) {
 
 export function axiosError2String(error: any) {
   if (!error.isAxiosError) {
-    return error;
+    return { error, parsed: false };
   }
-  return JSON.stringify(
-    {
-      name: error.name,
-      code: error.code,
-      message: error.message,
-      url: error?.request?._url || error?.config?.url,
-      method: error.config?.method,
-      res_data: error?.response?.data,
-      req_data: error.config.data || error?.request?.data,
-      res_headers: error?.response?.headers,
-      req_headers: error?.config.headers,
-      stack: error.stack,
-    },
-    null,
-    '  '
-  );
+  return {
+    message: JSON.stringify(
+      {
+        name: error.name,
+        code: error.code,
+        message: error.message,
+        url: error?.request?._url || error?.config?.url,
+        method: error.config?.method,
+        res_data: error?.response?.data,
+        req_data: error.config.data || error?.request?.data,
+        res_headers: error?.response?.headers,
+        req_headers: error?.config.headers,
+        stack: error.stack,
+      },
+      null,
+      '  '
+    ),
+    parsed: true,
+  };
 }
 
 export async function isExist(path: string) {
@@ -42,4 +45,15 @@ export function isExistsSync(path: string) {
 
 export function isAsync(fn: Function) {
   return fn['constructor'].name === 'AsyncFunction';
+}
+
+export async function call<A extends Array<any>, R>(
+  fn: (...args: A) => R | Promise<R>,
+  ...args: A
+) {
+  let result = fn(...args);
+  while (result instanceof Promise) {
+    result = await result;
+  }
+  return result as R;
 }
