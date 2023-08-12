@@ -13,9 +13,8 @@ import {
 import { useWatch } from 'react-hook-form';
 
 import API, { BASE_URL } from '@/functions/API';
-
 import Api from '@/functions/API-v1';
-import { TheImages } from '@/components';
+import { TheImages, showFiles } from '@/components';
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 
