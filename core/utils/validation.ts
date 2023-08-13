@@ -3,6 +3,7 @@ import {
   isMongoId,
   registerDecorator,
   ValidationOptions,
+  ValidationError,
 } from 'class-validator';
 import { Types } from 'mongoose';
 
@@ -44,4 +45,23 @@ export function IsMongoID(validationOptions?: ValidationOptions) {
       },
     });
   };
+}
+
+export function detectVE(errors: ValidationError[], depth = 10) {
+  let errs = errors,
+    i = 1;
+  const filteredErrors = {};
+  while (errs && i <= depth) {
+    errs = errs.flatMap((err) => {
+      Object.entries(err?.constraints ?? {}).forEach(
+        ([k, v]) =>
+          (filteredErrors[k] = `${
+            filteredErrors[k] ? `${filteredErrors[k]} , ` : ''
+          }${v}`)
+      );
+      return err?.children ?? [];
+    });
+    i++;
+  }
+  return filteredErrors;
 }

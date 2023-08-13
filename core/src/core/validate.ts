@@ -5,40 +5,25 @@ import { ValidationError as VE } from '../../types/error';
 import { MiddleWare } from '../../types/global';
 import store from '../../store';
 import { ValidateArgs, ValidatePipe } from '../../types/pipe';
+import { detectVE } from '../../utils/validation';
 
 export class CoreValidationPipe implements ValidatePipe {
   private types: Function[] = [String, Boolean, Number, Array, Object];
   private _detectError(errors: ValidationError[], depth = 10) {
-    let errs = errors,
-      i = 1;
-    const filteredErrors = {};
-    while (errs && i <= depth) {
-      errs = errs.flatMap((err) => {
-        Object.entries(err?.constraints ?? {}).forEach(
-          ([k, v]) =>
-            (filteredErrors[k] = `${
-              filteredErrors[k] ? `${filteredErrors[k]} , ` : ''
-            }${v}`)
-        );
-        return err?.children ?? [];
-      });
-      i++;
-    }
-    return filteredErrors;
+    return detectVE(errors, depth);
   }
   async transform<C>(value: any, metatype: ClassConstructor<C>) {
     if (!metatype || !this.toValidate(metatype)) return value as C;
 
     const object = (plainToInstance(metatype, value, {
       enableImplicitConversion: true,
-      excludeExtraneousValues: true,
+      // excludeExtraneousValues: true,
     }) ?? {}) as object;
     const errors = await validate(object, {
       forbidUnknownValues: true,
       forbidNonWhitelisted: true,
       whitelist: true,
     });
-
     if (errors.length > 0) {
       throw new VE(
         Object.entries(this._detectError(errors)).reduce((prev, [k, v]) => {

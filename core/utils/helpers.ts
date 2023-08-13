@@ -4,12 +4,14 @@ import _ from 'lodash';
 
 export function convertToString(a: any, pretty = true) {
   if (typeof a === 'object') {
+    const newA = {};
     Object.getOwnPropertyNames(a).forEach((key) => {
-      const temp = a[key];
-      delete a[key];
-      a[key] = temp;
+      newA[key] = a[key];
+      // const temp = a[key];
+      // delete a[key];
+      // a[key] = temp;
     });
-    return !pretty ? JSON.stringify(a) : JSON.stringify(a, null, '  ');
+    return !pretty ? JSON.stringify(newA) : JSON.stringify(newA, null, '  ');
   }
   return a?.toString() ?? String(a);
   // const msgs: string[] = [];

@@ -8,6 +8,7 @@ import {
   IsPositive,
   IsString,
   ValidateNested,
+  IsObject,
 } from 'class-validator';
 
 export class CoreConfigLimit {
@@ -66,11 +67,13 @@ export class CoreConfigDto {
 
   @Expose()
   @Type(() => CoreConfigLimit)
+  @IsObject()
   @ValidateNested()
   limit: CoreConfigLimit;
 
   @Expose()
   @Type(() => CoreConfigSmsOn)
+  @IsObject()
   @ValidateNested()
   sms_message_on: CoreConfigSmsOn;
 }
@@ -91,6 +94,7 @@ class CoreConfConfBody extends CoreConfigDto {
 export class CoreConfigBody {
   @Expose()
   @Type(() => CoreConfConfBody)
+  @IsObject()
   @ValidateNested()
   config: CoreConfConfBody;
 

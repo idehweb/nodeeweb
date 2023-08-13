@@ -15,9 +15,10 @@ import { DEFAULT_SMS_ON_OTP } from '../constants/String';
 import { validateSync } from 'class-validator';
 import { registerConfig } from '../handlers/config.handler';
 import logger from '../handlers/log.handler';
-import { MiddleWare, Req } from '../../types/global';
+import { MiddleWare } from '../../types/global';
 import { GeneralError } from '../../types/error';
 import { ConfigChangeOpt } from '../../types/config';
+import { detectVE } from '../../utils/validation';
 
 export class Config<C extends CoreConfigDto> {
   private __config: C;
@@ -25,15 +26,18 @@ export class Config<C extends CoreConfigDto> {
   protected _transform(value: any): C {
     return plainToInstance(CoreConfigDto, value, {
       enableImplicitConversion: true,
-      excludeExtraneousValues: true,
     }) as C;
   }
   protected _validate(value: any): void {
-    const errors = validateSync(value);
+    const errors = validateSync(value, {
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+      whitelist: true,
+    });
     if (errors.length)
       throw new Error(
-        `config validation failed:\n${errors
-          .map((e) => e.toString())
+        `config validation failed:\n${Object.entries(detectVE(errors))
+          .map(([k, v]) => `${k}: ${v}`)
           .join(' , ')}`
       );
     return;
@@ -60,11 +64,13 @@ export class Config<C extends CoreConfigDto> {
   }
   private set _config(value: any) {
     const newConf = this._transform(value);
-    this._validate(value);
+    this._validate(newConf);
     this.__config = newConf;
   }
   private _merge(newConf: any) {
-    this._config = _.merge(this._config, newConf);
+    const mergedValue = {};
+    _.merge(mergedValue, this._config, JSON.parse(JSON.stringify(newConf)));
+    this._config = mergedValue;
   }
   constructor() {
     this._readAndCreate();
@@ -121,11 +127,11 @@ export class Config<C extends CoreConfigDto> {
     if (rst) await restart({ external_wait, internal_wait });
   }
 
-  public async toString() {
+  public toString() {
     return JSON.stringify(this._config);
   }
-  public async toJSON() {
-    return JSON.stringify(this._config);
+  public toJSON() {
+    return this._config;
   }
 }
 
