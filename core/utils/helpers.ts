@@ -2,32 +2,49 @@ import { join } from 'path';
 import * as fs from 'fs';
 import _ from 'lodash';
 
+export function convertToString(a: any, pretty = true) {
+  if (typeof a === 'object') {
+    Object.getOwnPropertyNames(a).forEach((key) => {
+      const temp = a[key];
+      delete a[key];
+      a[key] = temp;
+    });
+    return !pretty ? JSON.stringify(a) : JSON.stringify(a, null, '  ');
+  }
+  return a?.toString() ?? String(a);
+  // const msgs: string[] = [];
+  // bfs(a, ({ value, key }) => {
+  //   if (value === undefined) return;
+  //   msgs.push(key && key !== 'message' ? `${key} : ${value}` : value);
+  // });
+  // return msgs.join('\n');
+}
+
 export function wait(sec: number) {
   return new Promise((resolve) => setTimeout(resolve, sec * 1000));
 }
 
-export function axiosError2String(error: any) {
+export function axiosError2String(error: any, pretty = true) {
   if (!error.isAxiosError) {
-    return { error, parsed: false };
+    return { error, parsed: false, message: convertToString(error, pretty) };
   }
+  const body = {
+    name: error.name,
+    code: error.code,
+    message: error.message,
+    url: error?.request?._url || error?.config?.url,
+    method: error.config?.method,
+    res_data: error?.response?.data,
+    req_data: error.config.data || error?.request?.data,
+    res_headers: error?.response?.headers,
+    req_headers: error?.config.headers,
+    stack: error.stack,
+  };
   return {
-    message: JSON.stringify(
-      {
-        name: error.name,
-        code: error.code,
-        message: error.message,
-        url: error?.request?._url || error?.config?.url,
-        method: error.config?.method,
-        res_data: error?.response?.data,
-        req_data: error.config.data || error?.request?.data,
-        res_headers: error?.response?.headers,
-        req_headers: error?.config.headers,
-        stack: error.stack,
-      },
-      null,
-      '  '
-    ),
+    body,
+    message: pretty ? JSON.stringify(body, null, '  ') : JSON.stringify(body),
     parsed: true,
+    error,
   };
 }
 

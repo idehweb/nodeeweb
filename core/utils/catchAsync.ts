@@ -22,17 +22,17 @@ export const catchFn = <F extends Function>(
       return result;
     } catch (err) {
       if (onError) {
-        const parsed = axiosError2String(err);
-        let newError: Error;
-        if (parsed.message) {
-          newError = new Error(parsed.message);
-          delete newError.stack;
-        } else {
-          newError = parsed.error;
-        }
-        return onError(newError, ...args);
+        // const parsed = axiosError2String(err);
+        // let newError: Error;
+        // if (parsed.message) {
+        //   newError = new Error(parsed.message);
+        //   delete newError.stack;
+        // } else {
+        //   newError = parsed.error;
+        // }
+        return onError(err, ...args);
       } else {
-        store.systemLogger.error('#Unhandled Error cath\n', err);
+        store.systemLogger.error('[catchAsync] Unhandled Error cath\n', err);
       }
     }
   };
