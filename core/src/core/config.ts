@@ -2,7 +2,7 @@ import fs from 'fs';
 import { SingleJobProcess } from '../handlers/singleJob.handler';
 import { isExist, isExistsSync } from '../../utils/helpers';
 import { getSharedPath } from '../../utils/path';
-import { CoreConfigDto } from '../../dto/config';
+import { CoreConfigBody, CoreConfigDto } from '../../dto/config';
 import { plainToInstance } from 'class-transformer';
 import _ from 'lodash';
 import restart from '../../utils/restart';
@@ -15,6 +15,9 @@ import { DEFAULT_SMS_ON_OTP } from '../constants/String';
 import { validateSync } from 'class-validator';
 import { registerConfig } from '../handlers/config.handler';
 import logger from '../handlers/log.handler';
+import { MiddleWare, Req } from '../../types/global';
+import { GeneralError } from '../../types/error';
+import { ConfigChangeOpt } from '../../types/config';
 
 export class Config<C extends CoreConfigDto> {
   private __config: C;
@@ -22,6 +25,7 @@ export class Config<C extends CoreConfigDto> {
   protected _transform(value: any): C {
     return plainToInstance(CoreConfigDto, value, {
       enableImplicitConversion: true,
+      excludeExtraneousValues: true,
     }) as C;
   }
   protected _validate(value: any): void {
@@ -67,7 +71,11 @@ export class Config<C extends CoreConfigDto> {
     Object.freeze(this.__config);
     return new Proxy(this, {
       get(target, p) {
-        if (String(p).startsWith('_') || p === 'change') return target[p];
+        if (
+          String(p).startsWith('_') ||
+          ['change', 'toString', 'toJSON'].includes(String(p))
+        )
+          return target[p];
         return target._config[p];
       },
     });
@@ -91,30 +99,57 @@ export class Config<C extends CoreConfigDto> {
     this._merge(JSON.parse(fs.readFileSync(this._path, 'utf-8')));
     SingleJobProcess.builderAsync('write-config', () => {
       this._write();
-      console.log('after _write');
     })().then();
   }
 
   private _write(config = this._config) {
     fs.writeFileSync(this._path, JSON.stringify(config, null, '  '), 'utf-8');
-    console.log('after write');
   }
 
   public async change(
     newConfig: any,
-    { _merge, restart: rst }: { _merge?: boolean; restart?: boolean } = {}
+    { merge, restart: rst, external_wait, internal_wait }: ConfigChangeOpt = {}
   ) {
-    // set or _merge
-    if (!_merge) this._config = newConfig;
+    // set or merge
+    if (!merge) this._config = newConfig;
     else this._merge(newConfig);
 
     // write
     this._write();
 
     // restart
-    if (rst) await restart();
+    if (rst) await restart({ external_wait, internal_wait });
+  }
+
+  public async toString() {
+    return JSON.stringify(this._config);
+  }
+  public async toJSON() {
+    return JSON.stringify(this._config);
   }
 }
+
+class ConfigService {
+  get: MiddleWare = async (req, res) => {
+    return res.json({ data: store.config });
+  };
+
+  update: MiddleWare = async (req, res) => {
+    const body: CoreConfigBody = req.body;
+    if (!store.config) throw new GeneralError('config not resister yet!', 500);
+
+    await store.config.change(body.config, {
+      merge: true,
+      restart: body.restart ?? true,
+      external_wait: true,
+      internal_wait: false,
+    });
+
+    return res.status(200).json({ data: store.config });
+  };
+}
+
+export const configService = new ConfigService();
 
 export function registerDefaultConfig() {
   registerConfig(new Config(), { from: 'CoreConfig', logger });

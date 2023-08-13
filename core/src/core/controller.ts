@@ -1,15 +1,45 @@
+import { CoreConfigBody } from '../../dto/config';
+import { RestartBody } from '../../dto/in/restart.dto';
 import { ControllerSchema } from '../../types/controller';
-import { OptUserAccess } from '../handlers/auth.handler';
+import { AdminAccess, OptUserAccess } from '../handlers/auth.handler';
 import {
   controllerRegister,
   controllersBatchRegister,
 } from '../handlers/controller.handler';
 import logger from '../handlers/log.handler';
 import { getAuth, mockTheme } from '../temp/routers';
+import { configService } from './config';
+import restartService from './restart';
 import settingService from './setting';
 import { getViewHandler } from './view';
 export function registerDefaultControllers() {
   const controllerStack: ControllerSchema[] = [];
+
+  // restart
+  controllerStack.push({
+    method: 'put',
+    service: restartService.restart,
+    url: '/restart',
+    access: AdminAccess,
+    validate: { dto: RestartBody, reqPath: 'body' },
+  });
+
+  // config
+  controllerStack.push(
+    {
+      method: 'get',
+      url: '/config',
+      service: configService.get,
+      access: AdminAccess,
+    },
+    {
+      method: 'put',
+      url: '/config',
+      service: configService.update,
+      access: AdminAccess,
+      validate: { reqPath: 'body', dto: CoreConfigBody },
+    }
+  );
 
   // theme
   controllerStack.push({
@@ -17,13 +47,6 @@ export function registerDefaultControllers() {
     url: '/theme',
     access: OptUserAccess,
     service: settingService.getTheme,
-  });
-
-  // auth
-  controllerStack.push({
-    method: 'post',
-    url: '/admin/admin/login',
-    service: getAuth,
   });
 
   //   register

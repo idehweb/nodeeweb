@@ -8,6 +8,7 @@ import { AuthStrategy } from './types/auth';
 import { PluginOut } from './types/plugin';
 import { Pipe } from './types/pipe';
 import { ConfigType } from './types/config';
+import { RestartPolicy } from './types/restart';
 export class Store {
   env: {
     APP_NAME: string;
@@ -33,7 +34,7 @@ export class Store {
     BASE_API_URL: string;
     RESTART_WEBHOOK?: string;
     RESTART_WEBHOOK_AUTH_TOKEN?: string;
-    RESTART_POLICY: 'internal' | 'external';
+    RESTART_POLICY: RestartPolicy;
     RESTART_COUNT: string;
     RESTARTING: string;
   } & { [k: string]: string };
@@ -65,7 +66,8 @@ export class Store {
         this.env.isLoc = true;
         break;
     }
-    if (!this.env.RESTART_POLICY) this.env.RESTART_POLICY = 'external';
+    if (!this.env.RESTART_POLICY)
+      this.env.RESTART_POLICY = RestartPolicy.External;
     this.globalMiddleware = { pipes: {}, error: {} };
   }
 }
