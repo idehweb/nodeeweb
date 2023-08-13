@@ -100,6 +100,12 @@ export class ShopConfigLimit extends CoreConfigLimit {
   @IsPositive()
   @IsInt()
   max_product_quantities_in_cart: number;
+
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  @IsInt()
+  max_need_to_pay_transaction: number;
 }
 
 class ShopManualPost {

@@ -17,22 +17,20 @@ import registerPage from './src/page';
 import registerPost from './src/post';
 import registerProduct from './src/product';
 import registerProductCategory from './src/productCategory';
-import registerSettings from './src/settings';
+import registerSettings from './src/config';
 import logger from './utils/log';
 import { store } from '@nodeeweb/core';
 import { handlePlugins } from './src/common/handlePlugins';
 import registerCustomerGroup from './src/customerGroup';
-import {
-  DEFAULT_PRODUCTS_IN_CART,
-  DEFAULT_PRODUCT_QUANTITY_IN_CART,
-} from './constants/limit';
+import { registerShopConfig } from './src/config/config';
 
 async function deployShop() {
   await deployCore();
   store.systemLogger = logger;
-  store.settings.MAX_PRODUCTS_IN_CART = DEFAULT_PRODUCTS_IN_CART;
-  store.settings.MAX_PRODUCT_QUANTITY_IN_CART =
-    DEFAULT_PRODUCT_QUANTITY_IN_CART;
+
+  // register config
+  registerShopConfig();
+
   // register entity
   registerAdmin();
   registerAttribute();
