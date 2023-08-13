@@ -5,6 +5,7 @@ import { shutdown } from '../src/core/shutdown';
 import { catchFn } from './catchAsync';
 import { axiosError2String, wait } from './helpers';
 import { RestartPolicy } from '../types/restart';
+import { stderr, stdin, stdout } from 'process';
 
 const externalReset = async () => {
   await axios.get(store.env.RESTART_WEBHOOK, {
@@ -15,14 +16,18 @@ const externalReset = async () => {
 };
 
 const internalReset = async () => {
-  spawn(process.argv[0], process.argv.slice(1), {
+  const executer = process.execPath;
+  const args = process.argv.filter((a) => a !== executer);
+
+  spawn(executer, args, {
     env: {
       ...process.env,
       RESTART_COUNT: +(store.env.RESTART_COUNT ?? 0) + 1 + '',
       RESTARTING: 'true',
     },
+    cwd: process.cwd(),
     detached: true,
-    stdio: 'inherit',
+    stdio: 'ignore',
   }).unref();
 
   await wait(1);
@@ -32,28 +37,27 @@ const internalReset = async () => {
 export default async function restart({
   external_wait = true,
   internal_wait,
-  wait,
   policy = store.env.RESTART_POLICY,
 }: {
   internal_wait?: boolean;
   external_wait?: boolean;
-  wait?: boolean;
   policy?: RestartPolicy;
 } = {}) {
   store.systemLogger.log(`[restart] run ${policy} restart`);
-
-  // merge waits
-  external_wait = external_wait || wait;
-  internal_wait = internal_wait || wait;
 
   if (policy === RestartPolicy.External) {
     if (!store.env.RESTART_WEBHOOK)
       throw new Error(`[restart] external restart need RESTART_WEBHOOK in env`);
     const catchExternal = catchFn(externalReset, {
       onError(err: Error) {
-        const msg = axiosError2String(err).message;
-        if (external_wait) throw new Error(`external reset error\n${msg}`);
-        store.systemLogger.error('[restart] external reset error\n', msg);
+        if (external_wait)
+          throw new Error(
+            `external reset error\n${axiosError2String(err, false).message}`
+          );
+        store.systemLogger.error(
+          '[restart] external reset error\n',
+          axiosError2String(err).message
+        );
       },
     });
     external_wait ? await catchExternal() : catchExternal();

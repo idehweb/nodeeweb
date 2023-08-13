@@ -1,4 +1,4 @@
 export enum RestartPolicy {
   Internal = 'internal',
-  External = 'External',
+  External = 'external',
 }

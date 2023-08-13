@@ -6,7 +6,8 @@ export class RestartService {
   restart: MiddleWare = async (req, res) => {
     const body: RestartBody = req.body;
     await restart({
-      wait: body.wait,
+      external_wait: body.wait,
+      internal_wait: body.wait,
       policy: body.policy,
     });
     return res.status(200).send();
