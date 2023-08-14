@@ -1,4 +1,4 @@
-import { ValidationError, store } from '@nodeeweb/core';
+import { ValidationError } from '@nodeeweb/core';
 import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
 import { Expose, Transform, Type } from 'class-transformer';
 import {
@@ -13,6 +13,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Types } from 'mongoose';
+import store from '../../../store';
 
 class ProductCombinations {
   @Expose()
@@ -24,10 +25,13 @@ class ProductCombinations {
   @IsPositive()
   @IsInt()
   @Transform(({ value }) => {
+    const maxComQua =
+      store.config.limit.max_product_combination_quantity_in_cart;
     const q = +value;
-    if (q > store.settings.MAX_PRODUCT_QUANTITY_IN_CART)
+
+    if (q > maxComQua)
       throw new ValidationError(
-        `quantity must be less than ${store.settings.MAX_PRODUCT_QUANTITY_IN_CART}`
+        `every product combination quantity must be equal or less than ${maxComQua}`
       );
     return q;
   })

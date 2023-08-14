@@ -118,14 +118,6 @@ export default class CartService {
 
       if (productInOrder)
         throw new DuplicateError('Can not add product in cart twice');
-    } else if (type === 'edit') {
-      // max combination quantity
-      const maxComQua =
-        store.config.limit.max_product_combination_quantity_in_cart;
-      if (!product.combinations.every(({ quantity }) => quantity <= maxComQua))
-        throw new LimitError(
-          `every product combination quantity must be equal or less than ${maxComQua}`
-        );
     }
   }
   static pDoc2pCart(
