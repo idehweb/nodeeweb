@@ -133,6 +133,9 @@ export class Config<C extends CoreConfigDto> {
   public toJSON() {
     return this._config;
   }
+  public toObject() {
+    return this._config;
+  }
 }
 
 class ConfigService {

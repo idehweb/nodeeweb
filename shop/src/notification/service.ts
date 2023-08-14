@@ -12,7 +12,7 @@ import {
   SmsSendStatus,
 } from '@nodeeweb/core/types/plugin';
 import { CustomerDocument, CustomerModel } from '../../schema/customer.schema';
-import { replaceValue } from '../../utils/helpers';
+import { replaceValue } from '@nodeeweb/core/utils/helpers';
 
 export default class Service {
   static get customerModel(): CustomerModel {

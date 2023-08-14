@@ -10,5 +10,6 @@ export type ConfigChangeOpt = {
 export type ConfigType<C extends CoreConfigDto = CoreConfigDto> = C & {
   change(newConf: any, opt: ConfigChangeOpt): Promise<void>;
   toString(): string;
-  toJSON(): string;
+  toJSON(): object;
+  toObject(): object;
 };

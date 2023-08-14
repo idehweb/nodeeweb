@@ -36,9 +36,10 @@ export function commonMiddleware(): (
   mw.push(expressLogger);
 
   // rate limit
+  const { limit } = store.config;
   const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000,
-    max: 100,
+    windowMs: limit.request_limit_window_s * 1000,
+    max: limit.request_limit,
     standardHeaders: true,
     legacyHeaders: false,
   });

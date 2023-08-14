@@ -21,6 +21,7 @@ export type Req = Request & {
   file: Express.Multer.File;
   user?: UserDocument;
   modelName?: string;
+  data?: any;
   [CRUD_DEFAULT_REQ_KEY]: any;
 };
 

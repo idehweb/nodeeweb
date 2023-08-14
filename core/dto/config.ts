@@ -59,7 +59,7 @@ export class CoreConfigDto {
 
   @Expose()
   @Allow()
-  auth: { [key: string]: string };
+  auth: { [key: string]: object };
 
   @Expose()
   @Allow()
