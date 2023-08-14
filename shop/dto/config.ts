@@ -3,8 +3,10 @@ import {
   CoreConfigLimit,
   CoreConfigSmsOn,
 } from '@nodeeweb/core';
-import { Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
+  Allow,
+  IsArray,
   IsBoolean,
   IsEnum,
   IsInt,
@@ -20,83 +22,97 @@ export enum Currency {
   Rial = 'Rial',
 }
 class Factor {
+  @Expose()
   @IsOptional()
   @IsString()
   name: string;
 
+  @Expose()
   @IsOptional()
   @IsString()
   url: string;
 
+  @Expose()
   @IsOptional()
   @IsString()
   address?: string;
 
+  @Expose()
   @IsOptional()
   @IsString()
   tel?: string;
 
+  @Expose()
   @IsOptional()
   @IsString()
   fax?: string;
 
+  @Expose()
   @IsOptional()
   @IsString()
   postalCode?: string;
 
+  @Expose()
   @IsOptional()
   @IsString()
   registrationCode?: string;
 
+  @Expose()
   @IsOptional()
   @IsString()
   economicCode?: string;
 }
 class ShopConfigSmsOn extends CoreConfigSmsOn {
+  @Expose()
   @IsOptional()
   @IsString()
   approach_transaction_expiration: string;
 
+  @Expose()
   @IsOptional()
   @IsString()
-  success_transaction: string;
+  paid_order: string;
 
-  @IsOptional()
-  @IsString()
-  fail_transaction: string;
-
+  @Expose()
   @IsOptional()
   @IsString()
   cancel_order: string;
 
+  @Expose()
   @IsOptional()
   @IsString()
   post_order: string;
 
+  @Expose()
   @IsOptional()
   @IsString()
   complete_order: string;
 }
 
 export class ShopConfigLimit extends CoreConfigLimit {
+  @Expose()
   @IsOptional()
   @IsNumber()
   transaction_expiration_s: number;
 
+  @Expose()
   @IsOptional()
   @IsNumber()
   approach_transaction_expiration: number;
 
+  @Expose()
   @IsOptional()
   @IsNumber()
   @IsInt()
   max_products_in_cart: number;
 
+  @Expose()
   @IsOptional()
   @IsNumber()
   @IsInt()
   max_product_combination_quantity_in_cart: number;
 
+  @Expose()
   @IsOptional()
   @IsNumber()
   @IsInt()
@@ -104,41 +120,51 @@ export class ShopConfigLimit extends CoreConfigLimit {
 }
 
 class ShopManualPost {
+  @Expose()
   @IsString()
   id: string;
 
+  @Expose()
   @IsString()
   title: string;
 
+  @Expose()
   @IsString()
   description: string;
 
+  @Expose()
   @IsBoolean()
   active: boolean;
 
+  @Expose()
   @IsNumber()
   @IsPositive()
   price: number;
 
+  @Expose()
   @IsOptional()
   @IsString({ each: true })
   cities?: string[];
 
+  @Expose()
   @IsOptional()
   @IsNumber()
   @IsPositive()
   products_min_price: number;
 
+  @Expose()
   @IsOptional()
   @IsNumber()
   @IsPositive()
   products_max_price: number;
 
+  @Expose()
   @IsOptional()
   @IsNumber()
   @IsPositive()
   products_min_weight: number;
 
+  @Expose()
   @IsOptional()
   @IsNumber()
   @IsPositive()
@@ -146,26 +172,32 @@ class ShopManualPost {
 }
 
 export class ShopConfigDto extends CoreConfigDto {
+  @Expose()
   @IsOptional()
   @IsBoolean()
   shop_active: boolean;
 
+  @Expose()
   @IsOptional()
   @IsString()
   shop_inactive_message: string;
 
+  @Expose()
   @IsOptional()
   @IsPositive()
   tax: number;
 
+  @Expose()
   @IsOptional()
   @IsEnum(Currency)
   currency: Currency;
 
+  @Expose()
   @IsOptional()
   @IsString()
   entry_submit_message: string;
 
+  @Expose()
   @Type(() => Factor)
   @ValidateNested()
   factor: Factor;
@@ -173,6 +205,7 @@ export class ShopConfigDto extends CoreConfigDto {
   @Type(() => ShopConfigLimit)
   limit: ShopConfigLimit;
 
+  @Expose()
   @IsOptional()
   @Type(() => ShopManualPost)
   @ValidateNested({ each: true })
@@ -181,5 +214,13 @@ export class ShopConfigDto extends CoreConfigDto {
   @Type(() => ShopConfigSmsOn)
   sms_message_on: ShopConfigSmsOn;
 
+  @Expose()
+  @IsOptional()
+  @IsString()
+  payment_redirect: string;
+
+  @Expose()
+  @IsOptional()
+  @IsArray()
   consumer_status: { key: string; value: string }[];
 }

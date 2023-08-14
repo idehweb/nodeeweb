@@ -1,6 +1,7 @@
 import {
   AdminAccess,
   PUBLIC_ACCESS,
+  controllerRegister,
   controllersBatchRegister,
   registerEntityCRUD,
 } from '@nodeeweb/core';
@@ -10,6 +11,7 @@ import { AuthUserAccess } from '@nodeeweb/core';
 import transactionService from './transaction.service';
 import orderService from './order.service';
 import { AddToCartBody, UpdateCartBody } from '../../dto/in/order/cart';
+import { OrderIdParam, UpdateOrderBody } from '../../dto/in/order/order';
 
 export default function registerController() {
   // api
@@ -96,23 +98,31 @@ export default function registerController() {
           },
         },
       },
-      updateOne: {
-        controller: {
-          access: AdminAccess,
-          service: orderService.updateOneAfter,
-        },
-        crud: {
-          parseFilter: orderService.updateOneFilterParser,
-          parseUpdate: orderService.updateOneParseBody,
-          saveToReq: true,
-          executeQuery: true,
-          paramFields: {
-            id: 'order',
-          },
-        },
-      },
     },
     {
+      from: 'ShopEntity',
+    }
+  );
+
+  controllerRegister(
+    {
+      method: 'put',
+      service: orderService.update,
+      url: '/',
+      access: AdminAccess,
+      validate: [
+        {
+          reqPath: 'params',
+          dto: OrderIdParam,
+        },
+        {
+          reqPath: 'body',
+          dto: UpdateOrderBody,
+        },
+      ],
+    },
+    {
+      base_url: '/api/v1/order',
       from: 'ShopEntity',
     }
   );

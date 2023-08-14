@@ -16,6 +16,8 @@ export class Utils {
     const msgs = store.config.sms_message_on;
 
     switch (orderStatus) {
+      case OrderStatus.Paid:
+        return msgs.paid_order;
       case OrderStatus.Posting:
         return msgs.post_order;
       case OrderStatus.Completed:

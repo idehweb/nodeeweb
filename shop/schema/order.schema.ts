@@ -5,6 +5,7 @@ import { MultiLang } from './_base.schema';
 export enum OrderStatus {
   Cart = 'cart',
   NeedToPay = 'need-to-pay',
+  Paid = 'paid',
   Posting = 'posting',
   Completed = 'completed',
   Canceled = 'canceled',

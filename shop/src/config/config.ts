@@ -18,11 +18,10 @@ import {
   DEFAULT_CANCEL_ORDER_MSG,
   DEFAULT_COMPLETE_ORDER_MSG,
   DEFAULT_ENTRY_SUBMIT_MSG,
-  DEFAULT_FAILED_TRANSACTION_MSG,
+  DEFAULT_PAID_MSG,
   DEFAULT_POST_ORDER_MSG,
   DEFAULT_REGISTER_MSG,
   DEFAULT_SHOP_INACTIVE_MSG,
-  DEFAULT_SUCCESS_TRANSACTION_MSG,
 } from '../../constants/String';
 import { plainToInstance } from 'class-transformer';
 import { registerConfig } from '@nodeeweb/core/src/handlers/config.handler';
@@ -62,9 +61,9 @@ export class ShopConfig extends Config<ShopConfigDto> {
         cancel_order: DEFAULT_CANCEL_ORDER_MSG,
         complete_order: DEFAULT_COMPLETE_ORDER_MSG,
         post_order: DEFAULT_POST_ORDER_MSG,
-        fail_transaction: DEFAULT_FAILED_TRANSACTION_MSG,
-        success_transaction: DEFAULT_SUCCESS_TRANSACTION_MSG,
+        paid_order: DEFAULT_PAID_MSG,
       },
+      payment_redirect: '/order/payment',
     };
   }
 

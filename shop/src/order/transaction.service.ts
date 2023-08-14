@@ -28,7 +28,7 @@ import {
 } from '../../types/plugin';
 import discountService from '../discount/service';
 import logger from '../../utils/log';
-import { axiosError2String } from '@nodeeweb/core/utils/helpers';
+import { axiosError2String, replaceValue } from '@nodeeweb/core/utils/helpers';
 import store from '../../store';
 
 class TransactionService {
@@ -200,19 +200,13 @@ class TransactionService {
 
     const { status } = await this.handlePayment(order, true, true, req.query);
 
-    let msg: string;
-    switch (status) {
-      case PaymentVerifyStatus.Paid:
-        msg = 'paid';
-        break;
-      case PaymentVerifyStatus.CheckBefore:
-        msg = 'verify before';
-        break;
-      case PaymentVerifyStatus.Failed:
-        msg = 'failed';
-        break;
-    }
-    return res.send(msg);
+    // redirect
+    return res.redirect(
+      `${store.config.payment_redirect}?${[
+        `order_id=${order._id}`,
+        `status=${status}`,
+      ].join('&')}`
+    );
   };
 
   private productCheck(order: OrderDocument, products: ProductDocument[]) {
@@ -236,13 +230,13 @@ class TransactionService {
       if (!mp) return;
 
       p.combinations.forEach((combinations) => {
-        const productcombination = mp.combinations.find(
+        const productCombination = mp.combinations.find(
           (d) => d._id === combinations._id
         );
-        if (!productcombination.in_stock) inStockCheck.push(p._id);
-        if (productcombination.salePrice !== combinations.salePrice)
+        if (!productCombination.in_stock) inStockCheck.push(p._id);
+        if (productCombination.salePrice !== combinations.salePrice)
           priceCheck.push(p._id);
-        if (productcombination.quantity - combinations.quantity < 0)
+        if (productCombination.quantity - combinations.quantity < 0)
           quantityCheck.push(p._id);
       });
     });
@@ -428,7 +422,9 @@ class TransactionService {
     order: OrderDocument,
     successAction: boolean,
     failedAction: boolean,
-    extraFields?: any
+    extraFields?: any,
+    statusWithoutVerify?: PaymentVerifyStatus,
+    sendSuccessSMS = true
   ) {
     const _clearTimer = (authority: string) => {
       const expiredTimer = this.transactionSupervisors.get(authority + '-1');
@@ -445,7 +441,7 @@ class TransactionService {
     const _success = async () => {
       const update = {
         $set: {
-          status: OrderStatus.Posting,
+          status: OrderStatus.Paid,
           post: {
             ...order.toObject().post,
             ...(await this.submitPostReq(order)),
@@ -460,7 +456,7 @@ class TransactionService {
       );
 
       // send sms
-      utils.sendOnStateChange(order)?.then();
+      sendSuccessSMS && utils.sendOnStateChange(order)?.then();
     };
 
     const _failed = async () => {
@@ -497,7 +493,11 @@ class TransactionService {
     };
 
     const _core = async () => {
-      if ([OrderStatus.Posting, OrderStatus.Completed].includes(order.status))
+      if (
+        [OrderStatus.Paid, OrderStatus.Posting, OrderStatus.Completed].includes(
+          order.status
+        )
+      )
         return { status: PaymentVerifyStatus.CheckBefore, order };
       else if (
         [OrderStatus.Cart, OrderStatus.Canceled, OrderStatus.Expired].includes(
@@ -511,11 +511,15 @@ class TransactionService {
           `order status invalid, current status: ${order.status}`
         );
 
-      const { status } = await this.verifyPayment({
-        ...extraFields,
-        authority: order.transaction.authority,
-        amount: order.totalPrice,
-      });
+      let status = statusWithoutVerify;
+      if (!statusWithoutVerify)
+        status = (
+          await this.verifyPayment({
+            ...extraFields,
+            authority: order.transaction.authority,
+            amount: order.totalPrice,
+          })
+        ).status;
 
       switch (status) {
         case PaymentVerifyStatus.Failed:
