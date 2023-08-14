@@ -28,17 +28,21 @@ export const userCreate = (props) => {
           label={translate('resources.user._id')}
         />
         <TextInput
-          source="nickname"
-          label={translate('resources.user.nickname')}
+          source="firstName"
+          label={translate('resources.user.firstName')}
+        />
+        <TextInput
+          source="lastName"
+          label={translate('resources.user.lastName')}
+        />
+        <TextInput
+          source="username"
+          label={translate('resources.user.username')}
         />
         <TextInput
           source="email"
           type="email"
           label={translate('resources.user.email')}
-        />
-        <TextInput
-          source="username"
-          label={translate('resources.user.username')}
         />
         <PasswordInput
           source="password"

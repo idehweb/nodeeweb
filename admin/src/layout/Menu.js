@@ -193,7 +193,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
           leftIcon={<DocumentScannerIcon />}
           dense={dense}
         />
-        <MenuItemLink
+        {/* <MenuItemLink
           to={{
             pathname: '/entry/create',
             state: { _scrollToTop: true },
@@ -201,7 +201,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
           primaryText={translate(`pos.menu.addEntry`)}
           leftIcon={<NoteAddIcon />}
           dense={dense}
-        />
+        /> */}
       </SubMenu>
       <SubMenu
         handleToggle={() => handleToggle('shopSection')}

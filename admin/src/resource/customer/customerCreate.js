@@ -62,21 +62,21 @@ export const customerCreate = (props) => {
           source="phoneNumber"
           label={translate('resources.customers.phoneNumber')}
         />
-        <TextInput
+        {/* <TextInput
           fullWidth
           source="countryCode"
           label={translate('resources.customers.countryCode')}
-        />
-        <TextInput
+        /> */}
+        {/* <TextInput
           fullWidth
           source="activationCode"
           label={translate('resources.customers.activationCode')}
-        />
-        <TextInput
+        /> */}
+        {/* <TextInput
           fullWidth
           source="birthday"
           label={translate('resources.customers.birthday')}
-        />
+        /> */}
         <TextInput
           defaultValue={'{}'}
           multiline
@@ -110,17 +110,17 @@ export const customerCreate = (props) => {
             { id: 'CRM', name: translate('resources.customers.CRM') },
           ]}
         />
-        <TextInput
+        {/* <TextInput
           fullWidth
           source="source"
           defaultValue={'CRM'}
           label={translate('resources.customers.source')}
-        />
+        /> */}
         <ReferenceArrayInput source="customerGroup" reference="customerGroup">
           <SelectArrayInput
             fullWidth
             label={translate('resources.customers.customerGroup')}
-            optionText="name.fa"
+            optionText="name.en"          
           />
         </ReferenceArrayInput>
         <BooleanInput
