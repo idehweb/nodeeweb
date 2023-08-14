@@ -17,6 +17,7 @@ export enum ErrorType {
   Forbidden = 'FORBIDDEN',
   Unauthorized = 'UNAUTHORIZED',
   NotImplement = 'NotImplement',
+  Unavailable = 'Unavailable',
   SMS = 'SMS',
 }
 

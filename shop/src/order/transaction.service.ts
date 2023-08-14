@@ -1,5 +1,6 @@
 import {
   BadRequestError,
+  ErrorType,
   GeneralError,
   LimitError,
   MiddleWare,
@@ -58,6 +59,14 @@ class TransactionService {
   }
 
   createTransaction: MiddleWare = async (req, res) => {
+    // 0. check shop available
+    if (!store.config.shop_active)
+      throw new GeneralError(
+        store.config.shop_inactive_message,
+        503,
+        ErrorType.Unavailable
+      );
+
     // 1. check user maximum need paid transaction
     const needToPayOrders = await this.orderModel
       .find({
@@ -536,7 +545,7 @@ class TransactionService {
       clear,
       expired_watcher,
       notif_watcher,
-      watchers_timeout = INACTIVE_PRODUCT_TIME,
+      watchers_timeout = store.config.limit.transaction_expiration_s,
     }: {
       clear?: boolean;
       expired_watcher?: boolean;
@@ -544,6 +553,7 @@ class TransactionService {
       watchers_timeout?: number;
     }
   ) {
+    const limit = store.config.limit;
     // clear
     if (clear) {
       // inactive products
@@ -576,14 +586,18 @@ class TransactionService {
           if (!td) return;
           await this.handlePayment(td, true, true);
         } catch (err) {}
-      }, watchers_timeout);
+      }, watchers_timeout * 1000);
       this.transactionSupervisors.set(
         order.transaction.authority + '-1',
         expiredTimer
       );
     }
 
-    if (notif_watcher && watchers_timeout !== -1) {
+    if (
+      notif_watcher &&
+      watchers_timeout !== -1 &&
+      limit.approach_transaction_expiration !== -1
+    ) {
       //2. Notification Before Expired
       const notifTimer = setTimeout(async () => {
         try {
@@ -598,7 +612,7 @@ class TransactionService {
           if (!td) return;
           utils.sendOnExpire(order)?.then();
         } catch (err) {}
-      }, watchers_timeout * 0.6);
+      }, watchers_timeout * 1000 * limit.approach_transaction_expiration);
       this.transactionSupervisors.set(
         order.transaction.authority + '-2',
         notifTimer
