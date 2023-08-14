@@ -47,15 +47,7 @@ export default class AuthGatewayStrategy extends AuthStrategy {
           to: req.data.user.phoneNumber,
           type: SMSPluginType.Reg,
           text: registerText,
-        }),
-        {
-          onError(err: any) {
-            logger.error(
-              `[AuthStrategyGateway] register sms failed\n`,
-              axiosError2String(err, true).message
-            );
-          },
-        }
+        })
       );
     }
     return res.status(201).json(req.data);
