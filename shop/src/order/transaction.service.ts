@@ -15,7 +15,6 @@ import {
   TransactionProvider,
 } from '../../schema/order.schema';
 import { ProductDocument, ProductModel } from '../../schema/product.schema';
-import { MAXIMUM_NEED_TO_PAY_TRANSACTION } from '../../constants/limit';
 import { FilterQuery, Types } from 'mongoose';
 import { DiscountDocument, DiscountModel } from '../../schema/discount.schema';
 import { roundPrice } from '../../utils/helpers';
@@ -76,7 +75,7 @@ class TransactionService {
       })
       .count();
 
-    if (needToPayOrders > MAXIMUM_NEED_TO_PAY_TRANSACTION)
+    if (needToPayOrders > store.config.limit.max_need_to_pay_transaction)
       throw new LimitError(
         'Maximum need to pay transaction , please paid them first'
       );

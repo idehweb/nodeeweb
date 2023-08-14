@@ -1,13 +1,12 @@
 import {
   MiddleWare,
-  store,
   NotFound,
   DuplicateError,
   ForbiddenError,
   LimitError,
-  BadRequestError,
   ValidationError,
 } from '@nodeeweb/core';
+import store from '../../store';
 import {
   OrderDocument,
   OrderModel,
@@ -21,7 +20,6 @@ import {
   UpdateCartBody,
 } from '../../dto/in/order/cart';
 import { UserDocument } from '@nodeeweb/core/types/user';
-import logger from '../../utils/log';
 
 export default class CartService {
   static get orderModel() {
@@ -112,11 +110,22 @@ export default class CartService {
 
     // restrict rules
     if (type === 'add' && orderDoc) {
-      if (orderDoc.products.length + 1 > store.settings.MAX_PRODUCTS_IN_CART)
+      if (
+        orderDoc.products.length + 1 >
+        store.config.limit.max_products_in_cart
+      )
         throw new LimitError('products in order limit exceeded');
 
       if (productInOrder)
         throw new DuplicateError('Can not add product in cart twice');
+    } else if (type === 'edit') {
+      // max combination quantity
+      const maxComQua =
+        store.config.limit.max_product_combination_quantity_in_cart;
+      if (!product.combinations.every(({ quantity }) => quantity <= maxComQua))
+        throw new LimitError(
+          `every product combination quantity must be equal or less than ${maxComQua}`
+        );
     }
   }
   static pDoc2pCart(

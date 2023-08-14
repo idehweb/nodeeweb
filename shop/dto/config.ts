@@ -95,7 +95,7 @@ export class ShopConfigLimit extends CoreConfigLimit {
   @IsOptional()
   @IsNumber()
   @IsInt()
-  max_product_quantities_in_cart: number;
+  max_product_combination_quantity_in_cart: number;
 
   @IsOptional()
   @IsNumber()

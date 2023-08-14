@@ -37,7 +37,7 @@ export class ShopConfig extends Config<ShopConfigDto> {
         request_limit: DEFAULT_REQ_LIMIT,
         request_limit_window_s: DEFAULT_REQ_WINDOW_LIMIT,
         approach_transaction_expiration: DEFAULT_APPROACH_TRANSACTION_EXP,
-        max_product_quantities_in_cart: MAX_PRODUCT_QUANTITY_IN_CART,
+        max_product_combination_quantity_in_cart: MAX_PRODUCT_QUANTITY_IN_CART,
         max_products_in_cart: MAX_PRODUCTS_IN_CART,
         transaction_expiration_s: DEFAULT_TRANSACTION_EXP_S,
         max_need_to_pay_transaction: MAXIMUM_NEED_TO_PAY_TRANSACTION,
