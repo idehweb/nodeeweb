@@ -88,3 +88,35 @@ export function getName(f: any, capitalize = true) {
     .map((word, i) => (i == 0 && capitalize ? _.capitalize(word) : word))
     .join(' ');
 }
+
+export function replaceValue({
+  data,
+  text,
+  boundary = '%',
+}: {
+  data: object[];
+  text: string;
+  boundary?: string;
+}) {
+  const values = data
+    .map((d) =>
+      Object.fromEntries(
+        Object.entries(d).map(([k, v]) => [
+          `${boundary}${k.toUpperCase()}${boundary}`,
+          v,
+        ])
+      )
+    )
+    .reduce((acc, curr) => ({ ...acc, ...curr }), {});
+
+  let newMsg = text;
+  const pattern = new RegExp(`(${boundary}[^${boundary} ]+${boundary})`, 'ig');
+  let value = pattern.exec(text);
+  while (value) {
+    const upperV = value[0]?.toUpperCase();
+    if (values[upperV])
+      newMsg = newMsg.replace(new RegExp(value[0], 'ig'), values[upperV]);
+    value = pattern.exec(text);
+  }
+  return newMsg;
+}
