@@ -45,7 +45,7 @@ export default class UserPassStrategy extends AuthStrategy {
     await this.exportUser(req, !signup && login);
 
     if (login && req.user) return await this.login(req, res);
-    if (signup && !req.user) return await this.signup(req, res);
+    if (signup && !req.user) return await this.signup(req, res, next);
     return res.json({ data: { userExists: Boolean(req.user) } });
   }
 
@@ -70,7 +70,7 @@ export default class UserPassStrategy extends AuthStrategy {
       },
     });
   }
-  async signup(req: Req, res: Res) {
+  async signup(req: Req, res: Res, next: NextFunction) {
     const userModel = store.db.model<IUser, UserModel>(req.modelName);
 
     const userBody = await this.transformSignup(req.body.user);
@@ -78,9 +78,12 @@ export default class UserPassStrategy extends AuthStrategy {
     const user = await userModel.create(userBody);
     const token = signToken(user.id);
     setToCookie(res, token, 'authToken');
-    return res.status(201).json({
+
+    req.data = {
       user: { ...user.toObject(), password: undefined },
       token,
-    });
+    };
+
+    return next();
   }
 }

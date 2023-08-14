@@ -28,6 +28,7 @@ import {
   OtpUserSignup,
 } from '../../dto/in/auth/index.dto';
 import { UserDocument } from '../../types/user';
+import { replaceValue } from '../../utils/helpers';
 
 export const OTP_STRATEGY = 'otp';
 export class OtpStrategy extends AuthStrategy {
@@ -133,7 +134,10 @@ export class OtpStrategy extends AuthStrategy {
       const response = await smsPlugin.stack[0]({
         to: phone,
         type: SMSPluginType.OTP,
-        text: `your code is: ${code}`,
+        text: replaceValue({
+          data: [store.config.toObject(), { code }],
+          text: store.config.sms_message_on.otp,
+        }),
       });
       if (response.status === SmsSendStatus.Send_Success) codeResult = true;
     } catch (err) {
@@ -208,12 +212,12 @@ export class OtpStrategy extends AuthStrategy {
       const token = signToken(user.id);
       setToCookie(res, token, 'authToken');
 
-      return res.status(201).json({
-        data: {
-          user,
-          token,
-        },
-      });
+      req.data = {
+        user,
+        token,
+      };
+
+      return next();
     } catch (err) {
       await this.codeRevert(codeDoc);
       throw err;
