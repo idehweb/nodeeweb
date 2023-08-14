@@ -5,8 +5,6 @@ import {
   MiddleWare,
   NotFound,
   NotImplement,
-  Req,
-  store,
 } from '@nodeeweb/core';
 import {
   IOrder,
@@ -20,9 +18,8 @@ import { MAXIMUM_NEED_TO_PAY_TRANSACTION } from '../../constants/limit';
 import { FilterQuery, Types } from 'mongoose';
 import { DiscountDocument, DiscountModel } from '../../schema/discount.schema';
 import { roundPrice } from '../../utils/helpers';
-import { INACTIVE_PRODUCT_TIME } from '../../constants/limit';
 import utils from './utils.service';
-import { PaymentVerifyStatus, ShopCallbackStatus } from '../../types/order';
+import { PaymentVerifyStatus } from '../../types/order';
 import {
   BankGatewayPluginContent,
   BankGatewayVerifyArgs,
@@ -32,6 +29,7 @@ import {
 import discountService from '../discount/service';
 import logger from '../../utils/log';
 import { axiosError2String } from '@nodeeweb/core/utils/helpers';
+import store from '../../store';
 
 class TransactionService {
   transactionSupervisors = new Map<string, NodeJS.Timer>();
@@ -336,7 +334,7 @@ class TransactionService {
     };
     const _taxes = async () => {
       if (taxesPrice) return taxesPrice;
-      return roundPrice(store.settings.taxRate * (await _total_before_tax()));
+      return roundPrice(store.config.tax * (await _total_before_tax()));
     };
     const _total_before_discount = async () => {
       return totalPrice_before_discount
@@ -407,7 +405,7 @@ class TransactionService {
 
     const description = `برای خرید محصولات ${products
       .map(({ title }) => title.fa ?? title.en ?? Object.values(title)[0])
-      .join(' ، ')} از فروشگاه ${store.env.APP_NAME}`;
+      .join(' ، ')} از فروشگاه ${store.config.app_name}`;
 
     return await bankPlugin.stack[0]({
       amount,

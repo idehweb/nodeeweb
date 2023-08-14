@@ -55,55 +55,50 @@ class Factor {
 class ShopConfigSmsOn extends CoreConfigSmsOn {
   @IsOptional()
   @IsString()
-  approach_transaction_expiration?: string;
+  approach_transaction_expiration: string;
 
   @IsOptional()
   @IsString()
-  success_transaction?: string;
+  success_transaction: string;
 
   @IsOptional()
   @IsString()
-  fail_transaction?: string;
+  fail_transaction: string;
 
   @IsOptional()
   @IsString()
-  cancel_order?: string;
+  cancel_order: string;
 
   @IsOptional()
   @IsString()
-  post_order?: string;
+  post_order: string;
 
   @IsOptional()
   @IsString()
-  complete_order?: string;
+  complete_order: string;
 }
 
 export class ShopConfigLimit extends CoreConfigLimit {
   @IsOptional()
   @IsNumber()
-  @IsPositive()
   transaction_expiration_s: number;
 
   @IsOptional()
   @IsNumber()
-  @IsPositive()
   approach_transaction_expiration: number;
 
   @IsOptional()
   @IsNumber()
-  @IsPositive()
   @IsInt()
   max_products_in_cart: number;
 
   @IsOptional()
   @IsNumber()
-  @IsPositive()
   @IsInt()
   max_product_quantities_in_cart: number;
 
   @IsOptional()
   @IsNumber()
-  @IsPositive()
   @IsInt()
   max_need_to_pay_transaction: number;
 }
@@ -153,23 +148,23 @@ class ShopManualPost {
 export class ShopConfigDto extends CoreConfigDto {
   @IsOptional()
   @IsBoolean()
-  shop_active?: boolean;
+  shop_active: boolean;
 
   @IsOptional()
   @IsString()
-  shop_inactive_message?: string;
+  shop_inactive_message: string;
 
   @IsOptional()
   @IsPositive()
-  tax?: number;
+  tax: number;
 
   @IsOptional()
   @IsEnum(Currency)
-  currency?: Currency;
+  currency: Currency;
 
   @IsOptional()
   @IsString()
-  entry_submit_message?: string;
+  entry_submit_message: string;
 
   @Type(() => Factor)
   @ValidateNested()
