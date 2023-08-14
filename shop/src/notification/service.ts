@@ -24,7 +24,10 @@ export default class Service {
   }
 
   static replaceValue(customer: CustomerDocument, text: string) {
-    return replaceValue({ data: [store.settings, customer.toObject()], text });
+    return replaceValue({
+      data: [store.config.toObject(), customer.toObject()],
+      text,
+    });
   }
 
   static afterCreate: MiddleWare = async (req, res) => {
