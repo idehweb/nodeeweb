@@ -1,7 +1,8 @@
 export const DEFAULT_SHOP_INACTIVE_MSG =
   'سایت در حال به روزرسانی و درگاه پرداخت موقتا غیر فعال است.';
 
-export const DEFAULT_ENTRY_SUBMIT_MSG = 'thanks for your message!';
+export const DEFAULT_ENTRY_SUBMIT_MSG =
+  'thanks for your message! your code: %TRACKING_CODE%';
 
 export const DEFAULT_APPROACH_TRANSACTION_EXP_MSG = `ما تنها مدت کوتاهی می‌توانیم سفارش‌تان را نگه ‌داریم و در صورت عدم پرداخت، ناچار به لغو آن هستیم. برای نهایی کردن، از بخش «پیگیری سفارش‌ها» مبلغ آن را پرداخت‌ کنید. شماره سفارش: %ORDER_ID% %BASE_URL%`;
 
