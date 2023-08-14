@@ -184,7 +184,7 @@ export class ShopConfigDto extends CoreConfigDto {
 
   @Expose()
   @IsOptional()
-  @IsPositive()
+  @IsNumber()
   tax: number;
 
   @Expose()

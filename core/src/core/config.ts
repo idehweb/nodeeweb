@@ -15,7 +15,7 @@ import { DEFAULT_SMS_ON_OTP } from '../constants/String';
 import { validateSync } from 'class-validator';
 import { registerConfig } from '../handlers/config.handler';
 import logger from '../handlers/log.handler';
-import { MiddleWare } from '../../types/global';
+import { MiddleWare, USE_ENV } from '../../types/global';
 import { GeneralError } from '../../types/error';
 import { ConfigChangeOpt } from '../../types/config';
 import { detectVE } from '../../utils/validation';
@@ -30,9 +30,9 @@ export class Config<C extends CoreConfigDto> {
   }
   protected _validate(value: any): void {
     const errors = validateSync(value, {
-      forbidNonWhitelisted: true,
       forbidUnknownValues: true,
-      whitelist: true,
+      forbidNonWhitelisted: true,
+      whitelist: store.env.USE_ENV !== USE_ENV.NPM,
     });
     if (errors.length)
       throw new Error(
