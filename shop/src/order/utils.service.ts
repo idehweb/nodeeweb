@@ -1,19 +1,30 @@
 import { OrderDocument, OrderStatus } from '../../schema/order.schema';
-import { store } from '@nodeeweb/core';
 import {
   CorePluginType,
   SMSPluginContent,
   SMSPluginType,
 } from '@nodeeweb/core/types/plugin';
-import {
-  ORDER_STATUS_CHANGE_MESSAGE,
-  TRANSACTION_ON_EXPIRE_MESSAGE,
-} from '../../constants/String';
-import { replaceValue } from '../../utils/helpers';
+import { replaceValue } from '@nodeeweb/core/utils/helpers';
+import store from '../../store';
 
 export class Utils {
   get smsPlugin() {
     return store.plugins.get(CorePluginType.SMS) as SMSPluginContent;
+  }
+
+  private orderStatus2Msg(orderStatus: OrderStatus) {
+    const msgs = store.config.sms_message_on;
+
+    switch (orderStatus) {
+      case OrderStatus.Posting:
+        return msgs.post_order;
+      case OrderStatus.Completed:
+        return msgs.complete_order;
+      case OrderStatus.Canceled:
+        return msgs.cancel_order;
+      default:
+        throw new Error(`unexpected value for order status, ${orderStatus}`);
+    }
   }
 
   private replaceValues(order: OrderDocument, msg: string) {
@@ -40,8 +51,7 @@ export class Utils {
     }
     return replaceValue({
       data: [
-        store.env,
-        store.settings,
+        store.config.toObject(),
         {
           ORDER_STATUS: orderStatus,
           ORDER_ID: order._id,
@@ -54,7 +64,10 @@ export class Utils {
   }
 
   async sendOnStateChange(order: OrderDocument) {
-    const message = this.replaceValues(order, ORDER_STATUS_CHANGE_MESSAGE);
+    const message = this.replaceValues(
+      order,
+      this.orderStatus2Msg(order.status)
+    );
 
     if (!this.smsPlugin || !order.customer.phone) return;
 
@@ -65,7 +78,10 @@ export class Utils {
     });
   }
   async sendOnExpire(order: OrderDocument) {
-    const message = this.replaceValues(order, TRANSACTION_ON_EXPIRE_MESSAGE);
+    const message = this.replaceValues(
+      order,
+      store.config.sms_message_on.approach_transaction_expiration
+    );
 
     if (!this.smsPlugin || !order.customer.phone) return;
 
