@@ -15,12 +15,15 @@ export type SMSPluginArgs = {
   type: SMSPluginType;
   subType?: string;
 };
-export type SMSPluginResponse = Promise<{
+
+export type SMSPluginResponseRaw = {
   from: string;
   at: Date;
   status: SmsSendStatus;
   message?: string;
-}>;
+};
+
+export type SMSPluginResponse = Promise<SMSPluginResponseRaw>;
 
 export type SMSPluginSendBulkArgs = {
   pattern?: {

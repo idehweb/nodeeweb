@@ -79,7 +79,7 @@ export class Config<C extends CoreConfigDto> {
       get(target, p) {
         if (
           String(p).startsWith('_') ||
-          ['change', 'toString', 'toJSON'].includes(String(p))
+          ['change', 'toString', 'toJSON', 'toObject'].includes(String(p))
         )
           return target[p];
         return target._config[p];

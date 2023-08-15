@@ -1,6 +1,7 @@
 import { MiddleWare } from '@nodeeweb/core/types/global';
-import store from '@nodeeweb/core/store';
+import store from '../../store';
 import {
+  INotification,
   NotificationDocument,
   NotificationModel,
 } from '../../schema/notification.schema';
@@ -8,19 +9,19 @@ import {
   CorePluginType,
   SMSPluginArgs,
   SMSPluginContent,
+  SMSPluginResponse,
+  SMSPluginResponseRaw,
   SMSPluginType,
   SmsSendStatus,
 } from '@nodeeweb/core/types/plugin';
 import { CustomerDocument, CustomerModel } from '../../schema/customer.schema';
-import { replaceValue } from '@nodeeweb/core/utils/helpers';
+import { getModelName, replaceValue } from '@nodeeweb/core/utils/helpers';
 import { AuthEvents } from '@nodeeweb/core/src/auth/authGateway.strategy';
 import { getPluginEventName } from '@nodeeweb/core/src/handlers/plugin.handler';
-import { UserDocument, UserModel } from '@nodeeweb/core/types/user';
+import { UserDocument } from '@nodeeweb/core/types/user';
 import { catchFn } from '@nodeeweb/core/utils/catchAsync';
 import { sendSms } from './sms.service';
-import { CreateNotification } from '../../dto/in/notification';
 import { SmsSubType } from '@nodeeweb/core/types/config';
-
 export default class Service {
   constructor() {
     this.init();
@@ -97,12 +98,15 @@ export default class Service {
       }
     );
   };
-  private createNotif = async (body: CreateNotification) => {
+  private createNotif = async (body: INotification) => {
     await this.notificationModel.create(body);
   };
   private afterRegister = async (user: UserDocument) => {
-    console.log('after register call');
     const registerText = store.config.sms_message_on.register;
+
+    if (!registerText || !user?.phone || getModelName(user) !== 'customer')
+      return;
+
     if (registerText && user?.phone) {
       await catchFn(async () => {
         // send welcome sms
@@ -116,9 +120,12 @@ export default class Service {
     }
   };
   private afterSendSMS = async (
-    _: any,
+    res: SMSPluginResponseRaw,
+    name: string,
     { to, type, subType, text }: SMSPluginArgs
   ) => {
+    if (res.status !== SmsSendStatus.Send_Success) return;
+
     // only handle automatic sms
     if (type !== SMSPluginType.Automatic) return;
 
@@ -127,6 +134,7 @@ export default class Service {
       message: text,
       title: subType,
       phone: to,
+      status: res.status,
     });
   };
 

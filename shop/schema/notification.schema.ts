@@ -2,7 +2,7 @@ import { SmsSendStatus } from '@nodeeweb/core/types/plugin';
 import mongoose, { Document, Model, Types } from 'mongoose';
 import { CustomerSource } from './customer.schema';
 
-interface INotification {
+export interface INotification {
   title: string;
   message: string;
   status: SmsSendStatus;
