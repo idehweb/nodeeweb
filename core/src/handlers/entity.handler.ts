@@ -241,8 +241,8 @@ export class EntityCreator {
 }
 
 export type EntityCRUDOpt = {
-  crud: Omit<CRUDCreatorOpt, 'httpCode'>;
-  controller: Partial<ControllerSchema> & {
+  crud?: Omit<CRUDCreatorOpt, 'httpCode'>;
+  controller?: Partial<ControllerSchema> & {
     beforeService?: MiddleWare | MiddleWare[];
   };
 };
@@ -270,6 +270,14 @@ export function registerEntityCRUD(
 
   for (const [name, opt] of Object.entries(ordered).filter(([k, v]) => v)) {
     const cName = name as CRUD;
+    opt.controller = opt.controller ?? {};
+    opt.crud = opt.crud ?? {};
+
+    // set default values
+    opt.crud.executeQuery = opt.crud.executeQuery ?? true;
+    opt.crud.sendResponse = opt.crud.sendResponse ?? true;
+    opt.crud.saveToReq = opt.crud.saveToReq ?? false;
+
     schemas.push({
       method: opt.controller.method ?? translateCRUD2Method(cName),
       url: opt.controller.url ?? translateCRUD2Url(cName, opt.crud),

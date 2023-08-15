@@ -13,40 +13,21 @@ export default function registerController() {
       create: {
         controller: {
           access,
-          service(req, res) {
-            res.status(200).json(req[CRUD_DEFAULT_REQ_KEY]);
-          },
         },
-        crud: { executeQuery: true, sendResponse: true },
       },
       getCount: {
         controller: {
           access,
-          service: (req, res) => {
-            res.json({
-              success: true,
-              count: req[CRUD_DEFAULT_REQ_KEY],
-            });
-          },
         },
-        crud: { executeQuery: true, sendResponse: false, saveToReq: true },
       },
       getOne: {
         controller: {
           access,
-          service(req, res) {
-            res.json(req[CRUD_DEFAULT_REQ_KEY]);
-          },
-        },
-        crud: {
-          executeQuery: true,
-          saveToReq: true,
         },
       },
       getAll: {
         controller: {
           access,
-          service: (req, res) => res.json(req[CRUD_DEFAULT_REQ_KEY]),
         },
         crud: {
           parseFilter(req) {
@@ -55,8 +36,6 @@ export default function registerController() {
             }
           },
           autoSetCount: true,
-          saveToReq: true,
-          executeQuery: true,
           paramFields: {
             limit: 'limit',
             offset: 'offset',
@@ -66,13 +45,6 @@ export default function registerController() {
       updateOne: {
         controller: {
           access,
-          service(req, res) {
-            res.json(req[CRUD_DEFAULT_REQ_KEY]);
-          },
-        },
-        crud: {
-          executeQuery: true,
-          saveToReq: true,
         },
       },
       deleteOne: {
@@ -80,8 +52,6 @@ export default function registerController() {
           access,
         },
         crud: {
-          executeQuery: true,
-          sendResponse: true,
           forceDelete: true,
         },
       },

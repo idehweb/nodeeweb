@@ -17,7 +17,7 @@ export default class Service {
     action[modelName] = menu;
     submitAction(action);
     updateThemeConfig(req.props);
-    return res.status(201).json(menu);
+    return res.status(201).json({ data: menu });
   };
   static updateAfter: MiddleWare = async (req, res) => {
     const menu = req[CRUD_DEFAULT_REQ_KEY];
@@ -32,7 +32,7 @@ export default class Service {
     action[modelName] = menu;
     submitAction(action);
     updateThemeConfig(req.props);
-    return res.status(200).json(menu);
+    return res.status(200).json({ data: menu });
   };
 
   static getOneFilterParser(req: Req) {
@@ -58,6 +58,6 @@ export default class Service {
         });
       }
     }
-    return res.json(menu);
+    return res.json({ data: menu });
   };
 }

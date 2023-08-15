@@ -11,15 +11,10 @@ export default function registerController() {
       getAll: {
         controller: {
           access: AdminAccess,
-          service(req, res) {
-            return res.json(req[CRUD_DEFAULT_REQ_KEY]);
-          },
         },
         crud: {
           autoSetCount: true,
-          executeQuery: true,
           populate: { path: 'form', select: '_id slug title' },
-          saveToReq: true,
           parseFilter: Service.getAllQuery,
           project: 'updatedAt trackingCode createdAt _id form',
           paramFields: {
@@ -34,8 +29,6 @@ export default function registerController() {
           access: AuthUserAccess,
         },
         crud: {
-          executeQuery: true,
-          sendResponse: true,
           parseBody: Service.createOneBodyParser,
         },
       },

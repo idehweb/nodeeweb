@@ -18,18 +18,12 @@ export default function registerController() {
           },
           service: service.afterCreate,
         },
-        crud: {
-          executeQuery: true,
-          saveToReq: true,
-        },
       },
       getAll: {
         controller: {
           access: AdminAccess,
         },
         crud: {
-          executeQuery: true,
-          sendResponse: true,
           autoSetCount: true,
           paramFields: {
             limit: 'limit',
@@ -41,18 +35,10 @@ export default function registerController() {
         controller: {
           access: AdminAccess,
         },
-        crud: {
-          executeQuery: true,
-          sendResponse: true,
-        },
       },
       getOne: {
         controller: {
           access: AdminAccess,
-        },
-        crud: {
-          executeQuery: true,
-          sendResponse: true,
         },
       },
     },

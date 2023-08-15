@@ -39,14 +39,9 @@ export default function registerController() {
       getAll: {
         controller: {
           access: AdminAccess,
-          service: (req, res) => {
-            res.json(req.crud);
-          },
         },
         crud: {
           autoSetCount: true,
-          executeQuery: true,
-          saveToReq: true,
           paramFields: {
             offset: 'offset',
             limit: 'limit',
@@ -56,13 +51,6 @@ export default function registerController() {
       getCount: {
         controller: {
           access: AdminAccess,
-          service: (req, res) => {
-            res.json(req.crud);
-          },
-        },
-        crud: {
-          executeQuery: true,
-          saveToReq: true,
         },
       },
       getOne: {
@@ -71,8 +59,6 @@ export default function registerController() {
           service: Service.getOneAfter,
         },
         crud: {
-          executeQuery: true,
-          saveToReq: true,
           parseFilter: Service.getOneFilterParser,
         },
       },
@@ -86,8 +72,6 @@ export default function registerController() {
           service: Service.createAfter,
         },
         crud: {
-          executeQuery: true,
-          sendResponse: true,
           parseBody: Service.createBodyParser,
         },
       },
@@ -97,8 +81,6 @@ export default function registerController() {
           service: Service.updateAfter,
         },
         crud: {
-          executeQuery: true,
-          saveToReq: true,
           parseUpdate: Service.updateBodyParser,
         },
       },
@@ -108,8 +90,6 @@ export default function registerController() {
           service: Service.deleteAfter,
         },
         crud: {
-          executeQuery: true,
-          saveToReq: true,
           parseUpdate: () => ({ status: 'trash' }),
         },
       },

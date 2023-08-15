@@ -13,8 +13,6 @@ export default function registerController() {
           access: AdminAccess,
         },
         crud: {
-          executeQuery: true,
-          sendResponse: true,
           autoSetCount: true,
           paramFields: {
             limit: 'limit',
@@ -36,8 +34,6 @@ export default function registerController() {
           }),
         },
         crud: {
-          executeQuery: true,
-          sendResponse: true,
           parseBody: service.createBodyParser,
         },
       },
@@ -55,8 +51,6 @@ export default function registerController() {
           service: service.updateAfter,
         },
         crud: {
-          executeQuery: false,
-          saveToReq: true,
           parseUpdate: service.updateBodyParser,
         },
       },
@@ -66,8 +60,6 @@ export default function registerController() {
           service: service.deleteAfter,
         },
         crud: {
-          executeQuery: true,
-          saveToReq: true,
           forceDelete: true,
         },
       },

@@ -24,7 +24,7 @@ export default function registerController() {
             quality: 0.8,
           },
         }),
-        (req, res) => res.status(201).json({ media: req.file_path }),
+        (req, res) => res.status(201).json({ data: { media: req.file_path } }),
       ],
     },
     { base_url: '/admin/document', from: 'ShopEntity' }
