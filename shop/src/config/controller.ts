@@ -159,19 +159,11 @@ export default function registerController() {
       getOne: {
         controller: {
           access,
-          service(req, res) {
-            res.json(req.crud);
-          },
-        },
-        crud: {
-          saveToReq: true,
-          executeQuery: true,
         },
       },
       getAll: {
         controller: {
           access,
-          service: (req, res) => res.json(req[CRUD_DEFAULT_REQ_KEY]),
         },
         crud: {
           parseFilter(req) {
@@ -180,8 +172,6 @@ export default function registerController() {
             }
           },
           autoSetCount: true,
-          saveToReq: true,
-          executeQuery: true,
           paramFields: {
             limit: 'limit',
             offset: 'offset',
@@ -191,10 +181,6 @@ export default function registerController() {
       updateOne: {
         controller: {
           access,
-        },
-        crud: {
-          sendResponse: true,
-          executeQuery: true,
         },
       },
     },
