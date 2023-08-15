@@ -136,9 +136,9 @@ export class EntityCreator {
   }
   createOneCreator({
     parseBody,
-    executeQuery = true,
-    saveToReq = false,
-    sendResponse = true,
+    executeQuery,
+    saveToReq,
+    sendResponse,
     project,
   }: CRUDCreatorOpt) {
     return async (req: Req, res: Response, next: NextFunction) => {
@@ -272,6 +272,12 @@ export function registerEntityCRUD(
     const cName = name as CRUD;
     opt.controller = opt.controller ?? {};
     opt.crud = opt.crud ?? {};
+
+    // set default values
+    opt.crud.executeQuery = opt.crud.executeQuery ?? true;
+    opt.crud.sendResponse = opt.crud.sendResponse ?? true;
+    opt.crud.saveToReq = opt.crud.saveToReq ?? false;
+
     schemas.push({
       method: opt.controller.method ?? translateCRUD2Method(cName),
       url: opt.controller.url ?? translateCRUD2Url(cName, opt.crud),
