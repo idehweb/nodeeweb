@@ -68,11 +68,10 @@ export default (apiUrl) => ({
     // console.log('url',url);
     return httpClient(url).then(({ headers, json = [] }) => {
       let total = getTotal(json, headers);
-      if (json && json[0]) {
+      if (json && json.data[0]) {
         // console.log(json.map((r, t) => ({ ...r, id: r._id, t })));
-
         var x = {
-          data: json.map((r, t) => ({ ...r, id: r._id, t })),
+          data: json.data.map((r, t) => ({ ...r, id: r._id, t })),
           total,
         };
         // console.log('x',x);
