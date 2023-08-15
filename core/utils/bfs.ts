@@ -23,8 +23,7 @@ export default function bfs(target: any, cb: (info: BFSInfo) => void) {
           value: v,
         }))
       );
-    } else {
-      cb({ parent, key, value });
     }
+    cb({ parent, key, value });
   } while (stack.length);
 }

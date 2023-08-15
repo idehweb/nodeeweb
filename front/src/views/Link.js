@@ -31,7 +31,7 @@ class Link extends React.PureComponent {
       });
     }
     // if(_id){
-    //   window.location.replace(MainUrl+"/customer/link/"+_id);
+    //   window.location.replace(MainUrl+"/link/"+_id);
     // }
     // if (props && props.match && props.match.params && props.match.params._id) {
     // }

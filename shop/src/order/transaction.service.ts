@@ -1,12 +1,11 @@
 import {
   BadRequestError,
+  ErrorType,
   GeneralError,
   LimitError,
   MiddleWare,
   NotFound,
   NotImplement,
-  Req,
-  store,
 } from '@nodeeweb/core';
 import {
   IOrder,
@@ -16,13 +15,11 @@ import {
   TransactionProvider,
 } from '../../schema/order.schema';
 import { ProductDocument, ProductModel } from '../../schema/product.schema';
-import { MAXIMUM_NEED_TO_PAY_TRANSACTION } from '../../constants/limit';
 import { FilterQuery, Types } from 'mongoose';
 import { DiscountDocument, DiscountModel } from '../../schema/discount.schema';
 import { roundPrice } from '../../utils/helpers';
-import { INACTIVE_PRODUCT_TIME } from '../../constants/limit';
 import utils from './utils.service';
-import { PaymentVerifyStatus, ShopCallbackStatus } from '../../types/order';
+import { PaymentVerifyStatus } from '../../types/order';
 import {
   BankGatewayPluginContent,
   BankGatewayVerifyArgs,
@@ -31,7 +28,8 @@ import {
 } from '../../types/plugin';
 import discountService from '../discount/service';
 import logger from '../../utils/log';
-import { axiosError2String } from '@nodeeweb/core/utils/helpers';
+import { axiosError2String, replaceValue } from '@nodeeweb/core/utils/helpers';
+import store from '../../store';
 
 class TransactionService {
   transactionSupervisors = new Map<string, NodeJS.Timer>();
@@ -60,6 +58,14 @@ class TransactionService {
   }
 
   createTransaction: MiddleWare = async (req, res) => {
+    // 0. check shop available
+    if (!store.config.shop_active)
+      throw new GeneralError(
+        store.config.shop_inactive_message,
+        503,
+        ErrorType.Unavailable
+      );
+
     // 1. check user maximum need paid transaction
     const needToPayOrders = await this.orderModel
       .find({
@@ -69,7 +75,7 @@ class TransactionService {
       })
       .count();
 
-    if (needToPayOrders > MAXIMUM_NEED_TO_PAY_TRANSACTION)
+    if (needToPayOrders > store.config.limit.max_need_to_pay_transaction)
       throw new LimitError(
         'Maximum need to pay transaction , please paid them first'
       );
@@ -83,7 +89,7 @@ class TransactionService {
     });
     if (!order) throw new NotFound('order not found');
 
-    // 3. check product details
+    // 3. check product combinations
     const products = await this.productModel.find({
       _id: { $in: order.products.map((p) => p._id) },
       active: true,
@@ -114,7 +120,7 @@ class TransactionService {
       order._id,
       totalPrice,
       products,
-      req.user.phone
+      req.user.phoneNumber
     );
 
     // 7. post if not payment issue
@@ -194,25 +200,20 @@ class TransactionService {
 
     const { status } = await this.handlePayment(order, true, true, req.query);
 
-    let msg: string;
-    switch (status) {
-      case PaymentVerifyStatus.Paid:
-        msg = 'paid';
-        break;
-      case PaymentVerifyStatus.CheckBefore:
-        msg = 'verify before';
-        break;
-      case PaymentVerifyStatus.Failed:
-        msg = 'failed';
-        break;
-    }
-    return res.send(msg);
+    // redirect
+    return res.redirect(
+      `${store.config.payment_redirect}?${[
+        `order_id=${order._id}`,
+        `status=${status}`,
+      ].join('&')}`
+    );
   };
 
   private productCheck(order: OrderDocument, products: ProductDocument[]) {
     let activeCheck: Types.ObjectId[] = [],
       priceCheck: Types.ObjectId[] = [],
-      quantityCheck: Types.ObjectId[] = [];
+      quantityCheck: Types.ObjectId[] = [],
+      inStockCheck: Types.ObjectId[] = [];
 
     const productMap = new Map(products.map((p) => [p._id.toString(), p]));
     // active
@@ -227,11 +228,25 @@ class TransactionService {
     order.products.forEach((p) => {
       const mp = productMap.get(p._id.toString());
       if (!mp) return;
-      if (mp.salePrice !== p.salePrice) priceCheck.push(p._id);
-      if (mp.quantity - p.quantity < 0) quantityCheck.push(p._id);
+
+      p.combinations.forEach((combinations) => {
+        const productCombination = mp.combinations.find(
+          (d) => d._id === combinations._id
+        );
+        if (!productCombination.in_stock) inStockCheck.push(p._id);
+        if (productCombination.salePrice !== combinations.salePrice)
+          priceCheck.push(p._id);
+        if (productCombination.quantity - combinations.quantity < 0)
+          quantityCheck.push(p._id);
+      });
     });
 
-    const errors = [activeCheck, priceCheck, quantityCheck].flat();
+    const errors = [
+      activeCheck,
+      priceCheck,
+      quantityCheck,
+      inStockCheck,
+    ].flat();
     if (errors.length)
       throw new BadRequestError(
         `these products must be change\n${[
@@ -249,7 +264,12 @@ class TransactionService {
     ) as PostGatewayPluginContent;
     if (!postPlugin) return 0;
 
-    return (await postPlugin.stack[1]({ products, address })).price;
+    return (
+      await postPlugin.stack[1]({
+        products: products.flatMap((p) => p.combinations),
+        address,
+      })
+    ).price;
   }
 
   private submitPostReq(order: OrderDocument): Promise<IOrder['post']> {
@@ -260,7 +280,7 @@ class TransactionService {
 
     return postPlugin.stack[0]({
       address: order.address,
-      products: order.products,
+      products: order.products.flatMap((p) => p.combinations),
     });
   }
 
@@ -299,7 +319,12 @@ class TransactionService {
       productsPrice
         ? productsPrice
         : roundPrice(
-            products.reduce((acc, { salePrice }) => acc + salePrice, 0)
+            products.reduce(
+              (acc, { combinations }) =>
+                acc +
+                combinations.reduce((acc, { salePrice }) => acc + salePrice, 0),
+              0
+            )
           );
     const _total_before_tax = async () => {
       if (totalPrice_before_taxes !== undefined) return totalPrice_before_taxes;
@@ -311,7 +336,7 @@ class TransactionService {
     };
     const _taxes = async () => {
       if (taxesPrice) return taxesPrice;
-      return roundPrice(store.settings.taxRate * (await _total_before_tax()));
+      return roundPrice(store.config.tax * (await _total_before_tax()));
     };
     const _total_before_discount = async () => {
       return totalPrice_before_discount
@@ -382,7 +407,7 @@ class TransactionService {
 
     const description = `برای خرید محصولات ${products
       .map(({ title }) => title.fa ?? title.en ?? Object.values(title)[0])
-      .join(' ، ')} از فروشگاه ${store.env.APP_NAME}`;
+      .join(' ، ')} از فروشگاه ${store.config.app_name}`;
 
     return await bankPlugin.stack[0]({
       amount,
@@ -397,7 +422,9 @@ class TransactionService {
     order: OrderDocument,
     successAction: boolean,
     failedAction: boolean,
-    extraFields?: any
+    extraFields?: any,
+    statusWithoutVerify?: PaymentVerifyStatus,
+    sendSuccessSMS = true
   ) {
     const _clearTimer = (authority: string) => {
       const expiredTimer = this.transactionSupervisors.get(authority + '-1');
@@ -414,7 +441,7 @@ class TransactionService {
     const _success = async () => {
       const update = {
         $set: {
-          status: OrderStatus.Posting,
+          status: OrderStatus.Paid,
           post: {
             ...order.toObject().post,
             ...(await this.submitPostReq(order)),
@@ -422,7 +449,6 @@ class TransactionService {
         },
         $unset: { 'transaction.expiredAt': '' },
       };
-      console.log('call', update);
       order = await this.orderModel.findOneAndUpdate(
         { _id: order._id },
         update,
@@ -430,7 +456,7 @@ class TransactionService {
       );
 
       // send sms
-      utils.sendOnStateChange(order)?.then();
+      sendSuccessSMS && utils.sendOnStateChange(order)?.then();
     };
 
     const _failed = async () => {
@@ -446,12 +472,14 @@ class TransactionService {
 
       // rollback products
       await this.productModel.bulkWrite(
-        order.products.map((p) => ({
-          updateOne: {
-            filter: { _id: p._id },
-            update: { $inc: { quantity: p.quantity } },
-          },
-        })),
+        order.products.flatMap((p) =>
+          p.combinations.map((d) => ({
+            updateOne: {
+              filter: { _id: p._id, 'combinations._id': d._id },
+              update: { $inc: { 'combinations.$.quantity': d.quantity } },
+            },
+          }))
+        ),
         { ordered: false }
       );
 
@@ -465,7 +493,11 @@ class TransactionService {
     };
 
     const _core = async () => {
-      if ([OrderStatus.Posting, OrderStatus.Completed].includes(order.status))
+      if (
+        [OrderStatus.Paid, OrderStatus.Posting, OrderStatus.Completed].includes(
+          order.status
+        )
+      )
         return { status: PaymentVerifyStatus.CheckBefore, order };
       else if (
         [OrderStatus.Cart, OrderStatus.Canceled, OrderStatus.Expired].includes(
@@ -479,11 +511,15 @@ class TransactionService {
           `order status invalid, current status: ${order.status}`
         );
 
-      const { status } = await this.verifyPayment({
-        ...extraFields,
-        authority: order.transaction.authority,
-        amount: order.totalPrice,
-      });
+      let status = statusWithoutVerify;
+      if (!statusWithoutVerify)
+        status = (
+          await this.verifyPayment({
+            ...extraFields,
+            authority: order.transaction.authority,
+            amount: order.totalPrice,
+          })
+        ).status;
 
       switch (status) {
         case PaymentVerifyStatus.Failed:
@@ -512,7 +548,7 @@ class TransactionService {
       clear,
       expired_watcher,
       notif_watcher,
-      watchers_timeout = INACTIVE_PRODUCT_TIME,
+      watchers_timeout = store.config.limit.transaction_expiration_s,
     }: {
       clear?: boolean;
       expired_watcher?: boolean;
@@ -520,21 +556,19 @@ class TransactionService {
       watchers_timeout?: number;
     }
   ) {
-    console.log(watchers_timeout);
+    const limit = store.config.limit;
     // clear
     if (clear) {
       // inactive products
       await this.productModel.bulkWrite(
-        order.products.map((p) => ({
-          updateOne: {
-            filter: { _id: p._id },
-            update: {
-              $inc: {
-                quantity: -p.quantity,
-              },
+        order.products.flatMap((p) =>
+          p.combinations.map((d) => ({
+            updateOne: {
+              filter: { _id: p._id, 'combinations._id': d._id },
+              update: { $inc: { 'combinations.$.quantity': -d.quantity } },
             },
-          },
-        })),
+          }))
+        ),
         { ordered: false }
       );
     }
@@ -555,14 +589,18 @@ class TransactionService {
           if (!td) return;
           await this.handlePayment(td, true, true);
         } catch (err) {}
-      }, watchers_timeout);
+      }, watchers_timeout * 1000);
       this.transactionSupervisors.set(
         order.transaction.authority + '-1',
         expiredTimer
       );
     }
 
-    if (notif_watcher && watchers_timeout !== -1) {
+    if (
+      notif_watcher &&
+      watchers_timeout !== -1 &&
+      limit.approach_transaction_expiration !== -1
+    ) {
       //2. Notification Before Expired
       const notifTimer = setTimeout(async () => {
         try {
@@ -577,7 +615,7 @@ class TransactionService {
           if (!td) return;
           utils.sendOnExpire(order)?.then();
         } catch (err) {}
-      }, watchers_timeout * 0.6);
+      }, watchers_timeout * 1000 * limit.approach_transaction_expiration);
       this.transactionSupervisors.set(
         order.transaction.authority + '-2',
         notifTimer

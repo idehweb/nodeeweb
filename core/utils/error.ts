@@ -14,8 +14,11 @@ export function errorDetector(err: any): GeneralError {
     return new GeneralError(message, 500, ErrorType.DB, undefined, stack);
   }
 
-  if ((message ?? '').startsWith('ValidationError'))
-    return new ValidationError(message, undefined, stack);
+  if (
+    (message ?? '').startsWith('ValidationError') ||
+    (message ?? '').search('validation failed') !== -1
+  )
+    return new ValidationError(message, ErrorType.DB, stack);
 
   return new GeneralError(message, 500, ErrorType.Unknown, undefined, stack);
 }

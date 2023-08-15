@@ -1,5 +1,6 @@
 import { MiddleWare } from '@nodeeweb/core/types/global';
-import store from '@nodeeweb/core/store';
+import store from '../../store';
+import { replaceValue } from '@nodeeweb/core/utils/helpers';
 
 export default class Service {
   static addEntry: MiddleWare = async (req, res) => {
@@ -23,10 +24,15 @@ export default class Service {
       data: req.body,
     });
 
+    const conf = store.config;
+
     return res.status(201).json({
       success: true,
-      trackingCode: trackingCode,
-      message: 'submitted successfully!',
+      trackingCode,
+      message: replaceValue({
+        data: [conf.toObject(), { TRACKING_CODE: trackingCode }],
+        text: conf.entry_submit_message,
+      }),
     });
   };
 }

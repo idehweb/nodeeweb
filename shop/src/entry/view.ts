@@ -25,7 +25,7 @@ const adminView: ViewContent = {
 
 export default function registerView() {
   registerAdminView(
-    { content: adminView, name: 'Entry' },
+    { content: adminView, name: 'entry' },
     { from: 'ShopEntity' }
   );
 }

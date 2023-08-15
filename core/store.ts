@@ -7,30 +7,11 @@ import { AdminViewSchema } from './types/view';
 import { AuthStrategy } from './types/auth';
 import { PluginOut } from './types/plugin';
 import { Pipe } from './types/pipe';
+import { ConfigType } from './types/config';
+import { RestartPolicy } from './types/restart';
+import { StoreEnv } from './types/store';
 export class Store {
-  env: {
-    APP_NAME: string;
-    MONGO_URL: string;
-    PORT?: string;
-    DB_NAME: string;
-    NODE_ENV: ENV;
-    isLoc: boolean;
-    isPro: boolean;
-    isDev: boolean;
-    logIntoFile: boolean;
-    STATIC_SERVER: string;
-    USE_ENV: USE_ENV;
-    ADMIN_EMAIL: string;
-    ADMIN_USERNAME: string;
-    ADMIN_PASSWORD: string;
-    APP_DIRS: string;
-    AUTH_SECRET: string;
-    LOG_TO_FILE: string;
-    SMS_USERNAME?: string;
-    SMS_PASSWORD?: string;
-    BASE_URL: string;
-    BASE_API_URL: string;
-  } & { [k: string]: string };
+  env: StoreEnv;
   db: typeof mongoose;
   dirs: string[];
   app: Application;
@@ -40,15 +21,14 @@ export class Store {
   };
   server: Server;
   systemLogger: any;
-  adminViews: AdminViewSchema[] = [];
+  adminViews: { [key: AdminViewSchema['name']]: AdminViewSchema['content'] } =
+    {};
   strategies = new Map<string, AuthStrategy>();
   plugins = new Map<PluginOut['type'], PluginOut['content']>();
-  settings: {
-    taxRate: number;
-  };
+  config: ConfigType;
 
   constructor() {
-    this.env = process.env as any;
+    this.env = { ...process.env } as any;
     switch (this.env.NODE_ENV) {
       case ENV.DEV:
         this.env.isDev = true;
@@ -60,8 +40,8 @@ export class Store {
         this.env.isLoc = true;
         break;
     }
-
-    this.settings = { taxRate: 0.25 };
+    if (!this.env.RESTART_POLICY)
+      this.env.RESTART_POLICY = RestartPolicy.External;
     this.globalMiddleware = { pipes: {}, error: {} };
   }
 }

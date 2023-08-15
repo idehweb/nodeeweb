@@ -4,7 +4,7 @@ export default isSSR
         BASE_URL: process.env.BASE_URL,
         SHOP_URL: process.env.SHOP_URL,
         THEME_URL: process.env.THEME_URL,
-        FRONT_ROUTE: process.env.BASE_URL + "/customer",
+        FRONT_ROUTE: process.env.BASE_URL,
         setting: {
             separator: "|",
             siteName: process.env.SITE_NAME

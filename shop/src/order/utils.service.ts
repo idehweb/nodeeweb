@@ -1,18 +1,32 @@
 import { OrderDocument, OrderStatus } from '../../schema/order.schema';
-import { store } from '@nodeeweb/core';
 import {
   CorePluginType,
   SMSPluginContent,
   SMSPluginType,
 } from '@nodeeweb/core/types/plugin';
-import {
-  ORDER_STATUS_CHANGE_MESSAGE,
-  TRANSACTION_ON_EXPIRE_MESSAGE,
-} from '../../constants/String';
+import { replaceValue } from '@nodeeweb/core/utils/helpers';
+import store from '../../store';
 
 export class Utils {
   get smsPlugin() {
     return store.plugins.get(CorePluginType.SMS) as SMSPluginContent;
+  }
+
+  private orderStatus2Msg(orderStatus: OrderStatus) {
+    const msgs = store.config.sms_message_on;
+
+    switch (orderStatus) {
+      case OrderStatus.Paid:
+        return msgs.paid_order;
+      case OrderStatus.Posting:
+        return msgs.post_order;
+      case OrderStatus.Completed:
+        return msgs.complete_order;
+      case OrderStatus.Canceled:
+        return msgs.cancel_order;
+      default:
+        throw new Error(`unexpected value for order status, ${orderStatus}`);
+    }
   }
 
   private replaceValues(order: OrderDocument, msg: string) {
@@ -37,29 +51,25 @@ export class Utils {
         orderStatus = 'منقضی شده';
         break;
     }
-    const values = {
-      ...Object.fromEntries(
-        Object.entries(store.env).map(([k, v]) => [`%${k}%`, v])
-      ),
-      '%ORDER_STATUS%': orderStatus,
-      '%ORDER_ID%': order._id,
-      '%CUSTOMER_FIRST_NAME%': order.customer.firstName,
-      '%CUSTOMER_LAST_NAME%': order.customer.lastName,
-    };
-
-    let newMsg = msg;
-    const pattern = /(%[^% ]+%)/g;
-    let value = pattern.exec(msg);
-    while (value) {
-      if (values[value[0]])
-        newMsg = newMsg.replace(new RegExp(value[0], 'g'), values[value[0]]);
-      value = pattern.exec(msg);
-    }
-    return newMsg;
+    return replaceValue({
+      data: [
+        store.config.toObject(),
+        {
+          ORDER_STATUS: orderStatus,
+          ORDER_ID: order._id,
+          CUSTOMER_FIRST_NAME: order.customer.firstName,
+          CUSTOMER_LAST_NAME: order.customer.lastName,
+        },
+      ],
+      text: msg,
+    });
   }
 
   async sendOnStateChange(order: OrderDocument) {
-    const message = this.replaceValues(order, ORDER_STATUS_CHANGE_MESSAGE);
+    const message = this.replaceValues(
+      order,
+      this.orderStatus2Msg(order.status)
+    );
 
     if (!this.smsPlugin || !order.customer.phone) return;
 
@@ -70,7 +80,10 @@ export class Utils {
     });
   }
   async sendOnExpire(order: OrderDocument) {
-    const message = this.replaceValues(order, TRANSACTION_ON_EXPIRE_MESSAGE);
+    const message = this.replaceValues(
+      order,
+      store.config.sms_message_on.approach_transaction_expiration
+    );
 
     if (!this.smsPlugin || !order.customer.phone) return;
 

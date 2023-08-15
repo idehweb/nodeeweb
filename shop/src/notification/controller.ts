@@ -1,39 +1,60 @@
-import {
-  CRUD_DEFAULT_REQ_KEY,
-  PUBLIC_ACCESS,
-} from '@nodeeweb/core/src/constants/String';
-import {
-  ControllerAccess,
-  ControllerSchema,
-} from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
-import { controllerRegister } from '@nodeeweb/core/src/handlers/controller.handler';
-import { uploadSingle } from '@nodeeweb/core/src/handlers/upload.handler';
+import { AdminAccess } from '@nodeeweb/core';
+import { CreateNotification } from '../../dto/in/notification';
 import Service from './service';
 
 export default function registerController() {
-  const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
-
-  // create
-  const controllerSchemas: ControllerSchema[] = [
+  // crud
+  registerEntityCRUD(
+    'notification',
     {
-      url: '/',
-      method: 'post',
-      service: Service.create,
-      access,
+      create: {
+        controller: {
+          access: AdminAccess,
+          validate: {
+            dto: CreateNotification,
+            reqPath: 'body',
+          },
+          service: Service.afterCreate,
+        },
+        crud: {
+          executeQuery: true,
+          saveToReq: true,
+        },
+      },
+      getAll: {
+        controller: {
+          access: AdminAccess,
+        },
+        crud: {
+          executeQuery: true,
+          sendResponse: true,
+          autoSetCount: true,
+          paramFields: {
+            limit: 'limit',
+            offset: 'offset',
+          },
+        },
+      },
+      getCount: {
+        controller: {
+          access: AdminAccess,
+        },
+        crud: {
+          executeQuery: true,
+          sendResponse: true,
+        },
+      },
+      getOne: {
+        controller: {
+          access: AdminAccess,
+        },
+        crud: {
+          executeQuery: true,
+          sendResponse: true,
+        },
+      },
     },
-    {
-      url: '/:_id',
-      method: 'put',
-      service: Service.create,
-      access,
-    },
-  ];
-
-  controllerSchemas.forEach((schema) =>
-    controllerRegister(schema, {
-      base_url: '/admin/notification',
-      from: 'ShopEntity',
-    })
+    { from: 'ShopEntity' }
   );
 }

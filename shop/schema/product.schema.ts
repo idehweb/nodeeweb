@@ -1,13 +1,48 @@
+import crypto from 'crypto';
 import mongoose, { Document, Model } from 'mongoose';
 import { Types } from 'mongoose';
+import { MultiLang, PublishStatus } from './_base.schema';
+
+export enum PriceType {
+  Normal = 'normal',
+  Variable = 'variable',
+}
 
 export interface IProduct {
   title: { [key: string]: string };
-  image?: string;
-  price: number;
-  salePrice: number;
-  weight?: number;
-  quantity: number;
+  miniTitle: { [key: string]: string };
+  metatitle?: { [key: string]: string };
+  metadescription?: { [key: string]: string };
+  keywords?: any;
+  slug: string;
+  excerpt?: { [key: string]: string };
+  description?: { [key: string]: string };
+  thumbnail?: string;
+  combinations: {
+    _id: string;
+    options?: { [key: string]: string };
+    price: number;
+    salePrice: number;
+    weight: number;
+    quantity: number;
+    in_stock: boolean;
+    sku?: string;
+  }[];
+  options: {
+    _id: string;
+    name: string;
+    values: { name: string }[];
+  }[];
+  productCategory: Types.ObjectId[];
+  attributes: { attribute: Types.ObjectId; values: string[] }[];
+  labels: { title: string }[];
+  data?: any;
+  extra_attr: { title: string; des: string }[];
+  price_type: PriceType;
+  status: PublishStatus;
+  relatedProducts: Types.ObjectId[];
+  photos: { _id: Types.ObjectId; url: string }[];
+  active: boolean;
 }
 
 export type ProductModel = Model<IProduct>;
@@ -22,27 +57,38 @@ const schema = new mongoose.Schema(
     attributes: [
       {
         attribute: { type: mongoose.Schema.Types.ObjectId, ref: 'attributes' },
-        values: [],
+        values: { type: [String] },
       },
     ],
-    sources: [],
-    labels: [],
-    in_stock: { type: Boolean, default: false },
-    story: { type: Boolean, default: false },
-    price: { type: Number, required: true },
-    weight: { type: Number, default: 0 },
-    quantity: { type: Number, default: 1 },
-    salePrice: { type: Number, required: true },
+    labels: [{ title: String }],
+    combinations: [
+      {
+        _id: { type: String, default: () => crypto.randomUUID() },
+        options: {},
+        price: { type: Number, required: true },
+        weight: { type: Number, default: 0 },
+        quantity: { type: Number, default: 1 },
+        salePrice: { type: Number, required: true },
+        sku: String,
+        in_stock: { type: Boolean, default: true },
+      },
+    ],
     data: {},
-    sku: String,
-    extra_button: String,
-    miniTitle: {},
-    excerpt: {},
-    options: [],
-    extra_attr: [],
-    combinations: [],
-    sections: [],
-    countries: [],
+    miniTitle: MultiLang,
+    excerpt: MultiLang,
+    options: [
+      {
+        _id: String,
+        name: String,
+        values: [{ name: String, _id: false }],
+      },
+    ],
+    extra_attr: [
+      {
+        title: { type: String, required: true },
+        des: { type: String, required: true },
+      },
+    ],
     like: [
       {
         customer: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' },
@@ -50,16 +96,12 @@ const schema = new mongoose.Schema(
         createdAt: { type: Date, default: Date.now },
       },
     ],
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' },
-    type: { type: String, default: 'normal' },
-    description: {},
-    requireWarranty: {},
-
+    price_type: { type: String, enum: PriceType, default: PriceType.Normal },
+    description: MultiLang,
     views: [],
-    addToCard: [],
-    title: {},
-    metatitle: {},
-    metadescription: {},
+    title: MultiLang,
+    metatitle: MultiLang,
+    metadescription: MultiLang,
     keywords: {},
     slug: {
       type: String,
@@ -68,11 +110,21 @@ const schema = new mongoose.Schema(
       trim: true,
     },
     thumbnail: String,
-    status: { type: String, default: 'processing' },
-    transaction: [{ type: mongoose.Schema.Types.ObjectId, ref: 'transaction' }],
+    status: {
+      type: String,
+      enum: PublishStatus,
+      default: PublishStatus.Processing,
+    },
     relatedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'product' }],
-    photos: [],
-    postNumber: String,
+    photos: [
+      {
+        type: {
+          _id: { type: mongoose.Schema.Types.ObjectId, ref: 'file' },
+          url: { type: String, required: true },
+        },
+        required: true,
+      },
+    ],
   },
   { timestamps: true }
 );

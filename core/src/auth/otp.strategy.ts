@@ -16,6 +16,7 @@ import {
   CorePluginType,
   SMSPluginContent,
   SMSPluginType,
+  SmsSendStatus,
 } from '../../types/plugin';
 import randomNumber from 'random-number-csprng';
 import { setToCookie, signToken } from '../handlers/auth.handler';
@@ -27,11 +28,7 @@ import {
   OtpUserSignup,
 } from '../../dto/in/auth/index.dto';
 import { UserDocument } from '../../types/user';
-
-export enum SmsSendType {
-  Send_Before = 'send_before',
-  Send_Success = 'send_success',
-}
+import { replaceValue } from '../../utils/helpers';
 
 export const OTP_STRATEGY = 'otp';
 export class OtpStrategy extends AuthStrategy {
@@ -91,7 +88,7 @@ export class OtpStrategy extends AuthStrategy {
   private async sendCode(req: Req, res: Res) {
     // generate and send code
 
-    const phone = req.user?.phone ?? req.body.user?.phone,
+    const phone = req.user?.phoneNumber ?? req.body.user?.phone,
       userExists = Boolean(req.user);
 
     // send code
@@ -108,7 +105,7 @@ export class OtpStrategy extends AuthStrategy {
     if (prevCode) {
       const leftTimeMs = prevCode.updatedAt.getTime() + 120 * 1000 - Date.now();
       return res.json({
-        type: SmsSendType.Send_Before,
+        type: SmsSendStatus.Send_Before,
         message: `sms send at ${prevCode.updatedAt}`,
         data: {
           userExists,
@@ -134,11 +131,15 @@ export class OtpStrategy extends AuthStrategy {
     // send code
     let codeResult: string | boolean;
     try {
-      codeResult = await smsPlugin.stack[0]({
+      const response = await smsPlugin.stack[0]({
         to: phone,
         type: SMSPluginType.OTP,
-        text: `your code is: ${code}`,
+        text: replaceValue({
+          data: [store.config.toObject(), { code }],
+          text: store.config.sms_message_on.otp,
+        }),
       });
+      if (response.status === SmsSendStatus.Send_Success) codeResult = true;
     } catch (err) {
       codeResult = err.message;
     }
@@ -150,7 +151,7 @@ export class OtpStrategy extends AuthStrategy {
     }
 
     return res.json({
-      type: SmsSendType.Send_Success,
+      type: SmsSendStatus.Send_Success,
       message: `sms send at ${new Date().toISOString()}`,
       data: {
         userExists,
@@ -183,7 +184,7 @@ export class OtpStrategy extends AuthStrategy {
     const user = await this.exportUser(req);
 
     // verify code
-    await this.verify(user.phone, req.body.user.code);
+    await this.verify(user.phoneNumber, req.body.user.code);
 
     // token
     const token = signToken(user.id);
@@ -211,12 +212,12 @@ export class OtpStrategy extends AuthStrategy {
       const token = signToken(user.id);
       setToCookie(res, token, 'authToken');
 
-      return res.status(201).json({
-        data: {
-          user,
-          token,
-        },
-      });
+      req.data = {
+        user,
+        token,
+      };
+
+      return next();
     } catch (err) {
       await this.codeRevert(codeDoc);
       throw err;

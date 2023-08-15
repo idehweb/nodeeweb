@@ -1,6 +1,7 @@
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
 import Service from './service';
 import { AdminAccess, AuthUserAccess } from '@nodeeweb/core';
+import { CreateCustomerBody, UpdateCustomerBody } from '../../dto/in/customer';
 
 export default function registerController() {
   // crud
@@ -35,6 +36,10 @@ export default function registerController() {
       updateOne: {
         controller: {
           access: AuthUserAccess,
+          validate: {
+            dto: UpdateCustomerBody,
+            reqPath: 'body',
+          },
         },
         crud: {
           parseFilter: Service.updateOneParseFilter,
@@ -50,6 +55,28 @@ export default function registerController() {
         crud: {
           executeQuery: true,
           sendResponse: true,
+        },
+      },
+      create: {
+        controller: {
+          access: AdminAccess,
+          validate: {
+            dto: CreateCustomerBody,
+            reqPath: 'body',
+          },
+        },
+        crud: {
+          executeQuery: true,
+          sendResponse: true,
+          parseBody: Service.createParseBody,
+        },
+      },
+      deleteOne: {
+        controller: { access: AdminAccess },
+        crud: {
+          executeQuery: true,
+          sendResponse: true,
+          forceDelete: true,
         },
       },
     },

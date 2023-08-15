@@ -17,15 +17,19 @@ import registerPage from './src/page';
 import registerPost from './src/post';
 import registerProduct from './src/product';
 import registerProductCategory from './src/productCategory';
-import registerSettings from './src/settings';
+import registerSettings from './src/config';
 import logger from './utils/log';
 import { store } from '@nodeeweb/core';
 import { handlePlugins } from './src/common/handlePlugins';
 import registerCustomerGroup from './src/customerGroup';
+import { registerShopConfig } from './src/config/config';
 
 async function deployShop() {
   await deployCore();
   store.systemLogger = logger;
+
+  // register config
+  registerShopConfig();
 
   // register entity
   registerAdmin();

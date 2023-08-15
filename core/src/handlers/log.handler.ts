@@ -5,26 +5,13 @@ import { createCustomLogger } from '../core/log';
 import store from '../../store';
 import { Colors, color, yellow } from '../../utils/color';
 import bfs from '../../utils/bfs';
+import { convertToString } from '../../utils/helpers';
 
 export class Logger {
   constructor(private logger: winston.Logger, private label?: string) {}
 
   private convert(a: any) {
-    if (typeof a === 'object') {
-      Object.getOwnPropertyNames(a).forEach((key) => {
-        const temp = a[key];
-        delete a[key];
-        a[key] = temp;
-      });
-      return JSON.stringify(a, null, '  ');
-    }
-    return a?.toString() ?? String(a);
-    // const msgs: string[] = [];
-    // bfs(a, ({ value, key }) => {
-    //   if (value === undefined) return;
-    //   msgs.push(key && key !== 'message' ? `${key} : ${value}` : value);
-    // });
-    // return msgs.join('\n');
+    return convertToString(a);
   }
 
   log(...args: any[]) {

@@ -9,10 +9,17 @@ import {
   handleUncaughtException,
 } from './src/core/shutdown';
 import { color } from './utils/color';
+import { wait } from './utils/helpers';
 
 export default async function deployCore() {
   // handle errors
   handleUncaughtException();
+
+  // wait for restarting
+  if (store.env.RESTARTING) {
+    logger.warn('waiting for restart...');
+    await wait(10);
+  }
 
   // set system logger
   store.systemLogger = logger;

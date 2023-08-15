@@ -276,7 +276,7 @@ let pageData = {
           header: [],
           body: [],
           params: ['phoneNumber'],
-          url: '/boy/customer/number/',
+          url: '/boy/number/',
           name: 'ثبت شماره',
           size: {
             sm: 12,
@@ -289,7 +289,7 @@ let pageData = {
             if (!phoneNumber) return toast.error('شماره تماس خود را وارد کنید');
 
             contactBoy(
-              'boy/customer/number/' + phoneNumber,
+              'boy/number/' + phoneNumber,
               pageData.estekhdam.add.data
             ).then((res) => {
               console.log('res for addDriver is:', res);

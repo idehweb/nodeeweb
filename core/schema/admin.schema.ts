@@ -16,6 +16,7 @@ export interface IAdmin {
   createdAt: Date;
   updatedAt: Date;
   passwordChangeAt?: Date;
+  credentialChangeAt: Date;
 }
 
 export type AdminModel = Model<IAdmin, {}, IAdminMethods>;
@@ -54,6 +55,11 @@ const schema = new mongoose.Schema(
       type: Date,
       select: false,
     },
+    credentialChangeAt: {
+      type: Date,
+      default: Date.now,
+      select: false,
+    },
     role: { type: String, default: 'admin' },
     active: { type: Boolean, default: true },
   },
@@ -68,8 +74,14 @@ schema.pre('save', async function (next) {
 
   user.password = await bcrypt.hash(user.password, 12);
   user.passwordChangeAt = new Date();
+  user.credentialChangeAt = user.passwordChangeAt;
 
   return next();
+});
+schema.post('save', function (doc, next) {
+  doc.credentialChangeAt = undefined;
+  doc.passwordChangeAt = undefined;
+  next();
 });
 
 schema.pre('findOneAndUpdate', async function (next) {
@@ -83,6 +95,7 @@ schema.pre('findOneAndUpdate', async function (next) {
     addFields.password = await bcrypt.hash(addFields.password, 12);
     // update change at
     addFields.passwordChangeAt = new Date();
+    addFields.credentialChangeAt = addFields.passwordChangeAt;
   } else {
     const password = update.$set?.password ?? update.password;
     if (!password) return next();
@@ -94,6 +107,7 @@ schema.pre('findOneAndUpdate', async function (next) {
     update.$set.password = await bcrypt.hash(password, 12);
     // update change at
     update.$set.passwordChangeAt = new Date();
+    update.$set.credentialChangeAt = update.$set.passwordChangeAt;
   }
 
   return next();

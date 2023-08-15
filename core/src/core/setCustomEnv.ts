@@ -1,8 +1,8 @@
 import fs from 'fs';
-import path from 'path';
+import path, { join } from 'path';
 import store from '../../store';
 import { USE_ENV } from '../../types/global';
-import { CORE_NODE_MODULE_PATH } from '../../utils/package';
+import { CORE_NODE_MODULE_PATH, NODE_MODULE_PATH } from '../../utils/package';
 import _ from 'lodash';
 import { BASE_API_URL } from '../constants/String';
 
@@ -12,7 +12,8 @@ export default function setCustomEnv() {
     path.resolve(appDirectory, relativePath);
 
   // use env
-  if (CORE_NODE_MODULE_PATH) store.env.USE_ENV = USE_ENV.NPM;
+  if (CORE_NODE_MODULE_PATH !== NODE_MODULE_PATH)
+    store.env.USE_ENV = USE_ENV.NPM;
   else store.env.USE_ENV = USE_ENV.GIT;
 
   // dirs
@@ -21,7 +22,9 @@ export default function setCustomEnv() {
     [
       appDirectory,
       ...env_dirs,
-      store.env.USE_ENV === USE_ENV.NPM ? CORE_NODE_MODULE_PATH : '',
+      store.env.USE_ENV === USE_ENV.NPM
+        ? join(CORE_NODE_MODULE_PATH, '..')
+        : '',
     ].filter((d) => d)
   );
 

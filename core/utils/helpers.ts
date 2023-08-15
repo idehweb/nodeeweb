@@ -1,32 +1,52 @@
 import { join } from 'path';
 import * as fs from 'fs';
+import _ from 'lodash';
+
+export function convertToString(a: any, pretty = true) {
+  if (typeof a === 'object') {
+    const newA = {};
+    Object.getOwnPropertyNames(a).forEach((key) => {
+      newA[key] = a[key];
+      // const temp = a[key];
+      // delete a[key];
+      // a[key] = temp;
+    });
+    return !pretty ? JSON.stringify(newA) : JSON.stringify(newA, null, '  ');
+  }
+  return a?.toString() ?? String(a);
+  // const msgs: string[] = [];
+  // bfs(a, ({ value, key }) => {
+  //   if (value === undefined) return;
+  //   msgs.push(key && key !== 'message' ? `${key} : ${value}` : value);
+  // });
+  // return msgs.join('\n');
+}
 
 export function wait(sec: number) {
   return new Promise((resolve) => setTimeout(resolve, sec * 1000));
 }
 
-export function axiosError2String(error: any) {
+export function axiosError2String(error: any, pretty = true) {
   if (!error.isAxiosError) {
-    return { error, parsed: false };
+    return { error, parsed: false, message: convertToString(error, pretty) };
   }
+  const body = {
+    name: error.name,
+    code: error.code,
+    message: error.message,
+    url: error?.request?._url || error?.config?.url,
+    method: error.config?.method,
+    res_data: error?.response?.data,
+    req_data: error.config.data || error?.request?.data,
+    res_headers: error?.response?.headers,
+    req_headers: error?.config.headers,
+    stack: error.stack,
+  };
   return {
-    message: JSON.stringify(
-      {
-        name: error.name,
-        code: error.code,
-        message: error.message,
-        url: error?.request?._url || error?.config?.url,
-        method: error.config?.method,
-        res_data: error?.response?.data,
-        req_data: error.config.data || error?.request?.data,
-        res_headers: error?.response?.headers,
-        req_headers: error?.config.headers,
-        stack: error.stack,
-      },
-      null,
-      '  '
-    ),
+    body,
+    message: pretty ? JSON.stringify(body, null, '  ') : JSON.stringify(body),
     parsed: true,
+    error,
   };
 }
 
@@ -56,4 +76,47 @@ export async function call<A extends Array<any>, R>(
     result = await result;
   }
   return result as R;
+}
+
+export function getName(f: any, capitalize = true) {
+  const name: string =
+    (typeof f === 'string'
+      ? f
+      : f?.shadowName || f?.name || f?.constructor?.name) ?? '';
+  return name
+    .split(' ')
+    .map((word, i) => (i == 0 && capitalize ? _.capitalize(word) : word))
+    .join(' ');
+}
+
+export function replaceValue({
+  data,
+  text,
+  boundary = '%',
+}: {
+  data: object[];
+  text: string;
+  boundary?: string;
+}) {
+  const values = data
+    .map((d) =>
+      Object.fromEntries(
+        Object.entries(d).map(([k, v]) => [
+          `${boundary}${k.toUpperCase()}${boundary}`,
+          v,
+        ])
+      )
+    )
+    .reduce((acc, curr) => ({ ...acc, ...curr }), {});
+
+  let newMsg = text;
+  const pattern = new RegExp(`(${boundary}[^${boundary} ]+${boundary})`, 'ig');
+  let value = pattern.exec(text);
+  while (value) {
+    const upperV = value[0]?.toUpperCase();
+    if (values[upperV])
+      newMsg = newMsg.replace(new RegExp(value[0], 'ig'), values[upperV]);
+    value = pattern.exec(text);
+  }
+  return newMsg;
 }
