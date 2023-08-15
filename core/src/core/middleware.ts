@@ -1,36 +1,16 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import { MiddleWare, MiddleWareError } from '../../types/global';
 import bodyParser from 'body-parser';
 import store from '../../store';
-import { expressLogger } from '../handlers/log.handler';
+import logger, { expressLogger } from '../handlers/log.handler';
 import rateLimit from 'express-rate-limit';
 import { getPublicDir } from '../../utils/path';
-
-export const headerMiddleware: MiddleWare = (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader(
-    'Access-Control-Allow-Methods',
-    'GET, POST, OPTIONS, PUT, PATCH, DELETE'
-  );
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'Content-Type,response, Authorization, Content-Length, X-Requested-With, shared_key, token , _id , lan , fields'
-  );
-  res.setHeader('Access-Control-Expose-Headers', 'X-Total-Count');
-  if (!req.headers.lan) {
-    req.headers.lan = process.env.defaultLanguage || 'fa';
-  }
-  res.setHeader('Content-Language', 'fa');
-
-  //intercepts OPTIONS method
-  if ('OPTIONS' === req.method) {
-    //respond with 200
-    return res.sendStatus(200);
-  } else {
-    next();
-  }
-};
+import { getViewHandler } from './view';
+import { color } from '../../utils/color';
+import { getName } from '../../utils/helpers';
+import { join } from 'path';
 
 export function commonMiddleware(): (
   | MiddleWare
@@ -43,17 +23,28 @@ export function commonMiddleware(): (
     | [string, MiddleWare | MiddleWareError]
   )[] = [];
 
+  // cors
+  mw.push(
+    cors({
+      allowedHeaders:
+        'Content-Type,response, Authorization, Content-Length, X-Requested-With, shared_key, token , _id , lan , fields',
+      exposedHeaders: ['X-Total-Count'],
+    })
+  );
+
   // logger
   mw.push(expressLogger);
 
   // rate limit
+  const { limit } = store.config;
   const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000,
-    max: 100,
+    windowMs: limit.request_limit_window_s * 1000,
+    max: limit.request_limit,
     standardHeaders: true,
     legacyHeaders: false,
   });
 
+  limiter['shadowName'] = 'RateLimiter';
   mw.push(limiter);
 
   mw.push(bodyParser.json({ limit: '10kb' }));
@@ -68,12 +59,36 @@ export function commonMiddleware(): (
   ) {
     const filesFolder = getPublicDir('files', true)[0];
     const adminFolder = getPublicDir('admin', true)[0];
-    const themeFolder = getPublicDir('theme', true)[0];
+    const frontFolder = getPublicDir('front', true)[0];
 
-    mw.push(express.static(filesFolder, { maxAge: '1y' }));
-    mw.push(['/site_setting', express.static(themeFolder + '/site_setting')]);
-    mw.push(['/static', express.static(themeFolder + '/static')]);
-    mw.push(['/admin', express.static(adminFolder)]);
+    const filesStatic = express.static(filesFolder, { maxAge: '1y' });
+    filesStatic['shadowName'] = `Server-Static / => ${filesFolder}`;
+
+    const frontSettingStatic: [string, MiddleWare] = [
+      '/site_setting',
+      express.static(frontFolder + '/site_setting'),
+    ];
+    frontSettingStatic['shadowName'] = `Server-Static /site_setting => ${join(
+      frontFolder,
+      '/site_setting'
+    )}`;
+
+    const frontStatic: [string, MiddleWare] = [
+      '/static',
+      express.static(frontFolder + '/static'),
+    ];
+    frontStatic['shadowName'] = `Server-Static /static => ${join(
+      frontFolder,
+      '/static'
+    )}`;
+
+    const adminStatic: [string, MiddleWare] = [
+      '/admin',
+      express.static(adminFolder),
+    ];
+    adminStatic['shadowName'] = `Server-Static /admin => ${adminFolder}`;
+
+    mw.push(filesStatic, frontSettingStatic, frontStatic, adminStatic);
   }
 
   // insert error packages
@@ -83,4 +98,14 @@ export function commonMiddleware(): (
   }
 
   return mw;
+}
+
+export function registerCommonHandlers() {
+  const mw = commonMiddleware();
+  mw.forEach((w) => {
+    if (Array.isArray(w)) {
+      store.app.use(w[0], w[1]);
+    } else store.app.use(w);
+    logger.log(color('Cyan', `## CoreMiddleware Register ${getName(w)} ##`));
+  });
 }

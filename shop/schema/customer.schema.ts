@@ -1,5 +1,25 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model, Types } from 'mongoose';
 import bcrypt from 'bcrypt';
+import { IUser } from '@nodeeweb/core/types/user';
+
+export enum CustomerSource {
+  Web = 'WEBSITE',
+  Panel = 'CRM',
+}
+
+export interface ICustomerMethods {
+  passwordVerify: (password: string) => Promise<boolean>;
+}
+
+export interface ICustomer extends IUser {
+  customerGroup: Types.ObjectId[];
+  source: CustomerSource;
+}
+
+export type CustomerModel = Model<ICustomer, {}, ICustomerMethods>;
+export type CustomerDocument = Document<Types.ObjectId, {}, ICustomer> &
+  ICustomer &
+  ICustomerMethods;
 
 const schema = new mongoose.Schema(
   {
@@ -11,21 +31,21 @@ const schema = new mongoose.Schema(
     },
     email: {
       type: String,
+      trim: true,
       unique: true,
       sparse: true,
-      trim: true,
     },
     username: {
       type: String,
+      trim: true,
       unique: true,
       sparse: true,
-      trim: true,
     },
     phone: {
       type: String,
+      trim: true,
       unique: true,
       sparse: true,
-      trim: true,
     },
     password: {
       type: String,
@@ -35,15 +55,20 @@ const schema = new mongoose.Schema(
       type: Date,
       select: false,
     },
+    credentialChangeAt: {
+      type: Date,
+      default: Date.now,
+      select: false,
+    },
     expire: Date,
     birth_day: String,
     birth_month: String,
-    birthday: String,
+    birthday: Date,
     birthdate: { type: Date },
     internationalCode: String,
     sex: String,
     extra: { type: String },
-    source: { type: String, default: 'WEBSITE' },
+    source: { type: String, enum: CustomerSource, default: CustomerSource.Web },
     bankData: {},
     data: {},
     type: {
@@ -62,7 +87,6 @@ const schema = new mongoose.Schema(
     ],
     age: { type: Number },
     whatsapp: { type: Boolean, default: false },
-    active: { type: Boolean, default: true },
     activationCode: Number,
     notificationTokens: [
       { token: String, updatedAt: { type: Date, default: Date.now } },
@@ -90,8 +114,10 @@ const schema = new mongoose.Schema(
       },
     ],
     role: { type: String, default: 'user' },
+    active: { type: Boolean, default: true },
     address: [],
     companyName: String,
+    companyTelNumber: String,
   },
   { timestamps: true }
 );
@@ -104,8 +130,15 @@ schema.pre('save', async function (next) {
 
   user.password = await bcrypt.hash(user.password, 12);
   user.passwordChangeAt = new Date();
+  user.credentialChangeAt = user.passwordChangeAt;
 
   return next();
+});
+
+schema.post('save', function (doc, next) {
+  doc.credentialChangeAt = undefined;
+  doc.passwordChangeAt = undefined;
+  next();
 });
 
 schema.pre('findOneAndUpdate', async function (next) {
@@ -119,6 +152,7 @@ schema.pre('findOneAndUpdate', async function (next) {
     addFields.password = await bcrypt.hash(addFields.password, 12);
     // update change at
     addFields.passwordChangeAt = new Date();
+    addFields.credentialChangeAt = addFields.passwordChangeAt;
   } else {
     const password = update.$set?.password ?? update.password;
     if (!password) return next();
@@ -130,6 +164,7 @@ schema.pre('findOneAndUpdate', async function (next) {
     update.$set.password = await bcrypt.hash(password, 12);
     // update change at
     update.$set.passwordChangeAt = new Date();
+    update.$set.credentialChangeAt = update.$set.passwordChangeAt;
   }
 
   return next();

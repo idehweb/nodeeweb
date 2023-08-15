@@ -4,6 +4,7 @@ export * from './types/controller';
 export * from './types/error';
 export * from './types/register';
 export * from './types/view';
+export * from './dto/config';
 export { default as deployCore } from './deploy';
 export { default as store } from './store';
 export { createLogger } from './src/handlers/log.handler';

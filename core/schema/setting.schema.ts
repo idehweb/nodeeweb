@@ -1,4 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model, Types } from 'mongoose';
+
+export interface ISetting {}
+
+export type SettingModel = Model<ISetting>;
+export type SettingDocument = Document<Types.ObjectId, {}, ISetting> & ISetting;
 
 const schema = new mongoose.Schema(
   {
@@ -13,15 +18,15 @@ const schema = new mongoose.Schema(
     tax: { type: Boolean, default: true },
     taxAmount: Number,
     defaultLanguage: String,
-    factore_shop_name: String,
-    factore_shop_site_name: String,
-    factore_shop_site_address: String,
-    factore_shop_address: String,
-    factore_shop_phoneNumber: String,
-    factore_shop_faxNumber: String,
-    factore_shop_postalCode: String,
-    factore_shop_submitCode: String,
-    factore_shop_internationalCode: String,
+    factor_shop_name: String,
+    factor_shop_site_name: String,
+    factor_shop_site_address: String,
+    factor_shop_address: String,
+    factor_shop_phone: String,
+    factor_shop_faxNumber: String,
+    factor_shop_postalCode: String,
+    factor_shop_submitCode: String,
+    factor_shop_internationalCode: String,
     defaultSmsGateway: String,
     defaultBankGateway: String,
     siteActiveMessage: String,

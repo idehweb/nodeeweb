@@ -10,6 +10,7 @@ import {
   UserPassUserSignup,
 } from '../../dto/in/auth/index.dto';
 import { IUser, UserDocument, UserModel } from '../../types/user';
+import { AuthEvents } from './authGateway.strategy';
 
 export const USER_PASS_STRATEGY = 'user-pass';
 export default class UserPassStrategy extends AuthStrategy {
@@ -45,7 +46,7 @@ export default class UserPassStrategy extends AuthStrategy {
     await this.exportUser(req, !signup && login);
 
     if (login && req.user) return await this.login(req, res);
-    if (signup && !req.user) return await this.signup(req, res);
+    if (signup && !req.user) return await this.signup(req, res, next);
     return res.json({ data: { userExists: Boolean(req.user) } });
   }
 
@@ -70,7 +71,7 @@ export default class UserPassStrategy extends AuthStrategy {
       },
     });
   }
-  async signup(req: Req, res: Res) {
+  async signup(req: Req, res: Res, next: NextFunction) {
     const userModel = store.db.model<IUser, UserModel>(req.modelName);
 
     const userBody = await this.transformSignup(req.body.user);
@@ -78,6 +79,10 @@ export default class UserPassStrategy extends AuthStrategy {
     const user = await userModel.create(userBody);
     const token = signToken(user.id);
     setToCookie(res, token, 'authToken');
+
+    // emit
+    store.event?.emit(AuthEvents.AfterRegister, user);
+
     return res.status(201).json({
       user: { ...user.toObject(), password: undefined },
       token,

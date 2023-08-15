@@ -5,7 +5,7 @@ const adminView: ViewContent = {
     header: [
       { name: 'message', type: 'string' },
       { name: 'title', type: 'string' },
-      { name: 'phoneNumber', type: 'number' },
+      { name: 'phone', type: 'number' },
       { name: 'from', type: 'string' },
       { name: 'createdAt', type: 'string' },
       { name: 'customer', type: 'string' },

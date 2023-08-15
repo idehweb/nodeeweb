@@ -37,34 +37,18 @@ export default function registerController() {
         controller: {
           access: AdminAccess,
         },
-        crud: {
-          executeQuery: true,
-          sendResponse: true,
-        },
       },
       getOne: {
         controller: {
           access: AdminAccess,
-          service(req, res) {
-            res.json(req.crud);
-          },
-        },
-        crud: {
-          saveToReq: true,
-          executeQuery: true,
         },
       },
       getAll: {
         controller: {
           access: AdminAccess,
-          service(req, res) {
-            res.json(req.crud);
-          },
         },
         crud: {
           autoSetCount: true,
-          executeQuery: true,
-          saveToReq: true,
           paramFields: {
             limit: 'limit',
             offset: 'offset',
@@ -77,8 +61,6 @@ export default function registerController() {
           validate: { reqPath: 'body', dto: CreateAdminBody },
         },
         crud: {
-          sendResponse: true,
-          executeQuery: true,
           project: { password: 0 },
         },
       },
@@ -87,19 +69,12 @@ export default function registerController() {
           access,
           validate: { reqPath: 'body', dto: UpdateAdminBody },
         },
-        crud: {
-          sendResponse: true,
-          executeQuery: true,
-          // parseFilter: (req) => ({ _id: req.user._id }),
-        },
       },
       deleteOne: {
         controller: {
           access,
         },
         crud: {
-          sendResponse: true,
-          executeQuery: true,
           forceDelete: true,
         },
       },

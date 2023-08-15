@@ -76,7 +76,7 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
       const query = (model: string) =>
         store.db.model(model).findOne({
           _id: id,
-          passwordChangeAt: { $lte: new Date(iat) },
+          credentialChangeAt: { $lte: new Date(iat) },
           active: true,
         });
 
@@ -88,7 +88,7 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
         }
       }
 
-      if (opt.notThrow) return done(null, {});
+      if (opt.notThrow) return done(null);
       return done(new UnauthorizedError());
     }
   );
@@ -146,10 +146,20 @@ export function authWithPass(opt: UserPassStrategyOpt) {
     .authenticate(opt.name);
 }
 
-export function authWithToken(opt: JwtStrategyOpt) {
-  return passport
-    .use(opt.name, jwtStrategyBuilder(opt))
-    .authenticate(opt.name, { session: false });
+export function authWithToken(opt: JwtStrategyOpt): MiddleWare {
+  return (req, res, next) => {
+    return passport
+      .use(opt.name, jwtStrategyBuilder(opt))
+      .authenticate(opt.name, { session: false }, (err, user, info, status) => {
+        const error = user ? null : err || info;
+        if (error && !opt.notThrow)
+          return next(
+            new UnauthorizedError(error.message, undefined, error.stack)
+          );
+        req.user = user;
+        return next();
+      })(req, res, next);
+  };
 }
 
 export function authWithGoogle() {}
@@ -159,24 +169,16 @@ export function authorizeWithToken(
   opt: Partial<JwtStrategyOpt> = {}
 ): MiddleWare[] {
   return [
-    (req, res, next) => {
-      if (opt.notThrow && !isJWT(extractToken(req, opt.cookieName)))
-        return next();
-      return authWithToken({
-        name: `jwt-${modelNames.join('-')}-${JSON.stringify(opt)}`,
-        ...opt,
-        model: modelNames,
-      })(req, res, next);
-    },
-    (req, res, next) => {
-      if (!req.user?._id) delete req.user;
-      return next();
-    },
+    authWithToken({
+      name: `jwt-${modelNames.join('-')}-${JSON.stringify(opt)}`,
+      ...opt,
+      model: modelNames,
+    }),
   ];
 }
 export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
   return (req, res, next) => {
-    const modelName = req.user?.['constructor']?.['modelName'];
+    const modelName = req.modelName ?? req.user?.['constructor']?.['modelName'];
     // not login and there is optional login role
     if (!modelName && accesses.map((a) => a.role).includes(OPTIONAL_LOGIN))
       return next();

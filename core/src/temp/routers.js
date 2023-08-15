@@ -144,3 +144,40 @@ export async function getAuth(req, res, next) {
     user: { tokens: [{ token: 'token' }] },
   });
 }
+
+export function mockTheme() {
+  return {
+    sso: {
+      google: {
+        client_id:
+          '618852057818-v5rut1jdac5n8qtakkbntkgf0uhmnnk6.apps.googleusercontent.com',
+      },
+    },
+    taxAmount: 0,
+    tax: true,
+    currency: 'Toman',
+    header: {},
+    body: [
+      {
+        name: 'MainContent',
+      },
+    ],
+    footer: {},
+    routes: [
+      {
+        path: '/',
+        exact: true,
+        layout: 'DefaultLayout',
+        element: 'Home',
+      },
+      {
+        path: '/a/:_entity/:_id/:_slug',
+        method: 'get',
+        access: 'customer_all',
+      },
+    ],
+    components: [],
+    models: [],
+    rules: {},
+  };
+}

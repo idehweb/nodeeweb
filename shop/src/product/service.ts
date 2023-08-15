@@ -3,8 +3,14 @@ import store from '@nodeeweb/core/store';
 import { show, submitAction } from '../common/mustImplement';
 import { SortValues, isObjectIdOrHexString } from 'mongoose';
 import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
+import { CreateProductBody } from '../../dto/in/product';
+import { NotFound } from '@nodeeweb/core';
+import { FileDocument, FileModel } from '../../schema/file.schema';
 
 export default class Service {
+  static get fileModel(): FileModel {
+    return store.db.model('file');
+  }
   static getAll: MiddleWare = async (req, res) => {
     const Product = store.db.model('product');
     if (req.headers.response !== 'json') {
@@ -315,45 +321,35 @@ export default class Service {
     delete product.relatedProducts;
     delete product.firstCategory;
 
-    res.json(product);
+    res.json({ data: product });
   };
-  static createBodyParser = (req: Req) => {
-    if (!req.body) {
-      req.body = {};
-    }
-    if (!req.body.type) {
-      req.body.type = 'normal';
-    }
-    if (req.body && req.body.slug) {
-      req.body.slug = req.body.slug.replace(/\s+/g, '-').toLowerCase();
-    }
+  static createBodyParser = async (req: Req) => {
+    const body: CreateProductBody = req.body;
 
-    if (req.body.type == 'variable') {
-      req.body.in_stock = false;
-      if (req.body.combinations) {
-        req.body.combinations.forEach((comb) => {
-          if (comb.in_stock && comb.quantity != 0) {
-            req.body.in_stock = true;
-          }
-        });
-      }
-    }
-    if (req.body.type == 'normal') {
-      delete req.body.combinations;
-    }
-
-    // parse to number
-    ['price', 'salePrice', 'quantity', 'weight'].forEach((k) => {
-      if (req.body[k] === '' || req.body[k] === undefined) delete req.body[k];
-      else req.body[k] = +req.body[k];
+    // combinations details
+    body.combinations.forEach((com) => {
+      if (com.salePrice === undefined) com.salePrice = com.price;
     });
 
-    if (!req.body.salePrice) req.body.salePrice = req.body.price;
+    // file
+    if (body.photos?.length) {
+      const files = await this.fileModel.find({ _id: { $in: body.photos } });
+      if (files.length !== body.photos.length) {
+        const notFoundIds = body.photos.filter(
+          (p) => !files.find((f) => f._id.equals(p))
+        );
+        throw new NotFound(
+          `file with IDs ${notFoundIds
+            .map((id) => id.toString())
+            .join(', ')} not found`
+        );
+      }
 
-    if (req.body.in_stock !== undefined)
-      req.body.in_stock = Boolean(req.body.in_stock);
+      body.photos = files as any;
+      body['thumbnail'] = files[0].url;
+    }
 
-    return req.body;
+    return body;
   };
 
   static createAfter: MiddleWare = async (req, res) => {
@@ -368,7 +364,7 @@ export default class Service {
       product: product._id,
     };
     submitAction(action);
-    res.status(201).json(product);
+    res.status(201).json({ data: product });
   };
 
   static updateBodyParser = (req: Req) => {
@@ -423,7 +419,7 @@ export default class Service {
       product: product._id,
     };
     submitAction(action);
-    res.status(200).json(product);
+    res.status(200).json({ data: product });
   };
   static deleteAfter: MiddleWare = async (req, res) => {
     const product = req[CRUD_DEFAULT_REQ_KEY];
@@ -435,10 +431,7 @@ export default class Service {
       product: product._id,
     };
     submitAction(action);
-    return res.status(204).json({
-      success: true,
-      message: 'Deleted!',
-    });
+    return res.status(204).send();
   };
 
   static rewriteProducts: MiddleWare = async (req, res) => {

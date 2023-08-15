@@ -3,11 +3,27 @@ import path, { join } from 'path';
 import fs from 'fs';
 import logger from './log.handler';
 import { isAsyncFunction } from 'util/types';
-import { PluginContent, CorePluginType, PluginOut } from '../../types/plugin';
+import { CorePluginType, PluginOut } from '../../types/plugin';
 import store from '../../store';
 import { color } from '../../utils/color';
 import { catchFn } from '../../utils/catchAsync';
 import { RegisterOptions } from '../../types/register';
+
+export function getPluginEventName({
+  content_stack,
+  type,
+  after,
+  before,
+}: {
+  type: PluginOut['type'];
+  after?: boolean;
+  before?: boolean;
+  content_stack: number;
+}) {
+  return `${
+    after ? 'after' : before ? 'before' : 'after'
+  }-plugin-${type}-${content_stack}`;
+}
 
 export default async function handlePlugin() {
   const __dirname = path.resolve();
@@ -34,18 +50,35 @@ export function registerPlugin(
   { from, logger = store.systemLogger }: RegisterOptions
 ) {
   // catch
-  content.stack = content.stack.map((cb) =>
-    catchFn(cb, {
-      onError(err: any) {
-        logger.error(
-          color(
-            'Red',
-            `## ${from ? `${from} ` : ''}${type}:${content.name} Plugin ##\n`
-          ),
-          err
+  content.stack = content.stack.map((cb, i) =>
+    catchFn(
+      async (...args) => {
+        store.event.emit(
+          getPluginEventName({ content_stack: i, type, before: true }),
+          content.name,
+          ...args
         );
+        const response = await cb(...args);
+        store.event.emit(
+          getPluginEventName({ content_stack: i, type, after: true }),
+          response,
+          content.name,
+          ...args
+        );
+        return response;
       },
-    })
+      {
+        onError(err: any) {
+          logger.error(
+            color(
+              'Red',
+              `## ${from ? `${from} ` : ''}${type}:${content.name} Plugin ##\n`
+            ),
+            err
+          );
+        },
+      }
+    )
   );
 
   store.plugins.set(type, content);

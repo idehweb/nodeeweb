@@ -1,88 +1,152 @@
 import { MiddleWare } from '@nodeeweb/core/types/global';
-import store from '@nodeeweb/core/store';
-import axios from 'axios';
-
+import store from '../../store';
+import {
+  INotification,
+  NotificationDocument,
+  NotificationModel,
+} from '../../schema/notification.schema';
+import {
+  CorePluginType,
+  SMSPluginArgs,
+  SMSPluginContent,
+  SMSPluginResponse,
+  SMSPluginResponseRaw,
+  SMSPluginType,
+  SmsSendStatus,
+} from '@nodeeweb/core/types/plugin';
+import { CustomerDocument, CustomerModel } from '../../schema/customer.schema';
+import { getModelName, replaceValue } from '@nodeeweb/core/utils/helpers';
+import { AuthEvents } from '@nodeeweb/core/src/auth/authGateway.strategy';
+import { getPluginEventName } from '@nodeeweb/core/src/handlers/plugin.handler';
+import { UserDocument } from '@nodeeweb/core/types/user';
+import { catchFn } from '@nodeeweb/core/utils/catchAsync';
+import { sendSms } from './sms.service';
+import { SmsSubType } from '@nodeeweb/core/types/config';
 export default class Service {
-  static create: MiddleWare = async (req, res) => {
-    const Notification = store.db.model('notification');
-    const Setting = store.db.model('setting');
-    const Gateway = store.db.model('gateway');
-    delete req.body._id;
-    if (!req.body.message) {
-      return res.status(400).json({
-        success: false,
-        message: 'enter message!',
-      });
-    }
-    const obj = {
-      message: req.body.message,
-    };
-    if (req.body.limit) {
-      obj['limit'] = req.body.limit;
-    }
-    if (req.body.customerGroup) {
-      obj['customerGroup'] = req.body.customerGroup;
-    }
-    if (req.body.source) {
-      obj['source'] = req.body.source;
-    }
-    if (req.body.offset) {
-      obj['offset'] = req.body.offset;
-    }
-    if (req.body.phoneNumber) {
-      obj['phoneNumber'] = req.body.phoneNumber;
-    }
-    const notification = await Notification.create(obj);
-    const setting = await Setting.findOne({}, 'defaultSmsGateway');
+  constructor() {
+    this.init();
+  }
+  get customerModel(): CustomerModel {
+    return store.db.model('customer');
+  }
+  get notificationModel(): NotificationModel {
+    return store.db.model('notification');
+  }
+  replaceValue(customer: CustomerDocument, text: string) {
+    return replaceValue({
+      data: [store.config.toObject(), customer.toObject()],
+      text,
+    });
+  }
+  afterCreate: MiddleWare = async (req, res) => {
+    const notif: NotificationDocument = req.crud;
 
-    if (!setting || !setting.defaultSmsGateway)
-      //send with default gateway
-      return res.status(400).json({ message: 'send with default gateway' });
+    // send response to user
+    res.status(202).json({ data: notif });
 
-    const gateway = await Gateway.findById(setting.defaultSmsGateway);
-
-    if (!gateway || !gateway.request) {
-      //send with default gateway
-      return res.status(404).json({
-        success: false,
-        gateway: gateway,
-      });
-    }
-
-    if (req.body.phoneNumber && !req.body.source) {
-      let m = gateway.request;
-      if (req.body.message) m = m.replaceAll('%message%', req.body.message);
-      if (req.body.phoneNumber)
-        m = m.replaceAll('%phoneNumber%', req.body.phoneNumber);
-
-      const theReq = JSON.parse(m);
-      const data = await axios(theReq);
-      return res.status(201).json(notification);
-    }
-
-    if (!req.body.phoneNumber && req.body.source) {
-      const Customer = store.db.model('Customer');
-      const customers = await Customer.find({ source: req.body.source })
-        .skip(req.body.offset || 0)
-        .limit(req.body.limit || 1000);
-
-      const promises = customers.map(async function (customer, i) {
-        let m = gateway.request;
-        if (req.body.message) m = m.replaceAll('%message%', req.body.message);
-        console.log('phoneNumber', customer.phoneNumber);
-        if (customer.phoneNumber)
-          m = m.replaceAll('%phoneNumber%', customer.phoneNumber);
-        if (customer.firstName) {
-          m = m.replaceAll('%firstName%', customer.firstName);
+    const smsPlugin = store.plugins.get(CorePluginType.SMS) as SMSPluginContent;
+    if (!smsPlugin) {
+      return await this.notificationModel.updateOne(
+        { _id: notif._id },
+        {
+          $set: {
+            status: SmsSendStatus.Send_Failed,
+            response: {
+              at: new Date(),
+              message: `send failed because system could'nt find any registered ${CorePluginType.SMS} plugin`,
+            },
+          },
         }
-        if (!customer.firstName) {
-          m = m.replaceAll('%firstName%', 'دوست');
-        }
-
-        const theReq = JSON.parse(m);
-        const data = await axios(theReq);
-      });
-      await Promise.all(promises);
+      );
     }
+
+    // fetch targets
+    const targets = await this.customerModel.find({
+      $and: [
+        Object.fromEntries(
+          Object.entries({
+            customerGroup: notif.customerGroup,
+            phone: notif.phone,
+            source: notif.source,
+          }).filter(([k, v]) => v)
+        ),
+        { phone: { $exists: true }, active: true },
+      ],
+    });
+
+    // send sms
+    const response = await smsPlugin.stack[1]({
+      type: SMSPluginType.Manual,
+      content: targets.map((customer) => ({
+        to: customer.phone,
+        text: this.replaceValue(customer, notif.message),
+      })),
+    });
+
+    // save notif
+    await this.notificationModel.updateOne(
+      { _id: notif._id },
+      {
+        $set: {
+          from: response.from,
+          response: {
+            at: response.at,
+            message: response.message,
+          },
+          status: response.status,
+        },
+      }
+    );
+  };
+  private createNotif = async (body: INotification) => {
+    await this.notificationModel.create(body);
+  };
+  private afterRegister = async (user: UserDocument) => {
+    const registerText = store.config.sms_message_on.register;
+
+    if (!registerText || !user?.phone || getModelName(user) !== 'customer')
+      return;
+
+    if (registerText && user?.phone) {
+      await catchFn(async () => {
+        // send welcome sms
+        await sendSms({
+          to: user.phone,
+          type: SMSPluginType.Automatic,
+          subType: SmsSubType.Register,
+          text: this.replaceValue(user as any, registerText),
+        });
+      })();
+    }
+  };
+  private afterSendSMS = async (
+    res: SMSPluginResponseRaw,
+    name: string,
+    { to, type, subType, text }: SMSPluginArgs
+  ) => {
+    if (res.status !== SmsSendStatus.Send_Success) return;
+
+    // only handle automatic sms
+    if (type !== SMSPluginType.Automatic) return;
+
+    // create record
+    await this.createNotif({
+      message: text,
+      title: subType,
+      phone: to,
+      status: res.status,
+    });
+  };
+
+  private init = () => {
+    store.event.on(AuthEvents.AfterRegister, this.afterRegister);
+    store.event.on(
+      getPluginEventName({
+        type: CorePluginType.SMS,
+        after: true,
+        content_stack: 0,
+      }),
+      this.afterSendSMS
+    );
   };
 }

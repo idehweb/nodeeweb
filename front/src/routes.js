@@ -107,12 +107,12 @@ export default [
     element: Link,
   },
   {
-    path: '/customer/link/:_id',
+    path: '/link/:_id',
     layout: DefaultLayout,
     element: Link,
   },
   {
-    path: '/customer/transaction/order/:_token/:_id',
+    path: '/transaction/order/:_token/:_id',
     layout: DefaultLayout,
     element: PlaceOrder,
   },
@@ -181,7 +181,7 @@ export default [
     element: Transaction
   },
   {
-    path: "/customer/transaction/order/:_token/:_id",
+    path: "/transaction/order/:_token/:_id",
     layout: DefaultLayout,
     element: PlaceOrder
   },

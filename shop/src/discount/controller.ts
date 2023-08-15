@@ -20,10 +20,6 @@ export default function registerController() {
         controller: {
           access: AdminAccess,
         },
-        crud: {
-          executeQuery: true,
-          sendResponse: true,
-        },
       },
       getOne: {
         controller: {
@@ -31,7 +27,6 @@ export default function registerController() {
         },
         crud: {
           parseFilter: discountService.getOneQueryParser,
-          executeQuery: true,
           sendResponse: discountService.getOneTransform,
           paramFields: {
             id: 'discount',
@@ -42,14 +37,7 @@ export default function registerController() {
       getCount: {
         controller: {
           access: AdminAccess,
-          service: (req, res) => {
-            res.json({
-              success: true,
-              count: req[CRUD_DEFAULT_REQ_KEY],
-            });
-          },
         },
-        crud: { executeQuery: true, sendResponse: false, saveToReq: true },
       },
       getAll: {
         controller: {
@@ -62,8 +50,6 @@ export default function registerController() {
             }
           },
           autoSetCount: true,
-          sendResponse: true,
-          executeQuery: true,
           paramFields: {
             limit: 'limit',
             offset: 'offset',
@@ -76,8 +62,6 @@ export default function registerController() {
         },
         crud: {
           parseFilter: discountService.updateOneParseFilter,
-          executeQuery: true,
-          sendResponse: true,
           paramFields: {
             id: 'discount',
           },
@@ -88,8 +72,6 @@ export default function registerController() {
           access: AdminAccess,
         },
         crud: {
-          executeQuery: true,
-          saveToReq: true,
           forceDelete: true,
         },
       },

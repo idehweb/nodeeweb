@@ -5,6 +5,7 @@ import { getSharedPath } from '../../utils/path';
 import { Logger } from './log.handler';
 import { RegisterOptions } from '../../types/register';
 import store from '../../store';
+import { join } from 'path';
 
 export type SingleJob = () => void | Promise<void>;
 
@@ -75,9 +76,17 @@ export class SingleJobProcess {
 
 export function clearAllLockFiles() {
   try {
-    fs.rmSync(getSharedPath('.'), { recursive: true, force: true });
-    this.logger.log('remove shared dir');
+    const sharedLockFile = fs
+      .readdirSync(getSharedPath('.'))
+      .filter((f) => f.endsWith('.lock'))
+      .map((f) => join(getSharedPath('.'), f));
+
+    for (const file of sharedLockFile) {
+      fs.rmSync(file, { recursive: true, force: true });
+    }
+
+    this.logger.log('remove shared lock files');
   } catch (err) {
-    this.logger.warn('shared dir removed before!');
+    this.logger.warn('shared lock files removed before!');
   }
 }

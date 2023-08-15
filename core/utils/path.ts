@@ -3,7 +3,7 @@ import fs from 'fs';
 import os from 'os';
 import store from '../store';
 import { USE_ENV } from '../types/global';
-import { CORE_NODE_MODULE_PATH } from './package';
+import info, { CORE_NODE_MODULE_PATH, NODE_MODULE_PATH } from './package';
 
 export function getSharedPath(...path: string[]) {
   return join(store.env.SHARED_PATH || '.', ...path);
@@ -17,7 +17,7 @@ export function getScriptFile(
     resolve(appDirectory, relativePath);
   const scripts = resolveApp(
     store.env.USE_ENV === USE_ENV.NPM
-      ? `${CORE_NODE_MODULE_PATH}/scripts`
+      ? join(CORE_NODE_MODULE_PATH, '..', 'scripts')
       : './scripts'
   );
   return join(
@@ -38,6 +38,12 @@ export function getPublicDir(dirName: string, only_app_dir = true) {
   return getStaticDir(join('public', dirName), only_app_dir);
 }
 export function getBuildDir(name: string) {
-  const core_dir = store.dirs[store.dirs.length - 1];
-  return join(core_dir, '..', `${name}-build`);
+  const buildName = Object.keys(info.dependencies).find((k) =>
+    k.endsWith(`${name}-build`)
+  );
+  if (!buildName)
+    throw new Error(
+      `not found any build package with name: ${name}-build in dependencies:\n${info.dependencies}`
+    );
+  return join(CORE_NODE_MODULE_PATH, buildName);
 }

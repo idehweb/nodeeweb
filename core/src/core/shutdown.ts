@@ -24,7 +24,7 @@ export function gracefullyShutdown() {
   });
 }
 
-function shutdown(code = 0) {
+export function shutdown(code = 0) {
   store.server?.close(async () => {
     try {
       await onSignal();

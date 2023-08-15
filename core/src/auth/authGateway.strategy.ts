@@ -3,6 +3,10 @@ import { AuthStrategy } from '../../types/auth';
 import { Req, Res } from '../../types/global';
 import store from '../../store';
 
+export enum AuthEvents {
+  AfterRegister = 'auth-after-register',
+}
+
 export default class AuthGatewayStrategy extends AuthStrategy {
   strategyId: string;
   exportModelName(req: Req) {

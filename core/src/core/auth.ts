@@ -35,7 +35,7 @@ export function activeAuthControllers() {
       },
       {
         method: 'post',
-        service: gateway.signup.bind(gateway),
+        service: [gateway.signup.bind(gateway)],
         url: '/auth/:strategyId/signup',
       },
     ].map((s: ControllerSchema) => ({

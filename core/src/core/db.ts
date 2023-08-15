@@ -51,11 +51,7 @@ export async function dbRegisterModels() {
   const schemaDir = getSchemaDir();
   const schemaFiles = fs
     .readdirSync(schemaDir)
-    .filter(
-      (name) =>
-        !name.startsWith('_') &&
-        (store.env.isLoc || store.env.isDev || !name.endsWith('.ts'))
-    )
+    .filter((name) => !name.startsWith('_') && !name.endsWith('.d.ts'))
     .sort()
     .map((sp) => [sp.split('.')[0].split('-').pop(), join(schemaDir, sp)]);
 

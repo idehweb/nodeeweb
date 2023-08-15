@@ -2,6 +2,7 @@ import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
 import store from '@nodeeweb/core/store';
 import { MiddleWare, Req, Res } from '@nodeeweb/core/types/global';
 import mongoose, { FilterQuery } from 'mongoose';
+import { CustomerSource } from '../../schema/customer.schema';
 
 export class Service {
   static getMe: MiddleWare = (req, res, next) => {
@@ -13,7 +14,7 @@ export class Service {
       'firstName',
       'lastName',
       'data',
-      'phoneNumber',
+      'phone',
       'internationalCode',
       'address',
     ];
@@ -50,7 +51,7 @@ export class Service {
     if (
       thef.firstName ||
       thef.lastName ||
-      thef.phoneNumber ||
+      thef.phone ||
       thef.internationalCode
     ) {
       search = { $or: [] };
@@ -65,9 +66,9 @@ export class Service {
         lastName: { $regex: thef.lastName, $options: 'i' },
       });
     }
-    if (thef.phoneNumber) {
+    if (thef.phone) {
       search['$or'].push({
-        phoneNumber: { $regex: thef.phoneNumber, $options: 'i' },
+        phone: { $regex: thef.phone, $options: 'i' },
       });
     }
     if (thef.internationalCode) {
@@ -114,7 +115,7 @@ export class Service {
       obj[String(_id)].orderCount = count;
     });
 
-    return res.json(Object.values(obj));
+    return res.json({ data: Object.values(obj) });
   };
 
   static updateOneParseFilter(req: Req) {
@@ -149,5 +150,23 @@ export class Service {
       post: customer,
     });
   };
+
+  static createParseBody(req: Req) {
+    return { ...req.body, source: CustomerSource.Panel };
+  }
+  static deleteParseUpdate() {
+    return [
+      {
+        $addFields: {
+          username: { $concat: ['$username', '-deleted', `-${Date.now()}`] },
+          phone: {
+            $concat: ['$phone', '-deleted', `-${Date.now()}`],
+          },
+          email: { $concat: ['$email', '-deleted', `-${Date.now()}`] },
+          active: false,
+        },
+      },
+    ];
+  }
 }
 export default Service;
