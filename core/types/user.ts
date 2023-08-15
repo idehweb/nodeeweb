@@ -15,7 +15,7 @@ export interface IUser {
   firstName?: string;
   lastName?: string;
   password?: string;
-  phoneNumber?: string;
+  phone?: string;
   role: string;
   active: boolean;
   createdAt: Date;

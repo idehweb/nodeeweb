@@ -10,7 +10,6 @@ import {
   NotImplement,
   SendSMSError,
   UnauthorizedError,
-  ValidationError,
 } from '../../types/error';
 import {
   CorePluginType,
@@ -27,8 +26,10 @@ import {
   OtpUserLogin,
   OtpUserSignup,
 } from '../../dto/in/auth/index.dto';
-import { UserDocument } from '../../types/user';
+import { UserDocument, UserModel } from '../../types/user';
 import { replaceValue } from '../../utils/helpers';
+import { AuthEvents } from './authGateway.strategy';
+import { SmsSubType } from '../../types/config';
 
 export const OTP_STRATEGY = 'otp';
 export class OtpStrategy extends AuthStrategy {
@@ -88,7 +89,7 @@ export class OtpStrategy extends AuthStrategy {
   private async sendCode(req: Req, res: Res) {
     // generate and send code
 
-    const phone = req.user?.phoneNumber ?? req.body.user?.phone,
+    const phone = req.user?.phone ?? req.body.user?.phone,
       userExists = Boolean(req.user);
 
     // send code
@@ -133,7 +134,8 @@ export class OtpStrategy extends AuthStrategy {
     try {
       const response = await smsPlugin.stack[0]({
         to: phone,
-        type: SMSPluginType.OTP,
+        type: SMSPluginType.Automatic,
+        subType: SmsSubType.OTP,
         text: replaceValue({
           data: [store.config.toObject(), { code }],
           text: store.config.sms_message_on.otp,
@@ -184,7 +186,7 @@ export class OtpStrategy extends AuthStrategy {
     const user = await this.exportUser(req);
 
     // verify code
-    await this.verify(user.phoneNumber, req.body.user.code);
+    await this.verify(user.phone, req.body.user.code);
 
     // token
     const token = signToken(user.id);
@@ -206,18 +208,19 @@ export class OtpStrategy extends AuthStrategy {
     delete req.body.user.code;
 
     // create
-    const userModel = store.db.model(req.modelName);
+    const userModel = store.db.model(req.modelName) as UserModel;
     try {
       const user = await userModel.create(req.body.user);
       const token = signToken(user.id);
       setToCookie(res, token, 'authToken');
 
-      req.data = {
+      // emit
+      store.event?.emit(AuthEvents.AfterRegister, user);
+
+      return res.status(201).json({
         user,
         token,
-      };
-
-      return next();
+      });
     } catch (err) {
       await this.codeRevert(codeDoc);
       throw err;

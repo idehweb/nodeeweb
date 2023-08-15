@@ -41,7 +41,7 @@ const schema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
-    phoneNumber: {
+    phone: {
       type: String,
       trim: true,
       unique: true,

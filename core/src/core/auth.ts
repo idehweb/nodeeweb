@@ -20,12 +20,12 @@ export function activeAuthControllers() {
     [
       {
         method: 'post',
-        service: [gateway.detect.bind(gateway), gateway.registerSMS],
+        service: [gateway.detect.bind(gateway)],
         url: '/auth/:strategyId',
       },
       {
         method: 'post',
-        service: [gateway.detect.bind(gateway), gateway.registerSMS],
+        service: [gateway.detect.bind(gateway)],
         url: '/auth/:strategyId/detect',
       },
       {
@@ -35,7 +35,7 @@ export function activeAuthControllers() {
       },
       {
         method: 'post',
-        service: [gateway.signup.bind(gateway), gateway.registerSMS],
+        service: [gateway.signup.bind(gateway)],
         url: '/auth/:strategyId/signup',
       },
     ].map((s: ControllerSchema) => ({

@@ -118,7 +118,7 @@ export default class Service {
     }
     const settingss = await Settings.findOne(
       {},
-      'factore_shop_name factore_shop_site_name factore_shop_address factore_shop_phoneNumber factore_shop_faxNumber factore_shop_postalCode factore_shop_submitCode factore_shop_internationalCode'
+      'factore_shop_name factore_shop_site_name factore_shop_address factore_shop_phone factore_shop_faxNumber factore_shop_postalCode factore_shop_submitCode factore_shop_internationalCode'
     )
       .skip(offset)
       .sort({ _id: -1 });

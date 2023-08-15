@@ -1,36 +1,44 @@
 import { MiddleWare } from '@nodeeweb/core/types/global';
-import store from '@nodeeweb/core/store';
-import axios from 'axios';
+import store from '../../store';
 import {
+  INotification,
   NotificationDocument,
   NotificationModel,
 } from '../../schema/notification.schema';
 import {
   CorePluginType,
+  SMSPluginArgs,
   SMSPluginContent,
+  SMSPluginResponse,
+  SMSPluginResponseRaw,
   SMSPluginType,
   SmsSendStatus,
 } from '@nodeeweb/core/types/plugin';
 import { CustomerDocument, CustomerModel } from '../../schema/customer.schema';
-import { replaceValue } from '@nodeeweb/core/utils/helpers';
-
+import { getModelName, replaceValue } from '@nodeeweb/core/utils/helpers';
+import { AuthEvents } from '@nodeeweb/core/src/auth/authGateway.strategy';
+import { getPluginEventName } from '@nodeeweb/core/src/handlers/plugin.handler';
+import { UserDocument } from '@nodeeweb/core/types/user';
+import { catchFn } from '@nodeeweb/core/utils/catchAsync';
+import { sendSms } from './sms.service';
+import { SmsSubType } from '@nodeeweb/core/types/config';
 export default class Service {
-  static get customerModel(): CustomerModel {
+  constructor() {
+    this.init();
+  }
+  get customerModel(): CustomerModel {
     return store.db.model('customer');
   }
-
-  static get notificationModel(): NotificationModel {
+  get notificationModel(): NotificationModel {
     return store.db.model('notification');
   }
-
-  static replaceValue(customer: CustomerDocument, text: string) {
+  replaceValue(customer: CustomerDocument, text: string) {
     return replaceValue({
       data: [store.config.toObject(), customer.toObject()],
       text,
     });
   }
-
-  static afterCreate: MiddleWare = async (req, res) => {
+  afterCreate: MiddleWare = async (req, res) => {
     const notif: NotificationDocument = req.crud;
 
     // send response to user
@@ -58,19 +66,19 @@ export default class Service {
         Object.fromEntries(
           Object.entries({
             customerGroup: notif.customerGroup,
-            phoneNumber: notif.phoneNumber,
+            phone: notif.phone,
             source: notif.source,
           }).filter(([k, v]) => v)
         ),
-        { phoneNumber: { $exists: true }, active: true },
+        { phone: { $exists: true }, active: true },
       ],
     });
 
     // send sms
     const response = await smsPlugin.stack[1]({
-      type: SMSPluginType.Reg,
+      type: SMSPluginType.Manual,
       content: targets.map((customer) => ({
-        to: customer.phoneNumber,
+        to: customer.phone,
         text: this.replaceValue(customer, notif.message),
       })),
     });
@@ -88,6 +96,57 @@ export default class Service {
           status: response.status,
         },
       }
+    );
+  };
+  private createNotif = async (body: INotification) => {
+    await this.notificationModel.create(body);
+  };
+  private afterRegister = async (user: UserDocument) => {
+    const registerText = store.config.sms_message_on.register;
+
+    if (!registerText || !user?.phone || getModelName(user) !== 'customer')
+      return;
+
+    if (registerText && user?.phone) {
+      await catchFn(async () => {
+        // send welcome sms
+        await sendSms({
+          to: user.phone,
+          type: SMSPluginType.Automatic,
+          subType: SmsSubType.Register,
+          text: this.replaceValue(user as any, registerText),
+        });
+      })();
+    }
+  };
+  private afterSendSMS = async (
+    res: SMSPluginResponseRaw,
+    name: string,
+    { to, type, subType, text }: SMSPluginArgs
+  ) => {
+    if (res.status !== SmsSendStatus.Send_Success) return;
+
+    // only handle automatic sms
+    if (type !== SMSPluginType.Automatic) return;
+
+    // create record
+    await this.createNotif({
+      message: text,
+      title: subType,
+      phone: to,
+      status: res.status,
+    });
+  };
+
+  private init = () => {
+    store.event.on(AuthEvents.AfterRegister, this.afterRegister);
+    store.event.on(
+      getPluginEventName({
+        type: CorePluginType.SMS,
+        after: true,
+        content_stack: 0,
+      }),
+      this.afterSendSMS
     );
   };
 }

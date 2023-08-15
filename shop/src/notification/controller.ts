@@ -4,6 +4,7 @@ import { CreateNotification } from '../../dto/in/notification';
 import Service from './service';
 
 export default function registerController() {
+  const service = new Service();
   // crud
   registerEntityCRUD(
     'notification',
@@ -15,7 +16,7 @@ export default function registerController() {
             dto: CreateNotification,
             reqPath: 'body',
           },
-          service: Service.afterCreate,
+          service: service.afterCreate,
         },
         crud: {
           executeQuery: true,

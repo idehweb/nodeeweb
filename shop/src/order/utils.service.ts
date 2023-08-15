@@ -6,6 +6,7 @@ import {
 } from '@nodeeweb/core/types/plugin';
 import { replaceValue } from '@nodeeweb/core/utils/helpers';
 import store from '../../store';
+import { SmsSubType } from '../../types/sms';
 
 export class Utils {
   get smsPlugin() {
@@ -75,7 +76,8 @@ export class Utils {
 
     await this.smsPlugin.stack[0]({
       to: order.customer.phone,
-      type: SMSPluginType.Reg,
+      type: SMSPluginType.Automatic,
+      subType: SmsSubType.OrderStatus,
       text: message,
     });
   }
@@ -89,7 +91,8 @@ export class Utils {
 
     await this.smsPlugin.stack[0]({
       to: order.customer.phone,
-      type: SMSPluginType.Reg,
+      type: SMSPluginType.Automatic,
+      subType: SmsSubType.ApproachTransactionExp,
       text: message,
     });
   }

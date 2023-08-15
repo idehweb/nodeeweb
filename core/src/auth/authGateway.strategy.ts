@@ -1,12 +1,11 @@
 import { NextFunction } from 'express';
 import { AuthStrategy } from '../../types/auth';
-import { MiddleWare, Req, Res } from '../../types/global';
+import { Req, Res } from '../../types/global';
 import store from '../../store';
-import { catchFn } from '../../utils/catchAsync';
-import { sendSms } from './sms.service';
-import { SMSPluginType } from '../../types/plugin';
-import logger from '../handlers/log.handler';
-import { axiosError2String } from '../../utils/helpers';
+
+export enum AuthEvents {
+  AfterRegister = 'auth-after-register',
+}
 
 export default class AuthGatewayStrategy extends AuthStrategy {
   strategyId: string;
@@ -37,19 +36,4 @@ export default class AuthGatewayStrategy extends AuthStrategy {
     if (!strategy) return next();
     return strategy.signup(req, res, next);
   }
-
-  registerSMS: MiddleWare = (req, res, next) => {
-    if (!req.data) return next();
-    const registerText = store.config.sms_message_on.register;
-    if (registerText && req.data.user?.phoneNumber) {
-      catchFn(
-        sendSms.bind(null, {
-          to: req.data.user.phoneNumber,
-          type: SMSPluginType.Reg,
-          text: registerText,
-        })
-      );
-    }
-    return res.status(201).json(req.data);
-  };
 }

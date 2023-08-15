@@ -1,6 +1,7 @@
 import { join } from 'path';
 import * as fs from 'fs';
 import _ from 'lodash';
+import { Document } from 'mongoose';
 
 export function convertToString(a: any, pretty = true) {
   if (typeof a === 'object') {
@@ -87,6 +88,10 @@ export function getName(f: any, capitalize = true) {
     .split(' ')
     .map((word, i) => (i == 0 && capitalize ? _.capitalize(word) : word))
     .join(' ');
+}
+
+export function getModelName(doc: Document) {
+  return doc?.['constructor']?.['modelName'];
 }
 
 export function replaceValue({

@@ -358,7 +358,7 @@ export default class Service {
     if (req.body.customer) {
       const customer = await Customer.findById(
         req.body.customer,
-        '_id firstName lastName countryCode internationalCode address phoneNumber'
+        '_id firstName lastName countryCode internationalCode address phone'
       );
 
       if (!customer)
@@ -580,7 +580,7 @@ export default class Service {
       customer: req.user._id.toString(),
     };
     const order = await Order.findOne(obj)
-      .populate('customer', 'nickname phoneNumber firstName lastName')
+      .populate('customer', 'nickname phone firstName lastName')
       .populate('transaction', 'Authority amount statusCode status');
 
     if (!order) {
@@ -821,15 +821,15 @@ export default class Service {
       }
       if (birthday && monthday) {
       }
-      let phoneNumber = item.data.billing.phone.slice(-12);
-      phoneNumber = phoneNumber.replace(/\s/g, '');
-      phoneNumber = persianJs(phoneNumber).arabicNumber().toString().trim();
-      phoneNumber = persianJs(phoneNumber).persianNumber().toString().trim();
-      phoneNumber = parseInt(phoneNumber).toString();
+      let phone = item.data.billing.phone.slice(-12);
+      phone = phone.replace(/\s/g, '');
+      phone = persianJs(phone).arabicNumber().toString().trim();
+      phone = persianJs(phone).persianNumber().toString().trim();
+      phone = parseInt(phone).toString();
 
-      if (phoneNumber.length < 12) {
-        if (phoneNumber.toString().length === 10) {
-          phoneNumber = '98' + phoneNumber.toString();
+      if (phone.length < 12) {
+        if (phone.toString().length === 10) {
+          phone = '98' + phone.toString();
         }
       }
       custObj['address'] = [
@@ -841,9 +841,9 @@ export default class Service {
           PostalCode: item.data.billing.postcode,
         },
       ];
-      if (phoneNumber.length == 12) {
+      if (phone.length == 12) {
         const customer = await Customer.findOneAndUpdate(
-          { phoneNumber: phoneNumber },
+          { phone: phone },
           custObj,
           { new: true }
         );
@@ -852,7 +852,7 @@ export default class Service {
           custObj['firstName'] = item.data.billing.first_name;
           custObj['lastName'] = item.data.billing.last_name;
           const tcustomer = await Customer.create({
-            phoneNumber: phoneNumber,
+            phone: phone,
             ...custObj,
           });
           if (tcustomer) {
@@ -873,7 +873,7 @@ export default class Service {
         }
         if (customer) {
           obj['customer_data'] = {
-            phoneNumber: phoneNumber,
+            phone: phone,
             firstName: customer.firstName || item.data.billing.first_name,
             lastName: customer.lastName || item.data.billing.last_name,
             email: item.data.billing.email,

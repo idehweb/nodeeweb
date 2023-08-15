@@ -2,12 +2,12 @@ import { SmsSendStatus } from '@nodeeweb/core/types/plugin';
 import mongoose, { Document, Model, Types } from 'mongoose';
 import { CustomerSource } from './customer.schema';
 
-interface INotification {
+export interface INotification {
   title: string;
   message: string;
   status: SmsSendStatus;
   response?: { message?: string; at: Date };
-  phoneNumber?: string;
+  phone?: string;
   source?: CustomerSource;
   customerGroup?: Types.ObjectId;
   from?: string;
@@ -33,7 +33,7 @@ const schema = new mongoose.Schema(
       },
       required: false,
     },
-    phoneNumber: String,
+    phone: String,
     source: String,
     customerGroup: {
       type: mongoose.Schema.Types.ObjectId,

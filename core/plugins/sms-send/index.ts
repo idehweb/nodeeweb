@@ -25,6 +25,12 @@ async function sendSMS({ to, type, text }: SMSPluginArgs): SMSPluginResponse {
       `core-sms-plugin need config.plugin.${CorePluginType.SMS}, which not defined`
     );
 
+  return {
+    from: '5000',
+    at: new Date(),
+    status: SmsSendStatus.Send_Success,
+  };
+
   const configs: AxiosRequestConfig = {
     method: 'POST',
     url: 'http://rest.payamak-panel.com/api/SendSMS/SendSMS',
@@ -61,7 +67,7 @@ async function sendBulkSMS({
 
 const smsSendPlugin: Plugin = () => {
   const content: SMSPluginContent = {
-    name: '[core-sms-send]',
+    name: 'core-sms-send',
     stack: [sendSMS, sendBulkSMS],
   };
   return {
