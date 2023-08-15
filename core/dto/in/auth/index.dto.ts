@@ -70,6 +70,11 @@ export class UserPassUserSignup {
   @IsOptional()
   @IsEmail()
   email?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsMobilePhone('fa-IR')
+  phone?: string;
 }
 
 export class OtpUserDetect {

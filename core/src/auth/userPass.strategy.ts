@@ -81,6 +81,7 @@ export default class UserPassStrategy extends AuthStrategy {
     setToCookie(res, token, 'authToken');
 
     // emit
+    console.log('after register', store.event);
     store.event?.emit(AuthEvents.AfterRegister, user);
 
     return res.status(201).json({

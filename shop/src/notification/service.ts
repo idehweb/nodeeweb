@@ -21,7 +21,7 @@ import { sendSms } from './sms.service';
 import { CreateNotification } from '../../dto/in/notification';
 import { SmsSubType } from '@nodeeweb/core/types/config';
 
-export class Service {
+export default class Service {
   constructor() {
     this.init();
   }
@@ -101,6 +101,7 @@ export class Service {
     await this.notificationModel.create(body);
   };
   private afterRegister = async (user: UserDocument) => {
+    console.log('after register call');
     const registerText = store.config.sms_message_on.register;
     if (registerText && user?.phoneNumber) {
       await catchFn(async () => {
@@ -141,7 +142,3 @@ export class Service {
     );
   };
 }
-
-const notifService = new Service();
-
-export default notifService;
