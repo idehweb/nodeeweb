@@ -76,8 +76,6 @@ export default function registerController() {
         },
         crud: {
           parseFilter: orderService.getOneFilterParser,
-          sendResponse: true,
-          executeQuery: true,
           paramFields: {
             id: 'order',
           },
@@ -89,8 +87,6 @@ export default function registerController() {
         },
         crud: {
           parseFilter: orderService.getAllFilterParser,
-          sendResponse: true,
-          executeQuery: true,
           sort: { updatedAt: -1 },
           paramFields: {
             limit: 'limit',
