@@ -136,9 +136,9 @@ export class EntityCreator {
   }
   createOneCreator({
     parseBody,
-    executeQuery,
-    saveToReq,
-    sendResponse,
+    executeQuery = true,
+    saveToReq = false,
+    sendResponse = true,
     project,
   }: CRUDCreatorOpt) {
     return async (req: Req, res: Response, next: NextFunction) => {
@@ -241,8 +241,8 @@ export class EntityCreator {
 }
 
 export type EntityCRUDOpt = {
-  crud: Omit<CRUDCreatorOpt, 'httpCode'>;
-  controller: Partial<ControllerSchema> & {
+  crud?: Omit<CRUDCreatorOpt, 'httpCode'>;
+  controller?: Partial<ControllerSchema> & {
     beforeService?: MiddleWare | MiddleWare[];
   };
 };
@@ -270,6 +270,8 @@ export function registerEntityCRUD(
 
   for (const [name, opt] of Object.entries(ordered).filter(([k, v]) => v)) {
     const cName = name as CRUD;
+    opt.controller = opt.controller ?? {};
+    opt.crud = opt.crud ?? {};
     schemas.push({
       method: opt.controller.method ?? translateCRUD2Method(cName),
       url: opt.controller.url ?? translateCRUD2Url(cName, opt.crud),
