@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
-import { ENV, MiddleWare, USE_ENV } from './types/global';
+import { Server } from 'http';
+import { ENV } from './types/global';
 import { Application } from 'express';
 import { ErrorPackageFn } from './types/error';
-import { Server } from 'http';
 import { AdminViewSchema } from './types/view';
 import { AuthStrategy } from './types/auth';
 import { PluginOut } from './types/plugin';
@@ -10,6 +10,7 @@ import { Pipe } from './types/pipe';
 import { ConfigType } from './types/config';
 import { RestartPolicy } from './types/restart';
 import { StoreEnv } from './types/store';
+import EventEmitter from 'events';
 export class Store {
   env: StoreEnv;
   db: typeof mongoose;
@@ -26,6 +27,7 @@ export class Store {
   strategies = new Map<string, AuthStrategy>();
   plugins = new Map<PluginOut['type'], PluginOut['content']>();
   config: ConfigType;
+  event: EventEmitter;
 
   constructor() {
     this.env = { ...process.env } as any;
