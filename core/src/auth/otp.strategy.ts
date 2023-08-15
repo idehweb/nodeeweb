@@ -29,6 +29,7 @@ import {
 import { UserDocument, UserModel } from '../../types/user';
 import { replaceValue } from '../../utils/helpers';
 import { AuthEvents } from './authGateway.strategy';
+import { SmsSubType } from '../../types/config';
 
 export const OTP_STRATEGY = 'otp';
 export class OtpStrategy extends AuthStrategy {
@@ -133,7 +134,8 @@ export class OtpStrategy extends AuthStrategy {
     try {
       const response = await smsPlugin.stack[0]({
         to: phone,
-        type: SMSPluginType.OTP,
+        type: SMSPluginType.Automatic,
+        subType: SmsSubType.OTP,
         text: replaceValue({
           data: [store.config.toObject(), { code }],
           text: store.config.sms_message_on.otp,
