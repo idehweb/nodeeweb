@@ -115,7 +115,7 @@ export class Service {
       obj[String(_id)].orderCount = count;
     });
 
-    return res.json(Object.values(obj));
+    return res.json({ data: Object.values(obj) });
   };
 
   static updateOneParseFilter(req: Req) {

@@ -17,7 +17,6 @@ export default function registerController() {
           parseFilter: Service.parseFilterForAllCustomer,
           autoSetCount: true,
           saveToReq: true,
-          executeQuery: true,
           paramFields: {
             limit: 'limit',
             offset: 'offset',
@@ -27,10 +26,6 @@ export default function registerController() {
       getCount: {
         controller: {
           access: AdminAccess,
-        },
-        crud: {
-          executeQuery: true,
-          sendResponse: true,
         },
       },
       updateOne: {
@@ -44,17 +39,11 @@ export default function registerController() {
         crud: {
           parseFilter: Service.updateOneParseFilter,
           parseUpdate: Service.updateOneParseUpdate,
-          executeQuery: true,
-          sendResponse: true,
         },
       },
       getOne: {
         controller: {
           access: AuthUserAccess,
-        },
-        crud: {
-          executeQuery: true,
-          sendResponse: true,
         },
       },
       create: {
@@ -66,16 +55,12 @@ export default function registerController() {
           },
         },
         crud: {
-          executeQuery: true,
-          sendResponse: true,
           parseBody: Service.createParseBody,
         },
       },
       deleteOne: {
         controller: { access: AdminAccess },
         crud: {
-          executeQuery: true,
-          sendResponse: true,
           forceDelete: true,
         },
       },
