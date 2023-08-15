@@ -68,26 +68,29 @@ const list = (props) => {
     <List {...props} filters={<PostFilter />} pagination={<PostPagination />}>
       <Datagrid>
         <TextField
-          source={'name.' + translate('lan')}
-          label={translate('resources.discount.name')}
-        />
-        <TextField source="slug" label={translate('resources.discount.slug')} />
-        <TextField
-          source="count"
-          label={translate('resources.discount.count')}
+          source='code'
+          label={translate('resources.discount.code')}
         />
         <TextField
+          source="amount"
+          label={translate('resources.discount.amount')}
+        />
+        <TextField
+          source="usageLimit"
+          label={translate('resources.discount.usageLimit')}
+        />
+        {/* <TextField
           source="price"
           label={translate('resources.discount.price')}
-        />
-        <TextField
+        /> */}
+        {/* <TextField
           source="percent"
           label={translate('resources.discount.percent')}
         />
         <TextField
           source="customerLimit"
           label={translate('resources.discount.customerLimit')}
-        />
+        /> */}
         {/*<ReferenceField*/}
         {/*label={translate('resources.discount.parent')}*/}
         {/*source="parent"*/}
