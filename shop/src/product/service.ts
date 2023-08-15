@@ -321,7 +321,7 @@ export default class Service {
     delete product.relatedProducts;
     delete product.firstCategory;
 
-    res.json(product);
+    res.json({ data: product });
   };
   static createBodyParser = async (req: Req) => {
     const body: CreateProductBody = req.body;
@@ -364,7 +364,7 @@ export default class Service {
       product: product._id,
     };
     submitAction(action);
-    res.status(201).json(product);
+    res.status(201).json({ data: product });
   };
 
   static updateBodyParser = (req: Req) => {
@@ -419,7 +419,7 @@ export default class Service {
       product: product._id,
     };
     submitAction(action);
-    res.status(200).json(product);
+    res.status(200).json({ data: product });
   };
   static deleteAfter: MiddleWare = async (req, res) => {
     const product = req[CRUD_DEFAULT_REQ_KEY];
@@ -431,10 +431,7 @@ export default class Service {
       product: product._id,
     };
     submitAction(action);
-    return res.status(204).json({
-      success: true,
-      message: 'Deleted!',
-    });
+    return res.status(204).send();
   };
 
   static rewriteProducts: MiddleWare = async (req, res) => {
