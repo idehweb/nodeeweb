@@ -362,7 +362,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
               pathname: '/transaction/create',
               state: { _scrollToTop: true },
             }}
-            primaryText={translate(`pos.menu.addOrderLink`)}
+            primaryText={translate(`pos.menu.addTransaction`)}
             // leftIcon={<OrderCart.icon/>}
             dense={dense}
           />
