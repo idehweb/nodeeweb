@@ -120,7 +120,7 @@ class TransactionService {
       order._id,
       totalPrice,
       products,
-      req.user.phoneNumber
+      req.user.phone
     );
 
     // 7. post if not payment issue

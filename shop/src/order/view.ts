@@ -7,7 +7,7 @@ const adminView: ViewContent = {
       {
         name: 'customer_data',
         type: 'object',
-        keys: ['firstName', 'lastName', 'phoneNumber'],
+        keys: ['firstName', 'lastName', 'phone'],
       },
       { name: 'sum', type: 'price' },
       { name: 'amount', type: 'price' },

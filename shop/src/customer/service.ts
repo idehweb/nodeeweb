@@ -14,7 +14,7 @@ export class Service {
       'firstName',
       'lastName',
       'data',
-      'phoneNumber',
+      'phone',
       'internationalCode',
       'address',
     ];
@@ -51,7 +51,7 @@ export class Service {
     if (
       thef.firstName ||
       thef.lastName ||
-      thef.phoneNumber ||
+      thef.phone ||
       thef.internationalCode
     ) {
       search = { $or: [] };
@@ -66,9 +66,9 @@ export class Service {
         lastName: { $regex: thef.lastName, $options: 'i' },
       });
     }
-    if (thef.phoneNumber) {
+    if (thef.phone) {
       search['$or'].push({
-        phoneNumber: { $regex: thef.phoneNumber, $options: 'i' },
+        phone: { $regex: thef.phone, $options: 'i' },
       });
     }
     if (thef.internationalCode) {
@@ -159,8 +159,8 @@ export class Service {
       {
         $addFields: {
           username: { $concat: ['$username', '-deleted', `-${Date.now()}`] },
-          phoneNumber: {
-            $concat: ['$phoneNumber', '-deleted', `-${Date.now()}`],
+          phone: {
+            $concat: ['$phone', '-deleted', `-${Date.now()}`],
           },
           email: { $concat: ['$email', '-deleted', `-${Date.now()}`] },
           active: false,

@@ -3,7 +3,7 @@ import { registerAdminView } from '@nodeeweb/core/src/handlers/view.handler';
 const adminView: ViewContent = {
   list: {
     header: [
-      { name: 'phoneNumber', type: 'number' },
+      { name: 'phone', type: 'number' },
       { name: 'email', type: 'email' },
       { name: 'activationCode', type: 'number' },
       { name: 'nickname', type: 'string' },
@@ -28,7 +28,7 @@ const adminView: ViewContent = {
       { name: 'nickname', type: 'string', size: { lg: 6, sm: 12 } },
       { name: 'type', type: 'string', size: { lg: 6, sm: 12 } },
       { name: 'internationalCode', type: 'string', size: { lg: 6, sm: 12 } },
-      { name: 'phoneNumber', type: 'string', size: { lg: 6, sm: 12 } },
+      { name: 'phone', type: 'string', size: { lg: 6, sm: 12 } },
       { name: 'email', type: 'string', size: { lg: 6, sm: 12 } },
       { name: 'password', type: 'string', size: { lg: 6, sm: 12 } },
       { name: 'age', type: 'number', size: { lg: 6, sm: 12 } },
@@ -52,7 +52,7 @@ const adminView: ViewContent = {
       { name: 'nickname', type: 'string', size: { lg: 6, sm: 12 } },
       { name: 'type', type: 'string', size: { lg: 6, sm: 12 } },
       { name: 'internationalCode', type: 'string', size: { lg: 6, sm: 12 } },
-      { name: 'phoneNumber', type: 'string', size: { lg: 6, sm: 12 } },
+      { name: 'phone', type: 'string', size: { lg: 6, sm: 12 } },
       { name: 'email', type: 'string', size: { lg: 6, sm: 12 } },
       { name: 'password', type: 'string', size: { lg: 6, sm: 12 } },
       { name: 'age', type: 'number', size: { lg: 6, sm: 12 } },

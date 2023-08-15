@@ -27,7 +27,7 @@ export default function registerController() {
           populate: [
             {
               path: 'customer',
-              select: 'phoneNumber firstName lastName _id',
+              select: 'phone firstName lastName _id',
             },
             {
               path: 'product',

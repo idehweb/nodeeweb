@@ -23,7 +23,7 @@ export class CreateNotification {
   @Expose()
   @IsOptional()
   @IsMobilePhone('fa-IR')
-  phoneNumber?: string;
+  phone?: string;
 
   @Expose()
   @IsString()
