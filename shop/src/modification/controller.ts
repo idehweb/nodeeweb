@@ -13,15 +13,12 @@ export default function registerController() {
       getAll: {
         controller: {
           access,
-          service: (req, res) => res.json(req[CRUD_DEFAULT_REQ_KEY]),
         },
         crud: {
           parseFilter(req) {
             return { user: req.query.user, product: req.query.product };
           },
           autoSetCount: true,
-          saveToReq: true,
-          executeQuery: true,
           project:
             '_id user product order page title action createdAt updatedAt',
           populate: [
