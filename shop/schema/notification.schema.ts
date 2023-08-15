@@ -7,7 +7,7 @@ interface INotification {
   message: string;
   status: SmsSendStatus;
   response?: { message?: string; at: Date };
-  phoneNumber?: string;
+  phone?: string;
   source?: CustomerSource;
   customerGroup?: Types.ObjectId;
   from?: string;
@@ -33,7 +33,7 @@ const schema = new mongoose.Schema(
       },
       required: false,
     },
-    phoneNumber: String,
+    phone: String,
     source: String,
     customerGroup: {
       type: mongoose.Schema.Types.ObjectId,

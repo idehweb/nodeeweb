@@ -46,7 +46,7 @@ export class CreateCustomerBody {
   @Expose()
   @IsOptional()
   @IsMobilePhone('fa-IR')
-  phoneNumber?: string;
+  phone?: string;
 
   @Expose()
   @Transform(({ value }) =>
@@ -123,7 +123,7 @@ export class UpdateCustomerBody {
   @Expose()
   @IsOptional()
   @IsMobilePhone('fa-IR')
-  phoneNumber?: string;
+  phone?: string;
 
   @Expose()
   @Transform(({ value }) =>

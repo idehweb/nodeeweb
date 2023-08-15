@@ -89,7 +89,7 @@ export class OtpStrategy extends AuthStrategy {
   private async sendCode(req: Req, res: Res) {
     // generate and send code
 
-    const phone = req.user?.phoneNumber ?? req.body.user?.phone,
+    const phone = req.user?.phone ?? req.body.user?.phone,
       userExists = Boolean(req.user);
 
     // send code
@@ -186,7 +186,7 @@ export class OtpStrategy extends AuthStrategy {
     const user = await this.exportUser(req);
 
     // verify code
-    await this.verify(user.phoneNumber, req.body.user.code);
+    await this.verify(user.phone, req.body.user.code);
 
     // token
     const token = signToken(user.id);

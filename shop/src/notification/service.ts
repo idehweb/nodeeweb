@@ -65,11 +65,11 @@ export default class Service {
         Object.fromEntries(
           Object.entries({
             customerGroup: notif.customerGroup,
-            phoneNumber: notif.phoneNumber,
+            phone: notif.phone,
             source: notif.source,
           }).filter(([k, v]) => v)
         ),
-        { phoneNumber: { $exists: true }, active: true },
+        { phone: { $exists: true }, active: true },
       ],
     });
 
@@ -77,7 +77,7 @@ export default class Service {
     const response = await smsPlugin.stack[1]({
       type: SMSPluginType.Manual,
       content: targets.map((customer) => ({
-        to: customer.phoneNumber,
+        to: customer.phone,
         text: this.replaceValue(customer, notif.message),
       })),
     });
@@ -103,11 +103,11 @@ export default class Service {
   private afterRegister = async (user: UserDocument) => {
     console.log('after register call');
     const registerText = store.config.sms_message_on.register;
-    if (registerText && user?.phoneNumber) {
+    if (registerText && user?.phone) {
       await catchFn(async () => {
         // send welcome sms
         await sendSms({
-          to: user.phoneNumber,
+          to: user.phone,
           type: SMSPluginType.Automatic,
           subType: SmsSubType.Register,
           text: this.replaceValue(user as any, registerText),
@@ -126,7 +126,7 @@ export default class Service {
     await this.createNotif({
       message: text,
       title: subType,
-      phoneNumber: to,
+      phone: to,
     });
   };
 
