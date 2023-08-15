@@ -37,10 +37,6 @@ export default function registerController() {
         controller: {
           access: AdminAccess,
         },
-        crud: {
-          executeQuery: true,
-          sendResponse: true,
-        },
       },
       getOne: {
         controller: {
