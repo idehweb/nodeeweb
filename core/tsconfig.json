@@ -23,6 +23,6 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true
   },
-  "include": ["**/*.ts","**/*.js"],
+  "include": ["**/*.ts","**/*.js", "../shop/src/notification/sms.service.ts"],
   "exclude": ["node_modules", "**/node_modules/*", "dist","src/temp","shared","public"]
 }

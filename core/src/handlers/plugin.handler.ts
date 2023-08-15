@@ -9,6 +9,22 @@ import { color } from '../../utils/color';
 import { catchFn } from '../../utils/catchAsync';
 import { RegisterOptions } from '../../types/register';
 
+export function getPluginEventName({
+  content_stack,
+  type,
+  after,
+  before,
+}: {
+  type: PluginOut['type'];
+  after?: boolean;
+  before?: boolean;
+  content_stack: number;
+}) {
+  return `${
+    after ? 'after' : before ? 'before' : 'after'
+  }-plugin-${type}-${content_stack}`;
+}
+
 export default async function handlePlugin() {
   const __dirname = path.resolve();
   const pluginPath = path.join(__dirname, './plugins/');
@@ -37,10 +53,14 @@ export function registerPlugin(
   content.stack = content.stack.map((cb, i) =>
     catchFn(
       async (...args) => {
-        store.event.emit(`before-plugin-${type}-${i}`, content.name, ...args);
+        store.event.emit(
+          getPluginEventName({ content_stack: i, type, before: true }),
+          content.name,
+          ...args
+        );
         const response = await cb(...args);
         store.event.emit(
-          `after-plugin-${type}-${i}`,
+          getPluginEventName({ content_stack: i, type, after: true }),
           response,
           content.name,
           ...args

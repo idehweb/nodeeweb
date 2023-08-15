@@ -2,8 +2,8 @@ export enum CorePluginType {
   SMS = 'sms',
 }
 export enum SMSPluginType {
-  OTP = 'otp',
-  Reg = 'regular',
+  Automatic = 'automatic',
+  Manual = 'manual',
 }
 export type SMSPluginArgs = {
   to: string;
@@ -13,6 +13,7 @@ export type SMSPluginArgs = {
   };
   text?: string;
   type: SMSPluginType;
+  subType?: string;
 };
 export type SMSPluginResponse = Promise<{
   from: string;
@@ -27,6 +28,7 @@ export type SMSPluginSendBulkArgs = {
     values: string[];
   };
   type: SMSPluginType;
+  subType?: string;
   content: { to: string; text: string }[];
 };
 

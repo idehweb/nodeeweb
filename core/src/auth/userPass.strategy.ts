@@ -10,6 +10,7 @@ import {
   UserPassUserSignup,
 } from '../../dto/in/auth/index.dto';
 import { IUser, UserDocument, UserModel } from '../../types/user';
+import { AuthEvents } from './authGateway.strategy';
 
 export const USER_PASS_STRATEGY = 'user-pass';
 export default class UserPassStrategy extends AuthStrategy {
@@ -79,11 +80,12 @@ export default class UserPassStrategy extends AuthStrategy {
     const token = signToken(user.id);
     setToCookie(res, token, 'authToken');
 
-    req.data = {
+    // emit
+    store.event?.emit(AuthEvents.AfterRegister, user);
+
+    return res.status(201).json({
       user: { ...user.toObject(), password: undefined },
       token,
-    };
-
-    return next();
+    });
   }
 }

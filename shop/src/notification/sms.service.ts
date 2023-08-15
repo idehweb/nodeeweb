@@ -1,11 +1,11 @@
-import store from '../../store';
-import { NotImplement } from '../../types/error';
+import store from '@nodeeweb/core/store';
+import { NotImplement } from '@nodeeweb/core/types/error';
 import {
   CorePluginType,
   SMSPluginArgs,
   SMSPluginContent,
-} from '../../types/plugin';
-import { replaceValue } from '../../utils/helpers';
+} from '@nodeeweb/core/types/plugin';
+import { replaceValue } from '@nodeeweb/core/utils/helpers';
 
 export function sendSms(args: SMSPluginArgs) {
   const smsPlugin = store.plugins.get(CorePluginType.SMS) as SMSPluginContent;
