@@ -5,8 +5,10 @@ import store from '../../store';
 import { catchFn } from '../../utils/catchAsync';
 import { sendSms } from './sms.service';
 import { SMSPluginType } from '../../types/plugin';
-import logger from '../handlers/log.handler';
-import { axiosError2String } from '../../utils/helpers';
+
+export enum AuthEvents {
+  AfterRegister = 'auth-after-register',
+}
 
 export default class AuthGatewayStrategy extends AuthStrategy {
   strategyId: string;

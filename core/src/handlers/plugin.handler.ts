@@ -3,7 +3,7 @@ import path, { join } from 'path';
 import fs from 'fs';
 import logger from './log.handler';
 import { isAsyncFunction } from 'util/types';
-import { PluginContent, CorePluginType, PluginOut } from '../../types/plugin';
+import { CorePluginType, PluginOut } from '../../types/plugin';
 import store from '../../store';
 import { color } from '../../utils/color';
 import { catchFn } from '../../utils/catchAsync';
@@ -34,18 +34,31 @@ export function registerPlugin(
   { from, logger = store.systemLogger }: RegisterOptions
 ) {
   // catch
-  content.stack = content.stack.map((cb) =>
-    catchFn(cb, {
-      onError(err: any) {
-        logger.error(
-          color(
-            'Red',
-            `## ${from ? `${from} ` : ''}${type}:${content.name} Plugin ##\n`
-          ),
-          err
+  content.stack = content.stack.map((cb, i) =>
+    catchFn(
+      async (...args) => {
+        store.event.emit(`before-plugin-${type}-${i}`, content.name, ...args);
+        const response = await cb(...args);
+        store.event.emit(
+          `after-plugin-${type}-${i}`,
+          response,
+          content.name,
+          ...args
         );
+        return response;
       },
-    })
+      {
+        onError(err: any) {
+          logger.error(
+            color(
+              'Red',
+              `## ${from ? `${from} ` : ''}${type}:${content.name} Plugin ##\n`
+            ),
+            err
+          );
+        },
+      }
+    )
   );
 
   store.plugins.set(type, content);

@@ -10,7 +10,6 @@ import {
   NotImplement,
   SendSMSError,
   UnauthorizedError,
-  ValidationError,
 } from '../../types/error';
 import {
   CorePluginType,
@@ -27,8 +26,9 @@ import {
   OtpUserLogin,
   OtpUserSignup,
 } from '../../dto/in/auth/index.dto';
-import { UserDocument } from '../../types/user';
+import { UserDocument, UserModel } from '../../types/user';
 import { replaceValue } from '../../utils/helpers';
+import { AuthEvents } from './authGateway.strategy';
 
 export const OTP_STRATEGY = 'otp';
 export class OtpStrategy extends AuthStrategy {
@@ -206,18 +206,19 @@ export class OtpStrategy extends AuthStrategy {
     delete req.body.user.code;
 
     // create
-    const userModel = store.db.model(req.modelName);
+    const userModel = store.db.model(req.modelName) as UserModel;
     try {
       const user = await userModel.create(req.body.user);
       const token = signToken(user.id);
       setToCookie(res, token, 'authToken');
 
-      req.data = {
+      // emit
+      store.event?.emit(AuthEvents.AfterRegister, user);
+
+      return res.status(201).json({
         user,
         token,
-      };
-
-      return next();
+      });
     } catch (err) {
       await this.codeRevert(codeDoc);
       throw err;
