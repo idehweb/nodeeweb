@@ -10,7 +10,7 @@ import { registerDefaultControllers } from './controller';
 import { activeAuthControllers } from './auth';
 import registerDefaultPlugins from './plugin';
 import { registerValidationPipe } from '../handlers/validate.handler';
-import { registerDefaultConfig } from './config';
+import { registerDefaultConfig } from '../config/config';
 import { registerDefaultEvent } from './event';
 
 const app = express();

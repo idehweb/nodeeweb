@@ -1,8 +1,8 @@
 import fs from 'fs';
 import { SingleJobProcess } from '../handlers/singleJob.handler';
-import { isExist, isExistsSync } from '../../utils/helpers';
+import { isExistsSync } from '../../utils/helpers';
 import { getSharedPath } from '../../utils/path';
-import { CoreConfigBody, CoreConfigDto } from '../../dto/config';
+import { CoreConfigDto } from '../../dto/config';
 import { plainToInstance } from 'class-transformer';
 import _ from 'lodash';
 import restart from '../../utils/restart';
@@ -15,8 +15,7 @@ import { DEFAULT_SMS_ON_OTP } from '../constants/String';
 import { validateSync } from 'class-validator';
 import { registerConfig } from '../handlers/config.handler';
 import logger from '../handlers/log.handler';
-import { MiddleWare, USE_ENV } from '../../types/global';
-import { GeneralError } from '../../types/error';
+import { USE_ENV } from '../../types/global';
 import { ConfigChangeOpt } from '../../types/config';
 import { detectVE } from '../../utils/validation';
 
@@ -137,28 +136,6 @@ export class Config<C extends CoreConfigDto> {
     return this._config;
   }
 }
-
-class ConfigService {
-  get: MiddleWare = async (req, res) => {
-    return res.json({ data: store.config });
-  };
-
-  update: MiddleWare = async (req, res) => {
-    const body: CoreConfigBody = req.body;
-    if (!store.config) throw new GeneralError('config not resister yet!', 500);
-
-    await store.config.change(body.config, {
-      merge: true,
-      restart: body.restart ?? true,
-      external_wait: true,
-      internal_wait: false,
-    });
-
-    return res.status(200).json({ data: store.config });
-  };
-}
-
-export const configService = new ConfigService();
 
 export function registerDefaultConfig() {
   registerConfig(new Config(), { from: 'CoreConfig', logger });

@@ -1,4 +1,4 @@
-import { Config } from '@nodeeweb/core/src/core/config';
+import { Config } from '@nodeeweb/core/src/config/config';
 import { Currency, ShopConfigDto } from '../../dto/config';
 import store from '../../store';
 import {

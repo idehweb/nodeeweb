@@ -1,6 +1,7 @@
 import { CoreConfigBody } from '../../dto/config';
 import { RestartBody } from '../../dto/in/restart.dto';
 import { ControllerSchema } from '../../types/controller';
+import { configService } from '../config/service';
 import { AdminAccess, OptUserAccess } from '../handlers/auth.handler';
 import {
   controllerRegister,
@@ -8,7 +9,6 @@ import {
 } from '../handlers/controller.handler';
 import logger from '../handlers/log.handler';
 import { getAuth, mockTheme } from '../temp/routers';
-import { configService } from './config';
 import restartService from './restart';
 import settingService from './setting';
 import { getViewHandler } from './view';
@@ -41,10 +41,10 @@ export function registerDefaultControllers() {
     }
   );
 
-  // theme
+  // admin dashboard
   controllerStack.push({
     method: 'get',
-    url: '/theme',
+    url: '/admin-dashboard',
     access: OptUserAccess,
     service: settingService.getTheme,
   });
