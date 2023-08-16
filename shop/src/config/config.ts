@@ -72,6 +72,9 @@ export class ShopConfig extends Config<ShopConfigDto> {
       enableImplicitConversion: true,
     });
   }
+  public getPublic(): Partial<ShopConfigDto> {
+    return {};
+  }
 }
 
 export function registerShopConfig() {

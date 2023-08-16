@@ -19,14 +19,26 @@ import { USE_ENV } from '../../types/global';
 import { ConfigChangeOpt } from '../../types/config';
 import { detectVE } from '../../utils/validation';
 
-export class Config<C extends CoreConfigDto> {
+export abstract class Config<C extends CoreConfigDto> {
   private __config: C;
-
-  protected _transform(value: any): C {
-    return plainToInstance(CoreConfigDto, value, {
-      enableImplicitConversion: true,
-    }) as C;
+  constructor() {
+    this._readAndCreate();
+    Object.freeze(this.__config);
+    return new Proxy(this, {
+      get(target, p) {
+        if (
+          String(p).startsWith('_') ||
+          ['change', 'toString', 'toJSON', 'toObject', 'getPublic'].includes(
+            String(p)
+          )
+        )
+          return target[p];
+        return target._config[p];
+      },
+    });
   }
+
+  protected abstract _transform(value: any): C;
   protected _validate(value: any): void {
     const errors = validateSync(value, {
       forbidUnknownValues: true,
@@ -41,27 +53,15 @@ export class Config<C extends CoreConfigDto> {
       );
     return;
   }
-  protected get _defaultSetting(): C {
-    return {
-      app_name: store.env.APP_NAME ?? 'Nodeeweb Core',
-      auth: {},
-      limit: {
-        request_limit: DEFAULT_REQ_LIMIT,
-        request_limit_window_s: DEFAULT_REQ_WINDOW_LIMIT,
-      },
-      plugin: {},
-      sms_message_on: {
-        otp: DEFAULT_SMS_ON_OTP,
-      },
-    } as C;
-  }
-  private get _path() {
+  protected abstract get _defaultSetting(): C;
+
+  protected get _path() {
     return getSharedPath('config.json');
   }
-  private get _config(): C {
+  protected get _config(): C {
     return this.__config;
   }
-  private set _config(value: any) {
+  protected set _config(value: any) {
     const newConf = this._transform(value);
     this._validate(newConf);
     this.__config = newConf;
@@ -71,21 +71,6 @@ export class Config<C extends CoreConfigDto> {
     _.merge(mergedValue, this._config, JSON.parse(JSON.stringify(newConf)));
     this._config = mergedValue;
   }
-  constructor() {
-    this._readAndCreate();
-    Object.freeze(this.__config);
-    return new Proxy(this, {
-      get(target, p) {
-        if (
-          String(p).startsWith('_') ||
-          ['change', 'toString', 'toJSON', 'toObject'].includes(String(p))
-        )
-          return target[p];
-        return target._config[p];
-      },
-    });
-  }
-
   private _readAndCreate() {
     this._config = this._defaultSetting;
 
@@ -106,11 +91,9 @@ export class Config<C extends CoreConfigDto> {
       this._write();
     })().then();
   }
-
   private _write(config = this._config) {
     fs.writeFileSync(this._path, JSON.stringify(config, null, '  '), 'utf-8');
   }
-
   public async change(
     newConfig: any,
     { merge, restart: rst, external_wait, internal_wait }: ConfigChangeOpt = {}
@@ -125,7 +108,6 @@ export class Config<C extends CoreConfigDto> {
     // restart
     if (rst) await restart({ external_wait, internal_wait });
   }
-
   public toString() {
     return JSON.stringify(this._config);
   }
@@ -135,8 +117,37 @@ export class Config<C extends CoreConfigDto> {
   public toObject() {
     return this._config;
   }
+  public abstract getPublic(): Partial<C>;
+}
+
+class CoreConfig extends Config<CoreConfigDto> {
+  protected _transform(value: any): CoreConfigDto {
+    return plainToInstance(CoreConfigDto, value, {
+      enableImplicitConversion: true,
+    });
+  }
+  protected get _defaultSetting(): CoreConfigDto {
+    return {
+      app_name: store.env.APP_NAME ?? 'Nodeeweb Core',
+      auth: {},
+      limit: {
+        request_limit: DEFAULT_REQ_LIMIT,
+        request_limit_window_s: DEFAULT_REQ_WINDOW_LIMIT,
+      },
+      plugin: {},
+      sms_message_on: {
+        otp: DEFAULT_SMS_ON_OTP,
+      },
+    };
+  }
+
+  public getPublic(): Partial<CoreConfigDto> {
+    return {
+      app_name: this._config.app_name,
+    };
+  }
 }
 
 export function registerDefaultConfig() {
-  registerConfig(new Config(), { from: 'CoreConfig', logger });
+  registerConfig(new CoreConfig(), { from: 'CoreConfig', logger });
 }
