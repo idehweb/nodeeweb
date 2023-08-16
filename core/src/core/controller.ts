@@ -28,23 +28,34 @@ export function registerDefaultControllers() {
   controllerStack.push(
     {
       method: 'get',
-      url: '/config',
+      url: '/config/system',
       service: configService.get,
       access: AdminAccess,
     },
     {
       method: 'put',
-      url: '/config',
+      url: '/config/system',
       service: configService.update,
       access: AdminAccess,
       validate: { reqPath: 'body', dto: CoreConfigBody },
+    },
+    {
+      method: 'get',
+      url: '/config/admin-dash',
+      service: configService.getAdminDashConf,
+      access: AdminAccess,
+    },
+    {
+      method: 'get',
+      url: '/config/view',
+      service: configService.getViewConf,
     }
   );
 
-  // admin dashboard
+  // theme
   controllerStack.push({
     method: 'get',
-    url: '/admin-dashboard',
+    url: '/theme',
     access: OptUserAccess,
     service: settingService.getTheme,
   });

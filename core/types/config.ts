@@ -17,4 +17,5 @@ export type ConfigType<C extends CoreConfigDto = CoreConfigDto> = C & {
   toString(): string;
   toJSON(): object;
   toObject(): object;
+  getPublic(): object;
 };

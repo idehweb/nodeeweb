@@ -22,8 +22,12 @@ class ConfigService {
     return res.status(200).json({ data: store.config });
   };
 
-  getGeneral: MiddleWare = (req, res) => {};
-  getAdminDashboard: MiddleWare = (req, res) => {};
+  getViewConf: MiddleWare = (req, res) => {
+    return res.status(200).json({ data: { config: store.config.getPublic() } });
+  };
+  getAdminDashConf: MiddleWare = (req, res) => {
+    return res.status(200).json({ data: store.adminViews });
+  };
 }
 
 export const configService = new ConfigService();
