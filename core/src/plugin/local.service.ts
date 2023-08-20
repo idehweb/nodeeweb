@@ -16,10 +16,12 @@ import { validatePlain } from '../../utils/validation';
 import logger from '../handlers/log.handler';
 import { registerPlugin, unregisterPlugin } from '../handlers/plugin.handler';
 import marketService from './market.service';
+import { merge } from 'lodash';
 
 enum PluginStep {
   CopyContent = 'copy-content',
   InsertToDB = 'insert-to-db',
+  UpdateDB = 'update-db',
   Register = 'register',
 }
 
@@ -65,7 +67,10 @@ class LocalService {
     return pluginStack;
   }
 
-  private async rollback(steps: PluginStep[], { slug }: { slug: string }) {
+  private async rollback(
+    steps: PluginStep[],
+    { slug, plugin }: { slug: string; plugin?: PluginDocument }
+  ) {
     const core = async (step: PluginStep) => {
       switch (step) {
         case PluginStep.CopyContent:
@@ -80,6 +85,12 @@ class LocalService {
 
         case PluginStep.Register:
           return unregisterPlugin(slug, 'CoreLocalPlugin');
+
+        case PluginStep.UpdateDB:
+          // restore document
+          return await this.pluginModel.findByIdAndUpdate(plugin._id, {
+            arg: plugin.arg,
+          });
       }
     };
 
@@ -92,10 +103,10 @@ class LocalService {
     }
   }
   getAllProjection() {
-    return '-args';
+    return '-arg';
   }
   getOneProjection() {
-    return '+args';
+    return '+arg';
   }
   getOneFilter(req: Req) {
     return { slug: req.params.slug };
@@ -107,7 +118,7 @@ class LocalService {
     const newPlugin = plugin.toObject();
 
     delete newPlugin.arg;
-    newPlugin['edit'] = { inputs: conf.edit };
+    newPlugin['edit'] = { inputs: conf.edit.inputs };
 
     // fill value
     for (const editInput of newPlugin['edit'].inputs) {
@@ -179,7 +190,7 @@ class LocalService {
       steps.push(PluginStep.Register);
 
       // present
-      return res.json({
+      return res.status(201).json({
         data: {
           ...pluginDoc.toObject(),
           arg: undefined,
@@ -187,6 +198,68 @@ class LocalService {
       });
     } catch (err) {
       await this.rollback(steps, { slug });
+      throw err;
+    }
+  };
+
+  editPlugin: MiddleWare = async (req, res) => {
+    const { slug } = req.params;
+    let body = req.body,
+      oldPluginDoc = await this.pluginModel.findOne({ slug });
+
+    // check registration
+    let notFoundMsg: string;
+    // 1. store
+    if (!store.plugin.get(slug)) notFoundMsg = 'this plugin not register yet';
+    // 2. db
+    else if (!oldPluginDoc)
+      notFoundMsg = 'can not edit plugin which not exist in db';
+    // 3. fs
+    else if (!(await isExist(getPluginPath(slug))))
+      notFoundMsg = `${getPluginPath(slug)} is not exist, try to add it first`;
+
+    if (notFoundMsg) throw new NotFound(notFoundMsg);
+
+    const steps: PluginStep[] = [];
+
+    // resolve from local
+    const conf = await this.resolve(slug);
+
+    // verify
+    body = await this.validate(conf, 'edit', body);
+
+    try {
+      // update db
+      await this.pluginModel.findByIdAndUpdate(oldPluginDoc._id, {
+        arg: merge(oldPluginDoc.arg, body),
+      });
+
+      steps.push(PluginStep.UpdateDB);
+
+      const stack = await this.run(conf, 'edit', body, false);
+
+      // register
+      registerPlugin(
+        {
+          type: conf.type,
+          slug: conf.slug,
+          name: conf.name,
+          stack,
+        },
+        { from: this.from, logger }
+      );
+
+      steps.push(PluginStep.Register);
+
+      // present
+      return res.json({
+        data: {
+          ...oldPluginDoc.toObject(),
+          arg: undefined,
+        },
+      });
+    } catch (err) {
+      await this.rollback(steps, { slug, plugin: oldPluginDoc });
       throw err;
     }
   };

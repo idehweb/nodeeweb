@@ -7,6 +7,7 @@ import {
   SMSPluginSendBulkArgs,
 } from '../../types/plugin';
 import logger from '../../src/handlers/log.handler';
+import { merge } from 'lodash';
 
 type SMSConfig = {
   username: string;
@@ -63,4 +64,7 @@ export function add(arg: SMSConfig): SMSPluginContent['stack'] {
   config = arg;
   return [sendSMS, sendBulkSMS];
 }
-export async function edit() {}
+export function edit(arg: Partial<SMSConfig>): SMSPluginContent['stack'] {
+  config = merge(config, arg);
+  return [sendSMS, sendBulkSMS];
+}

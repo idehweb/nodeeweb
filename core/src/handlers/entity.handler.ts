@@ -282,7 +282,7 @@ export function registerEntityCRUD(
     opt.crud = opt.crud ?? {};
 
     // set default values
-    opt.crud = _.merge(opt.crud, defaultCrudOpt);
+    opt.crud = _.merge(defaultCrudOpt, opt.crud);
 
     schemas.push({
       method: opt.controller.method ?? translateCRUD2Method(cName),

@@ -18,7 +18,7 @@ export function registerPluginControllers() {
     from: 'CorePlugin',
     logger,
   };
-  // market
+  // custom
   controllersBatchRegister(
     [
       {
@@ -41,6 +41,13 @@ export function registerPluginControllers() {
         access: AdminAccess,
         validate: { dto: CrudParamDto, reqPath: 'params' },
       },
+      {
+        method: 'put',
+        service: localService.editPlugin,
+        url: '/local/:slug',
+        access: AdminAccess,
+        validate: { dto: CrudParamDto, reqPath: 'params' },
+      },
     ],
     opt
   );
@@ -49,39 +56,6 @@ export function registerPluginControllers() {
   registerEntityCRUD(
     'plugin',
     {
-      // add plugin
-      // create: {
-      //   controller: {
-      //     url: '/:id',
-      //     access: AdminAccess,
-      //     validate: [
-      //       { dto: CrudParamDto, reqPath: 'params' },
-      //       { reqPath: 'body', dto: PluginBodyAdd },
-      //     ],
-      //     beforeService: pluginService.beforeAdd,
-      //     service: pluginService.afterAdd,
-      //   },
-      //   crud: {
-      //     saveToReq: true,
-      //   },
-      // },
-
-      //   edit plugin
-      // updateOne: {
-      //   controller: {
-      //     access: AdminAccess,
-      //     validate: [
-      //       { dto: CrudParamDto, reqPath: 'params' },
-      //       { reqPath: 'body', dto: PluginBodyAdd },
-      //     ],
-      //     beforeService: pluginService.beforeEdit,
-      //     service: pluginService.afterEdit,
-      //   },
-      //   crud: {
-      //     saveToReq: true,
-      //   },
-      // },
-
       //   get all
       getAll: {
         controller: {
@@ -110,17 +84,6 @@ export function registerPluginControllers() {
           },
         },
       },
-
-      //   delete
-      // deleteOne: {
-      //   controller: {
-      //     access: AdminAccess,
-      //     service: pluginService.afterDelete,
-      //   },
-      //   crud: {
-      //     saveToReq: true,
-      //   },
-      // },
     },
     { ...opt, base_url: `${opt.base_url}/local` }
   );
