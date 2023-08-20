@@ -1,9 +1,20 @@
-import { join } from 'path';
+import * as utils from 'node:util';
 import * as fs from 'fs';
 import _ from 'lodash';
 import { Document } from 'mongoose';
 
 export function convertToString(a: any, pretty = true) {
+  const cache = [];
+
+  const replacer = (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (cache.includes(value)) return;
+
+      cache.push(value);
+    }
+    return value;
+  };
+
   if (typeof a === 'object') {
     const newA = {};
     Object.getOwnPropertyNames(a).forEach((key) => {
@@ -12,7 +23,9 @@ export function convertToString(a: any, pretty = true) {
       // delete a[key];
       // a[key] = temp;
     });
-    return !pretty ? JSON.stringify(newA) : JSON.stringify(newA, null, '  ');
+    return !pretty
+      ? JSON.stringify(newA, replacer)
+      : JSON.stringify(newA, replacer, '  ');
   }
   return a?.toString() ?? String(a);
   // const msgs: string[] = [];
