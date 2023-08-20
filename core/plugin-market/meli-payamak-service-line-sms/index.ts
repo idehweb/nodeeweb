@@ -1,14 +1,11 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import {
-  Plugin,
-  CorePluginType,
   SMSPluginArgs,
   SMSPluginContent,
   SmsSendStatus,
   SMSPluginResponse,
   SMSPluginSendBulkArgs,
 } from '../../types/plugin';
-import store from '../../store';
 import logger from '../../src/handlers/log.handler';
 
 type SMSConfig = {
@@ -17,13 +14,11 @@ type SMSConfig = {
   from: string;
 };
 
-async function sendSMS({ to, type, text }: SMSPluginArgs): SMSPluginResponse {
-  const smsConfig = store.config.plugin[CorePluginType.SMS] as SMSConfig;
+let config: SMSConfig;
 
-  if (!smsConfig)
-    throw new Error(
-      `core-sms-plugin need config.plugin.${CorePluginType.SMS}, which not defined`
-    );
+async function sendSMS({ to, type, text }: SMSPluginArgs): SMSPluginResponse {
+  if (!config)
+    throw new Error(`core-sms-plugin need config, which not defined`);
 
   return {
     from: '5000',
@@ -35,9 +30,9 @@ async function sendSMS({ to, type, text }: SMSPluginArgs): SMSPluginResponse {
     method: 'POST',
     url: 'http://rest.payamak-panel.com/api/SendSMS/SendSMS',
     data: {
-      username: smsConfig.username,
-      password: smsConfig.password,
-      from: smsConfig.username,
+      username: config.username,
+      password: config.password,
+      from: config.username,
       to: to,
       isflash: 'false',
       text: text,
@@ -64,16 +59,8 @@ async function sendBulkSMS({
     status: SmsSendStatus.Send_Success,
   };
 }
-
-const smsSendPlugin: Plugin = () => {
-  const content: SMSPluginContent = {
-    name: 'core-sms-send',
-    stack: [sendSMS, sendBulkSMS],
-  };
-  return {
-    type: CorePluginType.SMS,
-    content,
-  };
-};
-
-export default smsSendPlugin;
+export function add(arg: SMSConfig): SMSPluginContent['stack'] {
+  config = arg;
+  return [sendSMS, sendBulkSMS];
+}
+export async function edit() {}

@@ -134,7 +134,6 @@ class CoreConfig extends Config<CoreConfigDto> {
         request_limit: DEFAULT_REQ_LIMIT,
         request_limit_window_s: DEFAULT_REQ_WINDOW_LIMIT,
       },
-      plugin: {},
       sms_message_on: {
         otp: DEFAULT_SMS_ON_OTP,
       },

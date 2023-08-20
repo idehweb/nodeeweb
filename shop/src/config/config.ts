@@ -41,7 +41,6 @@ export class ShopConfig extends Config<ShopConfigDto> {
         transaction_expiration_s: DEFAULT_TRANSACTION_EXP_S,
         max_need_to_pay_transaction: MAXIMUM_NEED_TO_PAY_TRANSACTION,
       },
-      plugin: {},
       currency: Currency.Toman,
       tax: 0,
       shop_active: true,

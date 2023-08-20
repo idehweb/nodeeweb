@@ -11,4 +11,7 @@ export class PluginCore {
     this.bySlug.set(plugin.slug, plugin);
     this.byType.set(plugin.type, plugin);
   }
+  delete(id: string) {
+    return this.bySlug.delete(id) || this.byType.delete(id);
+  }
 }
