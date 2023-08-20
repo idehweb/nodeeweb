@@ -17,6 +17,7 @@ import logger from '../handlers/log.handler';
 import { registerPlugin, unregisterPlugin } from '../handlers/plugin.handler';
 import marketService from './market.service';
 import { merge } from 'lodash';
+import { PluginConfig } from './plugin';
 
 enum PluginStep {
   CopyContent = 'copy-content',
@@ -32,7 +33,7 @@ class LocalService {
   private get pluginModel(): PluginModel {
     return store.db.model('plugin');
   }
-  async resolve(slug: string) {
+  async resolve(slug: string): Promise<PluginConfig> {
     const pluginConfPath = getPluginPath(slug, 'config.json');
 
     if (!(await isExist(pluginConfPath)))
@@ -42,7 +43,11 @@ class LocalService {
     return await import(pluginConfPath);
   }
 
-  private async validate(config: any, action: 'add' | 'edit', arg: any) {
+  private async validate(
+    config: PluginConfig,
+    action: 'add' | 'edit',
+    arg: any
+  ) {
     // validate
     if (config[action].dto) {
       const { default: dto } = await import(
@@ -53,7 +58,12 @@ class LocalService {
     return arg;
   }
 
-  async run(config: any, action: 'add' | 'edit', arg: any, validate = true) {
+  async run(
+    config: PluginConfig,
+    action: 'add' | 'edit',
+    arg: any,
+    validate = true
+  ) {
     // validate
     arg = validate ? await this.validate(config, action, arg) : arg;
 

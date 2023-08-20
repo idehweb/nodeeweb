@@ -15,3 +15,34 @@ export class PluginCore {
     return this.bySlug.delete(id) || this.byType.delete(id);
   }
 }
+
+export type PluginConfig = {
+  name: string;
+  version: string;
+  description?: string | { [key: string]: string };
+  type: string;
+  icon?: string;
+  author: string;
+  main: string;
+  slug: string;
+  add: {
+    inputs: {
+      key: string;
+      title: { [key: string]: string };
+      type: string;
+      description?: string | { [key: string]: string };
+    }[];
+    dto?: string;
+    run: string;
+  };
+  edit: {
+    inputs: {
+      key: string;
+      title: { [key: string]: string };
+      type: string;
+      description?: string | { [key: string]: string };
+    }[];
+    dto?: string;
+    run: string;
+  };
+};
