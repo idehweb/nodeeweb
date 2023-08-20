@@ -95,17 +95,17 @@ export function registerPlugin(
     color(
       'Yellow',
       `## ${from ? `${from} ` : ''}Register ${plugin.type}:${
-        plugin.name
+        plugin.slug
       } Plugin ##`
     )
   );
 }
 
-export function unregisterPlugin(type: CorePluginType, from?: string) {
-  const existBefore = store.plugin.delete(type);
+export function unregisterPlugin(id: string, from?: string) {
+  const existBefore = store.plugin.delete(id);
   if (!existBefore) return;
 
   logger.log(
-    color('Yellow', `## ${from ? `${from} ` : ''}Unregister ${type} Plugin ##`)
+    color('Yellow', `## ${from ? `${from} ` : ''}Unregister ${id} Plugin ##`)
   );
 }

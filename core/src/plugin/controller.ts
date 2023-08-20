@@ -34,6 +34,13 @@ export function registerPluginControllers() {
         access: AdminAccess,
         validate: { dto: CrudParamDto, reqPath: 'params' },
       },
+      {
+        method: 'post',
+        service: localService.addPlugin,
+        url: '/local/:slug',
+        access: AdminAccess,
+        validate: { dto: CrudParamDto, reqPath: 'params' },
+      },
     ],
     opt
   );

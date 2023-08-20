@@ -28,6 +28,8 @@ const schema = new mongoose.Schema(
     icon: { type: String },
     author: { type: String, required: true },
     arg: {
+      type: {},
+      required: true,
       _id: false,
     },
   },

@@ -10,6 +10,7 @@ import {
   ValidationError,
   validate,
 } from 'class-validator';
+import { ValidationError as VE } from '../types/error';
 import _ from 'lodash';
 import { Types } from 'mongoose';
 
@@ -96,7 +97,7 @@ export async function validatePlain<C>(
   });
 
   if (errors.length) {
-    throw new Error(detectVE(errors).toString());
+    throw new VE(detectVE(errors).toString());
   }
 
   return instance as C;

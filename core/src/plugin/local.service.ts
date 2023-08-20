@@ -1,8 +1,10 @@
+import * as fs from 'fs';
 import { PluginDocument, PluginModel } from '../../schema/plugin.schema';
 import store from '../../store';
 import { DuplicateError, NotFound } from '../../types/error';
 import { MiddleWare, Req } from '../../types/global';
 import { PluginContent } from '../../types/plugin';
+import { catchFn } from '../../utils/catchAsync';
 import exec from '../../utils/exec';
 import { isExist } from '../../utils/helpers';
 import {
@@ -12,8 +14,14 @@ import {
 } from '../../utils/path';
 import { validatePlain } from '../../utils/validation';
 import logger from '../handlers/log.handler';
-import { registerPlugin } from '../handlers/plugin.handler';
+import { registerPlugin, unregisterPlugin } from '../handlers/plugin.handler';
 import marketService from './market.service';
+
+enum PluginStep {
+  CopyContent = 'copy-content',
+  InsertToDB = 'insert-to-db',
+  Register = 'register',
+}
 
 class LocalService {
   private get pluginModel(): PluginModel {
@@ -27,6 +35,32 @@ class LocalService {
 
     // resolve
     return await import(pluginConfPath);
+  }
+  private async rollback(steps: PluginStep[], { slug }: { slug: string }) {
+    const core = async (step: PluginStep) => {
+      switch (step) {
+        case PluginStep.CopyContent:
+          // rm content
+          return await fs.promises.rmdir(getPluginPath(slug), {
+            maxRetries: 5,
+          });
+
+        case PluginStep.InsertToDB:
+          // delete doc
+          return await this.pluginModel.deleteOne({ slug });
+
+        case PluginStep.Register:
+          return unregisterPlugin(slug, 'CoreLocalPlugin');
+      }
+    };
+
+    for (const step of steps) {
+      await catchFn(core, {
+        onError(err: any) {
+          logger.error(`[PluginLocal] rollback failed on ${step}\n`, err);
+        },
+      })(step);
+    }
   }
   getAllProjection() {
     return '-args';
@@ -68,10 +102,13 @@ class LocalService {
       dupMsg = 'can not add plugin to db twice';
     // 3. fs
     else if (await isExist(getPluginPath(slug)))
-      dupMsg =
-        'plugin directory already have plugin content, try to remove them first';
+      dupMsg = `${getPluginPath(
+        slug
+      )} is already exists, try to remove it first`;
 
     if (dupMsg) throw new DuplicateError(dupMsg);
+
+    const steps: PluginStep[] = [];
 
     // resolve from market
     const conf = await marketService.resolve(slug);
@@ -83,38 +120,55 @@ class LocalService {
       );
       body = await validatePlain(body, addDto, true);
     }
+    try {
+      // copy files
+      await exec(
+        `${getScriptFile('cp')} ${getPluginMarketPath(slug)} ${getPluginPath(
+          slug
+        )}`,
+        { logger }
+      );
 
-    // copy files
-    await exec(
-      `${getScriptFile('cp')} ${getPluginMarketPath(slug)} ${getPluginPath()}`,
-      { logger }
-    );
+      steps.push(PluginStep.CopyContent);
 
-    // save to db
-    const pluginDoc = await this.pluginModel.create({
-      ...conf,
-      arg: body,
-    });
+      // save to db
+      const pluginDoc = await this.pluginModel.create({
+        ...conf,
+        arg: body,
+      });
 
-    // resolve and call runner plugin
-    const plugin = await import(getPluginPath(slug, conf.main));
-    const pluginStack: PluginContent['stack'] = await plugin[conf.add.run](
-      body
-    );
+      steps.push(PluginStep.InsertToDB);
 
-    // register
-    registerPlugin(
-      { type: conf.type, slug: conf.slug, name: conf.name, stack: pluginStack },
-      { from: 'CoreLocalPlugin', logger }
-    );
+      // resolve and call runner plugin
+      const plugin = await import(getPluginPath(slug, conf.main));
+      const pluginStack: PluginContent['stack'] = await plugin[conf.add.run](
+        body
+      );
 
-    // present
-    return res.json({
-      data: {
-        ...pluginDoc.toObject(),
-        arg: undefined,
-      },
-    });
+      // register
+      registerPlugin(
+        {
+          type: conf.type,
+          slug: conf.slug,
+          name: conf.name,
+          stack: pluginStack,
+        },
+        { from: 'CoreLocalPlugin', logger }
+      );
+
+      steps.push(PluginStep.Register);
+
+      // present
+      return res.json({
+        data: {
+          ...pluginDoc.toObject(),
+          arg: undefined,
+        },
+      });
+    } catch (err) {
+      await this.rollback(steps, { slug });
+      throw err;
+    }
   };
 }
 

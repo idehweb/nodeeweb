@@ -14,7 +14,7 @@ export function getPluginMarketPath(...path: string[]) {
 }
 
 export function getPluginPath(...path: string[]) {
-  return join(getStaticDir('plugin', true)[0], ...path);
+  return join(getStaticDir('plugins', true)[0], ...path);
 }
 
 export function getSharedPath(...path: string[]) {
