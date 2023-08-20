@@ -6,7 +6,7 @@ import { MiddleWare, Req } from '../../types/global';
 import { PluginContent } from '../../types/plugin';
 import { catchFn } from '../../utils/catchAsync';
 import exec from '../../utils/exec';
-import { isExist } from '../../utils/helpers';
+import { call, isExist } from '../../utils/helpers';
 import {
   getPluginMarketPath,
   getPluginPath,
@@ -24,6 +24,9 @@ enum PluginStep {
 }
 
 class LocalService {
+  private get from() {
+    return 'CoreLocalPlugin';
+  }
   private get pluginModel(): PluginModel {
     return store.db.model('plugin');
   }
@@ -36,6 +39,32 @@ class LocalService {
     // resolve
     return await import(pluginConfPath);
   }
+
+  private async validate(config: any, action: 'add' | 'edit', arg: any) {
+    // validate
+    if (config[action].dto) {
+      const { default: dto } = await import(
+        getPluginMarketPath(config.slug, config[action].dto)
+      );
+      arg = await validatePlain(arg, dto, true);
+    }
+    return arg;
+  }
+
+  async run(config: any, action: 'add' | 'edit', arg: any, validate = true) {
+    // validate
+    arg = validate ? await this.validate(config, action, arg) : arg;
+
+    // execute
+    const plugin = await import(getPluginPath(config.slug, config.main));
+    const pluginStack: PluginContent['stack'] = await call(
+      plugin[config[action].run],
+      arg
+    );
+
+    return pluginStack;
+  }
+
   private async rollback(steps: PluginStep[], { slug }: { slug: string }) {
     const core = async (step: PluginStep) => {
       switch (step) {
@@ -113,13 +142,8 @@ class LocalService {
     // resolve from market
     const conf = await marketService.resolve(slug);
 
-    // validate
-    if (conf.add.dto) {
-      const { default: addDto } = await import(
-        getPluginMarketPath(slug, conf.add.dto)
-      );
-      body = await validatePlain(body, addDto, true);
-    }
+    body = await this.validate(conf, 'add', body);
+
     try {
       // copy files
       await exec(
@@ -139,11 +163,7 @@ class LocalService {
 
       steps.push(PluginStep.InsertToDB);
 
-      // resolve and call runner plugin
-      const plugin = await import(getPluginPath(slug, conf.main));
-      const pluginStack: PluginContent['stack'] = await plugin[conf.add.run](
-        body
-      );
+      const stack = await this.run(conf, 'add', body, false);
 
       // register
       registerPlugin(
@@ -151,9 +171,9 @@ class LocalService {
           type: conf.type,
           slug: conf.slug,
           name: conf.name,
-          stack: pluginStack,
+          stack,
         },
-        { from: 'CoreLocalPlugin', logger }
+        { from: this.from, logger }
       );
 
       steps.push(PluginStep.Register);
@@ -168,6 +188,27 @@ class LocalService {
     } catch (err) {
       await this.rollback(steps, { slug });
       throw err;
+    }
+  };
+
+  initPlugins = async () => {
+    const plugins = await this.pluginModel.find();
+
+    for (const plugin of plugins) {
+      const conf = await this.resolve(plugin.slug);
+      const stack = await this.run(conf, 'add', plugin.arg, true);
+
+      registerPlugin(
+        {
+          name: plugin.name,
+          slug: plugin.slug,
+          type: plugin.type,
+          stack,
+        },
+        {
+          from: this.from,
+        }
+      );
     }
   };
 }

@@ -1,14 +1,12 @@
-import { CoreConfigBody } from '../../dto/config';
 import { RestartBody } from '../../dto/in/restart.dto';
 import { ControllerSchema } from '../../types/controller';
-import { configService } from '../config/service';
+import registerConfigControllers from '../config/controller';
 import { AdminAccess, OptUserAccess } from '../handlers/auth.handler';
 import {
   controllerRegister,
   controllersBatchRegister,
 } from '../handlers/controller.handler';
 import logger from '../handlers/log.handler';
-import { getAuth, mockTheme } from '../temp/routers';
 import restartService from './restart';
 import settingService from './setting';
 import { getViewHandler } from './view';
@@ -24,34 +22,6 @@ export function registerDefaultControllers() {
     validate: { dto: RestartBody, reqPath: 'body' },
   });
 
-  // config
-  controllerStack.push(
-    {
-      method: 'get',
-      url: '/config/system',
-      service: configService.get,
-      access: AdminAccess,
-    },
-    {
-      method: 'put',
-      url: '/config/system',
-      service: configService.update,
-      access: AdminAccess,
-      validate: { reqPath: 'body', dto: CoreConfigBody },
-    },
-    {
-      method: 'get',
-      url: '/config/admin-dash',
-      service: configService.getAdminDashConf,
-      access: AdminAccess,
-    },
-    {
-      method: 'get',
-      url: '/config/view',
-      service: configService.getViewConf,
-    }
-  );
-
   // theme
   controllerStack.push({
     method: 'get',
@@ -66,6 +36,9 @@ export function registerDefaultControllers() {
     base_url: '/api/v1',
     from: 'CoreController',
   });
+
+  // config
+  registerConfigControllers();
 
   // view
   const [viewPath, viewService] = getViewHandler();

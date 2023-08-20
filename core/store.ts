@@ -10,7 +10,7 @@ import { ConfigType } from './types/config';
 import { RestartPolicy } from './types/restart';
 import { StoreEnv } from './types/store';
 import EventEmitter from 'events';
-import { PluginCore } from './src/plugin';
+import { PluginCore } from './src/plugin/plugin';
 export class Store {
   env: StoreEnv;
   db: typeof mongoose;

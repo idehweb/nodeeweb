@@ -12,6 +12,7 @@ import { registerValidationPipe } from '../handlers/validate.handler';
 import { registerDefaultConfig } from '../config/config';
 import { registerDefaultEvent } from './event';
 import { registerPluginControllers } from '../plugin/controller';
+import { initPlugins } from '../plugin';
 
 const app = express();
 
@@ -32,7 +33,7 @@ export default async function buildApp() {
   // register models
   await dbRegisterModels();
 
-  // initial first records in db
+  // initial first records in db , do some initial stuff
   await dbInit();
 
   // error
@@ -44,18 +45,14 @@ export default async function buildApp() {
   // common
   registerCommonHandlers();
 
-  // plugins
-  // await handlePlugin();
-
   // auth controllers
   activeAuthControllers();
 
   // default controller
   registerDefaultControllers();
 
-  // default plugins
-  registerPluginControllers();
-  // registerDefaultPlugins();
+  // plugins
+  await initPlugins();
 
   return app;
 }
