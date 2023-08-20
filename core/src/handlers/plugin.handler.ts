@@ -3,7 +3,7 @@ import path, { join } from 'path';
 import fs from 'fs';
 import logger from './log.handler';
 import { isAsyncFunction } from 'util/types';
-import { CorePluginType, PluginOut } from '../../types/plugin';
+import { CorePluginType, PluginContent } from '../../types/plugin';
 import store from '../../store';
 import { color } from '../../utils/color';
 import { catchFn } from '../../utils/catchAsync';
@@ -15,7 +15,7 @@ export function getPluginEventName({
   after,
   before,
 }: {
-  type: PluginOut['type'];
+  type: PluginContent['type'];
   after?: boolean;
   before?: boolean;
   content_stack: number;
@@ -45,24 +45,31 @@ export default async function handlePlugin() {
 }
 
 export function registerPlugin(
-  type: PluginOut['type'],
-  content: PluginOut['content'],
+  plugin: PluginContent,
   { from, logger = store.systemLogger }: RegisterOptions
 ) {
   // catch
-  content.stack = content.stack.map((cb, i) =>
+  plugin.stack = plugin.stack.map((cb, i) =>
     catchFn(
       async (...args) => {
         store.event.emit(
-          getPluginEventName({ content_stack: i, type, before: true }),
-          content.name,
+          getPluginEventName({
+            content_stack: i,
+            type: plugin.type,
+            before: true,
+          }),
+          plugin.name,
           ...args
         );
         const response = await cb(...args);
         store.event.emit(
-          getPluginEventName({ content_stack: i, type, after: true }),
+          getPluginEventName({
+            content_stack: i,
+            type: plugin.type,
+            after: true,
+          }),
           response,
-          content.name,
+          plugin.name,
           ...args
         );
         return response;
@@ -72,7 +79,9 @@ export function registerPlugin(
           logger.error(
             color(
               'Red',
-              `## ${from ? `${from} ` : ''}${type}:${content.name} Plugin ##\n`
+              `## ${from ? `${from} ` : ''}${plugin.type}:${
+                plugin.name
+              } Plugin ##\n`
             ),
             err
           );
@@ -81,17 +90,19 @@ export function registerPlugin(
     )
   );
 
-  store.plugins.set(type, content);
+  store.plugin.set(plugin);
   logger.log(
     color(
       'Yellow',
-      `## ${from ? `${from} ` : ''}Register ${type}:${content.name} Plugin ##`
+      `## ${from ? `${from} ` : ''}Register ${plugin.type}:${
+        plugin.name
+      } Plugin ##`
     )
   );
 }
 
 export function unregisterPlugin(type: CorePluginType, from?: string) {
-  const existBefore = store.plugins.delete(type);
+  const existBefore = store.plugin.delete(type);
   if (!existBefore) return;
 
   logger.log(

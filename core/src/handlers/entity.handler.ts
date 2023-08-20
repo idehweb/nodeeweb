@@ -12,7 +12,7 @@ import { isAsyncFunction } from 'util/types';
 import { BadRequestError, GeneralError, NotFound } from '../../types/error';
 import { call } from '../../utils/helpers';
 import { CrudParamDto } from '../../dto/in/crud.dto';
-import { lowerFirst, orderBy } from 'lodash';
+import _, { lowerFirst, orderBy } from 'lodash';
 
 export class EntityCreator {
   constructor(private modelName: string) {}
@@ -254,6 +254,14 @@ type EntityOpts = {
   [CRUD.DELETE_ONE]?: EntityCRUDOpt;
   [CRUD.GET_COUNT]?: EntityCRUDOpt;
 };
+
+const defaultCrudOpt: Omit<CRUDCreatorOpt, 'httpCode'> = {
+  executeQuery: true,
+  sendResponse: true,
+  saveToReq: false,
+  autoSetCount: true,
+};
+
 export function registerEntityCRUD(
   modelName: string,
   opts: EntityOpts,
@@ -274,9 +282,7 @@ export function registerEntityCRUD(
     opt.crud = opt.crud ?? {};
 
     // set default values
-    opt.crud.executeQuery = opt.crud.executeQuery ?? true;
-    opt.crud.sendResponse = opt.crud.sendResponse ?? true;
-    opt.crud.saveToReq = opt.crud.saveToReq ?? false;
+    opt.crud = _.merge(opt.crud, defaultCrudOpt);
 
     schemas.push({
       method: opt.controller.method ?? translateCRUD2Method(cName),
@@ -359,7 +365,7 @@ function canUseDefaultParamValidation(name: CRUD, opt: EntityCRUDOpt) {
   return (
     opt.controller.validate === undefined &&
     [CRUD.UPDATE_ONE, CRUD.DELETE_ONE, CRUD.GET_ONE].includes(name) &&
-    (!opt.crud.paramFields || opt.crud.paramFields.id === 'id')
+    (!opt.crud.paramFields || ['id', 'slug'].includes(opt.crud.paramFields.id))
   );
 }
 

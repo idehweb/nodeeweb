@@ -72,6 +72,7 @@ export function detectVE(errors: ValidationError[], depth = 10) {
 
   filteredErrors.toString = () => {
     return Object.entries(filteredErrors)
+      .filter(([k]) => k !== 'toString')
       .map(([k, v]) => `${k}: ${v}`)
       .join(', ');
   };
