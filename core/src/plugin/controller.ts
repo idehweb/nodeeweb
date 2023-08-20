@@ -48,6 +48,13 @@ export function registerPluginControllers() {
         access: AdminAccess,
         validate: { dto: CrudParamDto, reqPath: 'params' },
       },
+      {
+        method: 'delete',
+        service: localService.deletePlugin,
+        url: '/local/:slug',
+        access: AdminAccess,
+        validate: { dto: CrudParamDto, reqPath: 'params' },
+      },
     ],
     opt
   );

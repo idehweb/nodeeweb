@@ -69,14 +69,24 @@ class LocalService {
 
   private async rollback(
     steps: PluginStep[],
-    { slug, plugin }: { slug: string; plugin?: PluginDocument }
+    {
+      slug,
+      plugin,
+      onError,
+    }: {
+      slug: string;
+      plugin?: PluginDocument;
+      onError?: (step: PluginStep, err: any) => void;
+    }
   ) {
     const core = async (step: PluginStep) => {
       switch (step) {
         case PluginStep.CopyContent:
           // rm content
-          return await fs.promises.rmdir(getPluginPath(slug), {
+          return await fs.promises.rm(getPluginPath(slug), {
             maxRetries: 5,
+            force: true,
+            recursive: true,
           });
 
         case PluginStep.InsertToDB:
@@ -96,9 +106,11 @@ class LocalService {
 
     for (const step of steps) {
       await catchFn(core, {
-        onError(err: any) {
-          logger.error(`[PluginLocal] rollback failed on ${step}\n`, err);
-        },
+        onError:
+          onError?.bind(this, step) ??
+          ((err: any) => {
+            logger.error(`[${this.from}] rollback failed on ${step}\n`, err);
+          }),
       })(step);
     }
   }
@@ -262,6 +274,28 @@ class LocalService {
       await this.rollback(steps, { slug, plugin: oldPluginDoc });
       throw err;
     }
+  };
+
+  deletePlugin: MiddleWare = async (req, res) => {
+    const { slug } = req.params;
+
+    const steps: PluginStep[] = [
+      PluginStep.Register,
+      PluginStep.InsertToDB,
+      PluginStep.CopyContent,
+    ];
+
+    await this.rollback(steps, {
+      slug,
+      onError(step, err) {
+        logger.error(
+          `[${this.from}] delete ${slug} has error on rollback step: ${step}\n`,
+          err
+        );
+      },
+    });
+
+    return res.status(204).send();
   };
 
   initPlugins = async () => {
