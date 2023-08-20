@@ -1,4 +1,4 @@
-import { Plugin } from '@nodeeweb/core/types/plugin';
+import { Plugin, PluginContent } from '@nodeeweb/core/types/plugin';
 import {
   BankGatewayPluginContent,
   BankGatewayUnverified,
@@ -24,15 +24,8 @@ const unverified: BankGatewayUnverified = async () => {
   return [{ authority: 'authority', amount: 5 }];
 };
 
-const bankGatewayPlugin: Plugin = () => {
-  const content: BankGatewayPluginContent = {
-    name: 'shop-bank-gateway',
-    stack: [create, verify, unverified],
-  };
-  return {
-    type: ShopPluginType.BANK_GATEWAY,
-    content,
-  };
+const bankGatewayPlugin = () => {
+  return [create, verify, unverified] as PluginContent['stack'];
 };
 
 export default bankGatewayPlugin;

@@ -90,7 +90,7 @@ export function registerPlugin(
     )
   );
 
-  store.plugin.set(plugin);
+  store.plugins.set(plugin);
   logger.log(
     color(
       'Yellow',
@@ -102,7 +102,7 @@ export function registerPlugin(
 }
 
 export function unregisterPlugin(id: string, from?: string) {
-  const existBefore = store.plugin.delete(id);
+  const existBefore = store.plugins.delete(id);
   if (!existBefore) return;
 
   logger.log(

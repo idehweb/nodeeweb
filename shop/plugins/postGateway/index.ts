@@ -15,15 +15,8 @@ const calcPost: PostGatewayCalcPrice = async () => {
   return { price: 0, provider: PostProvider.Manual };
 };
 
-const postGatewayPlugin: Plugin = () => {
-  const content: PostGatewayPluginContent = {
-    name: 'shop-post-gateway',
-    stack: [submitPostReq, calcPost],
-  };
-  return {
-    type: ShopPluginType.POST_GATEWAY,
-    content,
-  };
+const postGatewayPlugin = () => {
+  return [submitPostReq, calcPost];
 };
 
 export default postGatewayPlugin;

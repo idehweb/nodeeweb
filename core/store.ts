@@ -25,7 +25,7 @@ export class Store {
   adminViews: { [key: AdminViewSchema['name']]: AdminViewSchema['content'] } =
     {};
   strategies = new Map<string, AuthStrategy>();
-  plugin = new PluginCore();
+  plugins = new PluginCore();
   config: ConfigType;
   event: EventEmitter;
 

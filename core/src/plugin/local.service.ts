@@ -158,7 +158,7 @@ class LocalService {
     // check registration
     let dupMsg: string;
     // 1. store
-    if (store.plugin.get(slug)) dupMsg = 'this plugin added before';
+    if (store.plugins.get(slug)) dupMsg = 'this plugin added before';
     // 2. db
     else if (await this.pluginModel.findOne({ slug }))
       dupMsg = 'can not add plugin to db twice';
@@ -232,7 +232,7 @@ class LocalService {
     // check registration
     let notFoundMsg: string;
     // 1. store
-    if (!store.plugin.get(slug)) notFoundMsg = 'this plugin not register yet';
+    if (!store.plugins.get(slug)) notFoundMsg = 'this plugin not register yet';
     // 2. db
     else if (!oldPluginDoc)
       notFoundMsg = 'can not edit plugin which not exist in db';

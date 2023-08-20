@@ -93,7 +93,7 @@ export class OtpStrategy extends AuthStrategy {
       userExists = Boolean(req.user);
 
     // send code
-    const smsPlugin = store.plugin.get(CorePluginType.SMS) as SMSPluginContent;
+    const smsPlugin = store.plugins.get(CorePluginType.SMS) as SMSPluginContent;
     if (!smsPlugin) throw new NotImplement('sms plugin not found');
 
     // save to db
