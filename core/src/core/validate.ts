@@ -25,11 +25,7 @@ export class CoreValidationPipe implements ValidatePipe {
       whitelist: true,
     });
     if (errors.length > 0) {
-      throw new VE(
-        Object.entries(this._detectError(errors)).reduce((prev, [k, v]) => {
-          return `${prev}\n${k} : ${v}`;
-        }, '')
-      );
+      throw new VE(this._detectError(errors).toString());
     }
     return object as C;
   }

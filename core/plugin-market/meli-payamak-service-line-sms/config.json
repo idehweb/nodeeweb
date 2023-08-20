@@ -9,6 +9,7 @@
     "icon": "",
     "author": "Nodeeweb",
     "main":"index.ts",
+    "slug":"meli-payamak-service-line-sms",
     "add": {
         "inputs": [
             {

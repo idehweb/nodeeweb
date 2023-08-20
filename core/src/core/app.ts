@@ -8,10 +8,10 @@ import { dbInit } from './db';
 import { setErrorPackage } from './error';
 import { registerDefaultControllers } from './controller';
 import { activeAuthControllers } from './auth';
-import registerDefaultPlugins from './plugin';
 import { registerValidationPipe } from '../handlers/validate.handler';
 import { registerDefaultConfig } from '../config/config';
 import { registerDefaultEvent } from './event';
+import { registerPluginControllers } from '../plugin/controller';
 
 const app = express();
 
@@ -54,7 +54,8 @@ export default async function buildApp() {
   registerDefaultControllers();
 
   // default plugins
-  registerDefaultPlugins();
+  registerPluginControllers();
+  // registerDefaultPlugins();
 
   return app;
 }
