@@ -10,6 +10,7 @@ import {
 import { registerEntityCRUD } from '../handlers/entity.handler';
 import logger from '../handlers/log.handler';
 import marketService from './market.service';
+import localService from './local.service';
 
 export function registerPluginControllers() {
   const opt: ControllerRegisterOptions = {
@@ -38,75 +39,82 @@ export function registerPluginControllers() {
   );
 
   //   plugin crud
-  // registerEntityCRUD(
-  //   'plugin',
-  //   {
-  //     // add plugin
-  //     create: {
-  //       controller: {
-  //         url: '/:id',
-  //         access: AdminAccess,
-  //         validate: [
-  //           { dto: CrudParamDto, reqPath: 'params' },
-  //           { reqPath: 'body', dto: PluginBodyAdd },
-  //         ],
-  //         beforeService: pluginService.beforeAdd,
-  //         service: pluginService.afterAdd,
-  //       },
-  //       crud: {
-  //         saveToReq: true,
-  //       },
-  //     },
+  registerEntityCRUD(
+    'plugin',
+    {
+      // add plugin
+      // create: {
+      //   controller: {
+      //     url: '/:id',
+      //     access: AdminAccess,
+      //     validate: [
+      //       { dto: CrudParamDto, reqPath: 'params' },
+      //       { reqPath: 'body', dto: PluginBodyAdd },
+      //     ],
+      //     beforeService: pluginService.beforeAdd,
+      //     service: pluginService.afterAdd,
+      //   },
+      //   crud: {
+      //     saveToReq: true,
+      //   },
+      // },
 
-  //     //   edit plugin
-  //     updateOne: {
-  //       controller: {
-  //         access: AdminAccess,
-  //         validate: [
-  //           { dto: CrudParamDto, reqPath: 'params' },
-  //           { reqPath: 'body', dto: PluginBodyAdd },
-  //         ],
-  //         beforeService: pluginService.beforeEdit,
-  //         service: pluginService.afterEdit,
-  //       },
-  //       crud: {
-  //         saveToReq: true,
-  //       },
-  //     },
+      //   edit plugin
+      // updateOne: {
+      //   controller: {
+      //     access: AdminAccess,
+      //     validate: [
+      //       { dto: CrudParamDto, reqPath: 'params' },
+      //       { reqPath: 'body', dto: PluginBodyAdd },
+      //     ],
+      //     beforeService: pluginService.beforeEdit,
+      //     service: pluginService.afterEdit,
+      //   },
+      //   crud: {
+      //     saveToReq: true,
+      //   },
+      // },
 
-  //     //   get all
-  //     getAll: {
-  //       controller: {
-  //         access: AdminAccess,
-  //         service: pluginService.afterGetAll,
-  //       },
-  //       crud: {
-  //         saveToReq: true,
-  //       },
-  //     },
+      //   get all
+      getAll: {
+        controller: {
+          access: AdminAccess,
+        },
+        crud: {
+          project: localService.getAllProjection(),
+          paramFields: {
+            limit: 'limit',
+            offset: 'offset',
+          },
+        },
+      },
 
-  //     // get one
-  //     getOne: {
-  //       controller: {
-  //         access: AdminAccess,
-  //         service: pluginService.afterGetOne,
-  //       },
-  //       crud: {
-  //         saveToReq: true,
-  //       },
-  //     },
+      // get one
+      getOne: {
+        controller: {
+          access: AdminAccess,
+        },
+        crud: {
+          project: localService.getOneProjection(),
+          parseFilter: localService.getOneFilter,
+          sendResponse: localService.getOneTransform,
+          paramFields: {
+            id: 'slug',
+          },
+        },
+      },
 
-  //     //   delete
-  //     deleteOne: {
-  //       controller: {
-  //         access: AdminAccess,
-  //         service: pluginService.afterDelete,
-  //       },
-  //       crud: {
-  //         saveToReq: true,
-  //       },
-  //     },
-  //   },
-  //   opt
-  // );
+      //   delete
+      // deleteOne: {
+      //   controller: {
+      //     access: AdminAccess,
+      //     service: pluginService.afterDelete,
+      //   },
+      //   crud: {
+      //     saveToReq: true,
+      //   },
+      // },
+    },
+    { ...opt, base_url: `${opt.base_url}/local` }
+  );
 }

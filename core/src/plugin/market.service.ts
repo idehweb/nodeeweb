@@ -7,6 +7,16 @@ import { NotFound } from '../../types/error';
 import { plugin } from 'mongoose';
 
 class MarketService {
+  async resolve(slug: string) {
+    const pluginConfPath = getPluginMarketPath(slug, 'config.json');
+
+    if (!(await isExist(pluginConfPath)))
+      throw new NotFound(`${slug} not found in plugin market`);
+
+    // resolve
+    return await import(pluginConfPath);
+  }
+
   getAll: MiddleWare = async (req, res) => {
     // path
     const pluginsConfigPath = (
@@ -32,14 +42,8 @@ class MarketService {
     });
   };
   getOne: MiddleWare = async (req, res) => {
-    const slug = req.params.slug;
-    const pluginConfPath = getPluginMarketPath(slug, 'config.json');
-
-    if (!(await isExist(pluginConfPath)))
-      throw new NotFound(`${slug} not found in plugin market`);
-
     // resolve
-    const conf = await import(pluginConfPath);
+    const conf = await this.resolve(req.params.slug);
 
     // present
     return res.json({

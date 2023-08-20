@@ -36,6 +36,8 @@ export type SMSPluginSendBulkArgs = {
 };
 
 export interface PluginContent {
+  slug: string;
+  type: CorePluginType | string;
   name: string;
   stack: ((...args: any) => Promise<boolean | any>)[];
 }
@@ -46,12 +48,7 @@ export interface SMSPluginContent extends PluginContent {
   ];
 }
 
-export type PluginOut = {
-  type: CorePluginType | string;
-  content: PluginContent;
-};
-
-export type Plugin = () => PluginOut;
+export type Plugin = (arg: any) => PluginContent;
 
 export enum SmsSendStatus {
   Send_Processing = 'send_processing',

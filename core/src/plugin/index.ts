@@ -1,11 +1,14 @@
-import smsSendPlugin from '../../plugins/sms-send';
-import logger from '../handlers/log.handler';
-import { registerPlugin } from '../handlers/plugin.handler';
+import { PluginContent } from '../../types/plugin';
 
-export default function registerDefaultPlugins() {
-  const smsPlugin = smsSendPlugin();
-  registerPlugin(smsPlugin.type, smsPlugin.content, {
-    from: 'CorePlugin',
-    logger,
-  });
+export class PluginCore {
+  private byType = new Map<string, PluginContent>();
+  private bySlug = new Map<string, PluginContent>();
+
+  get(id: string) {
+    return this.bySlug.get(id) || this.byType.get(id);
+  }
+  set(plugin: PluginContent) {
+    this.bySlug.set(plugin.slug, plugin);
+    this.byType.set(plugin.type, plugin);
+  }
 }
