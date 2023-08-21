@@ -21,4 +21,4 @@ logs/*
 admin/*
 
 ## plugin
-plugin/*
+plugins/*
