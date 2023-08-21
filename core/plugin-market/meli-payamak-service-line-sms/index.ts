@@ -1,18 +1,18 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { merge } from 'lodash';
 import {
   SMSPluginArgs,
   SMSPluginContent,
-  SmsSendStatus,
   SMSPluginResponse,
   SMSPluginSendBulkArgs,
-} from '../../types/plugin';
-import logger from '../../src/handlers/log.handler';
-import { merge } from 'lodash';
+  SmsSendStatus,
+} from './type';
 
 type SMSConfig = {
   username: string;
   password: string;
   from: string;
+  resolve: (key: string) => any;
 };
 
 let config: SMSConfig;
@@ -40,6 +40,7 @@ async function sendSMS({ to, type, text }: SMSPluginArgs): SMSPluginResponse {
     },
   };
   const { data } = await axios(configs);
+  const logger = config.resolve('logger');
   logger.log(`[core-sms-send]`, data);
   return {
     from: '5000',
@@ -53,6 +54,7 @@ async function sendBulkSMS({
   type,
   pattern,
 }: SMSPluginSendBulkArgs): SMSPluginResponse {
+  const logger = config.resolve('logger');
   logger.log(`[core-sms-send]`, { content, type, pattern });
   return {
     from: '5000',

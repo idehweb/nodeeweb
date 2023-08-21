@@ -1,0 +1,40 @@
+{
+    "name": "Zibal Bank Gateway",
+    "version": "1.0.0",
+    "description": {
+        "en": "for handle payment",
+        "fa": "برای هندل کردن پرداخت ها"
+    },
+    "type": "bank-gateway",
+    "author": "Nodeeweb",
+    "main": "index.ts",
+    "slug": "zibal-bank-gateway",
+    "add": {
+        "inputs": [
+            {
+                "key": "merchant",
+                "title": {
+                    "en": "merchant",
+                    "fa": "شناسه درگاه"
+                },
+                "type": "string"
+            }
+        ],
+        "dto": "dto/add.ts",
+        "run": "add"
+    },
+    "edit": {
+        "inputs": [
+            {
+                "key": "merchant",
+                "title": {
+                    "en": "merchant",
+                    "fa": "شناسه درگاه"
+                },
+                "type": "string"
+            }
+        ],
+        "dto": "dto/edit.ts",
+        "run": "edit"
+    }
+}

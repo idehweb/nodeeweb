@@ -5,7 +5,7 @@
         "en": "for send sms with service line",
         "fa": "برای ارسال پیامک به وسیله خط خدماتی"
     },
-    "type" : "sms",
+    "type" : "sms-gateway",
     "icon": "",
     "author": "Nodeeweb",
     "main":"index.ts",
@@ -40,7 +40,7 @@
                 "description": {}
             }
         ],
-        "dto":"add.dto.ts",
+        "dto":"dto/add.ts",
         "run":"add"
     },
     "edit":{
@@ -73,7 +73,7 @@
                 "description": {}
             }
         ],
-        "dto":"edit.dto.ts",
+        "dto":"dto/edit.ts",
         "run":"edit"
     }
 }

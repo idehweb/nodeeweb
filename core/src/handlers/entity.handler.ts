@@ -279,10 +279,9 @@ export function registerEntityCRUD(
   for (const [name, opt] of Object.entries(ordered).filter(([k, v]) => v)) {
     const cName = name as CRUD;
     opt.controller = opt.controller ?? {};
-    opt.crud = opt.crud ?? {};
 
     // set default values
-    opt.crud = _.merge(defaultCrudOpt, opt.crud);
+    opt.crud = _.merge({ ...defaultCrudOpt }, opt.crud ?? {});
 
     schemas.push({
       method: opt.controller.method ?? translateCRUD2Method(cName),

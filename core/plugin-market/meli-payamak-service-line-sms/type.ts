@@ -1,6 +1,3 @@
-export enum CorePluginType {
-  SMS = 'sms-gateway',
-}
 export enum SMSPluginType {
   Automatic = 'automatic',
   Manual = 'manual',
@@ -37,7 +34,7 @@ export type SMSPluginSendBulkArgs = {
 
 export interface PluginContent {
   slug: string;
-  type: CorePluginType | string;
+  type: string;
   name: string;
   stack: ((...args: any) => Promise<boolean | any>)[];
 }

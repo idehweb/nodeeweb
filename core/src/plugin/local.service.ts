@@ -30,6 +30,16 @@ class LocalService {
   private get from() {
     return 'CoreLocalPlugin';
   }
+
+  private insidePluginLib = {
+    logger,
+    systemLogger: store.systemLogger,
+  };
+
+  private insideResolve = (key: string) => {
+    return this.insidePluginLib[key];
+  };
+
   private get pluginModel(): PluginModel {
     return store.db.model('plugin');
   }
@@ -71,7 +81,7 @@ class LocalService {
     const plugin = await import(getPluginPath(config.slug, config.main));
     const pluginStack: PluginContent['stack'] = await call(
       plugin[config[action].run],
-      arg
+      { ...arg, resolve: this.insideResolve }
     );
 
     return pluginStack;
