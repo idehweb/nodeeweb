@@ -1,13 +1,8 @@
 import axios from 'axios';
 import Types from '#c/functions/types';
-import store, {
-  storeAttrValue,
-  storePosts,
-  storeProduct,
-  storeProducts,
-} from '#c/functions/store';
+import store, {storeAttrValue, storePosts, storeProduct, storeProducts,} from '#c/functions/store';
 import CONFIG from '#c/config';
-import { createContext } from 'react';
+import {createContext} from 'react';
 import {
   clearState,
   deleteAdminData,
@@ -342,7 +337,7 @@ export const getMinPrice = (combinations) => {
 };
 export const getAllSidebarCategoriesData = (i = '') =>
   getData(`${ApiUrl}/category/all/0/300`, {}, true)
-    .then(({ data }) => {
+    .then(({data}) => {
       if (!data.length) return;
       let parentsArray = [];
       data.forEach((item) => {
@@ -350,8 +345,8 @@ export const getAllSidebarCategoriesData = (i = '') =>
           item.to = item._id;
           item.title = item.name;
 
-          item.htmlAfter = <KeyboardArrowLeftIcon />;
-          item.htmlBefore = <KeyboardArrowLeftIcon />;
+          item.htmlAfter = <KeyboardArrowLeftIcon/>;
+          item.htmlBefore = <KeyboardArrowLeftIcon/>;
         }
       });
       data.forEach((item1) => {
@@ -390,38 +385,38 @@ export const getAllSidebarCategoriesData = (i = '') =>
     });
 export const loadProduct =
   (_id = null) =>
-  async (dispatch) => {
-    await loadItem(_id).then(async (res) => {
-      return await dispatch(storeProduct({ data: res, _id: _id }));
-    });
-  };
+    async (dispatch) => {
+      await loadItem(_id).then(async (res) => {
+        return await dispatch(storeProduct({data: res, _id: _id}));
+      });
+    };
 export const loadPost =
   (_id = null) =>
-  async (dispatch) => {
-    await loadBlogItem(_id).then(async (res) => {
-      return await dispatch(storeProduct({ data: res, _id: _id }));
-    });
-  };
+    async (dispatch) => {
+      await loadBlogItem(_id).then(async (res) => {
+        return await dispatch(storeProduct({data: res, _id: _id}));
+      });
+    };
 export const loadProducts =
   (cat_id = null, include = null) =>
-  async (dispatch) => {
-    await loadProductItems(cat_id).then(async (res) => {
-      return await dispatch(storeProducts({ data: res, id: cat_id }));
-    });
-  };
+    async (dispatch) => {
+      await loadProductItems(cat_id).then(async (res) => {
+        return await dispatch(storeProducts({data: res, id: cat_id}));
+      });
+    };
 export const loadPosts =
   (cat_id = null, include = null) =>
-  async (dispatch) => {
-    await loadPostItems(cat_id).then(async (res) => {
-      return await dispatch(storePosts({ data: res, id: cat_id }));
-    });
-  };
+    async (dispatch) => {
+      await loadPostItems(cat_id).then(async (res) => {
+        return await dispatch(storePosts({data: res, id: cat_id}));
+      });
+    };
 
 export const setAttrValue =
   (attr = null, value = null) =>
-  async (dispatch) => {
-    await dispatch(storeAttrValue({ attr: attr, value: value }));
-  };
+    async (dispatch) => {
+      await dispatch(storeAttrValue({attr: attr, value: value}));
+    };
 
 export const fetchCats = () => async (dispatch) => {
   let allCategories = store.getState().store.allCategories;
@@ -431,7 +426,7 @@ export const fetchCats = () => async (dispatch) => {
     if (response && response[0] && response[0]._id) cat = response[0]._id;
     return await dispatch({
       type: 'cats/catsLoaded',
-      payload: { allCategories: response, cat: cat, searchvisible: false },
+      payload: {allCategories: response, cat: cat, searchvisible: false},
     });
   }
 };
@@ -455,7 +450,7 @@ export const fetchTheme = () => async (dispatch) => {
     const response = await getThemeData();
     return await dispatch({
       type: 'theme/themeLoaded',
-      payload: { themeData: response },
+      payload: {themeData: response},
     });
   }
 };
@@ -466,7 +461,7 @@ export const fetchHome = () => async (dispatch) => {
 
     return await dispatch({
       type: 'data/homeLoaded',
-      payload: { homeData: response },
+      payload: {homeData: response},
     });
   }
 };
@@ -484,13 +479,13 @@ export const getThemeData = (i = '') =>
   isClient && window.theme
     ? window.theme
     : getAdminData(`${THEME_URL}`, {}, true)
-        .then((res) => {
-          return res.data;
-        })
-        .catch((err) => {
-          handleErr(err);
-          return err;
-        });
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {
+        handleErr(err);
+        return err;
+      });
 export const getThemeDataold = (i = '') =>
   getAdminData(`${THEME_URL}`, {}, true)
     .then((res) => {
@@ -586,7 +581,7 @@ export const getContacts = () => {
   return new Promise(function (resolve, reject) {
     let c = [];
     getData(`${ApiUrl}/session/contacts/mine`, {}, true)
-      .then(({ data = {} }) => {
+      .then(({data = {}}) => {
         console.clear();
         resolve(data);
       })
@@ -600,10 +595,10 @@ export const addToMyContacts = (phoneNumber) => {
     let c = [];
     putData(
       `${ApiUrl}/session/contacts/mine`,
-      { phoneNumber: phoneNumber },
+      {phoneNumber: phoneNumber},
       true,
     )
-      .then(({ data = {} }) => {
+      .then(({data = {}}) => {
         console.clear();
         resolve(data);
       })
@@ -617,7 +612,7 @@ export const startChat = (phoneNumber, from) => {
     let c = [];
 
     getData(`${ApiUrl}/session/` + phoneNumber, true)
-      .then(({ data = {} }) => {
+      .then(({data = {}}) => {
         console.clear();
         resolve(data);
       })
@@ -632,7 +627,7 @@ export const SaveBuilder = (model = 'page', _id = null, data, headers) => {
     let c = [];
     if (_id)
       putAdminData(`${AdminRoute}/${model}/` + _id, data, true)
-        .then(({ data = {} }) => {
+        .then(({data = {}}) => {
           // console.clear()
           // let mainD = data["data"];
           // console.log('data',data)
@@ -659,7 +654,7 @@ export const GetBuilder = (model = 'page', _id) => {
   return new Promise(function (resolve, reject) {
     let c = [];
     getData(`${AdminRoute}/${model}/${_id}`)
-      .then(({ data = {} }) => {
+      .then(({data = {}}) => {
         // console.log('resolve GetBuilder')
 
         //     let mainD = data["data"];
@@ -688,13 +683,13 @@ export const getTheData = (
   console.log('getTheData header...', headers);
   return getAdminData(
     `${AdminRoute}/${model}/${offset}/${limit}`,
-    { headers: headers },
+    {headers: headers},
     true,
   )
     .then((res) => {
       // console.clear();
       // console.log('res', res)
-      return { data: res.data, headers: res.headers };
+      return {data: res.data, headers: res.headers};
     })
     .catch((err) => {
       handleErr(err);
@@ -716,7 +711,7 @@ export const updateTransactionStatus = (method, S) => {
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success) {
-          savePost({ order_id: null, card: [] });
+          savePost({order_id: null, card: []});
         }
         resolve(mainD);
       })
@@ -738,7 +733,7 @@ export const updateStatus = (S, A) => {
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success) {
-          savePost({ order_id: null, card: [] });
+          savePost({order_id: null, card: []});
         }
         resolve(mainD);
       })
@@ -857,7 +852,7 @@ export const siteStatus = async (dispatch, getState) => {
 
       // console.log('siteStatus res.data',obj);
 
-      dispatch({ type: 'site/status', payload: res.data });
+      dispatch({type: 'site/status', payload: res.data});
       return res.data;
     })
     .catch((err) => {
@@ -870,7 +865,7 @@ export const getPosts = (offset = 0, limit = 24, search, filter = {}) => {
   return new Promise(function (resolve, reject) {
     console.log('filter...', filter);
     let params = {};
-    const { country } = store.getState().store;
+    const {country} = store.getState().store;
     if (country) {
       params = {
         country: country,
@@ -881,7 +876,7 @@ export const getPosts = (offset = 0, limit = 24, search, filter = {}) => {
       if (filter['attr']) params['attr'] = filter['attr'];
       if (filter['value']) params['value'] = filter['value'];
     }
-    getData(`${ApiUrl}/product/${offset}/${limit}/${search}`, { params }, true)
+    getData(`${ApiUrl}/product/${offset}/${limit}/${search}`, {params}, true)
       .then((data) => {
         resolve(data.data);
       })
@@ -895,7 +890,7 @@ export const getBlogPosts = (offset = 0, limit = 24, search, filter = {}) => {
   return new Promise(function (resolve, reject) {
     // console.log('getPosts...',store.getState().store.country)
     let params = {};
-    const { country } = store.getState().store;
+    const {country} = store.getState().store;
     if (country) {
       params = {
         country: country,
@@ -904,7 +899,7 @@ export const getBlogPosts = (offset = 0, limit = 24, search, filter = {}) => {
     if (filter) {
       if (filter['type']) params['type'] = filter['type'];
     }
-    getData(`${ApiUrl}/post/${offset}/${limit}/${search}`, { params }, true)
+    getData(`${ApiUrl}/post/${offset}/${limit}/${search}`, {params}, true)
       .then((data) => {
         resolve(data.data);
       })
@@ -977,7 +972,7 @@ export const getEntities = (
     //   filter=false
     // }
     let params = {};
-    const { country } = store.getState().store;
+    const {country} = store.getState().store;
     if (country) {
       params = {
         country: country,
@@ -1003,7 +998,7 @@ export const getEntities = (
     if (!filter && populate) {
       url += '?populate=' + populate;
     }
-    getData(url, { params }, true)
+    getData(url, {params}, true)
       .then((data) => {
         resolve(data.data);
       })
@@ -1028,7 +1023,7 @@ export const getEntitiesWithCount = (
     //   filter=false
     // }
     let params = {};
-    const { country } = store.getState().store;
+    const {country} = store.getState().store;
     if (country) {
       params = {
         country: country,
@@ -1054,9 +1049,9 @@ export const getEntitiesWithCount = (
     if (!filter && populate) {
       url += '?populate=' + populate;
     }
-    getData(url, { params }, true)
+    getData(url, {params}, true)
       .then((d) => {
-        let { data, headers } = d;
+        let {data, headers} = d;
         resolve({
           items: data,
           count: headers ? headers['x-total-count'] : 0,
@@ -1078,7 +1073,7 @@ export const getEntitiesForAdmin = (
   return new Promise(function (resolve, reject) {
     // console.log('getPosts...',store.getState().store.country)
     let params = {};
-    const { country } = store.getState().store;
+    const {country} = store.getState().store;
     if (country) {
       params = {
         country: country,
@@ -1089,7 +1084,7 @@ export const getEntitiesForAdmin = (
     }
     let url = `${AdminRoute}/${entity}/${offset}/${limit}/`;
     if (search) url += search;
-    getAdminData(url, { params }, true)
+    getAdminData(url, {params}, true)
       .then((data) => {
         resolve(data.data);
       })
@@ -1110,7 +1105,7 @@ export const getPostsByCat = (
 ) => {
   return new Promise(function (resolve, reject) {
     let params = {};
-    const { country } = store.getState().store;
+    const {country} = store.getState().store;
     if (country) {
       params = {
         country: country,
@@ -1126,7 +1121,7 @@ export const getPostsByCat = (
     }
     getData(
       `${ApiUrl}/product/productsByCat/${_id}/${offset}/${limit}/${search}`,
-      { params },
+      {params},
       true,
     )
       .then((data) => {
@@ -1153,7 +1148,7 @@ export const getBlogPostsByCat = (
 ) => {
   return new Promise(function (resolve, reject) {
     let params = {};
-    const { country } = store.getState().store;
+    const {country} = store.getState().store;
     if (country) {
       params = {
         country: country,
@@ -1167,7 +1162,7 @@ export const getBlogPostsByCat = (
     }
     getData(
       `${ApiUrl}/post/postsByCat/${_id}/${offset}/${limit}/${search}`,
-      { params },
+      {params},
       true,
     )
       .then((data) => {
@@ -1275,7 +1270,7 @@ export const contactBoy = (d, obj) => {
 };
 export const addBookmark = (_id) => {
   return new Promise(function (resolve, reject) {
-    let { token } = store.getState().store.user;
+    let {token} = store.getState().store.user;
     console.log('token', token);
     if (!token) {
       reject({
@@ -1347,7 +1342,7 @@ export const updateNotifToken = (_id) => {
 
 export const updatetStatus = (status) => {
   return new Promise(async function (resolve, reject) {
-    let { order_id, user } = await store.getState().store;
+    let {order_id, user} = await store.getState().store;
     // let token = store.getState().store.user.token;
 
     let sendAuth = false;
@@ -1387,10 +1382,10 @@ export const updatetStatus = (status) => {
 export const updateCard = (card, sum = 0) => {
   console.log('updateCard');
   return new Promise(async function (resolve, reject) {
-    let { order_id, user } = await store.getState().store;
+    let {order_id, user} = await store.getState().store;
     // let token = store.getState().store.user.token;
     console.log('order_id:', order_id);
-    await SaveData({ card, sum });
+    await SaveData({card, sum});
     sum = 0;
     let sendAuth = false;
     if (user && user.token) {
@@ -1435,7 +1430,7 @@ export const updateCard = (card, sum = 0) => {
         let mainD = data['data'];
         // console.log('mainD');
 
-        SaveData({ order_id: mainD._id });
+        SaveData({order_id: mainD._id});
       })
       .catch((err) => {
         reject(err);
@@ -1447,7 +1442,7 @@ export const addItem = (item) => {
   return new Promise(async function (resolve) {
     // console.log('item.price', item);
 
-    let { card, sum } = await store.getState().store;
+    let {card, sum} = await store.getState().store;
     let price = null;
     let salePrice = null;
 
@@ -1523,7 +1518,7 @@ export const addItem = (item) => {
 };
 export const removeItem = (item) => {
   return new Promise(async function (resolve) {
-    let { card, sum } = await store.getState().store;
+    let {card, sum} = await store.getState().store;
 
     sum = 0;
     if (!card) {
@@ -1572,7 +1567,7 @@ export const addToCard = (_id) => {
     await getData(`${ApiUrl}/product/f/${_id}`, {}, true)
       .then(async (data) => {
         let mainD = await data['data'];
-        let { card } = await store.getState().store;
+        let {card} = await store.getState().store;
         if (!card) {
           card = [];
         }
@@ -1592,7 +1587,7 @@ export const addToCard = (_id) => {
           return;
         });
         if (!found) {
-          await card.push({ ...mainD, count: 1 });
+          await card.push({...mainD, count: 1});
           if (mainD.salePrice) {
             sum += mainD.salePrice;
           } else if (mainD.price && !mainD.salePrice) {
@@ -1602,7 +1597,7 @@ export const addToCard = (_id) => {
         // console.log('sum');
         // console.log(card);
         // console.log(sum);
-        await SaveData({ card, sum });
+        await SaveData({card, sum});
 
         await resolve(card);
       })
@@ -1661,7 +1656,7 @@ export const createOrder = (obj) => {
     // console.log(the_order);
 
     // return 0;
-    postData(`${ApiUrl}/order/createByCustomer`, { ...obj, ...the_order }, true)
+    postData(`${ApiUrl}/order/createByCustomer`, {...obj, ...the_order}, true)
       .then((data) => {
         let mainD = data['data'];
 
@@ -1791,7 +1786,11 @@ export const getBlogPost = (i) =>
 export const getPage = (i) =>
   getData(`${ApiUrl}/page/${i}`, {}, true)
     .then((res) => {
-      return res.data;
+      if (res.data && res.data.data) {
+        return res.data.data;
+
+      } else
+        return res.data;
     })
     .catch((err) => {
       handleErr(err);
@@ -1857,14 +1856,14 @@ export const uploadMedia = (file = {}, onUploadProgress, id, uploadType) => {
 
 export const CameFromPost = (bool) => {
   return new Promise(async function (resolve, reject) {
-    await SaveData({ CameFromPost: bool });
+    await SaveData({CameFromPost: bool});
     await resolve(true);
   });
 };
 
 export const enableAgent = (enableAgent) => {
   return new Promise(async function (resolve, reject) {
-    await SaveData({ enableAgent: enableAgent });
+    await SaveData({enableAgent: enableAgent});
     window.location.replace('/make-money');
 
     await resolve(true);
@@ -1873,14 +1872,14 @@ export const enableAgent = (enableAgent) => {
 
 export const enableAdmin = (enableAdmin) => {
   return new Promise(async function (resolve, reject) {
-    await SaveData({ enableAdmin: enableAdmin });
+    await SaveData({enableAdmin: enableAdmin});
 
     await resolve(true);
   });
 };
 export const enableSell = (enableSell) => {
   return new Promise(async function (resolve, reject) {
-    await SaveData({ enableSell: enableSell });
+    await SaveData({enableSell: enableSell});
     window.location.reload();
     await resolve(true);
   });
@@ -1888,31 +1887,31 @@ export const enableSell = (enableSell) => {
 export const updateAgent = (agent_id, link_id) => {
   return new Promise(async function (resolve, reject) {
     // console.log('agent_id', agent_id);
-    await SaveData({ agent: agent_id, link: link_id });
+    await SaveData({agent: agent_id, link: link_id});
     await resolve(true);
   });
 };
 export const goToProduct = (bool) => {
   return new Promise(async function (resolve, reject) {
     // console.log('set goToProduct ' + bool);
-    await SaveData({ goToProduct: bool });
+    await SaveData({goToProduct: bool});
     await resolve(true);
   });
 };
 export const setLanguage = (lan) => {
   return new Promise(async function (resolve, reject) {
-    SaveData({ lan: 'fa' });
+    SaveData({lan: 'fa'});
   });
 };
 export const setCountry = (country, d = true) => {
   return new Promise(async function (resolve, reject) {
-    await SaveData({ country: country });
+    await SaveData({country: country});
     if (d) await window.location.reload();
   });
 };
 export const setCat = (cat, d = true) => {
   return new Promise(async function (resolve, reject) {
-    await SaveData({ cat: cat });
+    await SaveData({cat: cat});
     if (d) await window.location.reload();
   });
 };
@@ -1920,7 +1919,7 @@ export const addToDataArray = (obj) => {
   return new Promise(async function (resolve, reject) {
     let arr = (await store.getState().store.allPostData) || {};
     arr[obj.name] = obj.value;
-    await SaveData({ allPostData: arr });
+    await SaveData({allPostData: arr});
   });
 };
 export const pushArrayToDataArray = (obj) => {
@@ -1939,15 +1938,15 @@ export const pushArrayToDataArray = (obj) => {
     } else {
       arr[obj.name] = [obj.value];
     }
-    await SaveData({ allPostData: arr });
+    await SaveData({allPostData: arr});
   });
 };
-export const savePost = (obj) => SaveData({ ...obj });
+export const savePost = (obj) => SaveData({...obj});
 
 export const toggleSidebar = (menuVisible) =>
-  SaveData({ menuVisible: !menuVisible });
+  SaveData({menuVisible: !menuVisible});
 export const toggleSearch = (searchvisible) => {
-  SaveData({ searchvisible: !searchvisible });
+  SaveData({searchvisible: !searchvisible});
   if (searchvisible) {
     // let themobilesearch = document.getElementById('themobilesearch');
     // if (themobilesearch) {
@@ -1957,10 +1956,10 @@ export const toggleSearch = (searchvisible) => {
   }
 };
 export const toggleCardbar = (cardVisible) =>
-  SaveData({ cardVisible: !cardVisible });
+  SaveData({cardVisible: !cardVisible});
 
 export const saveCountryPost = (obj) => {
-  const { countries, mainCountryList, mainCountry, countryChoosed } = obj;
+  const {countries, mainCountryList, mainCountry, countryChoosed} = obj;
 
   SaveData({
     countries,
@@ -1990,7 +1989,7 @@ export const clearPost = () =>
 
 export const clearPP = (obj) => {
   return new Promise(async function (resolve, reject) {
-    SaveData({ ...obj });
+    SaveData({...obj});
 
     await resolve({});
   });
@@ -2156,16 +2155,16 @@ export const deleteModel = (model, id) => {
 };
 
 export const register = (number, fd, method = 'sms') => {
-  let { user } = store.getState().store;
+  let {user} = store.getState().store;
   let userObj = {
     phoneNumber: number,
     countryCode: fd,
     method: method,
   };
   return postData(`${ApiUrl}/authCustomer`, userObj)
-    .then(({ data }) => {
-      user = { ...user, ...{ phoneNumber: number, countryCode: fd } };
-      if (data.success) SaveData({ user: user });
+    .then(({data}) => {
+      user = {...user, ...{phoneNumber: number, countryCode: fd}};
+      if (data.success) SaveData({user: user});
 
       return data;
     })
@@ -2179,18 +2178,18 @@ export const register = (number, fd, method = 'sms') => {
 export const loginAdmin = (username, password) => {
   console.log('loginAdmin');
   return new Promise(function (resolve, reject) {
-    let { admin } = store.getState().store;
+    let {admin} = store.getState().store;
     postData(`${AdminRoute}/admin/login`, {
       identifier: username,
       password: password,
     })
-      .then(({ data }) => {
+      .then(({data}) => {
         if (data && data.user) {
           admin = {
             ...admin,
-            ...{ username: username, admin_token: data.user.token },
+            ...{username: username, admin_token: data.user.token},
           };
-          if (data.success) SaveData({ admin: admin });
+          if (data.success) SaveData({admin: admin});
         }
         return resolve(data);
       })
@@ -2202,15 +2201,15 @@ export const loginAdmin = (username, password) => {
   });
 };
 export const authCustomerForgotPass = (number, fd, method = 'sms') => {
-  let { user } = store.getState().store;
+  let {user} = store.getState().store;
   return postData(`${ApiUrl}/authCustomerForgotPass`, {
     phoneNumber: number,
     countryCode: fd,
     method: method,
   })
-    .then(({ data }) => {
-      user = { ...user, ...{ phoneNumber: number, countryCode: fd } };
-      if (data.success) SaveData({ user: user });
+    .then(({data}) => {
+      user = {...user, ...{phoneNumber: number, countryCode: fd}};
+      if (data.success) SaveData({user: user});
 
       return data;
     })
@@ -2223,12 +2222,12 @@ export const authCustomerForgotPass = (number, fd, method = 'sms') => {
 
 export const setPassWithPhoneNumber = (data) => {
   return new Promise(function (resolve, reject) {
-    let { user } = store.getState().store;
+    let {user} = store.getState().store;
     postData(`${ApiUrl}/setPassword`, data, true)
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success) {
-          user = { ...user, ...mainD.customer };
+          user = {...user, ...mainD.customer};
 
           SaveData({
             // phoneNumber: mainD.customer.phoneNumber,
@@ -2247,17 +2246,17 @@ export const setPassWithPhoneNumber = (data) => {
 };
 export const updateAddress = (data) => {
   return new Promise(function (resolve, reject) {
-    let { user } = store.getState().store;
-    let { address } = store.getState().store;
+    let {user} = store.getState().store;
+    let {address} = store.getState().store;
     if (!address) {
       address = [];
     }
     address.push(data);
-    putData(`${ApiUrl}/updateAddress`, { address: address }, true)
+    putData(`${ApiUrl}/updateAddress`, {address: address}, true)
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success) {
-          user = { ...user, ...mainD.customer.address };
+          user = {...user, ...mainD.customer.address};
           SaveData({
             // phoneNumber: mainD.customer.phoneNumber,
             address: mainD.customer.address,
@@ -2329,20 +2328,20 @@ export const getTheChaparPrice = (destination = 0, value = 0, weight = 1) => {
     formData.append(
       'input',
       '{\n' +
-        '   "order":{\n' +
-        '      "origin":"10866",\n' +
-        '      "destination":"' +
-        destination +
-        '",\n' +
-        '      "method":"11",\n' +
-        '      "value":"' +
-        value +
-        '",\n' +
-        '      "weight":"' +
-        weight +
-        '"\n' +
-        '   }\n' +
-        '}',
+      '   "order":{\n' +
+      '      "origin":"10866",\n' +
+      '      "destination":"' +
+      destination +
+      '",\n' +
+      '      "method":"11",\n' +
+      '      "value":"' +
+      value +
+      '",\n' +
+      '      "weight":"' +
+      weight +
+      '"\n' +
+      '   }\n' +
+      '}',
     );
     const config = {
       headers: {
@@ -2362,12 +2361,12 @@ export const getTheChaparPrice = (destination = 0, value = 0, weight = 1) => {
 };
 export const changeAddressArr = (data) => {
   return new Promise(function (resolve, reject) {
-    let { user } = store.getState().store;
-    putData(`${ApiUrl}/updateAddress`, { address: data }, true)
+    let {user} = store.getState().store;
+    putData(`${ApiUrl}/updateAddress`, {address: data}, true)
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success) {
-          user = { ...user, ...mainD.customer.address };
+          user = {...user, ...mainD.customer.address};
           SaveData({
             // phoneNumber: mainD.customer.phoneNumber,
             address: mainD.customer.address,
@@ -2387,12 +2386,12 @@ export const changeAddressArr = (data) => {
 export const authCustomerWithPassword = (data) => {
   // console.log('==> authCustomerWithPassword()');
   return new Promise(function (resolve, reject) {
-    let { user } = store.getState().store;
+    let {user} = store.getState().store;
     postData(`${ApiUrl}/authCustomerWithPassword`, data)
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success) {
-          user = { ...user, ...mainD.customer };
+          user = {...user, ...mainD.customer};
           SaveData({
             address: mainD.customer.address,
             user: user,
@@ -2410,14 +2409,14 @@ export const authCustomerWithPassword = (data) => {
 
 export const submitProfile = (obj) => {
   return new Promise(function (resolve, reject) {
-    let { user } = store.getState().store;
+    let {user} = store.getState().store;
 
     putData(`${ApiUrl}/`, obj, true)
       .then((data) => {
         let mainD = data['data'];
         if (mainD.success) {
-          user = { ...user, ...obj };
-          SaveData({ user: user });
+          user = {...user, ...obj};
+          SaveData({user: user});
         }
         resolve(mainD);
       })
@@ -2431,8 +2430,8 @@ export const submitProfile = (obj) => {
 
 export const active = (req) => {
   return postData(`${ApiUrl}/activateCustomer`, req)
-    .then(({ data = {} }) => {
-      let { user } = store.getState().store;
+    .then(({data = {}}) => {
+      let {user} = store.getState().store;
       // console.log('data', data);
       if (data.success) {
         const {
@@ -2457,7 +2456,7 @@ export const active = (req) => {
           },
         };
 
-        SaveData({ user: user, address: address });
+        SaveData({user: user, address: address});
       }
 
       return data;

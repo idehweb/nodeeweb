@@ -33,6 +33,7 @@ const Page = (props) => {
   let page = useSelector((st) => {
     return st.store.page || [];
   });
+  console.log('page',page)
   let {firstName, lastName, internationalCode, token} = store.getState().store.user;
   let navigate=useNavigate();
 
@@ -53,6 +54,7 @@ const Page = (props) => {
     return new Promise(function (resolve, reject) {
 
       getPage(_id).then((d = {}) => {
+        console.log('d',d)
         if(d.success==false && (d.access && d.access=='private')){
           let redirect_url = "/login/";
           navigate(redirect_url)
@@ -102,6 +104,7 @@ const Page = (props) => {
       // if (_id != the_id)
       getThePost(the_id)
         .then(items => {
+          console.log('items',items)
           setState(items);
           if (isClient)
             window.scrollTo(0, 0);
