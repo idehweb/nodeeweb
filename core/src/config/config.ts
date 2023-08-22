@@ -1,8 +1,8 @@
 import fs from 'fs';
 import { SingleJobProcess } from '../handlers/singleJob.handler';
-import { isExist, isExistsSync } from '../../utils/helpers';
+import { isExistsSync } from '../../utils/helpers';
 import { getSharedPath } from '../../utils/path';
-import { CoreConfigBody, CoreConfigDto } from '../../dto/config';
+import { CoreConfigDto } from '../../dto/config';
 import { plainToInstance } from 'class-transformer';
 import _ from 'lodash';
 import restart from '../../utils/restart';
@@ -15,19 +15,30 @@ import { DEFAULT_SMS_ON_OTP } from '../constants/String';
 import { validateSync } from 'class-validator';
 import { registerConfig } from '../handlers/config.handler';
 import logger from '../handlers/log.handler';
-import { MiddleWare, USE_ENV } from '../../types/global';
-import { GeneralError } from '../../types/error';
+import { USE_ENV } from '../../types/global';
 import { ConfigChangeOpt } from '../../types/config';
 import { detectVE } from '../../utils/validation';
 
-export class Config<C extends CoreConfigDto> {
+export abstract class Config<C extends CoreConfigDto> {
   private __config: C;
-
-  protected _transform(value: any): C {
-    return plainToInstance(CoreConfigDto, value, {
-      enableImplicitConversion: true,
-    }) as C;
+  constructor() {
+    this._readAndCreate();
+    Object.freeze(this.__config);
+    return new Proxy(this, {
+      get(target, p) {
+        if (
+          String(p).startsWith('_') ||
+          ['change', 'toString', 'toJSON', 'toObject', 'getPublic'].includes(
+            String(p)
+          )
+        )
+          return target[p];
+        return target._config[p];
+      },
+    });
   }
+
+  protected abstract _transform(value: any): C;
   protected _validate(value: any): void {
     const errors = validateSync(value, {
       forbidUnknownValues: true,
@@ -42,27 +53,15 @@ export class Config<C extends CoreConfigDto> {
       );
     return;
   }
-  protected get _defaultSetting(): C {
-    return {
-      app_name: store.env.APP_NAME ?? 'Nodeeweb Core',
-      auth: {},
-      limit: {
-        request_limit: DEFAULT_REQ_LIMIT,
-        request_limit_window_s: DEFAULT_REQ_WINDOW_LIMIT,
-      },
-      plugin: {},
-      sms_message_on: {
-        otp: DEFAULT_SMS_ON_OTP,
-      },
-    } as C;
-  }
-  private get _path() {
+  protected abstract get _defaultSetting(): C;
+
+  protected get _path() {
     return getSharedPath('config.json');
   }
-  private get _config(): C {
+  protected get _config(): C {
     return this.__config;
   }
-  private set _config(value: any) {
+  protected set _config(value: any) {
     const newConf = this._transform(value);
     this._validate(newConf);
     this.__config = newConf;
@@ -72,21 +71,6 @@ export class Config<C extends CoreConfigDto> {
     _.merge(mergedValue, this._config, JSON.parse(JSON.stringify(newConf)));
     this._config = mergedValue;
   }
-  constructor() {
-    this._readAndCreate();
-    Object.freeze(this.__config);
-    return new Proxy(this, {
-      get(target, p) {
-        if (
-          String(p).startsWith('_') ||
-          ['change', 'toString', 'toJSON', 'toObject'].includes(String(p))
-        )
-          return target[p];
-        return target._config[p];
-      },
-    });
-  }
-
   private _readAndCreate() {
     this._config = this._defaultSetting;
 
@@ -107,11 +91,9 @@ export class Config<C extends CoreConfigDto> {
       this._write();
     })().then();
   }
-
   private _write(config = this._config) {
     fs.writeFileSync(this._path, JSON.stringify(config, null, '  '), 'utf-8');
   }
-
   public async change(
     newConfig: any,
     { merge, restart: rst, external_wait, internal_wait }: ConfigChangeOpt = {}
@@ -126,7 +108,6 @@ export class Config<C extends CoreConfigDto> {
     // restart
     if (rst) await restart({ external_wait, internal_wait });
   }
-
   public toString() {
     return JSON.stringify(this._config);
   }
@@ -136,30 +117,36 @@ export class Config<C extends CoreConfigDto> {
   public toObject() {
     return this._config;
   }
+  public abstract getPublic(): Partial<C>;
 }
 
-class ConfigService {
-  get: MiddleWare = async (req, res) => {
-    return res.json({ data: store.config });
-  };
-
-  update: MiddleWare = async (req, res) => {
-    const body: CoreConfigBody = req.body;
-    if (!store.config) throw new GeneralError('config not resister yet!', 500);
-
-    await store.config.change(body.config, {
-      merge: true,
-      restart: body.restart ?? true,
-      external_wait: true,
-      internal_wait: false,
+class CoreConfig extends Config<CoreConfigDto> {
+  protected _transform(value: any): CoreConfigDto {
+    return plainToInstance(CoreConfigDto, value, {
+      enableImplicitConversion: true,
     });
+  }
+  protected get _defaultSetting(): CoreConfigDto {
+    return {
+      app_name: store.env.APP_NAME ?? 'Nodeeweb Core',
+      auth: {},
+      limit: {
+        request_limit: DEFAULT_REQ_LIMIT,
+        request_limit_window_s: DEFAULT_REQ_WINDOW_LIMIT,
+      },
+      sms_message_on: {
+        otp: DEFAULT_SMS_ON_OTP,
+      },
+    };
+  }
 
-    return res.status(200).json({ data: store.config });
-  };
+  public getPublic(): Partial<CoreConfigDto> {
+    return {
+      app_name: this._config.app_name,
+    };
+  }
 }
-
-export const configService = new ConfigService();
 
 export function registerDefaultConfig() {
-  registerConfig(new Config(), { from: 'CoreConfig', logger });
+  registerConfig(new CoreConfig(), { from: 'CoreConfig', logger });
 }

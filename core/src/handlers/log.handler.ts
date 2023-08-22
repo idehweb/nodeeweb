@@ -4,7 +4,6 @@ import { MiddleWare, USE_ENV } from '../../types/global';
 import { createCustomLogger } from '../core/log';
 import store from '../../store';
 import { Colors, color, yellow } from '../../utils/color';
-import bfs from '../../utils/bfs';
 import { convertToString } from '../../utils/helpers';
 
 export class Logger {

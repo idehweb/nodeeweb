@@ -1,10 +1,10 @@
-import { Plugin } from '@nodeeweb/core/types/plugin';
 import {
   BankGatewayPluginContent,
   BankGatewayUnverified,
-  ShopPluginType,
-} from '../../types/plugin';
-import { PaymentVerifyStatus } from '../../types/order';
+  PaymentVerifyStatus,
+} from './type';
+
+let config: { merchant: string };
 
 const create: BankGatewayPluginContent['stack'][0] = async ({}) => {
   const d = new Date();
@@ -24,15 +24,12 @@ const unverified: BankGatewayUnverified = async () => {
   return [{ authority: 'authority', amount: 5 }];
 };
 
-const bankGatewayPlugin: Plugin = () => {
-  const content: BankGatewayPluginContent = {
-    name: 'shop-bank-gateway',
-    stack: [create, verify, unverified],
-  };
-  return {
-    type: ShopPluginType.BANK_GATEWAY,
-    content,
-  };
-};
+export function add(arg: any): BankGatewayPluginContent['stack'] {
+  config = arg;
+  return [create, verify, unverified];
+}
 
-export default bankGatewayPlugin;
+export function edit(arg: any): BankGatewayPluginContent['stack'] {
+  config = arg;
+  return [create, verify, unverified];
+}

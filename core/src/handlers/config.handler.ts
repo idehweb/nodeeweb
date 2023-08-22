@@ -3,7 +3,7 @@ import store from '../../store';
 import { RegisterOptions } from '../../types/register';
 import { color } from '../../utils/color';
 import { getName, wait } from '../../utils/helpers';
-import { Config } from '../core/config';
+import { Config } from '../config/config';
 
 export function registerConfig<
   Dto extends CoreConfigDto,
