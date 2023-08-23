@@ -30,8 +30,6 @@
     "date-fns-jalali": "^2.30.0-0",
     "final-form": "^4.20.10",
     "framer-motion": "^10.16.1",
-    "grapesjs": "^0.19.5",
-    "grapesjs-preset-webpage": "^0.1.11",
     "immutability-helper": "^3.1.1",
     "jalali-moment": "^3.3.11",
     "notiflix": "^3.2.6",
