@@ -255,7 +255,7 @@ const Core = (props) => {
                   item={i}
                   onDelete={handleDelete}
                   onAdd={toggleOptionBox}
-                  onEdit={() => setEditItem(i)}
+                  onEdit={(v) => setEditItem(v)}
                   onDrop={handleDrop}
                 />
 
