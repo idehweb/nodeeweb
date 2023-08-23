@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import _ from 'underscore';
-
+import _isEqual from 'lodash/isEqual';
 import { Col, Row } from 'shards-react';
 import InfiniteScroll from 'react-infinite-scroller';
 
@@ -29,7 +28,6 @@ import {
 import { ProductsSliderServer } from '@/components/components-overview/ProductsSlider';
 import { PostSliderServer } from '@/components/components-overview/PostSlider';
 import PostCard from '@/components/Home/PostCard';
-
 
 let theFilter = false;
 //
@@ -71,9 +69,9 @@ const LoadMore = (props) => {
   const [load, setLoad] = useState(null);
   //
   // const postCardMode = store.getState().store.postCardMode;
-  const postCardMode = useSelector((st) => st.store.postCardMode, _.isEqual);
-  const sortBy = useSelector((st) => st.store.sortBy, _.isEqual);
-  const defaultSort = useSelector((st) => st.store.defaultSort, _.isEqual);
+  const postCardMode = useSelector((st) => st.store.postCardMode, _isEqual);
+  const sortBy = useSelector((st) => st.store.sortBy, _isEqual);
+  const defaultSort = useSelector((st) => st.store.defaultSort, _isEqual);
 
   // console.log('sortBy', sortBy);
   // const theAttr = useSelector((st) => st.store.attr);
