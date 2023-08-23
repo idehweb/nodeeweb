@@ -5983,10 +5983,10 @@ filter-obj@^1.1.0:
   resolved "https://registry.yarnpkg.com/filter-obj/-/filter-obj-1.1.0.tgz#9b311112bc6c6127a16e016c6c5d7f19e0805c5b"
   integrity sha1-mzERErxsYSehbgFsbF1/GeCAXFs=
 
-final-form@^4.20.9:
-  version "4.20.9"
-  resolved "https://registry.yarnpkg.com/final-form/-/final-form-4.20.9.tgz#647b459f8c504d77ec8f6e280015ab172982af2f"
-  integrity sha512-shA1X/7v8RmukWMNRHx0l7+Bm41hOivY78IvOiBrPVHjyWFIyqqIEMCz7yTVRc9Ea+EU4WkZ5r4MH6whSo5taw==
+final-form@^4.20.10:
+  version "4.20.10"
+  resolved "https://registry.yarnpkg.com/final-form/-/final-form-4.20.10.tgz#1a484be6e9a91989121c054dcbd6f48bad051ecc"
+  integrity sha512-TL48Pi1oNHeMOHrKv1bCJUrWZDcD3DIG6AGYVNOnyZPr7Bd/pStN0pL+lfzF5BNoj/FclaoiaLenk4XUIFVYng==
   dependencies:
     "@babel/runtime" "^7.10.0"
 
@@ -6131,10 +6131,10 @@ fraction.js@^4.2.0:
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.2.0.tgz#448e5109a313a3527f5a3ab2119ec4cf0e0e2950"
   integrity sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==
 
-framer-motion@^10.15.0:
-  version "10.15.0"
-  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-10.15.0.tgz#5f043fdd4edb2c29a0a5e86cce1f67b88dcdc768"
-  integrity sha512-HDjWrYWgbO5orKuhnXETLFzk7UUvwWur2HFs2elAZ8lVpI49ClHql31DNTVvVBcOrSHfAOS4eBDBedIvOx634w==
+framer-motion@^10.16.1:
+  version "10.16.1"
+  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-10.16.1.tgz#0ff5de554bbb35ee6605357d80f92b27d0271a94"
+  integrity sha512-K6TXr5mZtitC/dxQCBdg7xzdN0d5IAIrlaqCPKtIQVdzVPGC0qBuJKXggHX1vjnP5gPOFwB1KbCCTWcnFc3kWg==
   dependencies:
     tslib "^2.4.0"
   optionalDependencies:
@@ -9964,10 +9964,10 @@ queue-microtask@^1.2.2:
   resolved "https://registry.yarnpkg.com/queue-microtask/-/queue-microtask-1.2.3.tgz#4929228bbc724dfac43e0efb058caf7b6cfb6243"
   integrity sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==
 
-ra-core@^4.12.2:
-  version "4.12.2"
-  resolved "https://registry.yarnpkg.com/ra-core/-/ra-core-4.12.2.tgz#0d3625b3c6454c75e0b3093a43b5d44eb0cb0973"
-  integrity sha512-ooChHjyvDr8hZuVWJAR4o+bMyuHlI4ie+d2plLRmY4FNtUqiMf8cjagN//kLHAz4GdVnPTNZBnyJTaGYw9odOQ==
+ra-core@^4.13.1:
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/ra-core/-/ra-core-4.13.1.tgz#d1e1c03a64abd6a6ea3efb9d2751eac78150c71c"
+  integrity sha512-Ww6pbD7OFcn63H11inWMRSKdnq6OnOffGgl1HHNTn44g4bqOsiZIkewZ1FpREM4pszO17fjbenABrWHnK0Z9gA==
   dependencies:
     clsx "^1.1.1"
     date-fns "^2.19.0"
@@ -9980,18 +9980,18 @@ ra-core@^4.12.2:
     react-is "^17.0.2"
     react-query "^3.32.1"
 
-ra-i18n-polyglot@^4.12.2:
-  version "4.12.2"
-  resolved "https://registry.yarnpkg.com/ra-i18n-polyglot/-/ra-i18n-polyglot-4.12.2.tgz#4484abb4144919d5e5c1f13835656f0769c1307a"
-  integrity sha512-xtR0M1CjmgHekwq6B1WSPFAFV1cHpzG+rLMdD0MAXNlxHevhi+tiAjJBo0fHZMUejyAAiCiP+QRSzVARdqoOAg==
+ra-i18n-polyglot@^4.13.1:
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/ra-i18n-polyglot/-/ra-i18n-polyglot-4.13.1.tgz#28577ac1fb218dbdc7da537fae6c4b9b23596472"
+  integrity sha512-N8soZdrOF/YAcg+dcX6i1qdDiUOOiTZewNhyZJ7eq2Vy41y/tid6mlr6n91ucqt1pi5R6dha+LUlAB6bltjf1Q==
   dependencies:
     node-polyglot "^2.2.2"
-    ra-core "^4.12.2"
+    ra-core "^4.13.1"
 
-ra-input-rich-text@^4.12.2:
-  version "4.12.2"
-  resolved "https://registry.yarnpkg.com/ra-input-rich-text/-/ra-input-rich-text-4.12.2.tgz#7f303f19e69481eb3b39af31d138253e9a1c4a6b"
-  integrity sha512-NPXQXmnOyTz9hhRnlCtm6ErYqZlIGi0YuYNjpvP1pd8htZdY60RGLFM8gSLdhdzObm0J0PoMk0PwR0E6j6EBQw==
+ra-input-rich-text@^4.13.1:
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/ra-input-rich-text/-/ra-input-rich-text-4.13.1.tgz#f071e7dd182616e034ffc90f240418d96b0eaad6"
+  integrity sha512-dH5OT3lVGeEL3bYKAJz2dbnAOyVJ/Nx9gNSognnPbQtgvAhAvMhAh5/j43Vv6cqeOIvFLbGCE8fVTVKHUYsiJg==
   dependencies:
     "@tiptap/core" "^2.0.3"
     "@tiptap/extension-color" "^2.0.3"
@@ -10007,22 +10007,22 @@ ra-input-rich-text@^4.12.2:
     "@tiptap/starter-kit" "^2.0.3"
     clsx "^1.1.1"
 
-ra-language-english@^4.12.2:
-  version "4.12.2"
-  resolved "https://registry.yarnpkg.com/ra-language-english/-/ra-language-english-4.12.2.tgz#a65f2932057f967ecd9307bba4a3c80d9f4bcec5"
-  integrity sha512-65bVgDuAKH2NUJUSwFrEcpzMhyJPBVgmIekIPbfq/jAYUAQHEggRFz/9pRgkXXEvGVuwfm+kTVuseP2lC+fJ5Q==
+ra-language-english@^4.13.1:
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/ra-language-english/-/ra-language-english-4.13.1.tgz#f1dae969e0aaa30735d594eff21cd9db49df877a"
+  integrity sha512-Kju8AfkqREUTu030y5lMetmVWzQwDVjY0mI+CYyHDPKbQeo0B2C8ppr2/zic/tsC+3D3zObVN0OixA6b/XRACQ==
   dependencies:
-    ra-core "^4.12.2"
+    ra-core "^4.13.1"
 
 ra-language-farsi@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/ra-language-farsi/-/ra-language-farsi-4.1.0.tgz#fc860db3fe16b9114cc4be6e3511ea99ad523033"
   integrity sha512-S6GphFxAaPw7YgrlD2HTwmBCfybtqMtCMQaGU83kOt+sMGaGS3lisOR0EJZiSEuSm27xRs9BPE4RkSS8c58CyQ==
 
-ra-ui-materialui@^4.12.2:
-  version "4.12.2"
-  resolved "https://registry.yarnpkg.com/ra-ui-materialui/-/ra-ui-materialui-4.12.2.tgz#4cfc804330dfbb74875d0e8503cb31d1fc4b8c15"
-  integrity sha512-4oIxDqfNuaFEwhk6mdkrbAxQI+EWpau7ufoBJgV9dHQamcUBT7ofLXm3OSRcaUvC8H3qeb+vJ5K46MTHEiSwBg==
+ra-ui-materialui@^4.13.1:
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/ra-ui-materialui/-/ra-ui-materialui-4.13.1.tgz#8074713deb87a280472d738963fa057a8facab76"
+  integrity sha512-E9TbP/itW2xhb8YntfHpEd2i6ncDt0lEwYfzdxryx6S8+wIyT/FgwTbPVac3JQnTzfeuzSo7xLF9NYumMCrP2A==
   dependencies:
     autosuggest-highlight "^3.1.1"
     clsx "^1.1.1"
@@ -10091,20 +10091,20 @@ react-admin-import-csv@^4.0.1:
     papaparse "5.x"
     ramda "0.28.0"
 
-react-admin@^4.12.2:
-  version "4.12.2"
-  resolved "https://registry.yarnpkg.com/react-admin/-/react-admin-4.12.2.tgz#5da91a12d0f8e4fef5328d2e0ec5a415f13f827f"
-  integrity sha512-O+5IdABugriksBxdSH+pjfBUg+yTaoIuvMljlxsMGf21Hv/emtJOawyfpVJQ31uql9BhJYAjHHWvTXV1LCCcwQ==
+react-admin@^4.13.1:
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/react-admin/-/react-admin-4.13.1.tgz#93599541582c3d922651b7460d6082b2fdecc16a"
+  integrity sha512-udQAhr0fSi4PUReDLuK2eZMZTp4NPjNVHMoHM9IoNsy+uOnCkeNHHzuETe9/daA6j3KC/vfJLy7eNCo1O4sOFg==
   dependencies:
     "@emotion/react" "^11.4.1"
     "@emotion/styled" "^11.3.0"
     "@mui/icons-material" "^5.0.1"
     "@mui/material" "^5.0.2"
     history "^5.1.0"
-    ra-core "^4.12.2"
-    ra-i18n-polyglot "^4.12.2"
-    ra-language-english "^4.12.2"
-    ra-ui-materialui "^4.12.2"
+    ra-core "^4.13.1"
+    ra-i18n-polyglot "^4.13.1"
+    ra-language-english "^4.13.1"
+    ra-ui-materialui "^4.13.1"
     react-hook-form "^7.43.9"
     react-router "^6.1.0"
     react-router-dom "^6.1.0"
@@ -10294,10 +10294,10 @@ react-query@^3.32.1:
     broadcast-channel "^3.4.1"
     match-sorter "^6.0.2"
 
-react-redux@^8.1.1:
-  version "8.1.1"
-  resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-8.1.1.tgz#8e740f3fd864a4cd0de5ba9cdc8ad39cc9e7c81a"
-  integrity sha512-5W0QaKtEhj+3bC0Nj0NkqkhIv8gLADH/2kYFMTHxCVqQILiWzLv6MaLuV5wJU3BQEdHKzTfcvPN0WMS6SC1oyA==
+react-redux@^8.1.2:
+  version "8.1.2"
+  resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-8.1.2.tgz#9076bbc6b60f746659ad6d51cb05de9c5e1e9188"
+  integrity sha512-xJKYI189VwfsFc4CJvHqHlDrzyFTY/3vZACbE+rr/zQ34Xx1wQfB4OTOSeOSNrF6BDVe8OOdxIrAnMGXA3ggfw==
   dependencies:
     "@babel/runtime" "^7.12.1"
     "@types/hoist-non-react-statics" "^3.3.1"
@@ -10554,10 +10554,10 @@ recharts-scale@^0.4.4:
   dependencies:
     decimal.js-light "^2.4.1"
 
-recharts@^2.7.2:
-  version "2.7.2"
-  resolved "https://registry.yarnpkg.com/recharts/-/recharts-2.7.2.tgz#6d813681910ad33a4bbf3bdd06c6f64f20b39319"
-  integrity sha512-HMKRBkGoOXHW+7JcRa6+MukPSifNtJlqbc+JreGVNA407VLE/vOP+8n3YYjprDVVIF9E2ZgwWnL3D7K/LUFzBg==
+recharts@^2.7.3:
+  version "2.7.3"
+  resolved "https://registry.yarnpkg.com/recharts/-/recharts-2.7.3.tgz#ca15789f94495d56a484ff6c0d9c7f665af0472d"
+  integrity sha512-cKoO9jUZRQavn06H6Ih2EcG82zUNdQH3OEGWVCmluSDyp3d7fIpDAsbMTd8hE8+T+MD8P76iicv/J4pJspDP7A==
   dependencies:
     classnames "^2.2.5"
     eventemitter3 "^4.0.1"
