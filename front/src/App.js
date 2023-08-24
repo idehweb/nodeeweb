@@ -13,14 +13,15 @@ const APP = (props) => {
   if (themeData && themeData.routes) {
     routes = createRoutes(themeData.routes);
   }
-  if (!themeData || (themeData && !themeData.models)) {
-    return <></>;
-  }
+  // if (!themeData || (themeData && !themeData.models)) {
+  //   return <></>;
+  // }
   return (
     <div className={t('languageDir')} dir={t('languageDir')}>
       <BrowserRouter>
         <Routes>
           {routes.map((route, index) => {
+            console.log(route.path)
             return (
               <Route
                 key={index}

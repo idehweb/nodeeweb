@@ -53,6 +53,7 @@ const Page = (props) => {
     return new Promise(function (resolve, reject) {
 
       getPage(_id).then((d = {}) => {
+        d = d.data;
         if(d.success==false && (d.access && d.access=='private')){
           let redirect_url = "/login/";
           navigate(redirect_url)

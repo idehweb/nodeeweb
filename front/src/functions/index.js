@@ -167,18 +167,18 @@ export const loadProductItems = (cat_id = null, filter = {}) => {
   return new Promise(function (resolve, reject) {
     // if (cat_id)
     //   getPostsByCat(0, 8, cat_id, "", {}, include).then((resp) => {
-    //     resolve(resp);
+    //     resolve(resp.data);
     //   });
     // else
     getEntities('product', 0, 12, '', filter).then((resp) => {
       // setLoadingMoreItems(false);
       // afterGetData(resp);
-      resolve(resp);
+      resolve(resp.data);
     });
     // getPosts(0, 12, "").then((resp) => {
     //   // setLoadingMoreItems(false);
     //   // afterGetData(resp);
-    //   resolve(resp);
+    //   resolve(resp.data);
     //
     // });
   });
@@ -187,11 +187,11 @@ export const loadPostItems = (cat_id = null, include = null) => {
   return new Promise(function (resolve, reject) {
     if (cat_id)
       getBlogPostsByCat(0, 8, cat_id, '', {}, include).then((resp) => {
-        resolve(resp);
+        resolve(resp.data);
       });
     else
       getBlogPosts(0, 12, '').then((resp) => {
-        resolve(resp);
+        resolve(resp.data);
       });
   });
 };
@@ -202,25 +202,25 @@ export const loadEntityItems = (entity, cat_id = null, include = null) => {
   return new Promise(function (resolve, reject) {
     // if (cat_id)
     //   getEntities(0, 8, cat_id, "", {}, include).then((resp) => {
-    //     resolve(resp);
+    //     resolve(resp.data);
     //   });
     // else
     getEntities(0, 12, '').then((resp) => {
-      resolve(resp);
+      resolve(resp.data);
     });
   });
 };
 export const loadItem = (_id = null) => {
   return new Promise(function (resolve, reject) {
     getPost(_id).then((resp) => {
-      resolve(resp);
+      resolve(resp.data);
     });
   });
 };
 export const loadBlogItem = (_id = null) => {
   return new Promise(function (resolve, reject) {
     getBlogPost(_id).then((resp) => {
-      resolve(resp);
+      resolve(resp.data);
     });
   });
 };

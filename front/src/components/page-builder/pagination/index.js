@@ -244,8 +244,8 @@ const Pagination = (props) => {
   return (<div className="main-content-container fghjkjhgf ">
 
       <Row className={"m-0"}>
-        {theload && loader}
-        {!theload && <Col
+        {!theload && loader}
+        {theload && <Col
           className="main-content iuytfghj pb-5 "
           lg={{size: 12}}
           md={{size: 12}}
