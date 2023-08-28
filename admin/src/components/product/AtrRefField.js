@@ -62,6 +62,7 @@ export default (props) => {
   };
   const getData = () => {
     API.get('' + props.url, {}, {}).then(({ data = [] }) => {
+      data = data.data;
       var cds = [];
       data.forEach((uf, s) => {
         cds.push({
@@ -108,6 +109,7 @@ export default (props) => {
 
       API.get('' + props.surl + '/' + t, {}, {}).then(({ data = [] }) => {
         // console.log('data', data);
+        data = data.data;
         var cds = [];
         hasTriggered = true;
         if (data || data.values) setG(data.values);
@@ -121,6 +123,7 @@ export default (props) => {
 
       API.get('' + props.surl + '/' + t, {}, {})
         .then(({ data = [] }) => {
+          data = data.data;
           // console.log('data', data);
           var cds = [];
           hasTriggered = true;
@@ -150,6 +153,7 @@ export default (props) => {
       // props.returnToHome(ckjhg);
       API.get('' + props.surl + '/' + _id, {}, {}).then(({ data = [] }) => {
         console.log('data', data);
+        data = data.data;
         let cds = [],
           catTemp = false;
         if (data && data.values && data.values[0]) {
