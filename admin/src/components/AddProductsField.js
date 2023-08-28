@@ -29,7 +29,7 @@ export default (props) => {
   // const { setFilters, displayedFilters,selectedChoices,allChoices,availableChoices,total } = useChoicesContext();
   const { field } = useInput(props);
   const getData = () => {
-    API.get('' + props.url, {}, {}).then(({ data = [] }) => {
+    API.get('' + props.url, {}).then(({ data: { data = [] } }) => {
       var cds = [];
       data.forEach((uf, s) => {
         cds.push({

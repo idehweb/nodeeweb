@@ -194,7 +194,7 @@ export default (props) => {
     //     });
   };
   const getData = () => {
-    API.get('/attributes/0/1000', {}, true).then(({ data = [] }) => {
+    API.get('/attributes/0/1000', {}).then(({ data: { data = [] } }) => {
       var cds = [];
       data.forEach((uf, s) => {
         cds[uf.name[lan]] = {
