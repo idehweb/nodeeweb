@@ -15,9 +15,9 @@ const list = (props) => {
       perPage={20}
       sort={{ field: 'reference', order: 'ASC' }}
       {...props}>
-        <Box className={'grid-box'}>
-          <GridList {...props} />
-        </Box>
+      <Box className={'grid-box'}>
+        <GridList {...props} />
+      </Box>
       <Pagination rowsPerPageOptions={[10, 20, 40]} />
     </ListBase>
   );
