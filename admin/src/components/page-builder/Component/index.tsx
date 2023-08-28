@@ -82,7 +82,7 @@ const Component = ({
                   animationKey={`${i.id}`}
                   index={idx}
                   item={i}
-                  onEdit={() => onEdit(i)}
+                  onEdit={(v) => onEdit(v)}
                   onDelete={onDelete}
                   onAdd={onAdd}
                   onDrop={onDrop}

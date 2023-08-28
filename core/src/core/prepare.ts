@@ -45,6 +45,8 @@ async function installRequirements() {
     'reflect-metadata',
     'class-transformer',
     'class-validator',
+    'axios',
+    'lodash',
   ].filter((pack) => !packageInfo.dependencies[pack]);
   if (!requirements.length) return;
   logger.log(color('Green', `## Install ${requirements.join(', ')} ##`));

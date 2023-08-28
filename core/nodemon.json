@@ -5,7 +5,8 @@
       "node_modules/**/node_modules",
       "dist",
       "public",
-      "shared"
+      "shared",
+      "plugins"
     ],
     "watch" : ["**/*.ts","**/*.js"],
     "ext": "ts",

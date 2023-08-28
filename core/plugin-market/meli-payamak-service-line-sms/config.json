@@ -1,0 +1,79 @@
+{
+    "name": "Meli Payamak Service Line SMS",
+    "version" : "1.0.0",
+    "description": {
+        "en": "for send sms with service line",
+        "fa": "برای ارسال پیامک به وسیله خط خدماتی"
+    },
+    "type" : "sms-gateway",
+    "icon": "",
+    "author": "Nodeeweb",
+    "main":"index.ts",
+    "slug":"meli-payamak-service-line-sms",
+    "add": {
+        "inputs": [
+            {
+                "key": "username",
+                "title": {
+                    "en": "username",
+                    "fa": "نام کاربری"
+                },
+                "type": "string",
+                "description": {}
+            },
+            {
+                "key": "password",
+                "title": {
+                    "en": "password",
+                    "fa": "کلمه عبور"
+                },
+                "type": "string",
+                "description": ""
+            },
+            {
+                "key": "from",
+                "title": {
+                    "en": "service line",
+                    "fa": "خط خدماتی"
+                },
+                "type": "string",
+                "description": {}
+            }
+        ],
+        "dto":"dto/add.ts",
+        "run":"add"
+    },
+    "edit":{
+        "inputs": [
+            {
+                "key": "username",
+                "title": {
+                    "en": "username",
+                    "fa": "نام کاربری"
+                },
+                "type": "string",
+                "description": {}
+            },
+            {
+                "key": "password",
+                "title": {
+                    "en": "password",
+                    "fa": "کلمه عبور"
+                },
+                "type": "string",
+                "description": ""
+            },
+            {
+                "key": "from",
+                "title": {
+                    "en": "service line",
+                    "fa": "خط خدماتی"
+                },
+                "type": "string",
+                "description": {}
+            }
+        ],
+        "dto":"dto/edit.ts",
+        "run":"edit"
+    }
+}

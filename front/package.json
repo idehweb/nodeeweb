@@ -1,6 +1,6 @@
 {
   "name": "@nodeeweb/front",
-  "version": "0.0.1",
+  "version": "0.0.23",
   "homepage": ".",
   "dependencies": {
     "@emotion/react": "^11.10.5",

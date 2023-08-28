@@ -13,6 +13,7 @@ process.env.REACT_APP_VERSION = now + ', ' + gitHash;
 module.exports = {
   webpack: {
     alias: {
+      '@': path.resolve(__dirname, 'src/'),
       '#c': path.resolve(__dirname, 'src/'),
     },
     configure: (webpackConfig, { env, paths }) => {
@@ -30,13 +31,7 @@ module.exports = {
       //     name: true,
       //   },
       // };
-      console.log('webpackConfig.plugins', webpackConfig.optimization);
 
-      // webpackConfig.plugins.map((plugin,i)=>{
-      //   // if(JSON.stringify(plugin).indexOf('MiniCssExtractPlugin')>0){
-      //     console.log('hi',JSON.stringify(plugin)+'\n\n\n\n')
-      //   // }
-      // })
       webpackConfig.plugins[5] = new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
         // both options are optional
