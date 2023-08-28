@@ -21,7 +21,8 @@ import Post from './post/index';
 import Product from './product/index';
 import Configuration from './configuration/Configuration';
 import Plugins from './plugins/Plugins';
-import Plugin from './plugins/Plugin';
+// import Plugin from './plugins/Plugin';
+import Plugin from './plugin/index';
 import Messages from './configuration/Messages';
 import PrivateConfiguration from './configuration/PrivateConfiguration';
 
