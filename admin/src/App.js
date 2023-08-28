@@ -72,6 +72,7 @@ export default function App() {
     'product',
     'productcategory',
     'transaction',
+    'plugin',
   ];
 
   const load = (options = {}) => {
@@ -101,7 +102,6 @@ export default function App() {
     Page,
     Messages,
     Configuration,
-    Plugins,
     PrivateConfiguration,
     Customer,
     Note,
@@ -186,6 +186,11 @@ export default function App() {
         name="admin"
         options={{ label: translate('pos.menu.users') }}
         {...User}
+      />
+      <Resource
+        name="plugin"
+        options={{ label: translate('pos.menu.plugin') }}
+        {...Plugin}
       />
       <Resource
         name="file"
@@ -290,8 +295,8 @@ export default function App() {
           }
         })}
       <CustomRoutes>
-        <Route path="/plugins" element={<Plugins />} />
-        <Route path="/plugins/:name" element={<Plugin />} />
+        {/* <Route path="/plugins" element={<Plugins />} />
+        <Route path="/plugins/:name" element={<Plugin />} /> */}
         <Route path="/configuration" element={<Configuration />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/p-c" element={<PrivateConfiguration />} />

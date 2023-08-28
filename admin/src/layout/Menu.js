@@ -46,6 +46,7 @@ const {
   Notification,
   Transaction,
   User,
+  Plugin,
 } = resources;
 const Menu = ({ onMenuClick, dense = false }) => {
   const themeData = useSelector((st) => st.themeData);
@@ -64,6 +65,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
     menuOrder: false,
     menuCustomer: false,
     menuUser: false,
+    menuPlugin: false,
 
     menuNotification: false,
     menuPost: false,
@@ -102,6 +104,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
     'product',
     'productcategory',
     'transaction',
+    'plugin',
   ];
 
   return (
@@ -447,6 +450,34 @@ const Menu = ({ onMenuClick, dense = false }) => {
           dense={dense}
         />
       </SubMenu>
+
+      <SubMenu
+        handleToggle={() => handleToggle('menuPlugin')}
+        isOpen={state.menuPlugin}
+        name="plugin"
+        label={translate(`pos.menu.plugin`)}
+        icon={<SettingsInputHdmiIcon />}
+        dense={dense}>
+        <MenuItemLink
+          to={{
+            pathname: '/plugin/create',
+            state: { _scrollToTop: true },
+          }}
+          primaryText={translate(`pos.menu.addPlugin`)}
+          leftIcon={<Plugin.market />}
+          dense={dense}
+        />
+        <MenuItemLink
+          to={{
+            pathname: '/plugin/local',
+            state: { _scrollToTop: true },
+          }}
+          primaryText={translate(`pos.menu.localPlugins`)}
+          leftIcon={<Plugin.installed />}
+          dense={dense}
+        />
+      </SubMenu>
+
       <SubMenu
         handleToggle={() => handleToggle('menuNotification')}
         isOpen={state.menuNotification}
@@ -534,7 +565,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
         label={translate(`pos.menu.more`)}
         icon={<MoreHoriz />}
         dense={dense}>
-        <MenuItemLink
+        {/* <MenuItemLink
           to={{
             pathname: '/plugins',
             state: { _scrollToTop: true },
@@ -542,7 +573,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
           primaryText={translate(`pos.menu.plugins`)}
           leftIcon={<SettingsInputHdmiIcon />}
           dense={dense}
-        />
+        /> */}
         <MenuItemLink
           to={{
             pathname: '/template',
