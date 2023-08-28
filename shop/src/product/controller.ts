@@ -41,6 +41,7 @@ export default function registerController() {
           access: AdminAccess,
         },
         crud: {
+          parseFilter: Service.getAllFilterParser,
           autoSetCount: true,
           paramFields: {
             offset: 'offset',

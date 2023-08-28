@@ -269,8 +269,13 @@ export default class Service {
     });
     return res.json(modifedProducts);
   };
+  static getAllFilterParser = (req: Req) => {
+    return { status: { $ne: 'trash' } };
+  };
   static getOneFilterParser = (req: Req) => {
-    const obj = {};
+    const obj = {
+      status: { $ne: 'trash' },
+    };
     if (isObjectIdOrHexString(req.params.id)) obj['_id'] = req.params.id;
     else obj['slug'] = req.params.id;
     return obj;
