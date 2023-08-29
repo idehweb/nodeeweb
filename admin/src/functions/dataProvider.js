@@ -1,5 +1,6 @@
 import { stringify } from 'query-string';
 import { fetchUtils } from 'ra-core';
+import Transform from './transform';
 
 const getTotal = (json, headers) => {
   if (!Array.isArray(json)) json = [json];
@@ -70,11 +71,22 @@ export default (apiUrl) => ({
       let total = getTotal(json, headers);
       if (json && json.data[0]) {
         // console.log(json.map((r, t) => ({ ...r, id: r._id, t })));
-        var x = {
-          data: json.data.map((r, t) => ({ ...r, id: r._id, t })),
+        const x = {
+          data: json.data,
           total,
         };
-        // console.log('x',x);
+
+        switch (resource) {
+          case 'product':
+            x.data = Transform.getAllProduct(x.data);
+            break;
+
+          default:
+            break;
+        }
+
+        x.data = x.data.map((r, t) => ({ ...r, id: r._id, t }));
+        console.log('##$$', x.data[0]);
         return x;
       } else {
         return {
@@ -91,11 +103,23 @@ export default (apiUrl) => ({
   },
 
   getOne: (resource, params) => {
-    console.log('getOne', resource, params);
     return httpClient(`${apiUrl}/${resource}/${params.id}`).then(
-      ({ json }) => ({
-        data: { ...json, id: json._id },
-      })
+      ({ json: { data } }) => {
+        const result = {
+          data: { ...data, id: data._id },
+        };
+
+        switch (resource) {
+          case 'product':
+            result.data = Transform.getOneProduct(result.data);
+            break;
+
+          default:
+            break;
+        }
+
+        return result;
+      }
     );
   },
   get: (resource, params) =>

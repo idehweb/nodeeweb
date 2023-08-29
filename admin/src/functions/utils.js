@@ -16,3 +16,14 @@ export const dateFormat = (d) => {
       .locale('fa')
       .format('YYYY/MM/DD HH:mm');
 };
+
+export function slugify(str = '') {
+  return str.trim().replace(/\s/g, '-').toLowerCase();
+}
+
+export function toNumber(str = '', def) {
+  if (!str) return def;
+  const myNum = +str;
+  if (isNaN(myNum)) return def;
+  return myNum;
+}

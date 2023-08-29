@@ -12,7 +12,7 @@ import {
 
 import { useWatch } from 'react-hook-form';
 
-import API, { BASE_URL } from '@/functions/API';
+import API, { BASE_URL, SERVER_URL } from '@/functions/API';
 import Api from '@/functions/API-v1';
 import { TheImages, showFiles } from '@/components';
 
@@ -61,41 +61,29 @@ export default (props) => {
         setProgress(p);
       },
     })
-      .then(({ data = {} }) => {
-        if (data.success) {
-          let { url, type, _id } = data.media;
-          // let a = [...valuesphotos, { url, type, _id }];
-          // console.log("a", { url, type, _id }, valuesphotos);
-          setProgress(0);
-          GalleryTemp.push(url);
-          // console.log("GalleryTemp", GalleryTemp);
-          // console.log("gallery", gallery);
-          if (data.media && data.media.url) {
-            // console.log("setGallery...");
-            setGallery(null);
-            valuesphotos = GalleryTemp;
-            props.inReturn(GalleryTemp).then((res) => {
-              setGallery(GalleryTemp);
-              setCounter(counter + 1);
-              // console.log('res ',res);
-            });
-          }
-        }
+      .then(({ data: { data } }) => {
+        const { url, _id } = data;
+        setProgress(0);
+        GalleryTemp.push(url);
+        setGallery(null);
+        valuesphotos = GalleryTemp;
+        props.inReturn({ _id, url }).then((res) => {
+          setGallery(GalleryTemp);
+          setCounter(counter + 1);
+        });
         setLoading(false);
-        notify('File saved successfully', 'success');
+        notify('File saved successfully', { type: 'success' });
       })
       .catch((err) => {
-        notify(err, 'error');
+        notify(err, { type: 'error' });
         setProgress(0);
       });
   };
   const deletFromObject = (photo, key) => {
-    // console.log('deletFromObject');
     let cc = [];
-    // console.log('valuesphotos',valuesphotos);
-
     gallery.forEach((item) => {
-      if (item !== photo) {
+      const url = item?.url || item;
+      if (url !== photo) {
         cc.push(item);
       }
     });
@@ -124,17 +112,23 @@ export default (props) => {
   return (
     <>
       <ImageInput
+        source="src"
         name={field.name}
         onChange={field.onChange}
         onBlur={field.onBlur}
         accept={props.accept}
         options={{
-          onDrop: (files) => setFiles(files),
+          onDrop: (files) => {
+            setFiles(files);
+          },
         }}>
         <ImageField source="src" title="title" />
       </ImageInput>
       <TheImages
-        gallery={gallery}
+        gallery={gallery?.map((path) => {
+          if (path?.url) return path.url;
+          return path;
+        })}
         v={v}
         onImageClick={onImageClick}
         deletFromObject={deletFromObject}

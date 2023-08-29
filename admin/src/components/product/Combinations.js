@@ -26,6 +26,7 @@ import {
   StockStatus,
   UploaderField,
 } from '@/components';
+import { Val } from '@/Utils';
 
 // API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 
@@ -94,6 +95,7 @@ export default (props) => {
                         record={scopedFormData}
                         className={'ltr'}
                         value={'fds'}
+                        validate={Val.reqNum}
                         source={getSource('price')}
                         format={(v) => {
                           if (!v) return '';
@@ -151,7 +153,7 @@ export default (props) => {
                     </div>
                   </div>
                   <div className={'row'}>
-                    <div className={'col-md-3'}>
+                    {/* <div className={'col-md-3'}>
                       <TextInput
                         fullWidth
                         className={'ltr'}
@@ -186,8 +188,8 @@ export default (props) => {
                         record={scopedFormData}
                         label={translate('resources.product.formula')}
                       />
-                    </div>
-                  </div>{' '}
+                    </div> */}
+                  </div>
                 </div>
               );
             }}

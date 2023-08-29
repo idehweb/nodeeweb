@@ -18,7 +18,6 @@ import {
 } from 'react-admin';
 import { ImportButton } from 'react-admin-import-csv';
 
-
 import jsonExport from 'jsonexport/dist';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
@@ -591,7 +590,10 @@ const TabbedDatagrid = (props) => {
               render={(record) => (
                 <>
                   <div>
-                    <EditButton label={'resources.product.sell'} key={'00'} />
+                    <EditButton
+                      label={translate('resources.product.edit')}
+                      key={'00'}
+                    />
                   </div>
                   {/*<EditButton label={"resources.product.content"} key={'11'}/>,*/}
                   {/*<ShowButton label={"resources.product.analytics"} key={'22'}/>,*/}
@@ -628,7 +630,8 @@ const TabbedDatagrid = (props) => {
                       target={'_blank'}
                       color="primary"
                       size="small"
-                      onClick={() => {}} rel="noreferrer">
+                      onClick={() => {}}
+                      rel="noreferrer">
                       <PendingActionsIcon />
                       <span className={'ml-2 mr-2'}>
                         {translate('resources.product.activities')}
