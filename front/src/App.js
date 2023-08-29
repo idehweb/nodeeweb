@@ -22,6 +22,7 @@ const APP = (props) => {
       <BrowserRouter>
         <Routes>
           {routes.map((route, index) => {
+            console.log(route.path)
             return (
               <Route
                 key={index}

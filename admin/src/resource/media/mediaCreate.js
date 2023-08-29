@@ -20,7 +20,7 @@ const create = (props) => (
       <UploaderField
         label="Course Audio or video"
         source="files"
-        accept="audio/*, video/*, image/*"
+        accept={['image/*', 'video/*', 'audio/*']}
         validate={required()}
       />
     </SimpleForm>

@@ -5,6 +5,7 @@ import {
   TextInput,
   useTranslate,
   useRedirect,
+  useNotify,
 } from 'react-admin';
 import React from 'react';
 
@@ -20,6 +21,7 @@ const Form = ({ children, ...rest }) => {
   const cls = useStyles();
   const translate = useTranslate();
   const redirect = useRedirect();
+  const notify = useNotify();
 
   function save(values) {
     if (values.parent == '') {
@@ -29,10 +31,9 @@ const Form = ({ children, ...rest }) => {
       .then(({ data = {} }) => {
         // showNotification(translate('product.created'));
         // console.clear()
-        console.log('data', data);
-        if (data._id) {
-          redirect('/productCategory/' + data._id);
-
+        if (data.data._id) {
+          notify('Added successfully');
+          redirect('/productCategory/');
           // window.location.href = "/#/productCategory/" + data._id;
           // window.location.reload();
         }

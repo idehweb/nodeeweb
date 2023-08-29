@@ -61,7 +61,7 @@ export default (props) => {
     // console.log('props.returnCatsValues',props.returnCatsValues());
   };
   const getData = () => {
-    API.get('' + props.url, {}, {}).then(({ data = [] }) => {
+    API.get('' + props.url, {}).then(({ data: { data = [] } }) => {
       var cds = [];
       data.forEach((uf, s) => {
         cds.push({

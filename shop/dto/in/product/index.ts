@@ -12,6 +12,7 @@ import {
   IsOptional,
   IsPositive,
   IsString,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
@@ -88,9 +89,9 @@ class CombinationProduct {
   weight?: number;
 
   @Expose()
-  @IsNumber()
   @IsOptional()
-  @IsPositive()
+  @IsNumber()
+  @Min(0)
   quantity?: number;
 
   @Expose()
@@ -190,9 +191,118 @@ export class CreateProductBody {
   relatedProducts?: Types.ObjectId[];
 
   @Expose()
+  @IsOptional()
+  @ToMongoID()
+  @IsMongoID({ each: true })
+  @ArrayMinSize(1)
+  photos?: Types.ObjectId[];
+
+  @Expose()
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
+}
+
+export class UpdateProductBody {
+  @Expose()
+  @IsMultiLang()
+  @IsOptional()
+  title?: { [key: string]: string };
+
+  @Expose()
+  @IsMultiLang()
+  @IsOptional()
+  miniTitle?: { [key: string]: string };
+
+  @Expose()
+  @IsOptional()
+  @IsMultiLang()
+  metatitle?: { [key: string]: string };
+
+  @Expose()
+  @IsOptional()
+  @IsMultiLang()
+  metadescription?: { [key: string]: string };
+
+  @Expose()
+  @IsString()
+  @IsOptional()
+  slug?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsMultiLang()
+  excerpt?: { [key: string]: string };
+
+  @Expose()
+  @IsOptional()
+  @IsMultiLang()
+  description?: { [key: string]: string };
+
+  @Expose()
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(1)
+  @Type(() => CombinationProduct)
+  @ValidateNested({ each: true })
+  combinations?: CombinationProduct[];
+
+  @Expose()
+  @IsOptional()
+  @Type(() => OptionProduct)
+  @ValidateNested({ each: true })
+  options?: OptionProduct[];
+
+  @Expose()
+  @IsOptional()
+  @ToMongoID()
+  @IsMongoID({ each: true })
+  productCategory?: Types.ObjectId[];
+
+  @Expose()
+  @IsOptional()
+  @Type(() => Attributes)
+  @ValidateNested({ each: true })
+  attributes?: Attributes[];
+
+  @Expose()
+  @IsOptional()
+  @Type(() => Labels)
+  @ValidateNested({ each: true })
+  labels?: Labels[];
+
+  @Expose()
+  @IsOptional()
+  @IsObject()
+  data?: any;
+
+  @Expose()
+  @IsOptional()
+  @Type(() => ExtraAtr)
+  @ValidateNested({ each: true })
+  extra_attr?: ExtraAtr[];
+
+  @Expose()
+  @IsOptional()
+  @IsEnum(PriceType)
+  price_type?: PriceType;
+
+  @Expose()
+  @IsOptional()
+  @IsEnum(PublishStatus)
+  status?: PublishStatus;
+
+  @Expose()
   @ToMongoID()
   @IsOptional()
   @IsMongoID({ each: true })
+  relatedProducts?: Types.ObjectId[];
+
+  @Expose()
+  @IsOptional()
+  @ToMongoID()
+  @IsMongoID({ each: true })
+  @ArrayMinSize(1)
   photos?: Types.ObjectId[];
 
   @Expose()

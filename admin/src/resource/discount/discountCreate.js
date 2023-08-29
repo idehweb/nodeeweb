@@ -27,33 +27,33 @@ const Form = ({ children, ...rest }) => {
   return (
     <SimpleForm {...rest}>
       {children}
-      <TextInput
+      {/* <TextInput
         source={'name.' + translate('lan')}
         label={translate('resources.discount.name')}
         validate={Val.req}
         formClassName={cls.f2}
         fullWidth
-      />
+      /> */}
       <TextInput
-        source="slug"
-        label={translate('resources.discount.slug')}
+        source="code"
+        label={translate('resources.discount.code')}
         validate={Val.req}
         formClassName={cls.f2}
         fullWidth
       />
       <NumberInput
-        source="percent"
-        label={translate('resources.discount.percent')}
+        source="amount"
+        label={translate('resources.discount.amount')}
         formClassName={cls.f2}
         fullWidth
       />
       <NumberInput
-        source="price"
-        label={translate('resources.discount.price')}
+        source="usageLimit"
+        label={translate('resources.discount.usageLimit')}
         formClassName={cls.f2}
         fullWidth
       />
-      <NumberInput
+      {/* <NumberInput
         source="count"
         label={translate('resources.discount.count')}
         formClassName={cls.f2}
@@ -64,9 +64,9 @@ const Form = ({ children, ...rest }) => {
         label={translate('resources.discount.customerLimit')}
         formClassName={cls.f2}
         fullWidth
-      />
+      /> */}
 
-      <ReferenceArrayInput
+      {/* <ReferenceArrayInput
         label={translate('resources.discount.excludeProductCategory')}
         source="excludeProductCategory"
         reference="productCategory">
@@ -83,7 +83,7 @@ const Form = ({ children, ...rest }) => {
         fullWidth
         source="expire"
         label={translate('resources.discount.expire')}
-      />
+      /> */}
       {/*<ReferenceInput*/}
       {/*label={translate('resources.discount.parent')}*/}
       {/*source="parent"*/}

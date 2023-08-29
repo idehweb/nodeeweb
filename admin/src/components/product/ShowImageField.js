@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import API, { BASE_URL } from '@/functions/API';
+import API, { BASE_URL, SERVER_URL } from '@/functions/API';
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 
@@ -25,7 +25,7 @@ export default (props) => {
   // }
   return (
     <div className={className + ' hytrdf ' + (v === photo ? 'active' : '')}>
-      <img onClick={() => onImageClick(photo)} src={BASE_URL + '/' + photo} />
+      <img onClick={() => onImageClick(photo)} src={SERVER_URL + photo} />
       <div className="d-flex">
         <div className={'bottom-actions'}>
           {deleteFunction && (
