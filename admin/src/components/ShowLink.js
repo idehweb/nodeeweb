@@ -5,6 +5,11 @@ import API from '@/functions/API';
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 
+const BASE_URL =
+  process.env.NODE_ENV === 'development'
+    ? process.env.REACT_APP_API_BASE_URL_DEV
+    : window.origin;
+
 export default ({ base = 'product', theSource = 'title' }) => {
   const record = useRecordContext();
   const translate = useTranslate();
@@ -14,7 +19,8 @@ export default ({ base = 'product', theSource = 'title' }) => {
       {record.path && record.slug && (
         <a
           target={'_blank'}
-          href={window.BASE_URL + (base ? base + '' : '') + record.path + '/'} rel="noreferrer">
+          href={BASE_URL + '/' + (base ? base + '' : '') + record.path + '/'}
+          rel="noreferrer">
           <TextField
             source={theSource + '.' + translate('lan')}
             label={translate('pos.' + theSource)}
@@ -25,7 +31,8 @@ export default ({ base = 'product', theSource = 'title' }) => {
       {!record.path && record.slug && (
         <a
           target={'_blank'}
-          href={window.SHOP_URL + (base ? base + '/' : '') + record.slug + '/'} rel="noreferrer">
+          href={BASE_URL + '/' + (base ? base + '/' : '') + record.slug + '/'}
+          rel="noreferrer">
           <TextField
             source={theSource + '.' + translate('lan')}
             label={translate('pos.' + theSource)}
