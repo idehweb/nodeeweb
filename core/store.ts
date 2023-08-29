@@ -5,12 +5,12 @@ import { Application } from 'express';
 import { ErrorPackageFn } from './types/error';
 import { AdminViewSchema } from './types/view';
 import { AuthStrategy } from './types/auth';
-import { PluginOut } from './types/plugin';
 import { Pipe } from './types/pipe';
 import { ConfigType } from './types/config';
 import { RestartPolicy } from './types/restart';
 import { StoreEnv } from './types/store';
 import EventEmitter from 'events';
+import { PluginCore } from './src/plugin/plugin';
 export class Store {
   env: StoreEnv;
   db: typeof mongoose;
@@ -25,7 +25,7 @@ export class Store {
   adminViews: { [key: AdminViewSchema['name']]: AdminViewSchema['content'] } =
     {};
   strategies = new Map<string, AuthStrategy>();
-  plugins = new Map<PluginOut['type'], PluginOut['content']>();
+  plugins = new PluginCore();
   config: ConfigType;
   event: EventEmitter;
 

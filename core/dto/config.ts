@@ -62,10 +62,6 @@ export class CoreConfigDto {
   auth: { [key: string]: object };
 
   @Expose()
-  @Allow()
-  plugin: { [key: string]: object };
-
-  @Expose()
   @Type(() => CoreConfigLimit)
   @IsObject()
   @ValidateNested()

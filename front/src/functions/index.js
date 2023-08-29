@@ -1791,7 +1791,9 @@ export const getBlogPost = (i) =>
 export const getPage = (i) =>
   getData(`${ApiUrl}/page/${i}`, {}, true)
     .then((res) => {
-      return res.data;
+      if (res.data && res.data.data) {
+        return res.data.data;
+      } else return res.data;
     })
     .catch((err) => {
       handleErr(err);

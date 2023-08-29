@@ -5,6 +5,18 @@ import store from '../store';
 import { USE_ENV } from '../types/global';
 import info, { CORE_NODE_MODULE_PATH, NODE_MODULE_PATH } from './package';
 
+export function getPluginTemp(...path: string[]) {
+  return getPluginPath('temp', ...path);
+}
+
+export function getPluginMarketPath(...path: string[]) {
+  return join(getStaticDir('plugin-market', false).pop(), ...path);
+}
+
+export function getPluginPath(...path: string[]) {
+  return join(getStaticDir('plugins', true)[0], ...path);
+}
+
 export function getSharedPath(...path: string[]) {
   return join(store.env.SHARED_PATH || '.', ...path);
 }

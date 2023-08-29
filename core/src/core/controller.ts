@@ -1,14 +1,12 @@
-import { CoreConfigBody } from '../../dto/config';
 import { RestartBody } from '../../dto/in/restart.dto';
 import { ControllerSchema } from '../../types/controller';
+import registerConfigControllers from '../config/controller';
 import { AdminAccess, OptUserAccess } from '../handlers/auth.handler';
 import {
   controllerRegister,
   controllersBatchRegister,
 } from '../handlers/controller.handler';
 import logger from '../handlers/log.handler';
-import { getAuth, mockTheme } from '../temp/routers';
-import { configService } from './config';
 import restartService from './restart';
 import settingService from './setting';
 import { getViewHandler } from './view';
@@ -24,23 +22,6 @@ export function registerDefaultControllers() {
     validate: { dto: RestartBody, reqPath: 'body' },
   });
 
-  // config
-  controllerStack.push(
-    {
-      method: 'get',
-      url: '/config',
-      service: configService.get,
-      access: AdminAccess,
-    },
-    {
-      method: 'put',
-      url: '/config',
-      service: configService.update,
-      access: AdminAccess,
-      validate: { reqPath: 'body', dto: CoreConfigBody },
-    }
-  );
-
   // theme
   controllerStack.push({
     method: 'get',
@@ -55,6 +36,9 @@ export function registerDefaultControllers() {
     base_url: '/api/v1',
     from: 'CoreController',
   });
+
+  // config
+  registerConfigControllers();
 
   // view
   const [viewPath, viewService] = getViewHandler();

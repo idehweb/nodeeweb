@@ -1,4 +1,4 @@
-import { Config } from '@nodeeweb/core/src/core/config';
+import { Config } from '@nodeeweb/core/src/config/config';
 import { Currency, ShopConfigDto } from '../../dto/config';
 import store from '../../store';
 import {
@@ -41,7 +41,6 @@ export class ShopConfig extends Config<ShopConfigDto> {
         transaction_expiration_s: DEFAULT_TRANSACTION_EXP_S,
         max_need_to_pay_transaction: MAXIMUM_NEED_TO_PAY_TRANSACTION,
       },
-      plugin: {},
       currency: Currency.Toman,
       tax: 0,
       shop_active: true,
@@ -71,6 +70,9 @@ export class ShopConfig extends Config<ShopConfigDto> {
     return plainToInstance(ShopConfigDto, value, {
       enableImplicitConversion: true,
     });
+  }
+  public getPublic(): Partial<ShopConfigDto> {
+    return {};
   }
 }
 
