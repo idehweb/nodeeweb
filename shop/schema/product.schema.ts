@@ -58,9 +58,10 @@ const schema = new mongoose.Schema(
       {
         attribute: { type: mongoose.Schema.Types.ObjectId, ref: 'attributes' },
         values: { type: [String] },
+        _id: false,
       },
     ],
-    labels: [{ title: String }],
+    labels: [{ title: String, _id: false }],
     combinations: [
       {
         _id: { type: String, default: () => crypto.randomUUID() },
@@ -87,6 +88,7 @@ const schema = new mongoose.Schema(
       {
         title: { type: String, required: true },
         des: { type: String, required: true },
+        _id: false,
       },
     ],
     like: [
@@ -94,6 +96,7 @@ const schema = new mongoose.Schema(
         customer: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' },
         userIp: String,
         createdAt: { type: Date, default: Date.now },
+        _id: false,
       },
     ],
     price_type: { type: String, enum: PriceType, default: PriceType.Normal },

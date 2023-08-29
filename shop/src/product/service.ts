@@ -4,7 +4,7 @@ import { show, submitAction } from '../common/mustImplement';
 import { SortValues, isObjectIdOrHexString } from 'mongoose';
 import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
 import { CreateProductBody } from '../../dto/in/product';
-import { NotFound } from '@nodeeweb/core';
+import { BadRequestError, NotFound } from '@nodeeweb/core';
 import { FileDocument, FileModel } from '../../schema/file.schema';
 
 export default class Service {
@@ -334,6 +334,7 @@ export default class Service {
     // combinations details
     body.combinations.forEach((com) => {
       if (com.salePrice === undefined) com.salePrice = com.price;
+      if (com.quantity === 0) com.in_stock = false;
     });
 
     // file
@@ -372,13 +373,8 @@ export default class Service {
     res.status(201).json({ data: product });
   };
 
-  static updateBodyParser = (req: Req) => {
-    if (!req.body) {
-      req.body = {};
-    }
-    if (!req.body.type) {
-      req.body.type = 'normal';
-    }
+  static updateBodyParser = async (req: Req) => {
+    const body = req.body;
     if (req.body.slug) {
       req.body.slug = req.body.slug.replace(/\s+/g, '-').toLowerCase();
     }
@@ -392,15 +388,11 @@ export default class Service {
         });
       }
     }
-    if (req.body.type == 'normal') {
-      delete req.body.options;
-      delete req.body.combinations;
+    if (req.body.type == 'normal' && req.body.combinations?.length !== 1) {
+      throw new BadRequestError('normal type need one combination');
     }
     if (req.body.like) {
       delete req.body.like;
-    }
-    if (!req.body.status || req.body.status == '') {
-      req.body.status = 'processings';
     }
 
     // parse to number
@@ -409,6 +401,23 @@ export default class Service {
       else req.body[k] = +req.body[k];
     });
 
+    // file
+    if (body.photos?.length) {
+      const files = await this.fileModel.find({ _id: { $in: body.photos } });
+      if (files.length !== body.photos.length) {
+        const notFoundIds = body.photos.filter(
+          (p) => !files.find((f) => f._id.equals(p))
+        );
+        throw new NotFound(
+          `file with IDs ${notFoundIds
+            .map((id: string) => id.toString())
+            .join(', ')} not found`
+        );
+      }
+
+      body.photos = files as any;
+      body['thumbnail'] = files[0].url;
+    }
     return req.body;
   };
 
