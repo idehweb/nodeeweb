@@ -433,7 +433,7 @@ class TransactionService {
       [expiredTimer, notifTimer]
         .filter((t) => t)
         .forEach((timer, index) => {
-          clearTimeout(timer);
+          clearTimeout(timer as any);
           this.transactionSupervisors.delete(`${authority}-${index + 1}`);
         });
     };

@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import { PluginDocument, PluginModel } from '../../schema/plugin.schema';
 import store from '../../store';
-import { DuplicateError, NotFound } from '../../types/error';
+import { DuplicateError, NotFound, SimpleError } from '../../types/error';
 import { MiddleWare, Req } from '../../types/global';
 import { PluginContent } from '../../types/plugin';
 import { catchFn } from '../../utils/catchAsync';
 import exec from '../../utils/exec';
-import { call, isExist } from '../../utils/helpers';
+import { axiosError2String, call, isExist } from '../../utils/helpers';
 import {
   getPluginMarketPath,
   getPluginPath,
@@ -34,6 +34,8 @@ class LocalService {
   private insidePluginLib = {
     logger,
     systemLogger: store.systemLogger,
+    SimpleError,
+    axiosError2String,
   };
 
   private insideResolve = (key: string) => {
