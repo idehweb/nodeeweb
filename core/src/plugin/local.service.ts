@@ -47,7 +47,7 @@ class LocalService {
     const pluginConfPath = getPluginPath(slug, 'config.json');
 
     if (!(await isExist(pluginConfPath)))
-      throw new NotFound(`${slug} not found in plugin market`);
+      throw new NotFound(`${slug} not found in local plugins`);
 
     // resolve
     return await import(pluginConfPath);

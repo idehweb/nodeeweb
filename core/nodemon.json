@@ -6,7 +6,7 @@
       "dist",
       "public",
       "shared",
-      "plugins"
+      "plugins/**"
     ],
     "watch" : ["**/*.ts","**/*.js"],
     "ext": "ts",
