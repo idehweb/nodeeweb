@@ -409,13 +409,23 @@ class TransactionService {
       .map(({ title }) => title.fa ?? title.en ?? Object.values(title)[0])
       .join(' ، ')} از فروشگاه ${store.config.app_name}`;
 
-    return await bankPlugin.stack[0]({
+    const response =  await bankPlugin.stack[0]({
       amount,
       callback_url: `${store.env.BASE_URL}/api/v1/order/payment_callback/${orderId}?amount=${amount}`,
-      currency: 'IRT',
+      currency: store.config.currency,
       description,
       userPhone,
     });
+
+    if(!response.isOk) throw new Error(response.message);
+
+    return {
+      authority : response.authority,
+      expiredAt : response.expiredAt,
+      payment_link:response.payment_link,
+      provider:bankPlugin.slug,
+    }
+
   }
 
   async handlePayment(
@@ -524,8 +534,6 @@ class TransactionService {
       switch (status) {
         case PaymentVerifyStatus.Failed:
           if (failedAction) await _failed();
-          break;
-        case PaymentVerifyStatus.CheckBefore:
           break;
         case PaymentVerifyStatus.Paid:
           if (successAction) await _success();

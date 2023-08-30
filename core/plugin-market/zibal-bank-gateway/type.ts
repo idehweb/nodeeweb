@@ -23,11 +23,15 @@ export type BankGatewayCreateArgs = {
   description: string;
   currency: string;
 };
-export type BankGatewayCreateOut = {
-  authority: string;
-  payment_link: string;
-  expiredAt: Date;
-};
+export type BankGatewayCreateOut =
+  | { isOk: false; message: string }
+  | {
+      isOk: true;
+      authority: string;
+      payment_link: string;
+      expiredAt: Date;
+      message?: string;
+    };
 
 export type BankGatewayVerifyArgs = {
   authority: string;
@@ -37,7 +41,7 @@ export type BankGatewayVerifyArgs = {
 
 export type BankGatewayVerify = (
   args: BankGatewayVerifyArgs
-) => Promise<{ status: PaymentVerifyStatus }>;
+) => Promise<{ status: PaymentVerifyStatus; message?: string }>;
 
 export type BankGatewayUnverified = () => Promise<
   Partial<BankGatewayVerifyArgs>[]

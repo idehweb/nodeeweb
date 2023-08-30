@@ -36,6 +36,9 @@ class LocalService {
     systemLogger: store.systemLogger,
     SimpleError,
     axiosError2String,
+    getEnv: (key: string) => {
+      return store.env[key];
+    },
   };
 
   private insideResolve = (key: string) => {

@@ -4,6 +4,7 @@ import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
+
   // crud
   registerEntityCRUD(
     'gateway',
