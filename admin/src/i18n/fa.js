@@ -742,6 +742,7 @@ const customFarsiMessages = {
       phoneNumber: 'شماره موبایل',
       customerGroup: 'ارسال به گروه مشتری',
       source: 'ارسال به منبع',
+      title: 'عنوان',
       CRM: 'CRM',
       WEBSITE: 'WEBSITE',
     },

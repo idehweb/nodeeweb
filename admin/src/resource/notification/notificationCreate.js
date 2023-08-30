@@ -34,7 +34,7 @@ export const notificationCreate = (props) => {
   return (
     <Create {...props}>
       <SimpleForm>
-        <ReferenceInput
+        {/* <ReferenceInput
           fullWidth
           source="customerGroup"
           reference="customerGroup">
@@ -43,21 +43,9 @@ export const notificationCreate = (props) => {
             label={translate('resources.notification.customerGroup')}
             optionText="name.fa"
           />
-        </ReferenceInput>
+        </ReferenceInput> */}
 
-        <SelectInput
-          label={translate('resources.notification.source')}
-          fullWidth
-          source="source"
-          choices={[
-            { id: 'CRM', name: translate('resources.notification.CRM') },
-            {
-              id: 'WEBSITE',
-              name: translate('resources.notification.WEBSITE'),
-            },
-          ]}
-        />
-        <TextInput
+        {/* <TextInput
           source="phoneNumber"
           label={translate('resources.notification.phoneNumber')}
           fullWidth
@@ -72,12 +60,29 @@ export const notificationCreate = (props) => {
           label={translate('resources.notification.offset')}
           fullWidth
         />
-        <div>{translate('resources.messages.help')}</div>
+        <div>{translate('resources.messages.help')}</div> */}
+        <TextInput
+          source="title"
+          label={translate('resources.notification.title')}
+          fullWidth
+        />
         <TextInput
           multiline
           source="message"
           label={translate('resources.notification.message')}
           fullWidth
+        />
+        <SelectInput
+          label={translate('resources.notification.source')}
+          fullWidth
+          source="source"
+          choices={[
+            { id: 'CRM', name: translate('resources.notification.CRM') },
+            {
+              id: 'WEBSITE',
+              name: translate('resources.notification.WEBSITE'),
+            },
+          ]}
         />
       </SimpleForm>
     </Create>

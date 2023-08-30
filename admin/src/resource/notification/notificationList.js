@@ -15,8 +15,8 @@ export const notificationList = (props) => {
     <List {...props}>
       <Datagrid>
         <TextField
-          source="phoneNumber"
-          label={translate('resources.notification.receiver')}
+          source="title"
+          label={translate('resources.notification.title')}
         />
         <TextField
           source="message"
@@ -27,8 +27,8 @@ export const notificationList = (props) => {
           label={translate('resources.notification.status')}
         />
         <TextField
-          source="from"
-          label={translate('resources.notification.sender')}
+          source="source"
+          label={translate('resources.notification.source')}
         />
         <DateField
           source="createdAt"
