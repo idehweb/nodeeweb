@@ -42,6 +42,14 @@ export default function registerController() {
           access: AdminAccess,
         },
       },
+      deleteOne: {
+        controller: {
+          access: AdminAccess,
+        },
+        crud: {
+          forceDelete: true,
+        },
+      },
     },
     { from: 'ShopEntity' }
   );

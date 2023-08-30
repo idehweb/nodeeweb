@@ -14,14 +14,14 @@ import { ValidationError as VE } from '../types/error';
 import _ from 'lodash';
 import { Types } from 'mongoose';
 
-export function ToMongoID() {
+export function ToMongoID(opt?: TransformOptions) {
   return Transform(({ value, key, options }) => {
     return Array.isArray(value) ? value.map(core) : core(value);
     function core(value: any) {
       if (!isMongoId(value)) return value;
       return new Types.ObjectId(value);
     }
-  });
+  }, opt);
 }
 
 export function IsMongoID(validationOptions?: ValidationOptions) {
@@ -40,11 +40,7 @@ export function IsMongoID(validationOptions?: ValidationOptions) {
       },
       validator: {
         validate(value: any) {
-          return validationOptions?.each
-            ? Array.isArray(value)
-              ? value.every(core)
-              : false
-            : core(value);
+          return core(value);
           function core(value: any) {
             return value instanceof Types.ObjectId || isMongoId(value);
           }

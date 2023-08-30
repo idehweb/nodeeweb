@@ -7,7 +7,7 @@ import { makeStyles } from '@mui/styles';
 // import withWidth, { WithWidth } from '@mui/material/withWidth';
 import { useListContext } from 'react-admin';
 
-import { ShopURL } from '@/functions/API';
+import { SERVER_URL, ShopURL } from '@/functions/API';
 
 const useStyles = makeStyles((theme) => ({
   gridList: {
@@ -62,7 +62,11 @@ const LoadedGridList = (props) => {
   return data.map((d, key) => {
     return (
       <ImageListItem key={key} className={'media_ImageListItem'}>
-        <img src={ShopURL + d.url} srcSet={ShopURL + d.url} loading="lazy" />
+        <img
+          src={SERVER_URL + d.url}
+          srcSet={SERVER_URL + d.url}
+          loading="lazy"
+        />
       </ImageListItem>
     );
   });

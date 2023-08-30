@@ -1,9 +1,11 @@
 import axios from 'axios';
 
-export const BASE_URL =
-  (process.env.NODE_ENV === 'development'
+export const SERVER_URL =
+  process.env.NODE_ENV === 'development'
     ? process.env.REACT_APP_API_BASE_URL_DEV
-    : window.origin) + '/api/v1';
+    : window.origin;
+
+export const BASE_URL = SERVER_URL + '/api/v1';
 export const ADMIN_ROUTE = BASE_URL + '/admin';
 export const ShopURL = BASE_URL;
 

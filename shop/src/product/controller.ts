@@ -10,7 +10,7 @@ import {
   AdminAccess,
   AuthUserAccess,
 } from '@nodeeweb/core/src/handlers/auth.handler';
-import { CreateProductBody } from '../../dto/in/product';
+import { CreateProductBody, UpdateProductBody } from '../../dto/in/product';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
@@ -41,6 +41,7 @@ export default function registerController() {
           access: AdminAccess,
         },
         crud: {
+          parseFilter: Service.getAllFilterParser,
           autoSetCount: true,
           paramFields: {
             offset: 'offset',
@@ -79,6 +80,10 @@ export default function registerController() {
         controller: {
           access,
           service: Service.updateAfter,
+          validate: {
+            reqPath: 'body',
+            dto: UpdateProductBody,
+          },
         },
         crud: {
           parseUpdate: Service.updateBodyParser,
