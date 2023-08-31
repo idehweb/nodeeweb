@@ -6,7 +6,6 @@ import logger, { Logger } from './log.handler';
 import { RegisterOptions } from '../../types/register';
 import store from '../../store';
 import { join } from 'path';
-import { setTimeout } from 'timers/promises';
 
 const lockFiles = new Set<string>();
 
@@ -80,9 +79,12 @@ export class SingleJobProcess {
 }
 
 export async function waitForLockFiles(timer = 10) {
-  const timerPromise = async () => {
-    await setTimeout(timer * 1000);
-    clearAllLockFiles();
+  const timerPromise = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject(new Error('time come to end'));
+      }, timer * 1000);
+    });
   };
 
   const watcherPromise = () => {
@@ -112,6 +114,7 @@ export async function waitForLockFiles(timer = 10) {
     await Promise.race([timerPromise(), watcherPromise()]);
   } catch (err) {
     store.systemLogger.error(`[single-job-handler] failed:\n`, err);
+    clearAllLockFiles();
   }
 }
 
