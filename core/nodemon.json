@@ -1,14 +1,15 @@
 {
     "restartable": "rs",
     "ignore": [
-      ".git",
-      "node_modules/**/node_modules",
-      "dist",
-      "public",
-      "shared",
-      "plugins/**"
+      "dist/**",
+      "public/**",
+      "shared/**",
+      "plugins/**",
+      ".git/**",
+      "node_modules/**"
     ],
     "watch" : ["**/*.ts","**/*.js"],
     "ext": "ts",
-    "noColors":true
+    "noColors":true,
+    "signal":"SIGINT"
   }

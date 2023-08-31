@@ -2,7 +2,10 @@ import { createTerminus } from '@godaddy/terminus';
 import mongoose from 'mongoose';
 import logger from '../handlers/log.handler';
 import store from '../../store';
-import { clearAllLockFiles } from '../handlers/singleJob.handler';
+import {
+  clearAllLockFiles,
+  waitForLockFiles,
+} from '../handlers/singleJob.handler';
 
 export function handleUncaughtException() {
   process.once('uncaughtException', (err) => {
@@ -28,13 +31,13 @@ export function shutdown(code = 0) {
   store.server?.close(async () => {
     try {
       await onSignal();
-      clearAllLockFiles();
     } catch (err) {}
     process.exit(code);
   });
 }
 async function onSignal() {
   await Promise.all(mongoose.connections.map((c) => c.close()));
+  await waitForLockFiles(10);
 }
 async function onHealthcheck() {
   const status = mongoose.connections.every((c) => c.readyState === 1);
