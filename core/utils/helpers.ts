@@ -1,8 +1,12 @@
 import * as fs from 'fs';
 import _ from 'lodash';
 import { Document } from 'mongoose';
+import { SimpleError } from '../types/error';
 
 export function convertToString(a: any, pretty = true) {
+  if (a instanceof SimpleError)
+    return `{ message : ${a.message} , stack : ${a.stack} }`;
+
   const cache = [];
 
   const replacer = (key, value) => {

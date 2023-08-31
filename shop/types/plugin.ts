@@ -14,11 +14,15 @@ export type BankGatewayCreateArgs = {
   description: string;
   currency: string;
 };
-export type BankGatewayCreateOut = {
-  authority: string;
-  payment_link: string;
-  expiredAt: Date;
-};
+export type BankGatewayCreateOut =
+  | { isOk: false; message: string }
+  | {
+      isOk: true;
+      authority: string;
+      payment_link: string;
+      expiredAt: Date;
+      message?: string;
+    };
 export type PostGatewaySendPostReq = (args: {
   products: {
     size?: string;
@@ -47,8 +51,8 @@ export type PostGatewayCalcPrice = (args: {
 
 export type BankGatewayVerifyArgs = {
   authority: string;
-  amount: number;
-  status: string;
+  amount?: number;
+  status?: string;
 } & { [key: string]: any };
 
 export type BankGatewayVerify = (

@@ -1,14 +1,10 @@
-import {
-  CRUD_DEFAULT_REQ_KEY,
-  PUBLIC_ACCESS,
-} from '@nodeeweb/core/src/constants/String';
+import { PUBLIC_ACCESS } from '@nodeeweb/core/src/constants/String';
 import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
-import { controllerRegister } from '@nodeeweb/core/src/handlers/controller.handler';
-import Service from './service';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
+
   // crud
   registerEntityCRUD(
     'gateway',

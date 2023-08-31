@@ -118,3 +118,11 @@ export class SendSMSError extends GeneralError {
     );
   }
 }
+
+export class SimpleError extends Error {
+  isSimple = true;
+  constructor(message?: string, stack?: string) {
+    super(message);
+    if (stack) this.stack = stack;
+  }
+}
