@@ -4,11 +4,11 @@ import axios from 'axios';
 import { isClient } from '#c/functions/index';
 
 export function getToken() {
-  return (
+  return `Bearer ${
     store.getState().store.admin.admin_token ??
     store.getState().store.user.token ??
     ''
-  );
+  }`;
 }
 
 export const postData = (
@@ -36,6 +36,7 @@ export const postData = (
         // if (token) {
         // console.log(store.getState().store);
         option['headers']['token'] = store.getState().store.user.token || '';
+        option['headers']['authorization'] = getToken();
         // }
         // else {
         //   console.log("postData redirect login");
@@ -63,6 +64,7 @@ export const postData = (
           return reject({
             success: false,
             message: error.response.data.message || 'Please sign in!',
+            code: error.response?.status,
           });
         }
         return reject(error);
@@ -96,6 +98,7 @@ export const postAdminData = (
         // console.log(store.getState().store);
         option['headers']['token'] =
           store.getState().store.admin.admin_token || '';
+        option['headers']['authorization'] = getToken();
         // }
         // else {
         //   console.log("postData redirect login");
@@ -150,9 +153,10 @@ export const putData = (url = '', data = {}, f = false) => {
       },
     };
     if (isClient)
-      if (f)
+      if (f) {
         option['headers']['token'] = store.getState().store.user.token || '';
-      else {
+        option['headers']['authorization'] = getToken();
+      } else {
         console.log('postData');
         return;
         window.location.replace('/login');
@@ -192,10 +196,11 @@ export const putAdminData = (url = '', data = {}, f = false) => {
       },
     };
     if (isClient)
-      if (f)
+      if (f) {
         option['headers']['token'] =
           store.getState().store.admin.admin_token || '';
-      else {
+        option['headers']['authorization'] = getToken();
+      } else {
         console.log('postData');
         return;
         window.location.replace('/login');
@@ -235,10 +240,11 @@ export const deleteAdminData = (url = '', f = false) => {
       },
     };
     if (isClient)
-      if (f)
+      if (f) {
         option['headers']['token'] =
           store.getState().store.admin.admin_token || '';
-      else {
+        option['headers']['authorization'] = getToken();
+      } else {
         console.log('postData');
         return;
         window.location.replace('/login');
@@ -278,9 +284,10 @@ export const deleteData = (url = '', f = false) => {
       },
     };
     if (isClient)
-      if (f)
+      if (f) {
         option['headers']['token'] = store.getState().store.user.token || '';
-      else {
+        option['headers']['authorization'] = getToken();
+      } else {
         console.log('postData');
         return;
         window.location.replace('/login');
@@ -317,9 +324,10 @@ export const getData = (
     option['headers']['lan'] = store.getState().store.lan;
     option['headers']['response'] = 'json';
     if (isClient)
-      if (f)
+      if (f) {
         option['headers']['token'] = store.getState().store.user.token || '';
-      else if (f && !token && isClient) {
+        option['headers']['authorization'] = getToken();
+      } else if (f && !token && isClient) {
         console.log('we have no tokens...');
         return;
         window.location.replace('/login');
@@ -359,10 +367,11 @@ export const getAdminData = (
     option['headers']['lan'] = store.getState().store.lan;
     option['headers']['response'] = 'json';
     if (isClient)
-      if (f)
+      if (f) {
         option['headers']['token'] =
           store.getState().store.admin.admin_token || '';
-      else if (f && !token && isClient) {
+        option['headers']['authorization'] = getToken();
+      } else if (f && !token && isClient) {
         console.log('we have no tokens...');
         return;
         window.location.replace('/login');

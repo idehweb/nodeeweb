@@ -56,7 +56,7 @@ export default function registerController() {
       },
       getOne: {
         controller: {
-          access: AuthUserAccess,
+          // access: AuthUserAccess,
           service: Service.getOneAfter,
         },
         crud: {

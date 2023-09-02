@@ -217,9 +217,17 @@ export default (apiUrl) => ({
     httpClient(`${apiUrl}/${resource}`, {
       method: 'POST',
       body: JSON.stringify(params.data),
-    }).then(({ json }) => ({
-      data: { ...params.data, id: json._id },
-    })),
+    })
+      .then(({ json }) => {
+        console.log('##$$', 'response is header', json);
+        return {
+          data: { ...params.data, id: json._id },
+        };
+      })
+      .catch((err) => {
+        console.log('##$$', 'error is header', err);
+        throw err;
+      }),
 
   delete: (resource, params) =>
     httpClient(`${apiUrl}/${resource}/${params.id}`, {

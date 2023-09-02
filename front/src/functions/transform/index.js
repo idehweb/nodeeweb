@@ -1,11 +1,6 @@
-import { slugify, toNumber } from '../utils';
-
-import { ProductIn } from './in.type';
-import { PriceType, ProductOut, PublishStatus } from './out.type';
-
 export default class Transform {
-  static productInOut(product: ProductIn): Partial<ProductOut> {
-    let status: PublishStatus;
+  static productInOut(product) {
+    let status;
     if (product.status) {
       switch (product.status) {
         case PublishStatus.Processing:
@@ -17,14 +12,9 @@ export default class Transform {
       }
     }
 
-    type ExtraOut = Pick<
-      ProductOut,
-      keyof { options: 0; combinations: 0; price_type: 0 }
-    >;
-
-    const out: Omit<ProductOut, keyof ExtraOut> = {
+    const out = {
       title: product.title,
-      slug: product.slug ?? slugify(product.slug),
+      slug: product.slug,
       photos: product.photos?.length
         ? product.photos?.map(({ _id }) => _id)
         : undefined,
@@ -40,31 +30,31 @@ export default class Transform {
       metadescription: product.metadescription,
       productCategory: product.productCategory,
     };
-    let extraOut: ExtraOut;
+    let extraOut;
     if (product.type === 'normal') {
       extraOut = {
-        price_type: PriceType.Normal,
+        price_type: 'normal',
         options: [],
         combinations: [
           {
-            price: toNumber(product.price),
-            salePrice: toNumber(product.salePrice),
+            price: product.price,
+            salePrice: product.salePrice,
             in_stock: product.in_stock,
-            quantity: toNumber(product.quantity as any),
-            weight: toNumber(product.weight as any),
+            quantity: product.quantity,
+            weight: product.weight,
           },
         ],
       };
     } else if (product.type === 'variable') {
       extraOut = {
-        price_type: PriceType.Variable,
+        price_type: 'variable',
         combinations: product.combinations?.map((comb) => ({
           in_stock: comb.in_stock ?? true,
-          price: toNumber(comb.price + ''),
-          quantity: toNumber(comb.quantity + ''),
-          salePrice: toNumber(comb.salePrice + ''),
+          price: comb.price + '',
+          quantity: comb.quantity + '',
+          salePrice: comb.salePrice + '',
           sku: comb.sku,
-          weight: toNumber(comb.weight + ''),
+          weight: comb.weight + '',
           options: comb.options,
         })),
         options: product.options?.map((opt) => ({
@@ -77,24 +67,26 @@ export default class Transform {
 
     return { ...out, ...extraOut };
   }
-  static createProduct(product: ProductIn): ProductOut {
-    return Transform.productInOut(product) as any;
-  }
-  static updateProduct(product: ProductIn): Partial<ProductOut> {
+  static createProduct(product) {
     return Transform.productInOut(product);
   }
-  static getOneProduct(product: ProductOut): ProductIn {
-    let out: Partial<ProductIn> = {
+  static updateProduct(product) {
+    return Transform.productInOut(product);
+  }
+  static getOneProduct(product) {
+    let out = {
       title: product.title,
       story: false,
       files: [],
       in_stock: product.combinations.some((c) => c.in_stock),
-      price: product.combinations[0].price as any,
-      salePrice: product.combinations[0].salePrice as any,
+      price: product.combinations[0].price,
+      salePrice: product.combinations[0].salePrice,
       weight: product.combinations[0].weight,
       quantity: product.combinations[0].quantity,
       slug: product.slug,
-      photos: product.photos as any,
+      photos: product.photos?.map(({ url }) =>
+        url.startsWith('/') ? url.slice(1) : url,
+      ),
       labels: product.labels,
       attributes: product.attributes,
       extra_attr: product.extra_attr,
@@ -109,7 +101,7 @@ export default class Transform {
       requireWarranty: false,
     };
 
-    if (product.price_type === PriceType.Normal) {
+    if (product.price_type === 'normal') {
       out = { ...out, type: 'normal' };
     } else {
       out = {
@@ -118,18 +110,18 @@ export default class Transform {
         combinations: product.combinations.map((c) => ({
           ...c,
           id: c['_id'],
-        })) as any,
+        })),
         options: product.options.map((opt) => ({
           ...opt,
           isDisabled: false,
-          values: opt.values as any,
+          values: opt.values,
         })),
       };
     }
 
-    return { ...product, ...out } as any;
+    return { ...product, ...out };
   }
-  static getAllProduct(products: ProductOut[]): ProductIn[] {
+  static getAllProduct(products) {
     return products.map(Transform.getOneProduct);
   }
 }

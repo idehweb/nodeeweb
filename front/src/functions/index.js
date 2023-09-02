@@ -21,11 +21,12 @@ import {
   putData,
 } from '#c/functions/utils';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import { getToken } from './utils';
 
 const DataContext = createContext(null);
 export const isClient = typeof window !== 'undefined';
 // clearState
-export const MainUrl = CONFIG.BASE_URL;
+export const MainUrl = CONFIG.SERVER_URL;
 if (isClient) {
   // import { createContext } from "react";
 }
@@ -34,13 +35,10 @@ export const ApiUrl = CONFIG.BASE_URL;
 export const AdminRoute = CONFIG.BASE_URL + '/admin';
 export const InstanceManagerUrl = 'https://instancemanager.nodeeweb.com/api/v1';
 export const THEME_URL = CONFIG.THEME_URL || CONFIG.BASE_URL;
+export const ServerUrl = CONFIG.SERVER_URL;
 
-export const token =
-  typeof window === 'undefined' ? null : store.getState().store.user.token;
-export const admin_token =
-  typeof window === 'undefined'
-    ? null
-    : store.getState().store.admin.admin_token;
+export const token = getToken();
+export const admin_token = getToken();
 export const setStyles = (fields) => {
   let style = {};
   let {
@@ -1275,7 +1273,7 @@ export const contactBoy = (d, obj) => {
 };
 export const addBookmark = (_id) => {
   return new Promise(function (resolve, reject) {
-    let { token } = store.getState().store.user;
+   const token = getToken();
     console.log('token', token);
     if (!token) {
       reject({

@@ -218,8 +218,10 @@ export class OtpStrategy extends AuthStrategy {
       store.event?.emit(AuthEvents.AfterRegister, user);
 
       return res.status(201).json({
-        user,
-        token,
+        data: {
+          user,
+          token,
+        },
       });
     } catch (err) {
       await this.codeRevert(codeDoc);

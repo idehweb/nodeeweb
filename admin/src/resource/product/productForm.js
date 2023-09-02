@@ -45,6 +45,7 @@ import {
 } from '@/components';
 import { Val } from '@/Utils';
 import Transform from '@/functions/transform';
+import { convertError } from '@/functions/utils';
 
 // import { RichTextInput } from 'ra-input-rich-text';
 // import {ImportButton} from "react-admin-import-csv";
@@ -235,7 +236,9 @@ const Form = ({ children, ...props }) => {
             values = [];
           }
         })
-        .catch((err) => {});
+        .catch((err) => {
+          notify(convertError(err), { type: 'error', multiLine: true });
+        });
     } else {
       const product = Transform.createProduct(values);
       API.post('/product/', JSON.stringify(product))
@@ -245,7 +248,9 @@ const Form = ({ children, ...props }) => {
             redirect('/product');
           }
         })
-        .catch((err) => {});
+        .catch((err) => {
+          notify(convertError(err), { type: 'error', multiLine: true });
+        });
     }
   }
   let ST = StockStatus() || [];
