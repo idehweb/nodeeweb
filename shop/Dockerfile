@@ -95,6 +95,32 @@ WORKDIR /app/shop
 ENTRYPOINT ["docker-entrypoint-dev.sh" ]
 CMD ["yarn","dev:start"]
 
+
+FROM base as semi-pro
+ENV NODE_ENV "production"
+
+# Copy Core Packages
+COPY --from=build-pro /app/core/node_modules ../core/node_modules
+
+# Copy Core Modules
+COPY --from=build-pro /app/core/dist ../core/
+
+# Copy packages
+COPY --from=build-pro /app/shop/node_modules ./node_modules
+
+
+# Copy Build Files
+COPY --from=build-pro /app/shop/dist /app/shop/package.json /app/shop/tsconfig.json ./
+
+# Copy Docker EntryPoint
+COPY shop/docker/docker-entrypoint-pro.sh /usr/local/bin
+
+# user
+# USER node
+
+ENTRYPOINT ["docker-entrypoint-pro.sh" ]
+CMD ["node","index"]
+
 FROM base as pro
 ENV NODE_ENV "production"
 
