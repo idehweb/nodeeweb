@@ -58,8 +58,7 @@ const schema = new mongoose.Schema(
     data: {},
     type: {
       type: String,
-      required: false,
-      default: 'user',
+      default: 'customer',
     },
     contacts: [
       { _id: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' } },

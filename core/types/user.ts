@@ -19,6 +19,7 @@ export interface IUser {
   password?: string;
   phone?: string;
   role: string;
+  type: string;
   active: boolean;
   createdAt: Date;
   updatedAt: Date;
