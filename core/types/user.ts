@@ -10,6 +10,8 @@ export enum UserSex {
 }
 
 export interface IUser {
+  _id: Types.ObjectId;
+  id?: string;
   email?: string;
   username?: string;
   firstName?: string;

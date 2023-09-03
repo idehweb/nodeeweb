@@ -17,6 +17,7 @@ import logger from './log.handler';
 import { color } from '../../utils/color';
 import _ from 'lodash';
 import { isJWT } from 'class-validator';
+import { IUser, UserDocument } from '../../types/user';
 
 const jwtStrategyMap = new Map<string, Strategy>();
 
@@ -198,10 +199,15 @@ export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
   };
 }
 
-export function signToken(id: string) {
-  return jwt.sign({ id }, store.env.AUTH_SECRET, {
-    expiresIn: '30d',
-  });
+export function signToken(user: UserDocument | IUser) {
+  user.id = String(user._id);
+  return jwt.sign(
+    user['toObject'] ? user['toObject']() : user,
+    store.env.AUTH_SECRET,
+    {
+      expiresIn: '30d',
+    }
+  );
 }
 export function verifyToken(token: string) {
   return jwt.verify(token, store.env.AUTH_SECRET);
