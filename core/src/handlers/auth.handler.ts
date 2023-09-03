@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { Jwt } from 'jsonwebtoken';
 import passport, { Strategy } from 'passport';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 import bcrypt from 'bcrypt';
@@ -210,7 +210,12 @@ export function signToken(user: UserDocument | IUser) {
   );
 }
 export function verifyToken(token: string) {
-  return jwt.verify(token, store.env.AUTH_SECRET);
+  return new Promise<jwt.JwtPayload | string>((resolve, reject) => {
+    jwt.verify(token, store.env.AUTH_SECRET, (err, payload) => {
+      if (err) return reject(err);
+      resolve(payload);
+    });
+  });
 }
 
 export function setToCookie(res: Response, value: string, key = 'authToken') {
@@ -264,7 +269,7 @@ export function unregisterAuthStrategy(id: string, from?: string) {
   );
 }
 
-function extractToken(req: Req, cookieName?: string) {
+export function extractToken(req: Req, cookieName?: string) {
   return (
     ExtractJwt.fromAuthHeaderAsBearerToken()(req) ||
     (cookieName && req.cookies[cookieName])
