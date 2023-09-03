@@ -13,7 +13,7 @@ export class JwtStrategy extends AuthStrategy {
   async login(req: Req, res: Res) {
     const onResponse = (isError?: any) => {
       if (isError) throw isError;
-      return res.json({ data: { user: req.user } });
+      return res.json({ data: req.user });
     };
     return authWithToken({ model: req.modelName, name: 'jwt' })(
       req,
