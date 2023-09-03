@@ -61,8 +61,7 @@ FROM build as build-pro
 # Build core
 RUN cd /app/core && \ 
     yarn install && \
-    yarn build && \
-    rm -rf node_modules
+    yarn build
 
 # Install Packages
 RUN cd /app/shop && \
