@@ -57,7 +57,10 @@ const morganStream = {
       response_time,
       status,
       url,
+      forwardHeader,
     }: MorganDetailType = JSON.parse(msg);
+
+    console.log(forwardHeader);
 
     let final_msg = '';
 
@@ -132,6 +135,7 @@ type MorganDetailType = {
   response_time: number;
   ip: string;
   agent: string;
+  forwardHeader: string;
 };
 
 export const expressLogger: MiddleWare = morgan(
@@ -147,6 +151,7 @@ export const expressLogger: MiddleWare = morgan(
       response_time: Number.parseFloat(tokens['response-time'](req, res)),
       ip: tokens['remote-addr'](req, res),
       agent: tokens['user-agent'](req, res),
+      forwardHeader: req.headers['x-forwarded-for'],
     } as MorganDetailType);
   },
   {
