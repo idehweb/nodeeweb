@@ -26,4 +26,5 @@ export type StoreEnv = {
   RESTART_POLICY: RestartPolicy;
   RESTART_COUNT: string;
   RESTARTING: string;
+  MAX_NUM_OF_PROXY?: number;
 } & { [k: string]: string };

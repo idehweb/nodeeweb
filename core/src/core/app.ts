@@ -17,6 +17,8 @@ import { initPlugins } from '../plugin';
 const app = express();
 
 app.disable('x-powered-by');
+store.env.MAX_NUM_OF_PROXY &&
+  app.set('trust proxy', store.env.MAX_NUM_OF_PROXY);
 
 store.app = app;
 

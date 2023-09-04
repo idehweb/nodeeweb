@@ -44,6 +44,10 @@ export class Store {
     }
     if (!this.env.RESTART_POLICY)
       this.env.RESTART_POLICY = RestartPolicy.External;
+
+    this.env.MAX_NUM_OF_PROXY =
+      this.env.MAX_NUM_OF_PROXY === undefined ? 0 : +this.env.MAX_NUM_OF_PROXY;
+
     this.globalMiddleware = { pipes: {}, error: {} };
   }
 }

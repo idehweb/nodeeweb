@@ -60,13 +60,13 @@ const morganStream = {
       forwardHeader,
     }: MorganDetailType = JSON.parse(msg);
 
-    console.log(forwardHeader);
+    const client_ip = forwardHeader ? forwardHeader.split(',')[0].trim() : ip;
 
     let final_msg = '';
 
     // ip , agent
     if (!store.env.isLoc) {
-      final_msg += `${ip} ${agent} `;
+      final_msg += `${client_ip} ${agent} `;
     }
 
     // method
