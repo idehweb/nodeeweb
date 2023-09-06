@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import { PluginDocument, PluginModel } from '../../schema/plugin.schema';
 import store from '../../store';
-import { DuplicateError, NotFound } from '../../types/error';
+import { DuplicateError, NotFound, SimpleError } from '../../types/error';
 import { MiddleWare, Req } from '../../types/global';
 import { PluginContent } from '../../types/plugin';
 import { catchFn } from '../../utils/catchAsync';
 import exec from '../../utils/exec';
-import { call, isExist } from '../../utils/helpers';
+import { axiosError2String, call, isExist } from '../../utils/helpers';
 import {
   getPluginMarketPath,
   getPluginPath,
@@ -34,6 +34,11 @@ class LocalService {
   private insidePluginLib = {
     logger,
     systemLogger: store.systemLogger,
+    SimpleError,
+    axiosError2String,
+    getEnv: (key: string) => {
+      return store.env[key];
+    },
   };
 
   private insideResolve = (key: string) => {
@@ -47,7 +52,7 @@ class LocalService {
     const pluginConfPath = getPluginPath(slug, 'config.json');
 
     if (!(await isExist(pluginConfPath)))
-      throw new NotFound(`${slug} not found in plugin market`);
+      throw new NotFound(`${slug} not found in local plugins`);
 
     // resolve
     return await import(pluginConfPath);
