@@ -460,10 +460,10 @@ const Menu = ({ onMenuClick, dense = false }) => {
         dense={dense}>
         <MenuItemLink
           to={{
-            pathname: '/plugin/create',
+            pathname: '/plugin/market',
             state: { _scrollToTop: true },
           }}
-          primaryText={translate(`pos.menu.addPlugin`)}
+          primaryText={translate(`pos.menu.marketPlugin`)}
           leftIcon={<Plugin.market />}
           dense={dense}
         />
@@ -472,7 +472,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
             pathname: '/plugin/local',
             state: { _scrollToTop: true },
           }}
-          primaryText={translate(`pos.menu.localPlugins`)}
+          primaryText={translate(`pos.menu.localPlugin`)}
           leftIcon={<Plugin.installed />}
           dense={dense}
         />
