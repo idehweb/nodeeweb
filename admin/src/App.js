@@ -12,6 +12,8 @@ import resources from '@/resource';
 import { authProvider, dataProvider, theme } from '@/functions';
 import englishMessages from '@/i18n/en';
 import farsiMessages from '@/i18n/fa';
+import PluginMarket from '@/resource/plugin/PluginMarket'
+import PluginLocal from '@/resource/plugin/PluginLocal'
 
 import Types from '@/functions/types';
 
@@ -187,11 +189,11 @@ export default function App() {
         options={{ label: translate('pos.menu.users') }}
         {...User}
       />
-      <Resource
+      {/* <Resource
         name="plugin"
         options={{ label: translate('pos.menu.plugin') }}
         {...Plugin}
-      />
+      /> */}
       <Resource
         name="file"
         options={{ label: translate('pos.menu.medias') }}
@@ -300,6 +302,8 @@ export default function App() {
         <Route path="/configuration" element={<Configuration />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/p-c" element={<PrivateConfiguration />} />
+        <Route path="/plugin/market" element={<PluginMarket />} />
+        <Route path="/plugin/local" element={<PluginLocal />} />
       </CustomRoutes>
       <CustomRoutes noLayout>
         <Route path="/logout" element={<Logout />} />
