@@ -175,6 +175,8 @@ const customFarsiMessages = {
       users: 'کاربران',
       allUsers: 'همه کاربران',
       addUser: 'افزودن کاربر',
+      marketPlugin:'بازار',
+      localPlugin:'داخلی',
       siteActions: 'فعالیت های سایت',
       siteSettings: 'تنظیمات سایت',
     },
@@ -346,6 +348,14 @@ const customFarsiMessages = {
       normal: 'عادی',
       useInFilter: 'قابل استفاده در فیلتر',
       color: 'رنگ',
+    },
+    plugin: {
+      name: 'عنوان',
+      description: 'توضیحات',
+      version: 'نسخه',
+      install: 'نصب',
+      unistall: 'حذف',
+      edit: 'ویرایش',
     },
     category: {
       priceType: 'نوع اعمال قیمت',
