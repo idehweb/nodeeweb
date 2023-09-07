@@ -51,7 +51,8 @@
   "devDependencies": {
     "@craco/craco": "^6.4.3",
     "dotenv": "^16.0.1",
-    "ftp-deploy": "^2.4.2"
+    "ftp-deploy": "^2.4.2",
+    "ssh2-sftp-client": "^9.1.0"
   },
   "scripts": {
     "dev": "craco start",
@@ -60,7 +61,7 @@
     "publish": "./publish.sh",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "deploy": "node deploy",
+    "deploy": "node deploy/index.js",
     "build:d": "yarn build && yarn deploy"
   },
   "eslintConfig": {
