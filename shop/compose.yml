@@ -27,6 +27,7 @@ services:
       - /var/instances/nwi-shop/shared:/app/shop/shared/
       - /var/instances/nwi-shop/logs:/app/shop/logs/
       - /var/instances/nwi-shop/public:/app/shop/public/
+      - /var/instances/nwi-shop/plugins:/app/shop/plugins/
 
 networks:
   mongonet:

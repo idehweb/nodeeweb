@@ -24,6 +24,7 @@ services:
       - /var/instances/nwi-core/shared:/app/shared
       - /var/instances/nwi-core/logs:/app/logs
       - /var/instances/nwi-core/public:/app/public
+      - /var/instances/nwi-core/plugins:/app/plugins
 
 networks:
   mongonet:

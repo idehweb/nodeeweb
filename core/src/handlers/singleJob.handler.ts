@@ -6,7 +6,6 @@ import logger, { Logger } from './log.handler';
 import { RegisterOptions } from '../../types/register';
 import store from '../../store';
 import { join } from 'path';
-import { setTimeout } from 'timers/promises';
 
 const lockFiles = new Set<string>();
 
@@ -34,12 +33,16 @@ export class SingleJobProcess {
   }
 
   get file_name() {
-    return getSharedPath(`single-job-${this.id}.lock`);
+    return `single-job-${this.id}.lock`;
+  }
+
+  get file_path() {
+    return getSharedPath(this.file_name);
   }
 
   #block() {
     try {
-      fs.writeFileSync(this.file_name, '', {
+      fs.writeFileSync(this.file_path, '', {
         flag: 'wx',
       });
       lockFiles.add(this.file_name);
@@ -50,7 +53,7 @@ export class SingleJobProcess {
   }
   #free() {
     try {
-      fs.rmSync(this.file_name);
+      fs.rmSync(this.file_path);
       lockFiles.delete(this.file_name);
     } catch (err) {
       this.logger.error('single job free error', err);
@@ -80,9 +83,12 @@ export class SingleJobProcess {
 }
 
 export async function waitForLockFiles(timer = 10) {
-  const timerPromise = async () => {
-    await setTimeout(timer * 1000);
-    clearAllLockFiles();
+  const timerPromise = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject(new Error('time come to end'));
+      }, timer * 1000);
+    });
   };
 
   const watcherPromise = () => {
@@ -112,6 +118,7 @@ export async function waitForLockFiles(timer = 10) {
     await Promise.race([timerPromise(), watcherPromise()]);
   } catch (err) {
     store.systemLogger.error(`[single-job-handler] failed:\n`, err);
+    clearAllLockFiles();
   }
 }
 

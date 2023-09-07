@@ -18,7 +18,7 @@ export function getPluginPath(...path: string[]) {
 }
 
 export function getSharedPath(...path: string[]) {
-  return join(store.env.SHARED_PATH || '.', ...path);
+  return join(store.env.SHARED_PATH || './shared', ...path);
 }
 
 export function getScriptFile(

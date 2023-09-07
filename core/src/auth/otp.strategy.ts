@@ -189,7 +189,7 @@ export class OtpStrategy extends AuthStrategy {
     await this.verify(user.phone, req.body.user.code);
 
     // token
-    const token = signToken(user.id);
+    const token = signToken(user);
     setToCookie(res, token, 'authToken');
 
     return res.json({
@@ -211,15 +211,17 @@ export class OtpStrategy extends AuthStrategy {
     const userModel = store.db.model(req.modelName) as UserModel;
     try {
       const user = await userModel.create(req.body.user);
-      const token = signToken(user.id);
+      const token = signToken(user);
       setToCookie(res, token, 'authToken');
 
       // emit
       store.event?.emit(AuthEvents.AfterRegister, user);
 
       return res.status(201).json({
-        user,
-        token,
+        data: {
+          user,
+          token,
+        },
       });
     } catch (err) {
       await this.codeRevert(codeDoc);

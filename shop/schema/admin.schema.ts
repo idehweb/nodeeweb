@@ -12,6 +12,7 @@ export interface IAdmin {
   lastName?: string;
   password?: string;
   role: string;
+  type: string;
   active: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -61,6 +62,7 @@ const schema = new mongoose.Schema(
       select: false,
     },
     role: { type: String, default: 'admin' },
+    type: { type: String, default: 'admin' },
     active: { type: Boolean, default: true },
   },
   { timestamps: true }

@@ -57,13 +57,16 @@ const morganStream = {
       response_time,
       status,
       url,
+      forwardHeader,
     }: MorganDetailType = JSON.parse(msg);
+
+    const client_ip = forwardHeader ? forwardHeader.split(',')[0].trim() : ip;
 
     let final_msg = '';
 
     // ip , agent
     if (!store.env.isLoc) {
-      final_msg += `${ip} ${agent} `;
+      final_msg += `${client_ip} ${agent} `;
     }
 
     // method
@@ -132,6 +135,7 @@ type MorganDetailType = {
   response_time: number;
   ip: string;
   agent: string;
+  forwardHeader: string;
 };
 
 export const expressLogger: MiddleWare = morgan(
@@ -147,6 +151,7 @@ export const expressLogger: MiddleWare = morgan(
       response_time: Number.parseFloat(tokens['response-time'](req, res)),
       ip: tokens['remote-addr'](req, res),
       agent: tokens['user-agent'](req, res),
+      forwardHeader: req.headers['x-forwarded-for'],
     } as MorganDetailType);
   },
   {

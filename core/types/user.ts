@@ -10,6 +10,8 @@ export enum UserSex {
 }
 
 export interface IUser {
+  _id: Types.ObjectId;
+  id?: string;
   email?: string;
   username?: string;
   firstName?: string;
@@ -17,6 +19,7 @@ export interface IUser {
   password?: string;
   phone?: string;
   role: string;
+  type: string;
   active: boolean;
   createdAt: Date;
   updatedAt: Date;

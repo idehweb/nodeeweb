@@ -58,15 +58,17 @@ export default class UserPassStrategy extends AuthStrategy {
     if (!user || !(await user.passwordVerify(password)))
       return res.status(400).json({ message: 'username or password is wrong' });
 
+    const outUser: IUser = { ...user.toObject(), password: undefined };
+
     // sign token
-    const token = signToken(user.id);
+    const token = signToken(outUser);
 
     // cookie
     setToCookie(res, token);
 
     return res.status(200).json({
       data: {
-        user: { ...user.toObject(), password: undefined },
+        user: outUser,
         token,
       },
     });
@@ -77,7 +79,7 @@ export default class UserPassStrategy extends AuthStrategy {
     const userBody = await this.transformSignup(req.body.user);
 
     const user = await userModel.create(userBody);
-    const token = signToken(user.id);
+    const token = signToken(user);
     setToCookie(res, token, 'authToken');
 
     // emit

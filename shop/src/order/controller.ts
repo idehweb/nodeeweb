@@ -12,6 +12,7 @@ import transactionService from './transaction.service';
 import orderService from './order.service';
 import { AddToCartBody, UpdateCartBody } from '../../dto/in/order/cart';
 import { OrderIdParam, UpdateOrderBody } from '../../dto/in/order/order';
+import postService from './post.service';
 
 export default function registerController() {
   // api
@@ -57,6 +58,12 @@ export default function registerController() {
       method: 'get',
       service: transactionService.getPrice,
       url: '/price',
+      access: AuthUserAccess,
+    },
+    {
+      method: 'get',
+      service: postService.getAll,
+      url: '/post',
       access: AuthUserAccess,
     },
   ];

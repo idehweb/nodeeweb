@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { Jwt } from 'jsonwebtoken';
 import passport, { Strategy } from 'passport';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 import bcrypt from 'bcrypt';
@@ -17,6 +17,7 @@ import logger from './log.handler';
 import { color } from '../../utils/color';
 import _ from 'lodash';
 import { isJWT } from 'class-validator';
+import { IUser, UserDocument } from '../../types/user';
 
 const jwtStrategyMap = new Map<string, Strategy>();
 
@@ -198,13 +199,23 @@ export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
   };
 }
 
-export function signToken(id: string) {
-  return jwt.sign({ id }, store.env.AUTH_SECRET, {
-    expiresIn: '30d',
-  });
+export function signToken(user: UserDocument | IUser) {
+  user.id = String(user._id);
+  return jwt.sign(
+    user['toObject'] ? user['toObject']() : user,
+    store.env.AUTH_SECRET,
+    {
+      expiresIn: '30d',
+    }
+  );
 }
 export function verifyToken(token: string) {
-  return jwt.verify(token, store.env.AUTH_SECRET);
+  return new Promise<jwt.JwtPayload | string>((resolve, reject) => {
+    jwt.verify(token, store.env.AUTH_SECRET, (err, payload) => {
+      if (err) return reject(err);
+      resolve(payload);
+    });
+  });
 }
 
 export function setToCookie(res: Response, value: string, key = 'authToken') {
@@ -258,7 +269,7 @@ export function unregisterAuthStrategy(id: string, from?: string) {
   );
 }
 
-function extractToken(req: Req, cookieName?: string) {
+export function extractToken(req: Req, cookieName?: string) {
   return (
     ExtractJwt.fromAuthHeaderAsBearerToken()(req) ||
     (cookieName && req.cookies[cookieName])

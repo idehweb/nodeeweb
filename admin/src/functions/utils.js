@@ -27,3 +27,10 @@ export function toNumber(str = '', def) {
   if (isNaN(myNum)) return def;
   return myNum;
 }
+
+export function convertError(err) {
+  let message = err.message;
+  if (err.isAxiosError && err.response?.data?.message)
+    message += `\n${err.response?.data?.message}`;
+  return message;
+}

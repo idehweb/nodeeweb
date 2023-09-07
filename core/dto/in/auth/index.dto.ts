@@ -34,9 +34,10 @@ export class AuthStrategyBody {
   login?: boolean;
 
   @Expose()
+  @IsOptional()
   @IsObject()
   @Transform(({ obj, key }) => obj[key])
-  user: any;
+  user?: any;
 }
 
 export class UserPassUserLogin {
