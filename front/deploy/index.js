@@ -40,6 +40,15 @@ async function build() {
   }
 }
 
+async function del() {
+  let remotePath = process.env.REMOTE_PATH;
+  if (remotePath.endsWith('/')) remotePath = remotePath.slice(0, -1);
+  if (remotePath === '/') throw new Error('invalid remote path', remotePath);
+  const rm = await sftp.rmdir(remotePath, true);
+  console.log('[delete]', rm);
+  await sftp.mkdir(remotePath, true);
+}
+
 async function scp() {
   try {
     const localPath = process.env.LOCAL_PATH || 'build/',
@@ -60,6 +69,7 @@ async function main() {
   try {
     await build();
     await connect();
+    await del();
     await scp();
     await sftp.end();
   } catch (error) {
