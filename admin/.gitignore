@@ -2,3 +2,5 @@
 
 # production
 **/build/**
+
+deploy/.deploy.env

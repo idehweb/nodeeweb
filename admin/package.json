@@ -12,7 +12,7 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "deploy": "node deploy",
+    "deploy": "node deploy/index.js",
     "build:d": "yarn build && yarn deploy",
     "anal": "export ANALYZE=true && set ANALYZE=true && yarn build",
     "publish": "./publish.sh"
@@ -67,6 +67,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "ftp-deploy": "^2.4.4",
     "prettier": "^2.8.8",
+    "ssh2-sftp-client": "^9.1.0",
     "typescript": "^5.1.6",
     "webpack-bundle-analyzer": "^4.9.0"
   },
