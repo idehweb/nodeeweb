@@ -45,19 +45,20 @@ async function backup() {
     });
   }
 
-  const stream = spawn(
-    `./script/backup.sh ${process.env.MONGO_URL} ${res_path}`,
-    {
-      stdio: [process.stdin, process.stdout, process.stderr],
-      shell: true,
-    }
-  );
   return await tryCount(
     () =>
       new Promise((resolve, reject) => {
+        const stream = spawn(
+          `./script/backup.sh ${process.env.MONGO_URL} ${res_path}`,
+          {
+            stdio: [process.stdin, process.stdout, process.stderr],
+            shell: true,
+          }
+        );
+
         // const t = setTimeout(() => {
-        //   reject("execute backup.sh timeout");
-        // }, 5 * 60 * 1000);
+        //   reject('execute backup.sh timeout');
+        // }, 30 * 60 * 1000);
         let err_msg = '';
         stream.on('error', (err) => {
           err_msg += String(err);
@@ -65,7 +66,9 @@ async function backup() {
         stream.on('close', (code) => {
           // clearTimeout(t);
           if (code !== null && code !== 0)
-            return reject(`backup.sh none-zero code\nmessage : ${err_msg}`);
+            return reject(
+              `backup.sh none-zero code\nmessage : ${err_msg}\ncode:${code}`
+            );
           resolve(res_path);
         });
       }),
