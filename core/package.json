@@ -5,7 +5,7 @@
   "main": "index",
   "scripts": {
     "build": "tsc --build",
-    "build:post":"copyfiles -F -e 'node_modules/**' -e 'public/**' '**/*.sh' '**/*.json' dist",
+    "build:post": "copyfiles -F -e 'node_modules/**' -e 'public/**' '**/*.sh' '**/*.json' dist",
     "dev": "nodemon --config nodemon.json start.ts",
     "log": "nodemon src/core/log.ts",
     "start": "node dist/start.js"
@@ -18,7 +18,7 @@
     "@nodeeweb/front-build": "^0.0.23",
     "@types/morgan": "^1.9.4",
     "axios": "^1.4.0",
-    "bcrypt": "^5.1.0",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",

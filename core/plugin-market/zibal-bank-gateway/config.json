@@ -7,7 +7,7 @@
     },
     "type": "bank-gateway",
     "author": "Nodeeweb",
-    "main": "index.ts",
+    "main": "index",
     "slug": "zibal-bank-gateway",
     "add": {
         "inputs": [
@@ -20,7 +20,7 @@
                 "type": "string"
             }
         ],
-        "dto": "dto/add.ts",
+        "dto": "dto/add",
         "run": "add"
     },
     "edit": {
@@ -34,7 +34,7 @@
                 "type": "string"
             }
         ],
-        "dto": "dto/edit.ts",
+        "dto": "dto/edit",
         "run": "edit"
     }
 }
