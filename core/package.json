@@ -5,6 +5,7 @@
   "main": "index",
   "scripts": {
     "build": "tsc --build",
+    "post:build":"copyfiles -F **/*.sh **/*.json dist",
     "dev": "nodemon --config nodemon.json start.ts",
     "log": "nodemon src/core/log.ts",
     "start": "node dist/start.js"
@@ -58,6 +59,7 @@
     "@types/passport-jwt": "^3.0.8",
     "@types/passport-local": "^1.0.35",
     "@types/random-number-csprng": "^1.0.0",
+    "copyfiles": "^2.4.1",
     "nodemon": "^2.0.22",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"

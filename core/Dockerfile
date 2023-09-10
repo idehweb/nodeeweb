@@ -45,6 +45,9 @@ COPY . .
 # Build
 RUN yarn build
 
+# Post Build
+RUN yarn post:build
+
 # Replace Packages with Production one
 RUN rm -rf node_modules && \
     yarn install --production && \

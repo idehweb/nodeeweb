@@ -38,9 +38,9 @@ COPY shop/package.json shop/yarn.lock shop/
 COPY core /app/core
 
 # Copy core script
-RUN cd /app/core && \
-    mkdir -p dist && \
-    cp -r scripts dist/scripts
+# RUN cd /app/core && \
+#     mkdir -p dist && \
+#     cp -r scripts dist/scripts
 
 
 FROM build as build-dev
@@ -58,21 +58,32 @@ COPY shop /app/shop
 
 FROM build as build-pro
 
-# Build core
+# Install Core
 RUN cd /app/core && \ 
-    yarn install && \
+    yarn install
+
+# Build Core
+RUN cd /app/core && \ 
     yarn build
 
-# Install Packages
+# Post:Build Core
+RUN cd /app/core && \ 
+    yarn post:build
+
+# Install Shop
 RUN cd /app/shop && \
     yarn install
 
-# Copy modules
+# Copy modules Shop
 COPY shop /app/shop
 
-# Build
+# Build Shop
 RUN cd /app/shop && \
     yarn build
+
+# Post:Build Shop
+RUN cd /app/shop && \
+    yarn post:build
 
 # Replace Packages with Production one
 RUN cd /app/shop && \ 
