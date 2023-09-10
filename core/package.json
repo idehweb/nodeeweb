@@ -5,7 +5,7 @@
   "main": "index",
   "scripts": {
     "build": "tsc --build",
-    "post:build":"copyfiles -F -e node_modules/** -e public/** **/*.sh **/*.json dist",
+    "build:post":"copyfiles -F -e 'node_modules/**' -e 'public/**' '**/*.sh' '**/*.json' dist",
     "dev": "nodemon --config nodemon.json start.ts",
     "log": "nodemon src/core/log.ts",
     "start": "node dist/start.js"

@@ -66,9 +66,9 @@ RUN cd /app/core && \
 RUN cd /app/core && \ 
     yarn build
 
-# Post:Build Core
+# Build:Post Core
 RUN cd /app/core && \ 
-    yarn post:build
+    yarn build:post
 
 # Install Shop
 RUN cd /app/shop && \
@@ -81,9 +81,9 @@ COPY shop /app/shop
 RUN cd /app/shop && \
     yarn build
 
-# Post:Build Shop
+# Build:Post Shop
 RUN cd /app/shop && \
-    yarn post:build
+    yarn build:post
 
 # Replace Packages with Production one
 RUN cd /app/shop && \ 
@@ -118,7 +118,6 @@ COPY --from=build-pro /app/core/dist ../core/
 
 # Copy packages
 COPY --from=build-pro /app/shop/node_modules ./node_modules
-
 
 # Copy Build Files
 COPY --from=build-pro /app/shop/dist ./
