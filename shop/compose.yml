@@ -2,11 +2,11 @@ version: '3'
 
 services:
   shop:
-    image: nodeeweb-shop:semi-1.0.2
+    image: nodeeweb-shop:dev-1.0.0
     build:
       context: ..
       dockerfile: shop/Dockerfile
-      target: semi-pro
+      target: dev
     container_name: nodeeweb-shop
     deploy:
       replicas: 1
