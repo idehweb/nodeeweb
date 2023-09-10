@@ -121,7 +121,7 @@ COPY --from=build-pro /app/shop/node_modules ./node_modules
 
 
 # Copy Build Files
-COPY --from=build-pro /app/shop/dist /app/shop/package.json /app/shop/tsconfig.json ./
+COPY --from=build-pro /app/shop/dist ./
 
 # Copy Docker EntryPoint
 COPY shop/docker/docker-entrypoint-pro.sh /usr/local/bin
@@ -139,7 +139,7 @@ ENV NODE_ENV "production"
 COPY --from=build-pro /app/shop/node_modules ./node_modules
 
 # Copy Build Files
-COPY --from=build-pro /app/shop/dist /app/shop/package.json /app/shop/tsconfig.json ./
+COPY --from=build-pro /app/shop/dist ./
 
 # Copy Docker EntryPoint
 COPY shop/docker/docker-entrypoint-pro.sh /usr/local/bin

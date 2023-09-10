@@ -24,10 +24,10 @@ services:
     env_file:
       - .env.local
     volumes:
-      - /var/instances/nwi-shop/shared:/app/shop/shared/
-      - /var/instances/nwi-shop/logs:/app/shop/logs/
-      - /var/instances/nwi-shop/public:/app/shop/public/
-      - /var/instances/nwi-shop/plugins:/app/shop/plugins/
+      - /var/instances/nwi-shop/shared:/app/shared/
+      - /var/instances/nwi-shop/logs:/app/logs/
+      - /var/instances/nwi-shop/public:/app/public/
+      - /var/instances/nwi-shop/plugins:/app/plugins/
 
 networks:
   mongonet:
