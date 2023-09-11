@@ -16,7 +16,7 @@ export interface IPlugin {
   type: string;
   icon?: string;
   author: string;
-  arg: { [key: string]: string };
+  arg?: { [key: string]: string };
   status: PluginStatus;
 }
 
@@ -36,7 +36,7 @@ const schema = new mongoose.Schema(
     status: { type: String, default: PluginStatus.NeedToConfig },
     arg: {
       type: {},
-      required: true,
+      required: false,
       _id: false,
     },
   },
