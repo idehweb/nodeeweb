@@ -1,6 +1,6 @@
 import { ArrayMaxSize } from 'class-validator';
 import { CrudParamDto } from '../../dto/in/crud.dto';
-import { PluginBodyAdd } from '../../dto/in/plugin.dto';
+import { PluginBodyAdd, PluginBodyUpdate } from '../../dto/in/plugin.dto';
 import { AdminAccess } from '../handlers/auth.handler';
 import {
   ControllerRegisterOptions,
@@ -53,7 +53,10 @@ export function registerPluginControllers() {
         service: localService.editPlugin,
         url: '/local/:slug',
         access: AdminAccess,
-        validate: { dto: CrudParamDto, reqPath: 'params' },
+        validate: [
+          { dto: CrudParamDto, reqPath: 'params' },
+          { dto: PluginBodyUpdate, reqPath: 'body' },
+        ],
       },
       {
         method: 'delete',

@@ -2,7 +2,7 @@ import { ClassConstructor } from 'class-transformer';
 import { MiddleWare } from './global';
 
 export interface Pipe<A> {
-  pipeCreator(args: A): MiddleWare[];
+  pipeCreator(args: A): MiddleWare;
 }
 
 export type ValidateArgs = {

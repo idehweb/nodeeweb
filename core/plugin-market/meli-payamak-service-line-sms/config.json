@@ -45,7 +45,7 @@
     },
     "active":{
         "dto" :"dto/config",
-        "run":"run"
+        "run":"active"
     },
     "edit":{
         "inputs": [

@@ -425,14 +425,20 @@ class LocalService {
       const conf = await this.resolve(slug);
 
       // verify
-      body = await this.validate(conf, 'edit', body);
+      const editConf = await this.validate(conf, 'edit', body.config);
       // update db
-      await this.pluginModel.findByIdAndUpdate(oldPluginDoc._id, {
-        arg: merge(oldPluginDoc.arg, body),
-      });
+      const newPluginDoc = await this.pluginModel.findByIdAndUpdate(
+        oldPluginDoc._id,
+        {
+          arg: merge(oldPluginDoc.arg, editConf),
+        },
+        {
+          new: true,
+        }
+      );
 
       if (oldPluginDoc.status === PluginStatus.Active) {
-        const stack = await this.run(conf, 'edit', body, false);
+        const stack = await this.run(conf, 'edit', editConf, false);
         // register
         registerPlugin(
           {
@@ -447,10 +453,7 @@ class LocalService {
 
       // present
       return res.json({
-        data: {
-          ...oldPluginDoc.toObject(),
-          arg: undefined,
-        },
+        data: newPluginDoc,
       });
     }
   };
