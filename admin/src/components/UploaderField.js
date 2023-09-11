@@ -15,6 +15,7 @@ import { useWatch } from 'react-hook-form';
 import API, { BASE_URL, SERVER_URL } from '@/functions/API';
 import Api from '@/functions/API-v1';
 import { TheImages, showFiles } from '@/components';
+import { uploadMedia } from '@/functions';
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 
@@ -55,13 +56,11 @@ export default (props) => {
     formData.append('file', file);
     formData.append('type', file.type);
     setLoading(true);
-    Api.post('/file', formData, {
-      onUploadProgress: (e) => {
-        let p = Math.floor((e.loaded * 100) / e.total);
-        setProgress(p);
-      },
+
+    uploadMedia(file, (percent, canceler) => {
+      setProgress(percent);
     })
-      .then(({ data: { data } }) => {
+      .then(({ data }) => {
         const { url, _id } = data;
         setProgress(0);
         GalleryTemp.push(url);

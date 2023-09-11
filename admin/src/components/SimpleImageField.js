@@ -1,8 +1,8 @@
 import React from 'react';
 import { useRecordContext } from 'react-admin';
 
-import API, { SERVER_URL } from '@/functions/API';
-import { ShopURL, BASE_URL } from '@/functions/API';
+import API from '@/functions/API';
+import { SERVER_URL } from '@/functions/API';
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 

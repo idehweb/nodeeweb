@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Field } from 'react-final-form';
 import { Col } from 'shards-react';
 
-// import {MainUrl, uploadMedia} from "@/functions/index";
 import { useTranslate } from 'react-admin';
 
-import { getEntitiesForAdmin, MainUrl, uploadMedia } from '@/functions/index';
+import { getEntitiesForAdmin } from '@/functions/index';
 import API, { BASE_URL } from '@/functions/API';
 
 function FieldSelect(props) {

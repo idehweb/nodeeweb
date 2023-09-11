@@ -8,7 +8,6 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { useTranslate } from 'react-admin';
 
 import { getField } from '@/components/form/fields';
-import { MainUrl, uploadMedia } from '@/functions/index';
 
 const Condition = ({ when, is, children }) => (
   <Field name={when} subscription={{ value: true }}>

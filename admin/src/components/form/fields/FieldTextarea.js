@@ -4,8 +4,6 @@ import { Col } from 'shards-react';
 
 import { useTranslate } from 'react-admin';
 
-import { getEntities, MainUrl, uploadMedia } from '@/functions/index';
-
 function FieldTextarea(props) {
   // console.clear();
   const t = useTranslate();
