@@ -1,4 +1,4 @@
-import { setTimeout } from "timers/promises";
+import { setTimeout } from 'timers/promises';
 
 export default async function tryCount(cb, { max_count, wait = 5000, name }) {
   let count = 0,
@@ -9,15 +9,15 @@ export default async function tryCount(cb, { max_count, wait = 5000, name }) {
     } catch (err) {
       count++;
       console.log(
-        "TryCount Error \n",
+        'TryCount Error \n',
         `name : ${name}\n`,
         err,
-        "\ncount",
+        '\ncount',
         count
       );
-      err_msg = String(err) + "\n" + err.message;
+      err_msg = String(err) + '\n' + err.message;
       await setTimeout(wait);
     }
   }
-  if (!isDone) throw new Error(`${name}\nmessage : ${err_msg}`);
+  throw new Error(`${name}\nmessage : ${err_msg}`);
 }
