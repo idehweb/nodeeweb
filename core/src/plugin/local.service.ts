@@ -71,11 +71,13 @@ class LocalService {
 
   private async validate(
     config: PluginConfig,
-    action: 'config' | 'edit',
+    action: 'config' | 'edit' | 'active',
     arg: any
   ) {
     // validate
-    if (config[action].dto) {
+    if (!config[action]?.dto && action === 'active') action = 'config';
+
+    if (config[action]?.dto) {
       const { default: dto } = await import(
         getPluginMarketPath(config.slug, config[action].dto)
       );
@@ -91,10 +93,9 @@ class LocalService {
     validate = true
   ) {
     // validate
-    arg =
-      validate && action !== 'active'
-        ? await this.validate(config, action, arg)
-        : arg;
+    arg = validate ? await this.validate(config, action, arg) : arg;
+
+    if (action === 'active' && !config[action]?.run) action = 'config';
 
     // execute
     const plugin = await import(getPluginPath(config.slug, config.main));
