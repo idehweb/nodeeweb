@@ -75,12 +75,14 @@ const unverified: BankGatewayUnverified = async () => {
   return [];
 };
 
-export function add(arg: any): BankGatewayPluginContent['stack'] {
+function add(arg: any): BankGatewayPluginContent['stack'] {
   config = arg;
   return [create, verify, unverified];
 }
 
-export function edit(arg: any): BankGatewayPluginContent['stack'] {
+function edit(arg: any): BankGatewayPluginContent['stack'] {
   config = arg;
   return [create, verify, unverified];
 }
+
+export { add as config, add as active, edit };

@@ -9,7 +9,7 @@
     "author": "Nodeeweb",
     "main": "index",
     "slug": "zibal-bank-gateway",
-    "add": {
+    "config": {
         "inputs": [
             {
                 "key": "merchant",
@@ -20,8 +20,12 @@
                 "type": "string"
             }
         ],
-        "dto": "dto/add",
-        "run": "add"
+        "dto": "dto/config",
+        "run": "config"
+    },
+    "active":{
+        "dto":"dto/config",
+        "run":"active"
     },
     "edit": {
         "inputs": [
