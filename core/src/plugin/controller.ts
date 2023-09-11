@@ -36,8 +36,15 @@ export function registerPluginControllers() {
       },
       {
         method: 'post',
-        service: localService.addPlugin,
-        url: '/local/:slug',
+        service: localService.install,
+        url: '/local/install/:slug',
+        access: AdminAccess,
+        validate: { dto: CrudParamDto, reqPath: 'params' },
+      },
+      {
+        method: 'post',
+        service: localService.config,
+        url: '/local/config/:slug',
         access: AdminAccess,
         validate: { dto: CrudParamDto, reqPath: 'params' },
       },
@@ -50,7 +57,7 @@ export function registerPluginControllers() {
       },
       {
         method: 'delete',
-        service: localService.deletePlugin,
+        service: localService.uninstall,
         url: '/local/:slug',
         access: AdminAccess,
         validate: { dto: CrudParamDto, reqPath: 'params' },

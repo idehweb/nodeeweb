@@ -1,7 +1,16 @@
 import * as fs from 'fs';
-import { PluginDocument, PluginModel } from '../../schema/plugin.schema';
+import {
+  PluginDocument,
+  PluginModel,
+  PluginStatus,
+} from '../../schema/plugin.schema';
 import store from '../../store';
-import { DuplicateError, NotFound, SimpleError } from '../../types/error';
+import {
+  BadRequestError,
+  DuplicateError,
+  NotFound,
+  SimpleError,
+} from '../../types/error';
 import { MiddleWare, Req } from '../../types/global';
 import { PluginContent } from '../../types/plugin';
 import { catchFn } from '../../utils/catchAsync';
@@ -22,8 +31,10 @@ import { PluginConfig } from './plugin';
 enum PluginStep {
   CopyContent = 'copy-content',
   InsertToDB = 'insert-to-db',
+  Config = 'config',
   UpdateDB = 'update-db',
   Register = 'register',
+  UnRegister = 'unregister',
 }
 
 class LocalService {
@@ -60,7 +71,7 @@ class LocalService {
 
   private async validate(
     config: PluginConfig,
-    action: 'add' | 'edit',
+    action: 'config' | 'edit',
     arg: any
   ) {
     // validate
@@ -75,12 +86,15 @@ class LocalService {
 
   async run(
     config: PluginConfig,
-    action: 'add' | 'edit',
+    action: 'active' | 'config' | 'edit',
     arg: any,
     validate = true
   ) {
     // validate
-    arg = validate ? await this.validate(config, action, arg) : arg;
+    arg =
+      validate && action !== 'active'
+        ? await this.validate(config, action, arg)
+        : arg;
 
     // execute
     const plugin = await import(getPluginPath(config.slug, config.main));
@@ -190,7 +204,7 @@ class LocalService {
     // resolve from market
     const conf = await marketService.resolve(slug);
 
-    body = await this.validate(conf, 'add', body);
+    body = await this.validate(conf, 'add' as any, body);
 
     try {
       // copy files
@@ -211,7 +225,7 @@ class LocalService {
 
       steps.push(PluginStep.InsertToDB);
 
-      const stack = await this.run(conf, 'add', body, false);
+      const stack = await this.run(conf, 'add' as any, body, false);
 
       // register
       registerPlugin(
@@ -239,54 +253,191 @@ class LocalService {
     }
   };
 
+  install: MiddleWare = async (req, res) => {
+    const { slug } = req.params;
+
+    // check registration
+    let dupMsg: string;
+    // 1. store
+    if (store.plugins.get(slug)) dupMsg = 'this plugin added before';
+    // 2. db
+    else if (await this.pluginModel.findOne({ slug }))
+      dupMsg = 'can not add plugin to db twice';
+    // 3. fs
+    else if (await isExist(getPluginPath(slug)))
+      dupMsg = `${getPluginPath(
+        slug
+      )} is already exists, try to remove it first`;
+
+    if (dupMsg) throw new DuplicateError(dupMsg);
+
+    // resolve from market
+    const conf = await marketService.resolve(slug);
+
+    // copy files
+    await exec(
+      `${getScriptFile('cp')} ${getPluginMarketPath(slug)} ${getPluginPath(
+        slug
+      )}`,
+      { logger }
+    );
+
+    // save to db
+    const pluginDoc = await this.pluginModel.create({
+      ...conf,
+      status: PluginStatus.NeedToConfig,
+    });
+
+    // present
+    return res.status(201).json({
+      data: {
+        ...pluginDoc.toObject(),
+        arg: undefined,
+      },
+    });
+  };
+
+  config: MiddleWare = async (req, res) => {
+    const { slug } = req.params;
+    let body = req.body;
+
+    const plugin = await this.pluginModel.findOne({
+      slug,
+      status: PluginStatus.NeedToConfig,
+    });
+
+    // check registration
+    let dupMsg: string;
+
+    // 1. store
+    if (store.plugins.get(slug)) dupMsg = 'this plugin config before';
+    if (dupMsg) throw new DuplicateError(dupMsg);
+
+    // not found
+
+    // db, fs
+    if (!plugin || !(await isExist(getPluginPath(slug))))
+      throw new NotFound('plugin not found');
+
+    // resolve from local
+    const conf = await localService.resolve(slug);
+    body = await this.validate(conf, 'config', body);
+
+    // save to db
+    const pluginDoc = await this.pluginModel.findOneAndUpdate(
+      { slug },
+      {
+        arg: body,
+        status: PluginStatus.Active,
+      },
+      {
+        new: true,
+      }
+    );
+
+    const stack = await this.run(conf, 'config', body, false);
+
+    // register
+    registerPlugin(
+      {
+        type: conf.type,
+        slug: conf.slug,
+        name: conf.name,
+        stack,
+      },
+      { from: this.from, logger }
+    );
+
+    // present
+    return res.status(200).json({
+      data: {
+        ...pluginDoc.toObject(),
+        arg: undefined,
+      },
+    });
+  };
+
   editPlugin: MiddleWare = async (req, res) => {
     const { slug } = req.params;
     let body = req.body,
-      oldPluginDoc = await this.pluginModel.findOne({ slug });
+      oldPluginDoc = await this.pluginModel.findOne({
+        slug,
+        status: { $in: [PluginStatus.Active, PluginStatus.Inactive] },
+      });
 
-    // check registration
-    let notFoundMsg: string;
-    // 1. store
-    if (!store.plugins.get(slug)) notFoundMsg = 'this plugin not register yet';
-    // 2. db
-    else if (!oldPluginDoc)
-      notFoundMsg = 'can not edit plugin which not exist in db';
-    // 3. fs
-    else if (!(await isExist(getPluginPath(slug))))
-      notFoundMsg = `${getPluginPath(slug)} is not exist, try to add it first`;
+    if (!oldPluginDoc) throw new NotFound('plugin not found');
 
-    if (notFoundMsg) throw new NotFound(notFoundMsg);
+    // activation
+    if (body.status) {
+      const wantActive =
+        body.status === PluginStatus.Active &&
+        oldPluginDoc.status === PluginStatus.Inactive;
 
-    const steps: PluginStep[] = [];
+      const wantInactive =
+        body.status === PluginStatus.Inactive &&
+        oldPluginDoc.status === PluginStatus.Active;
 
-    // resolve from local
-    const conf = await this.resolve(slug);
+      if (!wantActive && !wantInactive)
+        throw new BadRequestError('status must be deferent');
 
-    // verify
-    body = await this.validate(conf, 'edit', body);
+      const newPluginDoc = await this.pluginModel.findOneAndUpdate(
+        { slug },
+        { status: body.status },
+        { new: true }
+      );
 
-    try {
+      if (wantActive) {
+        // active
+        const conf = await this.resolve(slug);
+        const stack = await this.run(conf, 'active', newPluginDoc.arg);
+
+        // register
+        registerPlugin(
+          {
+            type: conf.type,
+            slug: conf.slug,
+            name: conf.name,
+            stack,
+          },
+          { from: this.from, logger }
+        );
+      }
+      if (wantInactive) {
+        // inactive
+        unregisterPlugin(slug, this.from);
+      }
+
+      return res
+        .status(200)
+        .json({ ...newPluginDoc.toObject(), args: undefined });
+    }
+
+    if (body.config) {
+      // change config
+
+      // resolve from local
+      const conf = await this.resolve(slug);
+
+      // verify
+      body = await this.validate(conf, 'edit', body);
       // update db
       await this.pluginModel.findByIdAndUpdate(oldPluginDoc._id, {
         arg: merge(oldPluginDoc.arg, body),
       });
 
-      steps.push(PluginStep.UpdateDB);
-
-      const stack = await this.run(conf, 'edit', body, false);
-
-      // register
-      registerPlugin(
-        {
-          type: conf.type,
-          slug: conf.slug,
-          name: conf.name,
-          stack,
-        },
-        { from: this.from, logger }
-      );
-
-      steps.push(PluginStep.Register);
+      if (oldPluginDoc.status === PluginStatus.Active) {
+        const stack = await this.run(conf, 'edit', body, false);
+        // register
+        registerPlugin(
+          {
+            type: conf.type,
+            slug: conf.slug,
+            name: conf.name,
+            stack,
+          },
+          { from: this.from, logger }
+        );
+      }
 
       // present
       return res.json({
@@ -295,20 +446,19 @@ class LocalService {
           arg: undefined,
         },
       });
-    } catch (err) {
-      await this.rollback(steps, { slug, plugin: oldPluginDoc });
-      throw err;
     }
   };
 
-  deletePlugin: MiddleWare = async (req, res) => {
+  uninstall: MiddleWare = async (req, res) => {
     const { slug } = req.params;
 
-    const steps: PluginStep[] = [
-      PluginStep.Register,
-      PluginStep.InsertToDB,
-      PluginStep.CopyContent,
-    ];
+    const plugin = await this.pluginModel.findOne({ slug });
+
+    const steps: PluginStep[] = [PluginStep.InsertToDB, PluginStep.CopyContent];
+
+    if (plugin?.status === PluginStatus.Active) {
+      steps.push(PluginStep.Register);
+    }
 
     await this.rollback(steps, {
       slug,
@@ -324,11 +474,13 @@ class LocalService {
   };
 
   initPlugins = async () => {
-    const plugins = await this.pluginModel.find();
+    const plugins = await this.pluginModel.find({
+      status: PluginStatus.Active,
+    });
 
     for (const plugin of plugins) {
       const conf = await this.resolve(plugin.slug);
-      const stack = await this.run(conf, 'add', plugin.arg, true);
+      const stack = await this.run(conf, 'active', plugin.arg, true);
 
       registerPlugin(
         {
