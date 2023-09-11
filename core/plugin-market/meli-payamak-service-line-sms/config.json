@@ -8,7 +8,7 @@
     "type" : "sms-gateway",
     "icon": "",
     "author": "Nodeeweb",
-    "main":"index.ts",
+    "main":"index",
     "slug":"meli-payamak-service-line-sms",
     "add": {
         "inputs": [
@@ -40,7 +40,7 @@
                 "description": {}
             }
         ],
-        "dto":"dto/add.ts",
+        "dto":"dto/add",
         "run":"add"
     },
     "edit":{
@@ -73,7 +73,7 @@
                 "description": {}
             }
         ],
-        "dto":"dto/edit.ts",
+        "dto":"dto/edit",
         "run":"edit"
     }
 }

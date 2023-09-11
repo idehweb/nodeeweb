@@ -38,9 +38,9 @@ COPY shop/package.json shop/yarn.lock shop/
 COPY core /app/core
 
 # Copy core script
-RUN cd /app/core && \
-    mkdir -p dist && \
-    cp -r scripts dist/scripts
+# RUN cd /app/core && \
+#     mkdir -p dist && \
+#     cp -r scripts dist/scripts
 
 
 FROM build as build-dev
@@ -58,21 +58,32 @@ COPY shop /app/shop
 
 FROM build as build-pro
 
-# Build core
+# Install Core
 RUN cd /app/core && \ 
-    yarn install && \
+    yarn install
+
+# Build Core
+RUN cd /app/core && \ 
     yarn build
 
-# Install Packages
+# Build:Post Core
+RUN cd /app/core && \ 
+    yarn build:post
+
+# Install Shop
 RUN cd /app/shop && \
     yarn install
 
-# Copy modules
+# Copy modules Shop
 COPY shop /app/shop
 
-# Build
+# Build Shop
 RUN cd /app/shop && \
     yarn build
+
+# Build:Post Shop
+RUN cd /app/shop && \
+    yarn build:post
 
 # Replace Packages with Production one
 RUN cd /app/shop && \ 
@@ -108,9 +119,8 @@ COPY --from=build-pro /app/core/dist ../core/
 # Copy packages
 COPY --from=build-pro /app/shop/node_modules ./node_modules
 
-
 # Copy Build Files
-COPY --from=build-pro /app/shop/dist /app/shop/package.json /app/shop/tsconfig.json ./
+COPY --from=build-pro /app/shop/dist ./
 
 # Copy Docker EntryPoint
 COPY shop/docker/docker-entrypoint-pro.sh /usr/local/bin
@@ -128,7 +138,7 @@ ENV NODE_ENV "production"
 COPY --from=build-pro /app/shop/node_modules ./node_modules
 
 # Copy Build Files
-COPY --from=build-pro /app/shop/dist /app/shop/package.json /app/shop/tsconfig.json ./
+COPY --from=build-pro /app/shop/dist ./
 
 # Copy Docker EntryPoint
 COPY shop/docker/docker-entrypoint-pro.sh /usr/local/bin
