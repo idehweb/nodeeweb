@@ -170,12 +170,17 @@ class LocalService {
     const newPlugin = plugin.toObject();
 
     delete newPlugin.arg;
-    newPlugin['edit'] = { inputs: conf.edit.inputs };
+
+    let key: 'edit' | 'config';
+    if (newPlugin.status === PluginStatus.NeedToConfig) key = 'config';
+    else key = 'edit';
+
+    newPlugin[key] = { inputs: conf[key].inputs };
 
     // fill value
-    for (const editInput of newPlugin['edit'].inputs) {
-      editInput.value = plugin.arg[editInput.key];
-    }
+    if (key === 'edit')
+      for (const input of newPlugin[key].inputs)
+        input.value = plugin.arg[input.key];
 
     // present
     return newPlugin;

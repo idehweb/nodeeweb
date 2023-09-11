@@ -55,7 +55,7 @@ class MarketService {
         slug: conf.slug,
         icon: conf.icon,
         type: conf.type,
-        add: { inputs: conf.add.inputs },
+        config: { inputs: conf.config.inputs },
       },
     });
   };
