@@ -30,7 +30,6 @@ export default (props) => {
   // let {values} = useFormState();
   let { field } = useInput(props);
   // console.log("input", field);
-
   const [gallery, setGallery] = useState(valuesphotos || []);
   const [counter, setCounter] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -88,13 +87,14 @@ export default (props) => {
     });
     setGallery(cc);
     setProgress(0);
-    props.setPhotos(cc);
+    props.onRemove && props.onRemove(photo);
 
     // console.log('valuesphotos',valuesphotos);
   };
   const onImageClick = (photo) => {
     props.thep(photo);
     setV(photo);
+    props.changeThumbnail && props.changeThumbnail(photo);
   };
   const removeK = (g) => {
     // e.preventDefault();
@@ -106,8 +106,6 @@ export default (props) => {
     setGallery(c);
   };
 
-  // console.cle/sar();
-  //   console.log("gallery", props);
   return (
     <>
       <ImageInput

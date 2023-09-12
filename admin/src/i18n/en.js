@@ -348,7 +348,7 @@ const customEnglishMessages = {
       labels: 'labels',
       story: 'story',
       miniTitle: 'Short title',
-      type: 'type',
+      type: 'Type of price calculation',
       photo: 'photo',
       extra_attr: 'extra attributes',
       sources: 'Robot Sources',

@@ -4,7 +4,10 @@ import { ProductIn } from './in.type';
 import { PriceType, ProductOut, PublishStatus } from './out.type';
 
 export default class Transform {
-  static productInOut(product: ProductIn): Partial<ProductOut> {
+  static productInOut(
+    product: ProductIn,
+    action: 'update' | 'create'
+  ): Partial<ProductOut> {
     let status: PublishStatus;
     if (product.status) {
       switch (product.status) {
@@ -27,7 +30,13 @@ export default class Transform {
       slug: product.slug ?? slugify(product.slug),
       photos: product.photos?.length
         ? product.photos?.map(({ _id }) => _id)
-        : undefined,
+        : action === 'create'
+        ? undefined
+        : [],
+      thumbnail:
+        !product.photos?.length && action === 'update'
+          ? undefined
+          : product.thumbnail,
       labels: product.labels,
       attributes: product.attributes,
       extra_attr: product.extra_attr,
@@ -78,10 +87,10 @@ export default class Transform {
     return { ...out, ...extraOut };
   }
   static createProduct(product: ProductIn): ProductOut {
-    return Transform.productInOut(product) as any;
+    return Transform.productInOut(product, 'create') as any;
   }
   static updateProduct(product: ProductIn): Partial<ProductOut> {
-    return Transform.productInOut(product);
+    return Transform.productInOut(product, 'update');
   }
   static getOneProduct(product: ProductOut): ProductIn {
     let out: Partial<ProductIn> = {

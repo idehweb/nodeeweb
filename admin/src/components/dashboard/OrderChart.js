@@ -28,8 +28,6 @@ const dateFormatter = (date) => {
 };
 
 const aggregateOrdersByDay = (order = []) => {
-  // console.log('aggregateOrdersByDay()',order);
-  // return order;
   return order.reduce((acc, curr) => {
     // console.log('acc',acc)
     // console.log('curr',curr.createdAt)
@@ -44,8 +42,6 @@ const aggregateOrdersByDay = (order = []) => {
   }, {});
 };
 const aggregateOrdersCompletedByDay = (order = []) => {
-  // console.log('aggregateOrdersByDay()',order);
-  // return order;
   return order.reduce((acc, curr) => {
     // console.log('acc',acc)
     // console.log('curr',curr.createdAt)
@@ -60,8 +56,6 @@ const aggregateOrdersCompletedByDay = (order = []) => {
   }, {});
 };
 const aggregateOrdersSuccessPaymentByDay = (order = []) => {
-  // console.log('aggregateOrdersByDay()',order);
-  // return order;
   return order.reduce((acc, curr) => {
     // console.log('acc',acc)
     // console.log('curr',curr.createdAt)

@@ -19,7 +19,7 @@ import {
 } from 'react-admin';
 import { useFormContext } from 'react-hook-form';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { RichTextInput } from 'ra-input-rich-text';
 
@@ -176,8 +176,6 @@ const CustomToolbar = (props) => {
     <Toolbar {...props} className={'dfghjk'}>
       <SaveButton
         alwaysEnable
-        redirect={false}
-        // onClick={(e) => save(e)}
         edit={'edit'}
         mutationMode={'pessimistic'}
         transform={transform}
@@ -189,13 +187,24 @@ const CustomToolbar = (props) => {
 const Form = ({ children, ...props }) => {
   const { record } = props;
   const [photos, setPhotos] = useState(record?.photos ?? []);
+  const [thumbnail, setThumbnail] = useState(record?.thumbnail);
 
   let _The_ID = '';
   const translate = useTranslate();
   const notify = useNotify();
 
-  const onChangePhoto = useCallback(async ({ _id, url }) => {
-    setPhotos([{ url, _id }]);
+  const onAddPhoto = useCallback(async ({ _id, url }) => {
+    setPhotos((photos) => {
+      if (photos.find((p) => p._id === _id)) return photos;
+      return [...photos, { _id, url }];
+    });
+  }, []);
+
+  const onRemovePhoto = useCallback((url) => {
+    setPhotos((photos) => photos.filter((p) => p.url !== url));
+  }, []);
+  const changeThumbnail = useCallback(async (url) => {
+    setThumbnail(url);
   }, []);
 
   if (record && record._id) {
@@ -218,6 +227,7 @@ const Form = ({ children, ...props }) => {
 
   function save(values) {
     values.photos = photos;
+    values.thumbnail = thumbnail;
 
     if (_The_ID.length > 0) {
       // delete values.photos;
@@ -538,7 +548,9 @@ const Form = ({ children, ...props }) => {
         multiple={true}
         thep={theP}
         setPhotos={setPhotos}
-        inReturn={onChangePhoto}
+        inReturn={onAddPhoto}
+        onRemove={onRemovePhoto}
+        changeThumbnail={changeThumbnail}
       />
 
       <div className={'mb-20'} />

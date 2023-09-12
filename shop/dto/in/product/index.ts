@@ -201,6 +201,11 @@ export class CreateProductBody {
 
   @Expose()
   @IsOptional()
+  @IsString()
+  thumbnail?: string;
+
+  @Expose()
+  @IsOptional()
   @IsBoolean()
   active?: boolean;
 }
@@ -304,8 +309,12 @@ export class UpdateProductBody {
   @IsOptional()
   @ToMongoID()
   @IsMongoID({ each: true })
-  @ArrayMinSize(1)
   photos?: Types.ObjectId[];
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  thumbnail?: string;
 
   @Expose()
   @IsOptional()

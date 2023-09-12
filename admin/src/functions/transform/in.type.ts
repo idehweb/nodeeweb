@@ -21,6 +21,7 @@ export type ProductIn = {
     values: string[];
   }[];
   photos: { _id: string; url: string }[];
+  thumbnail?: string;
   extra_attr: {
     title: string;
     des: string;
