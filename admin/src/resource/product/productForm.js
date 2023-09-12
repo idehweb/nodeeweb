@@ -195,7 +195,6 @@ const Form = ({ children, ...props }) => {
   const notify = useNotify();
 
   const onChangePhoto = useCallback(async ({ _id, url }) => {
-    console.log('##$$ on change', url);
     setPhotos([{ url, _id }]);
   }, []);
 

@@ -256,11 +256,9 @@ function CreateForm(props) {
                           console.log('e', e);
                         })
                           .then(({ data }) => {
-                            console.log('##$$', data);
                             field.setValue(name, data.url);
                           })
                           .catch((err) => {
-                            console.log('##$$ upload error');
                           });
                       }}
                       type={'file'}
