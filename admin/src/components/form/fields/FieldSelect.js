@@ -35,8 +35,8 @@ function FieldSelect(props) {
     if (limit) {
       limit = parseInt(limit);
     }
-    // ttps://parts.arvandguarantee.shop/admin/form/0/10?_order=ASC&_sort=id
     if (typeInitila === 'form') {
+      console.log('##$$ we are here');
       API.get(BASE_URL + `/admin/form/0/${limit}?_order=ASC&_sort=id`)
         .then((res) => {
           setList(res.data);

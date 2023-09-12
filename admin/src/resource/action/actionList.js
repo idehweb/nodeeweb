@@ -71,10 +71,17 @@ const list = (props) => {
                       label={translate('resources.action.username')}
                       sortable={false}
                     />
-                    {record.user.nickname && (
+                    {record.user.firstName && (
                       <ChipField
-                        source="user.nickname"
-                        label={translate('resources.action.nickname')}
+                        source="user.firstName"
+                        label={translate('resources.action.firstName')}
+                        sortable={false}
+                      />
+                    )}
+                    {record.user.lastName && (
+                      <ChipField
+                        source="user.lastName"
+                        label={translate('resources.action.lastName')}
                         sortable={false}
                       />
                     )}
