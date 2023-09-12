@@ -36,10 +36,9 @@ function FieldSelect(props) {
       limit = parseInt(limit);
     }
     if (typeInitila === 'form') {
-      console.log('##$$ we are here');
-      API.get(BASE_URL + `/admin/form/0/${limit}?_order=ASC&_sort=id`)
-        .then((res) => {
-          setList(res.data);
+      API.get(`/form/0/${limit}`)
+        .then(({ data: { data } }) => {
+          setList(data);
         })
         .catch((err) => {});
     }
