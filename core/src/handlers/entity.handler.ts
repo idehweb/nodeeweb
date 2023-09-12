@@ -89,11 +89,10 @@ export class EntityCreator {
     }: Partial<CRUDCreatorOpt>
   ) {
     let result: any = query;
-    let mySort: any =
-      sort ?? queryFields?.sort ? req.query[queryFields?.sort] : undefined;
+    const mySort: any =
+      sort ?? (queryFields?.sort ? req.query[queryFields?.sort] : undefined);
     if (mySort) query.sort(mySort);
     if (project) query.projection(project);
-
     const offset = +this.getFrom(
       req,
       [
