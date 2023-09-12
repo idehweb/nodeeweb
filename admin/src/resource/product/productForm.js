@@ -597,6 +597,7 @@ const Form = ({ children, ...props }) => {
       <SelectInput
         label={translate('resources.product.status')}
         source="status"
+        defaultValue={'published'}
         choices={[
           { id: 'published', name: translate('resources.product.published') },
           { id: 'processing', name: translate('resources.product.processing') },
