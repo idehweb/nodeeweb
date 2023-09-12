@@ -83,16 +83,6 @@ export default (props) => {
     // if (field.value) setV(field.value);
   }, []);
 
-  // const returnToHome = (t) => {
-  //     let uytfd = t.target.options.selectedIndex - 1;
-  //     console.log('returnToHome...', uytfd, g[uytfd]);
-  //     if (g[uytfd]) {
-  //         let _id = g[uytfd]._id;
-  //         ckjhg['secondCategory'] = _id;
-  //         props.returnToHome(ckjhg);
-  //     }
-  //
-  // }
   const chooseThirdCat = (t) => {
     let uytfd = t.value;
     // console.log('returnToHome...', uytfd);
@@ -135,15 +125,8 @@ export default (props) => {
     }
   };
   const changeSecondInput = (t, x = false) => {
-    // console.log('changeSecondInput', t);
-    // setG([]);
-    // setDefaultG({});
-    //
-    // setD([]);
-    // setDefaultD({});
+    console.log('##$$ change second input call');
 
-    // console.log(t.target.options.selectedIndex,v[t.target.options.selectedIndex]);
-    // if (t.target.options.selectedIndex) {
     if (t.value) {
       // console.log(v);
       let _id = t.value;
@@ -185,6 +168,7 @@ export default (props) => {
     }
   };
   const returnChoices = (attribute) => {
+    console.log('##$$ return choices call');
     let ddd = [];
     v.forEach((f) => {
       if (f.value == attribute) {
@@ -196,6 +180,8 @@ export default (props) => {
     return ddd;
   };
   const changeThirdInput = (t) => {
+    console.log('##$$ change third input call');
+
     // console.log('changeThirdInput', t);
 
     // console.log(t.target.options.selectedIndex,v[t.target.options.selectedIndex]);
@@ -209,18 +195,6 @@ export default (props) => {
       setSelectS([false, false, false]);
     }
   };
-
-  // React.useEffect(() => {
-  //     console.log('v changged', v);
-  //     // setV(v);
-  //     // changeSecondInput(v);
-  // }, [v]);
-  // React.useEffect(() => {
-  //     console.log('g changged', g);
-  // }, [g]);
-  // console.log('v', v);
-  console.log('g', g);
-  // console.log('d', d);
   if (v)
     return (
       <>
@@ -233,16 +207,6 @@ export default (props) => {
                 return (
                   <div className={'row mb-20'}>
                     <div className={'col-md-4'}>
-                      {/*<Select*/}
-                      {/*source={getSource("attribute")}*/}
-                      {/*isRtl={true}*/}
-                      {/*isLoading={selectS[0]}*/}
-                      {/*isDisabled={selectS[0]}*/}
-                      {/*className={"zindexhigh"}*/}
-                      {/*defaultValue={defaultV}*/}
-                      {/*onChange={changeSecondInput}*/}
-                      {/*options={v}*/}
-                      {/*/>*/}
                       <SelectInput
                         fullWidth
                         className={'mb-20'}

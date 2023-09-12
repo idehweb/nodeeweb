@@ -38,7 +38,9 @@ export default class Transform {
           ? undefined
           : product.thumbnail,
       labels: product.labels,
-      attributes: product.attributes,
+      attributes: product.attributes
+        ? product.attributes.filter((atr) => atr.attribute)
+        : undefined,
       extra_attr: product.extra_attr,
       status,
       miniTitle: product.miniTitle,
