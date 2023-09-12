@@ -125,8 +125,6 @@ export default (props) => {
     }
   };
   const changeSecondInput = (t, x = false) => {
-    console.log('##$$ change second input call');
-
     if (t.value) {
       // console.log(v);
       let _id = t.value;
@@ -168,7 +166,6 @@ export default (props) => {
     }
   };
   const returnChoices = (attribute) => {
-    console.log('##$$ return choices call');
     let ddd = [];
     v.forEach((f) => {
       if (f.value == attribute) {
@@ -180,14 +177,7 @@ export default (props) => {
     return ddd;
   };
   const changeThirdInput = (t) => {
-    console.log('##$$ change third input call');
-
-    // console.log('changeThirdInput', t);
-
-    // console.log(t.target.options.selectedIndex,v[t.target.options.selectedIndex]);
     if (t && t.value) {
-      // console.log(g);
-      // let _id = g[t.target.options.selectedIndex - 1]._id;
       let _id = t.value;
       ckjhg['secondCategory'] = _id;
       props.returnToHome(ckjhg);
