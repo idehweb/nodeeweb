@@ -72,9 +72,10 @@ class CombinationProduct {
   options?: { [key: string]: string };
 
   @Expose()
+  @IsOptional()
   @IsNumber()
   @IsPositive()
-  price: number;
+  price?: number;
 
   @Expose()
   @IsNumber()
@@ -112,7 +113,8 @@ export class CreateProductBody {
 
   @Expose()
   @IsMultiLang()
-  miniTitle: { [key: string]: string };
+  @IsOptional()
+  miniTitle?: { [key: string]: string };
 
   @Expose()
   @IsOptional()

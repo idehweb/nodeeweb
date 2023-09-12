@@ -5,6 +5,7 @@ import {
   ForbiddenError,
   LimitError,
   ValidationError,
+  BadRequestError,
 } from '@nodeeweb/core';
 import store from '../../store';
 import {
@@ -49,6 +50,31 @@ export default class CartService {
           `product with ID ${product._id.toString()} in combination with ID ${
             docCombinations._id
           } has insufficient quantity`
+        );
+    });
+  }
+  static checkProductPrice({
+    product,
+    productDoc,
+  }: {
+    product: ProductBody;
+    productDoc: ProductDocument;
+  }) {
+    const productCombinationsInDoc = productDoc.combinations;
+
+    product.combinations.forEach((combination) => {
+      const docCombinations = productCombinationsInDoc.find(
+        ({ _id }) => _id === combination._id
+      );
+
+      if (
+        docCombinations.price === undefined ||
+        docCombinations.salePrice === undefined
+      )
+        throw new ValidationError(
+          `product with ID ${product._id.toString()} in combination with ID ${
+            docCombinations._id
+          } has no valid price`
         );
     });
   }
@@ -105,6 +131,9 @@ export default class CartService {
         throw new NotFound('Some product combinations not exits');
     }
 
+    // price checker
+    this.checkProductPrice({ product, productDoc });
+
     // quantity rules
     this.checkProductQuantity({ product, productDoc });
 
@@ -145,7 +174,7 @@ export default class CartService {
 
     return {
       _id: product._id,
-      combinations: mergedCombinations,
+      combinations: mergedCombinations as any,
       miniTitle: product.miniTitle,
       title: product.title,
       image: product['image'] ?? product['thumbnail'],

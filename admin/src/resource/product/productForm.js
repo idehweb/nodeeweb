@@ -322,7 +322,6 @@ const Form = ({ children, ...props }) => {
       <TextInput
         source={'miniTitle.' + translate('lan')}
         label={translate('resources.product.miniTitle')}
-        validate={Val.req}
       />
       {/* <TextInput
         source={'extra_button'}
@@ -418,7 +417,7 @@ const Form = ({ children, ...props }) => {
                     // record={scopedFormData}
 
                     source={'price'}
-                    validate={Val.reqNum}
+                    validate={Val.num}
                     className={'ltr'}
                     label={translate('resources.product.price')}
                     format={(v) => {
