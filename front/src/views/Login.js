@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card, Col, Container, Row } from 'shards-react';
 import { withTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 import PageTitle from '#c/components/common/PageTitle';
 import LoginForm from '#c/components/components-overview/NewLoginForm';
-import { defaultImg } from '#c/assets/index';
-import { savePost } from '#c/functions/index';
+import { savePost } from '../functions/index';
+import { getToken } from '../functions/utils';
+import API from '../functions/API';
+
+const Status = {
+  NeedToCheck: 'need-to-check',
+  Authenticated: 'authenticated',
+  NeedAuth: 'need-auth',
+};
 
 const Login = ({ t }) => {
-  console.clear();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [status, setStatus] = useState(
+    searchParams.get('noCheck') ? Status.NeedAuth : Status.NeedToCheck,
+  );
+
   let params = useParams();
 
   if (params._state === 'goToCheckout') {
@@ -18,12 +29,22 @@ const Login = ({ t }) => {
   if (params._state === 'goToChat') {
     savePost({ goToChat: true });
   }
-  const [state, setState] = useState({
-    customer: {
-      phoneNumber: '',
-    },
-    noImage: defaultImg,
-  });
+
+  const check = useCallback(async () => {
+    try {
+      const token = getToken();
+      if (!token) return setStatus(Status.NeedAuth);
+
+      const { data } = API.post('/');
+    } catch (err) {
+      console.error(err);
+      return setStatus(Status.NeedAuth);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (status === Status.NeedToCheck) check();
+  }, []);
 
   return (
     <Container fluid className="main-content-container px-4">

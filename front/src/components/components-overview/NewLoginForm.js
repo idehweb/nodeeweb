@@ -220,8 +220,6 @@ class LoginForm extends React.Component {
     const response = await this.detect(fd + phoneNumber, true);
     if (!response.isOk) return toast.error(response.message);
 
-    console.log('##$$ set', response.sms_time);
-
     return this.setState((s) => ({
       ...s,
       authStatus: 'signup:active',
@@ -280,7 +278,6 @@ class LoginForm extends React.Component {
 
     if (this.state.authStatus.includes('active'))
       this.myInterval = setInterval(() => {
-        console.log('##$$ timer call');
         this.setState(({ timer }) => ({
           timer: timer > 0 ? timer - 1 : this.handleClearInterval(),
         }));

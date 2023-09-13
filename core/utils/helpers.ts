@@ -141,3 +141,7 @@ export function replaceValue({
   }
   return newMsg;
 }
+
+export function slugify(str: string) {
+  return _.kebabCase(str);
+}
