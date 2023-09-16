@@ -245,6 +245,9 @@ const customEnglishMessages = {
       install: 'install',
       unistall: 'unistall',
       edit: 'edit',
+      configuration: 'config',
+      status: 'status',
+      activation: 'activation',
     },
     category: {
       menu_label: 'categories',
