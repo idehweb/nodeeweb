@@ -1,4 +1,4 @@
-import _isEqual from 'lodash/isEqual'
+import _isEqual from 'lodash/isEqual';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
@@ -8,6 +8,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import createRoutes from '#c/DefaultRoute';
 
 const APP = (props) => {
+  console.log('##$$ 3', process.env);
+  window.TEST_ENV = process.env.TEST_ENV;
   let { t } = props,
     routes = [];
   const themeData = useSelector((st) => st.store.themeData, _isEqual);
@@ -22,7 +24,7 @@ const APP = (props) => {
       <BrowserRouter>
         <Routes>
           {routes.map((route, index) => {
-            console.log(route.path)
+            console.log(route.path);
             return (
               <Route
                 key={index}

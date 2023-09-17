@@ -26,16 +26,16 @@ import { getToken } from './utils';
 const DataContext = createContext(null);
 export const isClient = typeof window !== 'undefined';
 // clearState
-export const MainUrl = CONFIG.SERVER_URL;
+export const ServerUrl = process.env.REACT_APP_SERVER_URL;
+export const MainUrl = ServerUrl;
 if (isClient) {
   // import { createContext } from "react";
 }
 // export const MainUrl = "http://localhost:3003";
-export const ApiUrl = CONFIG.BASE_URL;
-export const AdminRoute = CONFIG.BASE_URL + '/admin';
+export const ApiUrl = process.env.REACT_APP_API_URL;
+export const AdminRoute = ServerUrl + '/admin';
 export const InstanceManagerUrl = 'https://instancemanager.nodeeweb.com/api/v1';
-export const THEME_URL = CONFIG.THEME_URL || CONFIG.BASE_URL;
-export const ServerUrl = CONFIG.SERVER_URL;
+export const THEME_URL = ApiUrl + '/theme';
 
 export const token = getToken();
 export const admin_token = getToken();
@@ -1273,7 +1273,7 @@ export const contactBoy = (d, obj) => {
 };
 export const addBookmark = (_id) => {
   return new Promise(function (resolve, reject) {
-   const token = getToken();
+    const token = getToken();
     console.log('token', token);
     if (!token) {
       reject({
