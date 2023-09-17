@@ -1,8 +1,9 @@
 import axios from 'axios';
 import API_Conf, { ApiUrl } from '.';
 import { getToken } from './utils';
+import { Navigate } from 'react-router-dom';
 
-export default axios.create({
+const API = axios.create({
   baseURL: ApiUrl,
   headers: {
     Accept: 'application/json',
@@ -18,3 +19,29 @@ export default axios.create({
     },
   ],
 });
+
+API.interceptors.response.use(
+  (data) => {
+    return data;
+  },
+  (err) => {
+    if (err.isAxiosError) {
+      // unauthorize
+      if (
+        err.response?.status === 401 &&
+        !location.pathname.startsWith('/login') &&
+        !err.config?.no_redirect
+      ) {
+        return (
+          <Navigate
+            replace={`/login?check=false&redirect=${location.pathname}`}
+          />
+        );
+      }
+    }
+
+    throw err;
+  },
+);
+
+export default API;
