@@ -6,7 +6,6 @@ import store, {
   storeProduct,
   storeProducts,
 } from '#c/functions/store';
-import CONFIG from '#c/config';
 import { createContext } from 'react';
 import {
   clearState,
@@ -36,8 +35,8 @@ export const ApiUrl = process.env.REACT_APP_API_URL;
 export const AdminRoute = ServerUrl + '/admin';
 export const InstanceManagerUrl = 'https://instancemanager.nodeeweb.com/api/v1';
 export const THEME_URL = ApiUrl + '/theme';
+const token = getToken();
 
-export const token = getToken();
 export const admin_token = getToken();
 export const setStyles = (fields) => {
   let style = {};

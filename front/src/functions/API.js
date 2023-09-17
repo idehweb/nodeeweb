@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { ApiUrl, token } from '.';
+import API_Conf, { ApiUrl } from '.';
+import { getToken } from './utils';
 
 export default axios.create({
   baseURL: ApiUrl,
@@ -11,7 +12,8 @@ export default axios.create({
   // add Authorization token to header
   transformRequest: [
     (data, headers) => {
-      headers.Authorization = token;
+      headers.Authorization = getToken();
+      if (typeof data === 'object') data = JSON.stringify(data);
       return data;
     },
   ],

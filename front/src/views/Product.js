@@ -114,8 +114,6 @@ const Product = (props) => {
 
         // **************WarrantyRequired*****************
 
-        console.log('##$$', d);
-
         resolve({
           load: true,
           title: d.title,

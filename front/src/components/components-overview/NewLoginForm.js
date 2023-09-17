@@ -308,29 +308,10 @@ class LoginForm extends React.Component {
     }
   }
   render() {
-    const {
-      goToProfile,
-      token,
-      firstName,
-      lastName,
-      username,
-      CameFromPost,
-      goToProduct,
-      goToCheckout,
-      goToChat,
-      timer,
-      authStatus,
-    } = this.state;
+    const { firstName, lastName, username, timer, authStatus } = this.state;
     const { t } = this.props;
     if (authStatus === 'success') {
-      let redirect_url;
-
-      if (goToCheckout) redirect_url = '/checkout/';
-      if (goToChat) redirect_url = '/chat/';
-      if (CameFromPost) redirect_url = '/add-new-post/publish';
-      if (goToProfile) redirect_url = '/profile';
-
-      return <Navigate to={redirect_url} />;
+      return <Navigate to={this.props.redirectTo} />;
     }
     return (
       <ListGroup flush>
