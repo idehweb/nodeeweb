@@ -32,7 +32,7 @@ import Captcha from '#c/components/captcha';
 import { fNum } from '#c/functions/utils';
 
 import CircularProgress from '@mui/material/CircularProgress';
-import otpHandler from '@/functions/auth';
+import { otpHandler } from '@/functions/auth';
 import { SaveData } from '@/functions';
 
 const globalTimerSet = 120;
@@ -77,12 +77,13 @@ class LoginForm extends React.Component {
 
   async detect(phone, signup = false) {
     try {
-      const {
-        data: { data },
-      } = await otpHandler.detect(phone, {
-        login: true,
-        signup,
-      });
+      const data = await otpHandler.detect(
+        { phone },
+        {
+          login: true,
+          signup,
+        },
+      );
 
       return {
         isOk: true,
@@ -103,9 +104,7 @@ class LoginForm extends React.Component {
 
   async login(phone, code) {
     try {
-      const {
-        data: { data },
-      } = await otpHandler.login(phone, code);
+      const data = await otpHandler.login({ phone, code });
       this.afterAuth(data.user, data.token);
       return { isOk: true };
     } catch (err) {
@@ -118,9 +117,7 @@ class LoginForm extends React.Component {
 
   async signup(user) {
     try {
-      const {
-        data: { data },
-      } = await otpHandler.signup(user);
+      const data = await otpHandler.signup(user);
       this.afterAuth(data.user, data.token);
       return { isOk: true };
     } catch (err) {

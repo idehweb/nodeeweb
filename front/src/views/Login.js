@@ -8,6 +8,7 @@ import LoginForm from '#c/components/components-overview/NewLoginForm';
 import { savePost } from '../functions/index';
 import { getToken } from '../functions/utils';
 import API from '../functions/API';
+import { jwtHandler } from '@/functions/auth';
 
 const Status = {
   NeedToCheck: 'need-to-check',
@@ -35,7 +36,7 @@ const Login = ({ t }) => {
       const token = getToken();
       if (!token) return setStatus(Status.NeedAuth);
 
-      const { data } = API.post('/');
+      const { data } = await jwtHandler.login(undefined, { login: true });
     } catch (err) {
       console.error(err);
       return setStatus(Status.NeedAuth);
