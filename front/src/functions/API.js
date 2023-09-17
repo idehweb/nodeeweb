@@ -34,7 +34,9 @@ API.interceptors.response.use(
       ) {
         return (
           <Navigate
-            replace={`/login?check=false&redirect=${location.pathname}`}
+            replace={`/login?check=false&redirect=${encodeURIComponent(
+              location.pathname,
+            )}`}
           />
         );
       }
