@@ -21,6 +21,7 @@ import {
 } from '#c/functions/utils';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { getToken } from './utils';
+import API from './API';
 
 const DataContext = createContext(null);
 export const isClient = typeof window !== 'undefined';
@@ -1010,7 +1011,7 @@ export const getEntities = (
       });
   });
 };
-export const getEntitiesWithCount = (
+export const getEntitiesWithCount = async (
   entity,
   offset = 0,
   limit = 24,
@@ -1018,52 +1019,32 @@ export const getEntitiesWithCount = (
   filter,
   populate,
 ) => {
-  return new Promise(function (resolve, reject) {
-    // console.log('filter', filter)
-    // console.log('getPosts...',store.getState().store.country)
-    // if(typeof filter!='object'){
-    //   filter=false
-    // }
-    let params = {};
-    const { country } = store.getState().store;
-    if (country) {
-      params = {
-        country: country,
-      };
-    }
+  let params = {};
+  const { country } = store.getState().store;
+  if (country) {
+    params = {
+      country: country,
+    };
+  }
 
-    let url = `${ApiUrl}/${entity}/${offset}/${limit}/`;
+  let url = `${ApiUrl}/${entity}/${offset}/${limit}/`;
 
-    if (search) url += search;
-    // if (filter) {
+  if (search) url += search;
 
+  if (filter) {
+    url += '?filter=' + filter;
     // if (filter["type"]) params["type"] = filter["type"];
-    // }
-    // console.log('filter', filter)
+  }
+  if (filter && populate) {
+    url += '&populate=' + populate;
+  }
+  if (!filter && populate) {
+    url += '?populate=' + populate;
+  }
 
-    if (filter) {
-      url += '?filter=' + filter;
-      // if (filter["type"]) params["type"] = filter["type"];
-    }
-    if (filter && populate) {
-      url += '&populate=' + populate;
-    }
-    if (!filter && populate) {
-      url += '?populate=' + populate;
-    }
-    getData(url, { params }, true)
-      .then((d) => {
-        let { data, headers } = d;
-        resolve({
-          items: data,
-          count: headers ? headers['x-total-count'] : 0,
-        });
-      })
-      .catch((err) => {
-        handleErr(err);
-        reject(err);
-      });
-  });
+  const { data, headers } = await API.get(url, { params });
+
+  return { items: data.data, count: headers ? headers['x-total-count'] : 0 };
 };
 export const getEntitiesForAdmin = (
   entity,

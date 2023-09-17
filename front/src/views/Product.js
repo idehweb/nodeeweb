@@ -12,7 +12,7 @@ import {
   NavLink,
   Row,
 } from 'shards-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import Gallery from '#c/components/single-post/Gallery';
 import {
   WarrantyIcon,
@@ -155,24 +155,12 @@ const Product = (props) => {
 
   if (isClient)
     useEffect(() => {
-      // let mounted = true;
       let { _id, title } = params;
       getThePost(the_id).then((items) => {
         setState(items);
         if (isClient) window.scrollTo(0, 0);
-        // }
       });
-      // return () => mounted = false;
     }, [the_id]);
-
-  // useEffect(() => {
-  //   let { _id, title } = params;
-  //   // if (mainId != _id) {
-  //   getThePost(_id).then(res=>setState(state => ({ ...state, ...res })));
-  //   window.scrollTo(0, 0);
-  //   // }
-  //
-  // }, [the_id]);
 
   let {
     labels,

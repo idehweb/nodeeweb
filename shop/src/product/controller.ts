@@ -37,9 +37,9 @@ export default function registerController() {
     'product',
     {
       getAll: {
-        controller: {
-          access: AdminAccess,
-        },
+        // controller: {
+        //   access: AdminAccess,
+        // },
         crud: {
           parseFilter: Service.getAllFilterParser,
           autoSetCount: true,
@@ -50,9 +50,9 @@ export default function registerController() {
         },
       },
       getCount: {
-        controller: {
-          access: AdminAccess,
-        },
+        // controller: {
+        //   access: AdminAccess,
+        // },
       },
       getOne: {
         controller: {
