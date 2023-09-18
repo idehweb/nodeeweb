@@ -61,6 +61,7 @@ export default function registerController() {
         },
         crud: {
           parseFilter: Service.getOneFilterParser,
+          paramFields: { slug: 'slug' },
         },
       },
       create: {

@@ -179,15 +179,24 @@ export class EntityCreator {
   }
   getOneCreator({
     parseFilter,
-    paramFields = { id: 'id' },
+    paramFields: pf = { id: 'id', slug: 'slug' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = parseFilter
         ? await call(parseFilter, req)
         : {
-            _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+            _id:
+              pf.id &&
+              req.params[pf.id] &&
+              new mongoose.Types.ObjectId(req.params[pf.id]),
+            slug: req.params[pf.slug],
           };
+
+      for (const key in f) {
+        if (f[key] === undefined) delete f[key];
+      }
+
       const query = this.model.findOne(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
@@ -202,15 +211,24 @@ export class EntityCreator {
   updateOneCreator({
     parseFilter,
     parseUpdate,
-    paramFields = { id: 'id' },
+    paramFields: pf = { id: 'id', slug: 'slug' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = parseFilter
         ? await call(parseFilter, req)
         : {
-            _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+            _id:
+              pf.id &&
+              req.params[pf.id] &&
+              new mongoose.Types.ObjectId(req.params[pf.id]),
+            slug: req.params[pf.slug],
           };
+
+      for (const key in f) {
+        if (f[key] === undefined) delete f[key];
+      }
+
       const u = parseUpdate ? await call(parseUpdate, req) : req.body;
       const query = this.model.findOneAndUpdate(f, u, { new: true });
       return await this.baseCreator(query, req, res, next, opt);
@@ -220,15 +238,24 @@ export class EntityCreator {
     parseFilter,
     forceDelete,
     parseUpdate,
-    paramFields = { id: 'id' },
+    paramFields: pf = { id: 'id', slug: 'slug' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = parseFilter
         ? await call(parseFilter, req)
         : {
-            _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+            _id:
+              pf.id &&
+              req.params[pf.id] &&
+              new mongoose.Types.ObjectId(req.params[pf.id]),
+            slug: req.params[pf.slug],
           };
+
+      for (const key in f) {
+        if (f[key] === undefined) delete f[key];
+      }
+
       const u = parseUpdate ? await call(parseUpdate, req) : { active: false };
       const query = forceDelete
         ? this.model.findOneAndDelete(f)
@@ -355,7 +382,8 @@ function translateCRUD2Url(
     case CRUD.GET_ONE:
     case CRUD.UPDATE_ONE:
     case CRUD.DELETE_ONE:
-      return `/:${opt.paramFields?.id ?? 'id'}`;
+      const identifier = opt.paramFields?.id ?? opt.paramFields?.slug ?? 'id';
+      return `/:${identifier}`;
     default:
       throw new Error(`Invalid CRUD name : ${name}`);
   }
