@@ -11,8 +11,9 @@ import { BASE_API_URL, CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { isAsyncFunction } from 'util/types';
 import { BadRequestError, GeneralError, NotFound } from '../../types/error';
 import { call } from '../../utils/helpers';
-import { CrudParamDto } from '../../dto/in/crud.dto';
+import { CrudParamDto, MultiIDParam } from '../../dto/in/crud.dto';
 import _, { lowerFirst, orderBy } from 'lodash';
+import { ClassConstructor } from 'class-transformer';
 
 export class EntityCreator {
   constructor(private modelName: string) {}
@@ -311,6 +312,8 @@ export function registerEntityCRUD(
     // set default values
     opt.crud = _.merge({ ...defaultCrudOpt }, opt.crud ?? {});
 
+    const defValidator = detectDefaultParamValidation(cName, opt);
+
     schemas.push({
       method: opt.controller.method ?? translateCRUD2Method(cName),
       url: opt.controller.url ?? translateCRUD2Url(cName, opt.crud),
@@ -320,8 +323,8 @@ export function registerEntityCRUD(
         creator[translateCRUD2Creator(cName)](opt.crud),
         ...[opt.controller.service ?? []].flat(),
       ],
-      validate: canUseDefaultParamValidation(cName, opt)
-        ? { reqPath: 'params', dto: CrudParamDto }
+      validate: defValidator
+        ? { reqPath: 'params', dto: defValidator }
         : opt.controller.validate,
     });
   }
@@ -389,12 +392,22 @@ function translateCRUD2Url(
   }
 }
 
-function canUseDefaultParamValidation(name: CRUD, opt: EntityCRUDOpt) {
-  return (
+function detectDefaultParamValidation(
+  name: CRUD,
+  opt: EntityCRUDOpt
+): ClassConstructor<unknown> | null {
+  const canUse =
     opt.controller.validate === undefined &&
     [CRUD.UPDATE_ONE, CRUD.DELETE_ONE, CRUD.GET_ONE].includes(name) &&
-    (!opt.crud.paramFields || ['id', 'slug'].includes(opt.crud.paramFields.id))
-  );
+    (!opt.crud?.paramFields ||
+      ['id', 'slug'].includes(opt.crud?.paramFields.id));
+
+  return !canUse
+    ? null
+    : !opt.crud?.paramFields ||
+      (opt.crud.paramFields.id && opt.crud.paramFields.slug)
+    ? MultiIDParam
+    : CrudParamDto;
 }
 
 function order(opts: EntityOpts): EntityOpts {

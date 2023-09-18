@@ -6,10 +6,6 @@ import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
 import { controllersBatchRegister } from '@nodeeweb/core/src/handlers/controller.handler';
 import Service from './service';
-import {
-  AdminAccess,
-  AuthUserAccess,
-} from '@nodeeweb/core/src/handlers/auth.handler';
 import { CreateProductBody, UpdateProductBody } from '../../dto/in/product';
 
 export default function registerController() {
@@ -58,10 +54,6 @@ export default function registerController() {
         controller: {
           // access: AuthUserAccess,
           service: Service.getOneAfter,
-        },
-        crud: {
-          parseFilter: Service.getOneFilterParser,
-          paramFields: { slug: 'slug' },
         },
       },
       create: {
