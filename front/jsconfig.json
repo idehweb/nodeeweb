@@ -6,7 +6,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "#c/*": ["./src/*"],
+      "#c/*": ["./src/*"]
     }
   },
   "exclude": ["node_modules", "**/node_modules/*", "public"]

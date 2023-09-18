@@ -16,9 +16,6 @@
   "rules": {
     "comma-dangle": "off",
     "@typescript-eslint/comma-dangle": "off",
-    "jsx-a11y/anchor-is-valid": "off",
-    "babel/no-invalid-this": "error"
-  },
-  "parser": "babel/eslint-parser",
-  "plugins": ["babel"]
- }
+    "jsx-a11y/anchor-is-valid": "off"
+  }
+}
