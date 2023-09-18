@@ -33,8 +33,6 @@ const getURIParts = (url) => {
   return new URL(url);
 };
 const Pagination = (props) => {
-  console.log('##$$', 'render pagination');
-
   let url = isClient ? new URL(window.location.href) : '';
   let theurl = getURIParts(url);
   let navigate = useNavigate();
@@ -56,16 +54,6 @@ const Pagination = (props) => {
   if (!limit) {
     limit = 32;
   }
-
-  // let params = data;
-  // if (!params.offset) {
-  //   params.offset = 0
-  // }
-  // if (!params.limit) {
-  //   params.limit = 24
-  // }
-
-  // theurl=theurl.split('/');
 
   const postCardMode = useSelector((st) => st.store.postCardMode, _.isEqual);
   let device = isClient ? url.searchParams.get('device') || '' : '';
@@ -216,19 +204,14 @@ const Pagination = (props) => {
   const afterGetData = (resp, tracks = []) => {
     let trackss = [...tracks],
       { items, count } = resp;
-    // if (resp.length < 24) sethasMoreItems(false);
     if (items && items.length) {
       items.forEach((item) => {
         trackss.push(item);
       });
       settracks(trackss);
       setcount(count);
-      settheload(false);
-
-      // if (resp && resp.length < 1) sethasMoreItems(false);
+      settheload(true);
     } else {
-      // sethasMoreItems(false);
-      // setLoad(false);
       settheload(false);
     }
   };
@@ -238,15 +221,13 @@ const Pagination = (props) => {
       <LoadingComponent height={30} width={30} type="spin" color="#3d5070" />
     </div>
   );
-  // return JSON.stringify(params)
+
   if (!offset) {
     offset = 0;
   }
   if (!limit) {
     limit = 32;
   }
-
-  console.log('##$$', { tracks, counts });
 
   return (
     <div className="main-content-container fghjkjhgf ">
@@ -271,7 +252,9 @@ const Pagination = (props) => {
                     xs="6"
                     className={'nbghjk  post-style-' + 'grid'}>
                     {entity == 'post' && <BlogCard item={i} method={'grid'} />}
-                    {entity != 'post' && <PostCard item={i} method={'grid'} />}
+                    {entity != 'post' && (
+                      <PostCard item={i} method={'grid'} entity={entity} />
+                    )}
                   </Col>
                 ))}
             </Row>

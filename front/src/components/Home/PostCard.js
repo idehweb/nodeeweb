@@ -10,11 +10,11 @@ import { addItem, MainUrl, removeItem } from '#c/functions/index';
 import { defaultImg } from '#c/assets/index';
 // import store from "#c/functions/store";
 import AddToCardButton from '#c/components/components-overview/AddToCardButton';
+import Transform from '@/functions/transform';
 
-function PostCard({ onClick, item, method, t }) {
-  console.log('##$$', 'render product');
-  // return
-  // let card = store.getState().store.card || [];
+function PostCard({ onClick, item, method, t, entity }) {
+  console.log('##$$', { entity, item });
+  if (entity === 'product') item = Transform.getOneProduct(item);
   let date = dFormat(item.updatedAt, t);
   let price = null;
   let salePrice = null;
@@ -24,7 +24,7 @@ function PostCard({ onClick, item, method, t }) {
   if (item.photos && item.photos[0])
     backgroundImage = MainUrl + '/' + item.photos[0];
   if (item.thumbnail) backgroundImage = MainUrl + '/' + item.thumbnail;
-  // let title = encodeURIComponent(item.title.fa.replace(/\\|\//g, ""));
+
   let slug = item.slug;
   let cat_inLink = slug;
   if (item.firstCategory) {
@@ -35,7 +35,7 @@ function PostCard({ onClick, item, method, t }) {
       cat_inLink = item.thirdCategory.slug;
   }
   cat_inLink = 'product/' + slug;
-  // console.log('item.labels', item.labels);
+
   return (
     <div className="mb-4 ad-card-col nbghjk">
       <div className="ad-card-main-div">
@@ -78,12 +78,14 @@ function PostCard({ onClick, item, method, t }) {
                 />
               )}
             </div>
+
             <span className="a-card-title">
               <Link to={'/' + cat_inLink + '/'}>
                 {_truncate(item.title['fa'], { length: 120 })}
               </Link>
             </span>
           </div>
+
           {method === 'list' && (
             <>
               {item.type === 'variable' && (
