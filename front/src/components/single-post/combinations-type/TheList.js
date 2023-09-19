@@ -19,7 +19,6 @@ import AddToCardButton from '#c/components/components-overview/AddToCardButton';
 
 // import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 const TheList = (props) => {
-  console.log('##$$ we are in list');
   // console.log("props", props);
   const {
     combinations,

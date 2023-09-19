@@ -13,6 +13,7 @@ import CardbarMainNavbar from './CardbarMainNavbar';
 import Swiper from '#c/components/swiper';
 
 import store from '#c/functions/store';
+import { CartService } from '@/functions/order/cart';
 
 const CardSidebar = ({ props, t }) => {
   const themeData = useSelector((st) => st.store.themeData);
@@ -135,9 +136,23 @@ const CardSidebar = ({ props, t }) => {
       );
   };
 
-  const onAdd = useCallback(async (combId, product) => {}, []);
-  const onMinus = useCallback(async (combId, product) => {}, []);
-  const onDelete = useCallback(async (combId, product) => {}, []);
+  const onAdd = useCallback(async (combId, product) => {
+    await CartService.modify(product, {
+      ...product,
+      _id: combId,
+      quantity: product.quantity + 1,
+    });
+  }, []);
+  const onMinus = useCallback(async (combId, product) => {
+    await CartService.modify(product, {
+      ...product,
+      _id: combId,
+      quantity: product.quantity - 1,
+    });
+  }, []);
+  const onDelete = useCallback(async (combId, product) => {
+    await CartService.delete(product._id, combId);
+  }, []);
 
   return (
     <Col tag="aside" className={classes} lg={{ size: 3 }} md={{ size: 4 }}>

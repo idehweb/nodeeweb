@@ -54,7 +54,8 @@ export class CartService {
   }
 
   static async modify(product, combination) {
-    const localProduct = { ...combination, ...product };
+    const localProduct = { ...product, ...combination };
+    localProduct._id = product._id;
     const body = this.parseComb(combination);
     await this.query({
       method: 'put',
@@ -64,7 +65,7 @@ export class CartService {
 
     const localCart = store.getState().store?.cart ?? {};
     localCart[combination._id] = localProduct;
-    SaveData({ cart: localCart });
+    SaveData({ cart: { ...localCart } });
   }
 
   static async delete(productId, combinationId) {
@@ -75,7 +76,7 @@ export class CartService {
 
     const localCart = store.getState().store?.cart ?? {};
     delete localCart[combinationId];
-    SaveData({ cart: localCart });
+    SaveData({ cart: { ...localCart } });
   }
 
   static async sync() {

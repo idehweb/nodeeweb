@@ -65,7 +65,6 @@ import ReviewsIcon from '@mui/icons-material/Reviews';
 import Transform from '../functions/transform';
 
 const Product = (props) => {
-  console.log('##$$ in product');
   let { match, location, history, t, url } = props;
 
   let product = useSelector((st) => {

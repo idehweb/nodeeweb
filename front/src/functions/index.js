@@ -527,8 +527,6 @@ export const isStringified = (jsonValue) => {
   try {
     return JSON.parse(jsonValue);
   } catch (err) {
-    console.log('not need to parse');
-
     return jsonValue;
   }
 };
