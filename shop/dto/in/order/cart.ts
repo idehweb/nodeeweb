@@ -1,4 +1,4 @@
-import { ValidationError } from '@nodeeweb/core';
+import { ValidationError, extractToken } from '@nodeeweb/core';
 import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
 import { Expose, Transform, Type } from 'class-transformer';
 import {
@@ -7,6 +7,7 @@ import {
   IsInt,
   IsMongoId,
   IsNumber,
+  IsOptional,
   IsPositive,
   IsString,
   Max,
@@ -15,7 +16,7 @@ import {
 import { Types } from 'mongoose';
 import store from '../../../store';
 
-class ProductCombinations {
+class ProductCombination {
   @Expose()
   @IsString()
   _id: string;
@@ -45,9 +46,9 @@ export class ProductBody {
   _id: Types.ObjectId;
 
   @Expose()
-  @Type(() => ProductCombinations)
+  @Type(() => ProductCombination)
   @ValidateNested({ each: true })
-  combinations: ProductCombinations[];
+  combinations: ProductCombination[];
 }
 
 export class AddToCartBody {
@@ -59,3 +60,17 @@ export class AddToCartBody {
 }
 
 export class UpdateCartBody extends AddToCartBody {}
+export class ModifyCombBody extends ProductCombination {
+  @IsOptional()
+  _id: string;
+}
+export class ModifyCombParam {
+  @Expose()
+  @ToMongoID()
+  @IsMongoID()
+  productId: Types.ObjectId;
+
+  @Expose()
+  @IsString()
+  combId: string;
+}

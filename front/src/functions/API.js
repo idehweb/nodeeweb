@@ -20,6 +20,17 @@ const API = axios.create({
   ],
 });
 
+API.interceptors.request.use(
+  (config) => {
+    const url = `${config.baseURL || ''}${config.url}`;
+    if (!url.startsWith('http')) config.baseURL = ApiUrl;
+    return config;
+  },
+  (err) => {
+    throw err;
+  },
+);
+
 API.interceptors.response.use(
   (data) => {
     return data;

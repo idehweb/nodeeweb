@@ -9,12 +9,13 @@ import {
 } from '@nodeeweb/core';
 import store from '../../store';
 import {
+  IOrder,
   OrderDocument,
   OrderModel,
   OrderStatus,
 } from '../../schema/order.schema';
 import { ProductDocument, ProductModel } from '../../schema/product.schema';
-import { Types } from 'mongoose';
+import { FilterQuery, Types, UpdateQuery } from 'mongoose';
 import {
   AddToCartBody,
   ProductBody,
@@ -295,5 +296,85 @@ export default class CartService {
       throw new NotFound('not found any order with that product id');
 
     return res.status(204).send('success');
+  };
+
+  static modifyComb: MiddleWare = async (req, res) => {
+    const { productId, combId } = req.params;
+
+    const body = {
+      _id: new Types.ObjectId(productId),
+      combinations: [
+        {
+          ...req.body,
+          _id: combId,
+        },
+      ],
+    };
+
+    const productDoc = await this.productModel.findOne({
+      _id: body._id,
+      'combinations._id': combId,
+    });
+
+    if (!productDoc)
+      throw new NotFound('product with this combination not found');
+
+    const cart = await CartService.orderModel.findOne({
+      'customer._id': req.user._id,
+      status: OrderStatus.Cart,
+      active: true,
+    });
+
+    const myProduct = cart?.products?.find((p) => p._id.equals(productId));
+    const myComb = myProduct?.combinations?.find((c) => c._id === combId);
+
+    await CartService._checkProduct({
+      type: myProduct ? 'edit' : 'add',
+      order: cart,
+      product: body,
+      user: req.user,
+    });
+
+    const productCart = this.pDoc2pCart(productDoc, [body]);
+
+    // cart not exist
+    if (!cart) {
+      const order = await CartService.orderModel.create({
+        customer: req.user.toObject(),
+        products: [productCart],
+      });
+      return res.status(201).json({
+        data: order,
+      });
+    }
+
+    const cartProducts = [...cart.products];
+
+    // add product in cart
+    if (!myProduct) {
+      cartProducts.push(productCart);
+    }
+    // add comb
+    else if (!myComb) {
+      myProduct.combinations.push(...productCart.combinations);
+    }
+    // modify comb
+    else {
+      myProduct.combinations = myProduct.combinations.map((comb) => {
+        if (comb._id !== combId) return comb;
+        return productCart.combinations[0];
+      });
+    }
+
+    const newCart = await CartService.orderModel.findOneAndUpdate(
+      { _id: cart._id },
+      {
+        products: cartProducts,
+      },
+      { new: true }
+    );
+    return res.status(200).json({
+      data: newCart,
+    });
   };
 }
