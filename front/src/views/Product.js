@@ -400,6 +400,7 @@ const Product = (props) => {
             <Row>
               <Col lg="12" md="12" className={'single-product mb-3'}>
                 <SidebarActions
+                  product={state}
                   className={'mobilenone '}
                   add={false}
                   edit={true}

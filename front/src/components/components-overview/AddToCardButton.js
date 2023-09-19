@@ -3,10 +3,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from 'shards-react';
 import { withTranslation } from 'react-i18next';
 
-import { dFormat, PriceFormat } from '#c/functions/utils';
-import { addItem, MainUrl, removeItem } from '#c/functions/index';
-import { defaultImg } from '#c/assets/index';
-import { store } from '#c/functions/store';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -15,7 +11,6 @@ import { toggleCardbar } from '#c/functions/index';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
-import API from '@/functions/API';
 import { CartService } from '@/functions/order/cart';
 function AddToCardButton({
   item,
@@ -24,45 +19,53 @@ function AddToCardButton({
   children,
   t,
   product,
+  combination,
 }) {
   const [count, setCount] = useState(0);
   let [Navigate, SetNavigate] = useState(null);
-  let card = useSelector((st) => st.store.card || []);
-  let history = useNavigate();
-
-  function getCombination() {
-    return product.combinations[0];
-  }
   const onCreate = useCallback(
     async (e) => {
       try {
-        const comb = getCombination();
-        await CartService.create({ ...product, combinations: [comb] });
+        await CartService.modify(product, { ...combination, quantity: 1 });
+        toggleCardbar();
+        toast.success(t('Added to cart successfully!'));
+      } catch (err) {
+        toast.error(t('Can not add to cart'));
+        console.log(err);
+      }
+    },
+    [product, combination, toggleCardbar],
+  );
+  const onIncrease = useCallback(
+    async (e) => {
+      try {
+        await CartService.modify(product, {
+          ...combination,
+          quantity: count + 1,
+        });
+        setCount(count + 1);
         toggleCardbar();
         toast.success(t('Added to cart successfully!'));
       } catch (err) {
         toast.error(t('Can not add to cart'));
       }
     },
-    [product.id, getCombination, toggleCardbar],
+    [product, combination],
   );
-  const onIncrease = useCallback(async (e) => {
-    // if (text && text === t('options') && !item.single) {
-    //   let title = encodeURIComponent(item.title.fa.replace(/\\|\//g, ''));
-    //   history('/product/' + item._id + '/' + title);
-    // }
-    try {
-      const comb = getCombination();
-      comb.quantity = count + 1;
-      await CartService.update({ ...product, combinations: [comb] });
-      setCount(count + 1);
-      toggleCardbar();
-      toast.success(t('Added to cart successfully!'));
-    } catch (err) {
-      toast.error(t('Can not add to cart'));
-    }
-  }, []);
-  const onDecrease = useCallback((e) => {}, []);
+  const onDecrease = useCallback(
+    async (e) => {
+      try {
+        await CartService.modify(product, {
+          ...combination,
+          quantity: count - 1,
+        });
+        setCount(count - 1);
+      } catch (err) {
+        toast.error(t('Can not delete from cart'));
+      }
+    },
+    [product, combination],
+  );
 
   const refreshCard = () => {};
   if (Navigate) {

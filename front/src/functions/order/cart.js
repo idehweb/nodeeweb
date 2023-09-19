@@ -3,7 +3,16 @@ import API from '../API';
 import store from '../store';
 
 export class CartService {
-  static parse(product) {
+  static parseCart(cart) {
+    const newCart = {};
+    for (const product of cart) {
+      for (const comb of product.combinations) {
+        newCart[comb._id] = { ...comb, ...product };
+      }
+    }
+    return newCart;
+  }
+  static parseProduct(product) {
     return {
       _id: product.id,
       combinations: product.combinations.map((c) => ({
@@ -12,6 +21,11 @@ export class CartService {
       })),
     };
   }
+
+  static parseComb(comb) {
+    return { quantity: comb.quantity };
+  }
+
   static async query(config) {
     const response = await API({
       baseURL: `${ApiUrl}/order/cart`,
@@ -32,45 +46,26 @@ export class CartService {
       });
 
       if (!cart) throw new Error('no cart');
-      return cart;
+
+      return this.parseCart(cart);
     } catch (err) {
-      if (!notLocal) return store.getState().store?.cart ?? [];
+      if (!notLocal) return store.getState().store?.cart ?? {};
     }
   }
 
-  static async create(product) {
-    const body = {
-      products: [this.parse(product)],
-    };
-    await this.query({ method: 'post', data: body });
-
-    const localCart = store.getState().store?.cart ?? [];
-    localCart.push(product);
-
-    SaveData({ cart: localCart });
-  }
-
-  static async update(product) {
-    const body = {
-      products: [this.parse(product)],
-    };
-    await this.query({ method: 'put', data: body });
-
-    const localCart = store.getState().store?.cart ?? [];
-    const newCart = localCart.map((p) => {
-      const id = p._id || p.id;
-      const isMine = id === product.id;
-      if (!isMine) return p;
-      p.combinations = p.combinations.map((comb) => {
-        const id = comb._id || comb.id;
-        const productComb = product.combinations.find((c) => c._id === id);
-        if (productComb) comb = { ...comb, ...productComb };
-        return comb;
-      });
-      return p;
+  static async modify(product, combination) {
+    const localProduct = { ...combination, ...product };
+    const body = this.parseComb(combination);
+    console.log({ product, combination });
+    await this.query({
+      method: 'put',
+      url: `/${product._id}/${combination._id}`,
+      data: body,
     });
 
-    SaveData({ cart: newCart });
+    const localCart = store.getState().store?.cart ?? {};
+    localCart[combination._id] = localProduct;
+    SaveData({ cart: localCart });
   }
 
   static async delete(productId, combinationId) {
@@ -79,46 +74,25 @@ export class CartService {
       url: `/${productId}/${combinationId}`,
     });
 
-    const localCart = store.getState().store?.cart ?? [];
-    const newCart = localCart
-      .map((p) => {
-        const id = p._id || p.id;
-        if (id !== productId) return p;
-        p.combinations = p.combinations.filter(
-          (comb) => comb._id !== combinationId,
-        );
-        return p;
-      })
-      .filter((p) => p.combinations.length);
-
-    SaveData({ cart: newCart });
+    const localCart = store.getState().store?.cart ?? {};
+    delete localCart[combinationId];
+    SaveData({ cart: localCart });
   }
 
   static async sync() {
-    const localCart = store.getState().store?.cart ?? [];
-    const onlineCart = (await this.get(true)) ?? [];
+    const localCart = store.getState().store?.cart ?? {};
+    const onlineCart = (await this.get(true)) ?? {};
 
-    const createProducts = [],
-      updateProducts = [];
+    const modifyComIds = [];
 
-    for (const p of localCart) {
-      const matchProduct = onlineCart.find((product) => product._id === p._id);
-
-      if (!matchProduct) createProducts(p);
-      else updateProducts(p);
+    for (const comId in localCart) {
+      const matchProduct = onlineCart[comId];
+      if (!matchProduct || matchProduct.quantity !== localCart[comId].quantity)
+        modifyComIds(comId);
     }
 
-    if (createProducts.length) {
-      await this.query({
-        method: 'post',
-        data: { products: createProducts.map(this.parse) },
-      });
-    }
-    if (updateProducts.length) {
-      await this.query({
-        method: 'put',
-        data: { products: updateProducts.map(this.parse) },
-      });
+    for (const comId of modifyComIds) {
+      await this.modify(localCart[comId], { ...localCart[comId], _id: comId });
     }
   }
 }

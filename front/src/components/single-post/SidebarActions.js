@@ -79,7 +79,6 @@ class SidebarActions extends React.PureComponent {
   };
 
   render() {
-    const { phoneNumber, email, lan, optionsId, combinationsTemp } = this.state;
     let {
       requireWarranty,
       t,
@@ -121,6 +120,7 @@ class SidebarActions extends React.PureComponent {
                   single={single}
                   method={method}
                   combinations={combinations}
+                  product={this.props.product}
                   t={t}
                 />
               )}
@@ -133,6 +133,7 @@ class SidebarActions extends React.PureComponent {
                   single={single}
                   method={method}
                   combinations={combinations}
+                  product={this.props.product}
                   t={t}
                 />
               )}
@@ -154,6 +155,7 @@ class SidebarActions extends React.PureComponent {
 
             <AddToCardButton
               product={this.props.product}
+              combination={this.props.product.combinations[0]}
               item={{
                 _id: _id,
                 title: title,

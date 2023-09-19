@@ -13,7 +13,6 @@ import AddToCardButton from '#c/components/components-overview/AddToCardButton';
 import Transform from '@/functions/transform';
 
 function PostCard({ onClick, item, method, t, entity }) {
-  console.log('##$$', { entity, item });
   if (entity === 'product') item = Transform.getOneProduct(item);
   let date = dFormat(item.updatedAt, t);
   let price = null;
@@ -91,6 +90,7 @@ function PostCard({ onClick, item, method, t, entity }) {
               {item.type === 'variable' && (
                 <div className={'single-product mb-3'}>
                   <SidebarActions
+                    product={item}
                     className={'mobilenone '}
                     add={false}
                     edit={true}
@@ -120,6 +120,7 @@ function PostCard({ onClick, item, method, t, entity }) {
             <>
               {item.type === 'variable' && (
                 <AddToCardButton
+                  product={item}
                   item={item}
                   text={t('options')}
                   variable={true}>
@@ -156,7 +157,13 @@ function PostCard({ onClick, item, method, t, entity }) {
                   )}
                 </AddToCardButton>
               )}
-              {item.type === 'normal' && <AddToCardButton item={item} />}
+              {item.type === 'normal' && (
+                <AddToCardButton
+                  item={item}
+                  product={item}
+                  combination={item.combinations[0]}
+                />
+              )}
             </>
           )}
         </div>
