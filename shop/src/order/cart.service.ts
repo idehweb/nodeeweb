@@ -86,7 +86,7 @@ export default class CartService {
     user,
     order,
   }: {
-    type: 'add' | 'edit';
+    type: 'add' | 'edit' | 'modify-comb';
     order?: OrderDocument;
     product: {
       _id: Types.ObjectId;
@@ -139,14 +139,14 @@ export default class CartService {
     this.checkProductQuantity({ product, productDoc });
 
     // restrict rules
-    if (type === 'add' && orderDoc) {
+    if ((type === 'add' || type === 'modify-comb') && orderDoc) {
       if (
         orderDoc.products.length + 1 >
         store.config.limit.max_products_in_cart
       )
         throw new LimitError('products in order limit exceeded');
 
-      if (productInOrder)
+      if (productInOrder && type === 'add')
         throw new DuplicateError('Can not add product in cart twice');
     }
   }
@@ -329,7 +329,7 @@ export default class CartService {
     const myComb = myProduct?.combinations?.find((c) => c._id === combId);
 
     await CartService._checkProduct({
-      type: myProduct ? 'edit' : 'add',
+      type: 'modify-comb',
       order: cart,
       product: body,
       user: req.user,
@@ -376,5 +376,67 @@ export default class CartService {
     return res.status(200).json({
       data: newCart,
     });
+  };
+
+  static deleteComb: MiddleWare = async (req, res) => {
+    const { productId, combId } = req.params;
+
+    const productDoc = await this.productModel.findOne({
+      _id: productId,
+      'combinations._id': combId,
+    });
+
+    if (!productDoc)
+      throw new NotFound('product with this combination not found');
+
+    const cart = await CartService.orderModel.findOne({
+      'customer._id': req.user._id,
+      'products._id': productId,
+      'products.combinations._id': combId,
+      status: OrderStatus.Cart,
+      active: true,
+    });
+
+    if (!cart)
+      throw new NotFound('product with this combination not found in cart');
+
+    const cartCombinations = cart.products.reduce(
+      (acc, p) => acc + p.combinations.length,
+      0
+    );
+
+    const myProduct = cart.products.find((p) => p._id.equals(productId));
+
+    const rmCart = async () => {
+      await this.orderModel.deleteOne({ _id: cart._id });
+    };
+
+    const popProduct = async () => {
+      await this.orderModel.updateOne(
+        { _id: cart._id },
+        {
+          $pull: {
+            products: { _id: productId },
+          },
+        }
+      );
+    };
+
+    const popComb = async () => {
+      await this.orderModel.updateOne(
+        { _id: cart._id, 'products._id': productId },
+        {
+          $pull: {
+            'products.$.combinations': { _id: combId },
+          },
+        }
+      );
+    };
+
+    if (cartCombinations === 1) await rmCart();
+    else if (myProduct.combinations.length === 1) await popProduct();
+    else await popComb();
+
+    return res.status(204).send();
   };
 }

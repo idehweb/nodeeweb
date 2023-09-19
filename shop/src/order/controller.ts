@@ -12,6 +12,7 @@ import transactionService from './transaction.service';
 import orderService from './order.service';
 import {
   AddToCartBody,
+  DeleteCombParam,
   ModifyCombBody,
   ModifyCombParam,
   UpdateCartBody,
@@ -57,6 +58,13 @@ export default function registerController() {
         { reqPath: 'params', dto: ModifyCombParam },
         { reqPath: 'body', dto: ModifyCombBody },
       ],
+    },
+    {
+      method: 'delete',
+      url: '/cart/:productId/:combId',
+      service: CartService.deleteComb,
+      access: AuthUserAccess,
+      validate: { reqPath: 'params', dto: DeleteCombParam },
     },
     {
       method: 'post',

@@ -74,3 +74,5 @@ export class ModifyCombParam {
   @IsString()
   combId: string;
 }
+
+export class DeleteCombParam extends ModifyCombParam {}
