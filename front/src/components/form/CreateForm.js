@@ -96,7 +96,7 @@ function CreateForm(props) {
         lg={fields.lg ? fields.lg : ''}
         className={'MGD ' +  (className !== undefined ? className : '')}>
         <label htmlFor={name}>{fields.label}</label>
-        <div class="radio-toolbar">
+        <div className="radio-toolbar">
             <input type="radio" id="radioApple" name="radioFruit" value="apple" checked />
             <label for="radioApple">Apple</label>
         </div>

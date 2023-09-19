@@ -56,7 +56,6 @@ export class CartService {
   static async modify(product, combination) {
     const localProduct = { ...combination, ...product };
     const body = this.parseComb(combination);
-    console.log({ product, combination });
     await this.query({
       method: 'put',
       url: `/${product._id}/${combination._id}`,
