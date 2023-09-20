@@ -1,7 +1,6 @@
 import { useEffect, useState, memo, useCallback, Fragment } from 'react';
 import { useParams } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { useDispatch } from 'react-redux';
 import { useNotify, useTranslate } from 'react-admin';
 import _get from 'lodash/get';
 
@@ -18,12 +17,7 @@ import {
   OnDropType,
 } from '@/components/page-builder/Component/types';
 
-import {
-  changeThemeData,
-  changeThemeDataFunc,
-  GetBuilder,
-  SaveBuilder,
-} from '@/functions';
+import { GetBuilder, SaveBuilder } from '@/functions';
 
 import Header from './Header';
 import Container from './Container';
@@ -48,7 +42,6 @@ interface StateType {
 
 const Core = (props) => {
   const translate = useTranslate();
-  const dispatch = useDispatch();
   const notify = useNotify();
   const { _id, model = 'page' } = useParams();
 
@@ -71,21 +64,17 @@ const Core = (props) => {
   const LoadData = useCallback(() => {
     if (!_id) return;
 
-    changeThemeDataFunc().then((e) => {
-      dispatch(changeThemeData(e));
-    });
     GetBuilder(model, _id)
       .then((r) => {
-        console.log('asdf', r);
         const elements = _get(r, 'data.elements', []);
         setState((s) => ({ ...s, components: elements }));
       })
       .catch((err) => {
-        console.error('err');
+        console.error('err =>', err);
         notify('Some thing went Wrong!!', { type: 'error' });
       })
       .finally(() => setLoading(false));
-  }, [_id, model, dispatch, notify]);
+  }, [_id, model, notify]);
 
   useEffect(() => {
     LoadData();
@@ -97,15 +86,13 @@ const Core = (props) => {
       setLoading(true);
       SaveBuilder(model, _id, { elements: data })
         .then((r) => {
-          if (r._id)
-            notify(translate('saved successfully.'), {
-              type: 'success',
-            });
-        })
-        .catch((f) => {
-          notify(translate('shit!'), {
-            type: 'warning',
+          notify(translate('saved successfully.'), {
+            type: 'success',
           });
+        })
+        .catch((err) => {
+          console.error('err =>', err);
+          notify('Some thing went Wrong!!', { type: 'error' });
         })
         .finally(() => setLoading(false));
     },
