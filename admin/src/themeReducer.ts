@@ -7,7 +7,7 @@ import { CHANGE_THEME } from '@/functions';
 // type Action =
 // | ReturnType<typeof changeTheme>
 // | { type: 'OTHER_ACTION'; payload?: any };
-const them = localStorage.getItem('theme');
+let them = localStorage.getItem('theme');
 // const themeReducer = (
 //     previousState = them || 'light',
 //     action
@@ -27,13 +27,15 @@ const them = localStorage.getItem('theme');
 //     return previousState;
 // };
 // export default themeReducer;
-export default function themeReducer(state = { theme: { them } }, action) {
+
+const DefaultState = {
+  theme: them,
+};
+export default function themeReducer(state = DefaultState, action) {
   switch (action.type) {
     case CHANGE_THEME:
-      // console.log("themeReducer",state, {theme: action.payload });
       return action.payload === 'dark' ? 'light' : 'dark';
     default:
-      console.log('here', state);
       return state;
   }
 }
