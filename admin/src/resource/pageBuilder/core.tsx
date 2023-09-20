@@ -71,18 +71,21 @@ const Core = (props) => {
   const LoadData = useCallback(() => {
     if (!_id) return;
 
-    setLoading(true);
     changeThemeDataFunc().then((e) => {
       dispatch(changeThemeData(e));
     });
     GetBuilder(model, _id)
       .then((r) => {
-        if (r && r.elements) {
-          setState((s) => ({ ...s, components: r.elements }));
-        }
+        console.log('asdf', r);
+        const elements = _get(r, 'data.elements', []);
+        setState((s) => ({ ...s, components: elements }));
+      })
+      .catch((err) => {
+        console.error('err');
+        notify('Some thing went Wrong!!', { type: 'error' });
       })
       .finally(() => setLoading(false));
-  }, [_id, model, dispatch]);
+  }, [_id, model, dispatch, notify]);
 
   useEffect(() => {
     LoadData();
