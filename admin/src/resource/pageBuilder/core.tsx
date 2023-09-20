@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { useNotify, useTranslate } from 'react-admin';
 import _get from 'lodash/get';
+import _unset from 'lodash/unset';
 
 import { LoadingContainer } from '@/components/global';
 import { OptionBox } from '@/components/page-builder';
@@ -175,6 +176,9 @@ const Core = (props) => {
 
   const handleAdd = useCallback(
     (item) => {
+      _unset(item, 'settings.design');
+      _unset(item, 'settings.general.rules');
+
       const newComponents = AddNewItem(sourceAddress, components, item);
       setState((s) => ({
         ...s,
