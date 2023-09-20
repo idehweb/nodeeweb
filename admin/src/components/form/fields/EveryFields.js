@@ -13,7 +13,7 @@ const StyledButton = styled(IconButton)({
 
 export default function EveryFields({ onClick }) {
   return (
-    <StyledButton className="remove-button" onClick={onClick}>
+    <StyledButton tabIndex={-1} className="remove-button" onClick={onClick}>
       <Delete />
     </StyledButton>
   );

@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import _get from 'lodash/get';
 
 import CreateForm from '@/components/form/CreateForm';
 import Modal from '@/components/global/Modal';
@@ -14,6 +15,8 @@ const ComponentSetting = ({
 }) => {
   const cls = useStyles();
 
+  const DATA = _get(component, 'settings.general', null);
+
   return (
     <Modal
       open={open}
@@ -21,18 +24,17 @@ const ComponentSetting = ({
       title={component.label}
       className={cls.modal}>
       <div className={cls.container}>
-        {component.settings && component.settings.general && (
+        {DATA && open && (
           <CreateForm
-            onSubmit={(e) => {
-              onSubmit(component, 'general', e);
+            onSubmit={(v) => {
+              onSubmit(component, 'general', v);
               onClose();
             }}
-            rules={{ fields: component.settings.general.rules }}
-            buttons={[]}
+            rules={{ fields: DATA.rules }}
             componentType={component.name}
-            childrens={component.children}
-            fields={component.settings.general.fields}
-          />
+            fields={DATA.fields}>
+            {component.children}
+          </CreateForm>
         )}
       </div>
     </Modal>
