@@ -110,7 +110,6 @@ const Core = (props) => {
       let tempArray = [];
       the_com['settings'][method].fields = element;
       let array = Object.keys(element);
-      console.log('array', array);
 
       if (
         the_com &&
@@ -161,8 +160,6 @@ const Core = (props) => {
         }
       });
 
-      console.log('save components:', tempArray);
-      console.log('save components:', address);
       setState((s) => ({ ...s, components: tempArray }));
     },
     [components]

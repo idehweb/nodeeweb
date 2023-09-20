@@ -34,8 +34,8 @@ import {
 function CreateForm({
   fields,
   rules = { fields: [] },
-  componentType,
-  childrens,
+  componentType = '',
+  children = undefined,
   onSubmit,
 }) {
   // @ts-ignore
@@ -346,7 +346,7 @@ function CreateForm({
       return <ChatBase field={field} />;
     }
     if (type === 'conditionRow') {
-      return <ConditionRow field={field} childrens={childrens} />;
+      return <ConditionRow field={field} childrens={children} />;
     }
   };
   const handleSubmit = async (v) => {

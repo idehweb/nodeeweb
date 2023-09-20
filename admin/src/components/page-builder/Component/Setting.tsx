@@ -24,7 +24,7 @@ const ComponentSetting = ({
       title={component.label}
       className={cls.modal}>
       <div className={cls.container}>
-        {DATA && open && (
+        {DATA && (
           <CreateForm
             onSubmit={(v) => {
               onSubmit(component, 'general', v);

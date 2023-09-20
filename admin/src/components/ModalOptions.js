@@ -44,7 +44,7 @@ export default function ModalOptions({
                 display: 'flex',
                 lineHeight: '60px',
               }}
-              onClick={() => onAdd(i)}>
+              onClick={() => onAdd(structuredClone(i))}>
               <ShowElementIcon type={i.name} />
 
               <span
