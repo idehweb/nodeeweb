@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { Button, Col, Container, Row } from 'shards-react';
 import { useSelector } from 'react-redux';
+import clsx from 'clsx';
 
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import SaveIcon from '@mui/icons-material/Save';
@@ -30,9 +31,17 @@ import {
   ConditionRow,
 } from '@/components/form/fields';
 
-function CreateForm(props) {
-  let { fields, rules = { fields: [] }, componentType, childrens } = props;
+function CreateForm({
+  fields,
+  rules = { fields: [] },
+  componentType,
+  childrens,
+  onSubmit,
+}) {
+  // @ts-ignore
   const themeData = useSelector((st) => st.themeData);
+
+  const [optionInputs, setOptionInputs] = useState(null);
 
   const [theRules, setTheRules] = useState(rules);
   const [theF, setTheF] = useState('');
@@ -57,6 +66,7 @@ function CreateForm(props) {
       setTheRules(rules);
     }
   }, []);
+
   if (!themeData) return;
 
   const addField = (e) => {
@@ -96,7 +106,7 @@ function CreateForm(props) {
         <Col
           sm={size ? size.sm : ''}
           lg={size ? size.lg : ''}
-          className={'MGD ' + className}>
+          className={clsx('MGD', className)}>
           <label htmlFor={name}>{label}</label>
           <EveryFields onClick={(e) => removeField(e)} />
 
@@ -118,7 +128,7 @@ function CreateForm(props) {
         <Col
           sm={size ? size.sm : ''}
           lg={size ? size.lg : ''}
-          className={'MGD ' + className}>
+          className={clsx('MGD', className)}>
           <label htmlFor={name}>{label}</label>
           <EveryFields onClick={(e) => removeField(e)} />
           <Field
@@ -172,7 +182,7 @@ function CreateForm(props) {
       // return <Col
       //   sm={size ? size.sm : ''}
       //   lg={size ? size.lg : ''}
-      //   className={'MGD ' + className}>
+      //   className={clsx('MGD', className)}>
       //   <label htmlFor={name}>{t(label)}</label>
       //   <Field
       //     name={name}
@@ -188,7 +198,7 @@ function CreateForm(props) {
         <Col
           sm={size ? size.sm : ''}
           lg={size ? size.lg : ''}
-          className={'MGD ' + className}>
+          className={clsx('MGD', className)}>
           <label htmlFor={name}>{label}</label>
           <EveryFields onClick={(e) => removeField(e)} />
 
@@ -226,7 +236,7 @@ function CreateForm(props) {
         <Col
           sm={size ? size.sm : ''}
           lg={size ? size.lg : ''}
-          className={'MGD ' + className}>
+          className={clsx('MGD', className)}>
           <label htmlFor={name}>{label}</label>
           <EveryFields onClick={(e) => removeField(e)} />
 
@@ -289,7 +299,7 @@ function CreateForm(props) {
         <Col
           sm={size ? size.sm : ''}
           lg={size ? size.lg : ''}
-          className={'MGD ' + className}>
+          className={clsx('MGD', className)}>
           <label htmlFor={name}>{label}</label>
           <EveryFields onClick={(e) => removeField(e)} />
 
@@ -339,10 +349,9 @@ function CreateForm(props) {
       return <ConditionRow field={field} childrens={childrens} />;
     }
   };
-  const [optionInputs, setOptionInputs] = useState(null);
-  const onSubmit = async (v) => {
+  const handleSubmit = async (v) => {
     let values = [];
-    if (props.onSubmit) {
+    if (onSubmit) {
       values = v;
       if (theRules && theRules.fields)
         theRules.fields.forEach((item, i) => {
@@ -363,7 +372,7 @@ function CreateForm(props) {
       if (optionInputs) {
         Object.assign(values, { options: optionInputs });
       }
-      props.onSubmit(values);
+      onSubmit(values);
     }
   };
   const saveInputOptions = (options) => {
@@ -380,124 +389,122 @@ function CreateForm(props) {
 
     setTheRules(px);
   };
-  if (themeData)
-    return (
-      <div className="fields pt-2">
-        <Form
-          onSubmit={onSubmit}
-          // validate={v => {
 
-          //   let values = v;
-          //   if (theRules && theRules.fields)
-          //     theRules.fields.forEach((item, i) => {
-          //       if (item.type == 'object' && values[item.name] instanceof Object && item.value) {
-          //         let arr = [];
-          //         Object.keys(item.value).forEach((it) => {
-          //           let obj = {
-          //             property: it,
-          //             value: item.value[it]
-          //           }
-          //           arr.push(obj)
-          //         })
-          //         values[item.name] = arr;
-          //       }
-          //     })
+  return (
+    <div className="fields pt-2">
+      <Form
+        onSubmit={handleSubmit}
+        // validate={v => {
 
-          //   // return values
-          // }}
-          initialValues={fields}
-          mutators={{
-            setValue: ([field, value], state, { changeValue }) => {
-              changeValue(state, field, () => value);
-            },
-            // setMin: (args, state, utils) => {
-            //   utils.changeValue(state, 'apples', () => 1)
-            // },
-          }}
-          render={({ handleSubmit, form, submitting, pristine, values }) => (
-            <form onSubmit={handleSubmit} draggable={false}>
-              <Container>
-                <Row style={{ direction: 'ltr !important' }}>
-                  {theRules?.fields?.map((field, index) => {
-                    if (fields[field.name]) {
-                      field.value = fields[field.name];
-                    }
-                    let lastObj = {
-                      id: index,
-                      type: field.type,
-                      label: field.name,
-                      name: field.name,
-                      size: {
-                        sm: 12,
-                        lg: 12,
-                      },
-                      onChange: (text) => {
-                        // setFields([...fields,])
-                        // this.state.checkOutBillingAddress.add.data[d] = text;
-                      },
-                      className: '',
-                      placeholder: '',
-                      child: [],
-                      ...field,
-                    };
-                    if (field.value) {
-                      lastObj['value'] = field.value;
-                    }
+        //   let values = v;
+        //   if (theRules && theRules.fields)
+        //     theRules.fields.forEach((item, i) => {
+        //       if (item.type == 'object' && values[item.name] instanceof Object && item.value) {
+        //         let arr = [];
+        //         Object.keys(item.value).forEach((it) => {
+        //           let obj = {
+        //             property: it,
+        //             value: item.value[it]
+        //           }
+        //           arr.push(obj)
+        //         })
+        //         values[item.name] = arr;
+        //       }
+        //     })
 
-                    return (
-                      <TheField
-                        key={index}
-                        removeField={(e) => removeField(e, index)}
-                        {...lastObj}
-                        setValue={form.mutators.setValue}
-                      />
-                    );
-                  })}
+        //   // return values
+        // }}
+        initialValues={fields}
+        mutators={{
+          setValue: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => value);
+          },
+          // setMin: (args, state, utils) => {
+          //   utils.changeValue(state, 'apples', () => 1)
+          // },
+        }}
+        render={({ handleSubmit, form, submitting, pristine, values }) => (
+          <form onSubmit={handleSubmit} draggable={false}>
+            <Container>
+              <Row style={{ direction: 'ltr !important' }}>
+                {theRules?.fields?.map((field, index) => {
+                  if (fields[field.name]) {
+                    field.value = fields[field.name];
+                  }
+                  let lastObj = {
+                    id: index,
+                    type: field.type,
+                    label: field.name,
+                    name: field.name,
+                    size: {
+                      sm: 12,
+                    },
+                    onChange: (text) => {
+                      // setFields([...fields,])
+                      // this.state.checkOutBillingAddress.add.data[d] = text;
+                    },
+                    className: 'mb-2',
+                    placeholder: '',
+                    child: [],
+                    ...field,
+                  };
+                  if (field.value) {
+                    lastObj['value'] = field.value;
+                  }
 
-                  <ConditionFiled
-                    data={fields.options}
-                    type={componentType}
-                    saveOptions={saveInputOptions}
-                  />
+                  return (
+                    <TheField
+                      key={index}
+                      removeField={(e) => removeField(e, index)}
+                      {...lastObj}
+                      setValue={form.mutators.setValue}
+                    />
+                  );
+                })}
 
+                <ConditionFiled
+                  data={fields.options}
+                  type={componentType}
+                  saveOptions={saveInputOptions}
+                />
+
+                <div
+                  className="buttons absolute-bottom bottom-bar-settings"
+                  style={{ direction: 'ltr' }}>
                   <div
-                    className="buttons absolute-bottom bottom-bar-settings"
-                    style={{ direction: 'ltr' }}>
-                    <div
-                      className={'d-flex ltr'}
-                      style={{ marginBottom: '20px' }}>
-                      <input
-                        className={'form-control d-flex-inputs'}
-                        style={{ height: '45px', padding: '0px 10px' }}
-                        value={theF}
-                        onChange={(e) => {
-                          setTheF(e.target.value);
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        className={'whitespace-nowrap'}
-                        onClick={(e) => {
-                          addField(e);
-                        }}>
-                        <AddCircleOutlineIcon />
-                        {'Add Field'}
-                      </Button>
-                    </div>
-                    <hr />
-                    <Button type="submit">
-                      <SaveIcon />
-                      {'Save'}
+                    className={'d-flex ltr'}
+                    style={{ marginBottom: '20px' }}>
+                    <input
+                      className={'form-control d-flex-inputs'}
+                      style={{ height: '45px', padding: '0px 10px' }}
+                      value={theF}
+                      onChange={(e) => {
+                        setTheF(e.target.value);
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      className={'whitespace-nowrap'}
+                      onClick={(e) => {
+                        addField(e);
+                      }}>
+                      <AddCircleOutlineIcon />
+                      {'Add Field'}
                     </Button>
                   </div>
-                </Row>
-              </Container>
-            </form>
-          )}
-        />
-      </div>
-    );
-  else return <></>;
+                  <hr />
+                  <Button type="submit">
+                    <SaveIcon />
+                    {'Save'}
+                  </Button>
+                </div>
+              </Row>
+            </Container>
+          </form>
+        )}
+      />
+    </div>
+  );
 }
 
 export default CreateForm;
