@@ -18,6 +18,11 @@ import { color } from '../../utils/color';
 import _ from 'lodash';
 import { isJWT } from 'class-validator';
 import { IUser, UserDocument } from '../../types/user';
+import { catchFn } from '../../utils/catchAsync';
+
+function jwtStrategyName(opt: JwtStrategyOpt) {
+  return JSON.stringify(opt);
+}
 
 const jwtStrategyMap = new Map<string, Strategy>();
 
@@ -62,7 +67,7 @@ export type JwtStrategyOpt = {
 };
 
 function jwtStrategyBuilder(opt: JwtStrategyOpt) {
-  let strategy = jwtStrategyMap.get(opt.name);
+  let strategy = jwtStrategyMap.get(jwtStrategyName(opt));
   if (strategy) return strategy;
 
   strategy = new JwtStrategy(
@@ -71,30 +76,35 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
       secretOrKey: store.env.AUTH_SECRET,
       passReqToCallback: true,
     },
-    async (req: Req, { id, iat }, done) => {
-      iat = iat * 1000;
-      const models = Array.isArray(opt.model) ? opt.model : [opt.model];
-      const query = (model: string) =>
-        store.db.model(model).findOne({
-          _id: id,
-          credentialChangeAt: { $lte: new Date(iat) },
-          active: true,
-        });
-
-      for (const model of models) {
-        const user = await query(model);
-        if (user) {
-          req.modelName = model;
-          return done(null, user);
+    catchFn(
+      async (req: Req, { id, iat, _id }, done) => {
+        iat = iat * 1000;
+        const models = Array.isArray(opt.model) ? opt.model : [opt.model];
+        const query = (model: string) =>
+          store.db.model(model).findOne({
+            _id: id || _id,
+            credentialChangeAt: { $lte: new Date(iat) },
+            active: true,
+          });
+        for (const model of models) {
+          const user = await query(model);
+          if (user) {
+            req.modelName = model;
+            return done(null, user);
+          }
         }
+        if (opt.notThrow) return done(null);
+        return done(new UnauthorizedError());
+      },
+      {
+        onError(err, req, payload, done) {
+          return done(err);
+        },
       }
-
-      if (opt.notThrow) return done(null);
-      return done(new UnauthorizedError());
-    }
+    )
   );
 
-  jwtStrategyMap.set(opt.name, strategy);
+  jwtStrategyMap.set(jwtStrategyName(opt), strategy);
   return strategy;
 }
 function localStrategyBuilder(opt: UserPassStrategyOpt) {
@@ -200,14 +210,11 @@ export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
 }
 
 export function signToken(user: UserDocument | IUser) {
-  user.id = String(user._id);
-  return jwt.sign(
-    user['toObject'] ? user['toObject']() : user,
-    store.env.AUTH_SECRET,
-    {
-      expiresIn: '30d',
-    }
-  );
+  const newUser = user['toObject'] ? user['toObject']() : user;
+  newUser.id = String(user._id);
+  return jwt.sign(newUser, store.env.AUTH_SECRET, {
+    expiresIn: '30d',
+  });
 }
 export function verifyToken(token: string) {
   return new Promise<jwt.JwtPayload | string>((resolve, reject) => {

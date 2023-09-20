@@ -10,12 +10,11 @@ export default function SidebarItem() {
     return [
       {
         title: 'my orders',
-        htmlBefore: '<i class="material-icons mr-1">list_alt</i>',
+        htmlBefore: '<i className="material-icons mr-1">list_alt</i>',
         to: '/my-orders',
       },
     ];
   } else {
-    return [
-    ];
+    return [];
   }
 }

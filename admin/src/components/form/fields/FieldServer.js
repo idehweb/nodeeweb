@@ -4,7 +4,7 @@ import { Col } from 'shards-react';
 
 import { useTranslate } from 'react-admin';
 
-import { getEntities, MainUrl, uploadMedia } from '@/functions/index';
+import { getEntities } from '@/functions/index';
 
 function FieldServer(props) {
   // console.clear();

@@ -102,7 +102,6 @@ const Notes = (props) => {
             transform={transform}>
             <SimpleForm>
               <RichTextInput
-                multiline
                 fullWidth
                 source={'description.' + translate('lan')}
                 toolbar={false}

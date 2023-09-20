@@ -329,8 +329,8 @@ const DefaultOptions = [
   {
     label: 'Navigation bar',
     name: 'navigation',
-    addable: true,
     settings: {
+    addable: true,
       general: {
         fields: { colCount: 1, type: 'simple', ...fields },
         rules: [

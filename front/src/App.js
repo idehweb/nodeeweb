@@ -1,9 +1,7 @@
-import _isEqual from 'lodash/isEqual'
+import _isEqual from 'lodash/isEqual';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
-import store from '#c/functions/store';
-import { SaveData } from '#c/functions/index';
 import { useSelector, useDispatch } from 'react-redux';
 import createRoutes from '#c/DefaultRoute';
 
@@ -22,7 +20,7 @@ const APP = (props) => {
       <BrowserRouter>
         <Routes>
           {routes.map((route, index) => {
-            console.log(route.path)
+            console.log(route.path);
             return (
               <Route
                 key={index}

@@ -152,7 +152,6 @@ const Form = ({ children, ...rest }) => {
       </ReferenceInput>
 
       <RichTextInput
-        multiline
         fullWidth
         source={'description.' + translate('lan')}
         label={translate('resources.category.description')}

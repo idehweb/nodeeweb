@@ -23,6 +23,7 @@ import { store } from '@nodeeweb/core';
 import { handlePlugins } from './src/common/handlePlugins';
 import registerCustomerGroup from './src/customerGroup';
 import { registerShopConfig } from './src/config/config';
+import registerTemplate from './src/template';
 
 async function deployShop() {
   await deployCore();
@@ -51,6 +52,7 @@ async function deployShop() {
   registerProduct();
   registerProductCategory();
   registerSettings();
+  await registerTemplate();
 
   // register plugins
   handlePlugins();

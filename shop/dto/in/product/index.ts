@@ -72,9 +72,10 @@ class CombinationProduct {
   options?: { [key: string]: string };
 
   @Expose()
+  @IsOptional()
   @IsNumber()
   @IsPositive()
-  price: number;
+  price?: number;
 
   @Expose()
   @IsNumber()
@@ -112,7 +113,8 @@ export class CreateProductBody {
 
   @Expose()
   @IsMultiLang()
-  miniTitle: { [key: string]: string };
+  @IsOptional()
+  miniTitle?: { [key: string]: string };
 
   @Expose()
   @IsOptional()
@@ -196,6 +198,11 @@ export class CreateProductBody {
   @IsMongoID({ each: true })
   @ArrayMinSize(1)
   photos?: Types.ObjectId[];
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  thumbnail?: string;
 
   @Expose()
   @IsOptional()
@@ -302,8 +309,12 @@ export class UpdateProductBody {
   @IsOptional()
   @ToMongoID()
   @IsMongoID({ each: true })
-  @ArrayMinSize(1)
   photos?: Types.ObjectId[];
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  thumbnail?: string;
 
   @Expose()
   @IsOptional()

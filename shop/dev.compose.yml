@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  shop:
+    image: nodeeweb-shop:dev-1.0.0
+    build:
+      context: ..
+      dockerfile: shop/Dockerfile
+      target: dev
+    container_name: nodeeweb-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 3
+        window: 2m
+    networks:
+      mongonet:
+      webnet:
+        aliases:
+          - nodeeweb-shop
+          - nwi-shop
+    env_file:
+      - .env.local
+    volumes:
+      - /var/instances/nwi-shop/shared:/app/shop/shared/
+      - /var/instances/nwi-shop/logs:/app/shop/logs/
+      - /var/instances/nwi-shop/public:/app/shop/public/
+      - /var/instances/nwi-shop/plugins:/app/shop/plugins/
+
+networks:
+  mongonet:
+    external: true
+    name: mongonet
+  webnet:
+    external: true
+    name: webnet

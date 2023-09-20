@@ -5,15 +5,17 @@ import {
   ForbiddenError,
   LimitError,
   ValidationError,
+  BadRequestError,
 } from '@nodeeweb/core';
 import store from '../../store';
 import {
+  IOrder,
   OrderDocument,
   OrderModel,
   OrderStatus,
 } from '../../schema/order.schema';
 import { ProductDocument, ProductModel } from '../../schema/product.schema';
-import { Types } from 'mongoose';
+import { FilterQuery, Types, UpdateQuery } from 'mongoose';
 import {
   AddToCartBody,
   ProductBody,
@@ -52,6 +54,31 @@ export default class CartService {
         );
     });
   }
+  static checkProductPrice({
+    product,
+    productDoc,
+  }: {
+    product: ProductBody;
+    productDoc: ProductDocument;
+  }) {
+    const productCombinationsInDoc = productDoc.combinations;
+
+    product.combinations.forEach((combination) => {
+      const docCombinations = productCombinationsInDoc.find(
+        ({ _id }) => _id === combination._id
+      );
+
+      if (
+        docCombinations.price === undefined ||
+        docCombinations.salePrice === undefined
+      )
+        throw new ValidationError(
+          `product with ID ${product._id.toString()} in combination with ID ${
+            docCombinations._id
+          } has no valid price`
+        );
+    });
+  }
 
   static async _checkProduct({
     product,
@@ -59,7 +86,7 @@ export default class CartService {
     user,
     order,
   }: {
-    type: 'add' | 'edit';
+    type: 'add' | 'edit' | 'modify-comb';
     order?: OrderDocument;
     product: {
       _id: Types.ObjectId;
@@ -105,18 +132,21 @@ export default class CartService {
         throw new NotFound('Some product combinations not exits');
     }
 
+    // price checker
+    this.checkProductPrice({ product, productDoc });
+
     // quantity rules
     this.checkProductQuantity({ product, productDoc });
 
     // restrict rules
-    if (type === 'add' && orderDoc) {
+    if ((type === 'add' || type === 'modify-comb') && orderDoc) {
       if (
         orderDoc.products.length + 1 >
         store.config.limit.max_products_in_cart
       )
         throw new LimitError('products in order limit exceeded');
 
-      if (productInOrder)
+      if (productInOrder && type === 'add')
         throw new DuplicateError('Can not add product in cart twice');
     }
   }
@@ -145,7 +175,7 @@ export default class CartService {
 
     return {
       _id: product._id,
-      combinations: mergedCombinations,
+      combinations: mergedCombinations as any,
       miniTitle: product.miniTitle,
       title: product.title,
       image: product['image'] ?? product['thumbnail'],
@@ -266,5 +296,147 @@ export default class CartService {
       throw new NotFound('not found any order with that product id');
 
     return res.status(204).send('success');
+  };
+
+  static modifyComb: MiddleWare = async (req, res) => {
+    const { productId, combId } = req.params;
+
+    const body = {
+      _id: new Types.ObjectId(productId),
+      combinations: [
+        {
+          ...req.body,
+          _id: combId,
+        },
+      ],
+    };
+
+    const productDoc = await this.productModel.findOne({
+      _id: body._id,
+      'combinations._id': combId,
+    });
+
+    if (!productDoc)
+      throw new NotFound('product with this combination not found');
+
+    const cart = await CartService.orderModel.findOne({
+      'customer._id': req.user._id,
+      status: OrderStatus.Cart,
+      active: true,
+    });
+
+    const myProduct = cart?.products?.find((p) => p._id.equals(productId));
+    const myComb = myProduct?.combinations?.find((c) => c._id === combId);
+
+    await CartService._checkProduct({
+      type: 'modify-comb',
+      order: cart,
+      product: body,
+      user: req.user,
+    });
+
+    const productCart = this.pDoc2pCart(productDoc, [body]);
+
+    // cart not exist
+    if (!cart) {
+      const order = await CartService.orderModel.create({
+        customer: req.user.toObject(),
+        products: [productCart],
+      });
+      return res.status(201).json({
+        data: order,
+      });
+    }
+
+    const cartProducts = [...cart.products];
+
+    // add product in cart
+    if (!myProduct) {
+      cartProducts.push(productCart);
+    }
+    // add comb
+    else if (!myComb) {
+      myProduct.combinations.push(...productCart.combinations);
+    }
+    // modify comb
+    else {
+      myProduct.combinations = myProduct.combinations.map((comb) => {
+        if (comb._id !== combId) return comb;
+        return productCart.combinations[0];
+      });
+    }
+
+    const newCart = await CartService.orderModel.findOneAndUpdate(
+      { _id: cart._id },
+      {
+        products: cartProducts,
+      },
+      { new: true }
+    );
+    return res.status(200).json({
+      data: newCart,
+    });
+  };
+
+  static deleteComb: MiddleWare = async (req, res) => {
+    const { productId, combId } = req.params;
+
+    const productDoc = await this.productModel.findOne({
+      _id: productId,
+      'combinations._id': combId,
+    });
+
+    if (!productDoc)
+      throw new NotFound('product with this combination not found');
+
+    const cart = await CartService.orderModel.findOne({
+      'customer._id': req.user._id,
+      'products._id': productId,
+      'products.combinations._id': combId,
+      status: OrderStatus.Cart,
+      active: true,
+    });
+
+    if (!cart)
+      throw new NotFound('product with this combination not found in cart');
+
+    const cartCombinations = cart.products.reduce(
+      (acc, p) => acc + p.combinations.length,
+      0
+    );
+
+    const myProduct = cart.products.find((p) => p._id.equals(productId));
+
+    const rmCart = async () => {
+      await this.orderModel.deleteOne({ _id: cart._id });
+    };
+
+    const popProduct = async () => {
+      await this.orderModel.updateOne(
+        { _id: cart._id },
+        {
+          $pull: {
+            products: { _id: productId },
+          },
+        }
+      );
+    };
+
+    const popComb = async () => {
+      await this.orderModel.updateOne(
+        { _id: cart._id, 'products._id': productId },
+        {
+          $pull: {
+            'products.$.combinations': { _id: combId },
+          },
+        }
+      );
+    };
+
+    if (cartCombinations === 1) await rmCart();
+    else if (myProduct.combinations.length === 1) await popProduct();
+    else await popComb();
+
+    return res.status(204).send();
   };
 }
