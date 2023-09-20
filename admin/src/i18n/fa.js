@@ -1,7 +1,5 @@
 import farsiMessages from 'ra-language-farsi';
 
-console.log('running farsi language...');
-
 const customFarsiMessages = {
   ...farsiMessages,
   perPage: 'perPage',
