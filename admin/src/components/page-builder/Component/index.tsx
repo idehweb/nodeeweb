@@ -3,6 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import {
   CloseRounded,
   EditRounded,
+  ContentCopyRounded,
   AddRounded,
 } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
@@ -18,6 +19,7 @@ export interface ComponentProps {
   onDelete: (id: string) => void;
   onAdd: (payload: any) => void;
   onEdit: (item: ItemType) => void;
+  onDuplicate: (item: ItemType) => void;
   onDrop: OnDropType;
   animationKey?: React.Key;
 }
@@ -29,6 +31,7 @@ const Component = ({
   onAdd,
   onEdit,
   onDrop,
+  onDuplicate,
 }: ComponentProps) => {
   return (
     <DraggableCard
@@ -37,13 +40,18 @@ const Component = ({
       item={item}
       onDropEnd={onDrop}>
       <Header>
-        {`${item.name} ${index + 1}: ${item.id}`}
         <Actions>
-          <IconButton title="Edit" onClick={() => onEdit(item)}>
-            <EditRounded />
-          </IconButton>
+          {/* <IconButton title="Duplicate" onClick={() => onDuplicate(item)}>
+            <ContentCopyRounded />
+          </IconButton> */}
           <IconButton title="Delete" onClick={() => onDelete(item.id)}>
             <CloseRounded />
+          </IconButton>
+
+          <p>{`${item.name} ${index + 1}: ${item.id}`}</p>
+
+          <IconButton title="Edit" onClick={() => onEdit(item)}>
+            <EditRounded />
           </IconButton>
           {item.addable && (
             <IconButton
@@ -84,6 +92,7 @@ const Component = ({
                   onDelete={onDelete}
                   onAdd={onAdd}
                   onDrop={onDrop}
+                  onDuplicate={onDuplicate}
                 />
 
                 {idx === item.children.length - 1 ? (

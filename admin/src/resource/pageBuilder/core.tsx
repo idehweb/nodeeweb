@@ -185,6 +185,15 @@ const Core = (props) => {
     [components, sourceAddress]
   );
 
+  // TODO: fix duplicate ids lead to error, we should regenerate ids
+  const handleDuplicate = useCallback(
+    (item) => {
+      const newComponents = PushItem(item.id, components, item);
+      setState((s) => ({ ...s, components: newComponents }));
+    },
+    [components]
+  );
+
   const handleDrop = useCallback<OnDropType>(
     (source, dest, order) => {
       const sourceNodeAddress = FindNodeAddress(components, source.id);
@@ -244,6 +253,7 @@ const Core = (props) => {
                   onAdd={toggleOptionBox}
                   onEdit={(v) => setEditItem(v)}
                   onDrop={handleDrop}
+                  onDuplicate={handleDuplicate}
                 />
 
                 {idx === components.length - 1 ? (

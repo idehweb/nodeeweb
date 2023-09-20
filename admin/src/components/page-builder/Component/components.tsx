@@ -2,12 +2,17 @@ import { styled } from '@mui/material';
 
 export const Actions = styled('div')({
   display: 'flex',
-  marginInlineStart: 16,
-  opacity: 0,
+  alignItems: 'center',
   transition: '0.2s ease-in-out',
+  '& button': {
+    opacity: 0,
+  },
   '& svg': {
     fontSize: 18,
     color: '#464D55',
+  },
+  '& p': {
+    margin: '0 16px',
   },
 });
 Actions.defaultProps = {
@@ -39,9 +44,6 @@ export const Container = styled('div')({
   width: '-webkit-fill-available',
   display: 'flex',
   flexDirection: 'column',
-  '&:hover > div > .pb-actions': {
-    opacity: 1,
-  },
 });
 export const Footer = styled('div')({
   display: 'flex',
