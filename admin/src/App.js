@@ -1,40 +1,37 @@
-import React, { useEffect } from 'react';
-
+import { lazy, useEffect } from 'react';
 import { Admin, CustomRoutes, Resource, useTranslate } from 'react-admin';
-
 import { Route } from 'react-router-dom';
-
 import { useDispatch, useSelector } from 'react-redux';
-
 import polyglotI18nProvider from 'ra-i18n-polyglot';
-
-import resources from '@/resource';
-import { authProvider, dataProvider, theme } from '@/functions';
-import englishMessages from '@/i18n/en';
-import farsiMessages from '@/i18n/fa';
-import PluginMarket from '@/resource/plugin/PluginMarket'
-import PluginLocal from '@/resource/plugin/PluginLocal'
-
-import Types from '@/functions/types';
-
-import themeDataReducer from './themeDataReducer';
-import themeReducer from './themeReducer';
-import languageReducer from './languageReducer';
-
-import Login from './layout/Login';
-
-import { changeThemeData, changeThemeDataFunc } from './functions/index';
+import _get from 'lodash/get';
 
 import '@/assets/global.css';
-import { MainLayout } from './layout';
 import '@/assets/rtl.css';
+
+import ResourceList from '@/resource';
+import {
+  authProvider,
+  dataProvider,
+  changeThemeData,
+  changeThemeDataFunc,
+} from '@/functions';
+import PluginMarket from '@/resource/plugin/PluginMarket';
+import PluginLocal from '@/resource/plugin/PluginLocal';
+
+import englishMessages from '@/i18n/en';
+import farsiMessages from '@/i18n/fa';
+
+import Login from './layout/Login';
+import { MainLayout } from './layout';
+
+import MyTheme from './MuiTheme';
+
+const PageBuilder = lazy(() => import('@/resource/pageBuilder'));
 
 const messages = {
   fa: farsiMessages,
   en: englishMessages,
 };
-
-let dl = Types()['default_locale'];
 
 const localeMain = localStorage.getItem('locale');
 const i18nProvider = polyglotI18nProvider((locale) => {
@@ -42,51 +39,50 @@ const i18nProvider = polyglotI18nProvider((locale) => {
     locale = localeMain;
   }
   return messages[locale] ? messages[locale] : messages.en;
-}, dl);
+}, 'en');
+
+const exclude = [
+  'automation',
+  'task',
+  'note',
+  'category',
+  'document',
+  'action',
+  'attributes',
+  'customergroup',
+  'entry',
+  'form',
+  'gateway',
+  'discount',
+  'template',
+  'settings',
+  'order',
+  'admin',
+  'menu',
+  'page',
+  'notification',
+  'media',
+  'post',
+  'customer',
+  'product',
+  'productcategory',
+  'transaction',
+  'plugin',
+];
 
 export default function App() {
   const translate = useTranslate();
   const dispatch = useDispatch();
+  // @ts-ignore
   const themeData = useSelector((st) => st.themeData);
-  let exclude = [
-    'automation',
-    'task',
-    'note',
-    'category',
-    'document',
-    'action',
-    'attributes',
-    'customergroup',
-    'entry',
-    'form',
-    'gateway',
-    'discount',
-    'template',
-    'settings',
-    'order',
-    'admin',
-    'menu',
-    'page',
-    'notification',
-    'media',
-    'post',
-    'customer',
-    'product',
-    'productcategory',
-    'transaction',
-    'plugin',
-  ];
 
-  const load = (options = {}) => {
+  useEffect(() => {
     changeThemeDataFunc().then((e) => {
       dispatch(changeThemeData(e));
     });
-  };
-  useEffect(() => {
-    // console.clear();
-
-    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const {
     Action,
     Plugin,
@@ -120,23 +116,20 @@ export default function App() {
     Notification,
     Transaction,
     User,
-    PageBuilder,
-  } = resources;
+  } = ResourceList;
+
+  const ModelList = _get(themeData, 'models', []) || [];
+
   return (
     <Admin
       title={translate('websiteName')}
       disableTelemetry
-      theme={theme}
+      theme={MyTheme}
       loginPage={Login}
       dataProvider={dataProvider}
       authProvider={authProvider}
       dashboard={MainDashboard}
       layout={MainLayout}
-      customReducers={{
-        theme: themeReducer,
-        locale: languageReducer,
-        themeData: themeDataReducer,
-      }}
       i18nProvider={i18nProvider}>
       <Resource
         name="attributes"
@@ -269,36 +262,21 @@ export default function App() {
         options={{ label: translate('pos.menu.automation') }}
         {...Automation}
       />
-      {themeData &&
-        themeData.models &&
-        themeData.models.map((model, idx) => {
-          if (exclude.indexOf(model.toLowerCase()) == -1) {
-            let modelName = model.toLowerCase();
-            return (
-              <Resource
-                key={idx}
-                name={modelName}
-                options={{ label: translate('pos.menu.' + modelName) }}
-                {...Dynamic}
-              />
-            );
+      {ModelList.map((i, idx) => {
+        const modelName = i.toLowerCase();
+        if (!exclude.includes(modelName))
+          return (
+            <Resource
+              key={`${modelName}-${idx}`}
+              name={modelName}
+              options={{ label: translate('pos.menu.' + modelName) }}
+              {...Dynamic}
+            />
+          );
 
-            // return <MenuItemLink
-            //   to={{
-            //     pathname: "/" + model,
-            //     state: { _scrollToTop: true }
-            //   }}
-            //   primaryText={translate(`${model}`)}
-            //   leftIcon={<Dashboard/>}
-            //   exact={"true"}
-            //   dense={dense}
-            //   className={"vas"}
-            // />;
-          }
-        })}
+        return null;
+      })}
       <CustomRoutes>
-        {/* <Route path="/plugins" element={<Plugins />} />
-        <Route path="/plugins/:name" element={<Plugin />} /> */}
         <Route path="/configuration" element={<Configuration />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/p-c" element={<PrivateConfiguration />} />
