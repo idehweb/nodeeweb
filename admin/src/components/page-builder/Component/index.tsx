@@ -1,16 +1,13 @@
 import { Fragment, memo } from 'react';
 import { AnimatePresence } from 'framer-motion';
-
-import { EditIconSvg, CloseIconSvg, AddIconSvg } from '../base/Icon';
-
 import {
-  AddButton,
-  EditButton,
-  DeleteButton,
-  Actions,
-  Header,
-  Content,
-} from './components';
+  CloseRounded,
+  EditRounded,
+  AddRounded,
+} from '@mui/icons-material';
+import { IconButton } from '@mui/material';
+
+import { Actions, Header, Content } from './components';
 import DraggableCard from './DraggableCard';
 import { ItemType, OnDropType } from './types';
 import { AnimatedComponent, AnimatedEmptyDropSlot } from './AnimationComponent';
@@ -42,14 +39,15 @@ const Component = ({
       <Header>
         {`${item.name} ${index + 1}: ${item.id}`}
         <Actions>
-          <EditButton onClick={() => onEdit(item)}>
-            <EditIconSvg />
-          </EditButton>
-          <DeleteButton onClick={() => onDelete(item.id)}>
-            <CloseIconSvg width="20px" height="20px" background="#464D55" />
-          </DeleteButton>
+          <IconButton title="Edit" onClick={() => onEdit(item)}>
+            <EditRounded />
+          </IconButton>
+          <IconButton title="Delete" onClick={() => onDelete(item.id)}>
+            <CloseRounded />
+          </IconButton>
           {item.addable && (
-            <AddButton
+            <IconButton
+              title="Add"
               onClick={(e) => {
                 let address = item.id + '_';
                 let mainAddress = address.split('_');
@@ -61,8 +59,8 @@ const Component = ({
                 }
                 onAdd(update);
               }}>
-              <AddIconSvg />
-            </AddButton>
+              <AddRounded />
+            </IconButton>
           )}
         </Actions>
       </Header>
