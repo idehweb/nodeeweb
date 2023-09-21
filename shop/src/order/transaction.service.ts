@@ -234,7 +234,10 @@ class TransactionService {
           (d) => d._id === combinations._id
         );
         if (!productCombination.in_stock) inStockCheck.push(p._id);
-        if (productCombination.salePrice !== combinations.salePrice)
+        if (
+          productCombination.salePrice !== combinations.salePrice ||
+          productCombination.salePrice === undefined
+        )
           priceCheck.push(p._id);
         if (productCombination.quantity - combinations.quantity < 0)
           quantityCheck.push(p._id);
@@ -409,7 +412,7 @@ class TransactionService {
       .map(({ title }) => title.fa ?? title.en ?? Object.values(title)[0])
       .join(' ، ')} از فروشگاه ${store.config.app_name}`;
 
-    const response =  await bankPlugin.stack[0]({
+    const response = await bankPlugin.stack[0]({
       amount,
       callback_url: `${store.env.BASE_URL}/api/v1/order/payment_callback/${orderId}?amount=${amount}`,
       currency: store.config.currency,
@@ -417,15 +420,14 @@ class TransactionService {
       userPhone,
     });
 
-    if(!response.isOk) throw new Error(response.message);
+    if (!response.isOk) throw new Error(response.message);
 
     return {
-      authority : response.authority,
-      expiredAt : response.expiredAt,
-      payment_link:response.payment_link,
-      provider:bankPlugin.slug,
-    }
-
+      authority: response.authority,
+      expiredAt: response.expiredAt,
+      payment_link: response.payment_link,
+      provider: bankPlugin.slug,
+    };
   }
 
   async handlePayment(

@@ -1,11 +1,21 @@
 import React from 'react';
 
-import {Button, Card, CardHeader, Col, Form, FormInput, ListGroup, ListGroupItem, Row,} from 'shards-react';
-import {withTranslation} from 'react-i18next';
+import {
+  Button,
+  Card,
+  CardHeader,
+  Col,
+  Form,
+  FormInput,
+  ListGroup,
+  ListGroupItem,
+  Row,
+} from 'shards-react';
+import { withTranslation } from 'react-i18next';
 import store from '#c/functions/store';
-import {Logout, submitProfile} from '#c/functions/index';
-import {Navigate} from 'react-router-dom';
-import { toast } from "react-toastify";
+import { Logout, submitProfile } from '#c/functions/index';
+import { Navigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 // const UserAccountDetails  = ({ title }) => (
 class LoginForm extends React.PureComponent {
@@ -13,17 +23,19 @@ class LoginForm extends React.PureComponent {
     super(props);
     let st = store.getState().store.user;
     this.state = {
-      phoneNumber: st.phoneNumber,
-      firstName: st.firstName,
-      lastName: st.lastName,
-      email: st.email,
-      internationalCode: st.internationalCode,
+      phoneNumber: st?.phoneNumber || st?.phone,
+      firstName: st?.firstName,
+      lastName: st?.lastName,
+      email: st?.email,
+      internationalCode: st?.internationalCode,
+      isUserExist: Boolean(st),
     };
   }
 
   submitForm = () => {
-    const {phoneNumber, firstName, lastName, internationalCode,email} = this.state;
-    const {t} = this.props;
+    const { phoneNumber, firstName, lastName, internationalCode, email } =
+      this.state;
+    const { t } = this.props;
     if (phoneNumber) {
       submitProfile({
         phoneNumber,
@@ -32,8 +44,8 @@ class LoginForm extends React.PureComponent {
         email,
         internationalCode,
       }).then((d) => {
-        toast(t("successfully done!"), {
-          type: "success"
+        toast(t('successfully done!'), {
+          type: 'success',
         });
         return;
       });
@@ -41,13 +53,18 @@ class LoginForm extends React.PureComponent {
   };
 
   render() {
-    const {phoneNumber, firstName, lastName, internationalCode,email} = this.state;
-    const {title, t} = this.props;
-    console.log('internationalCode',firstName , lastName ,email, internationalCode,!(firstName && lastName && internationalCode));
-    if (!(firstName && lastName && internationalCode)) {
-      return <Navigate to={'/login/'}/>;
+    const {
+      phoneNumber,
+      firstName,
+      lastName,
+      internationalCode,
+      email,
+      isUserExist,
+    } = this.state;
+    const { title, t } = this.props;
 
-    }
+    if (!isUserExist) return <Navigate replace={'/login?check=false'} />;
+
     return (
       <Card small={'true'} className="mb-4">
         <CardHeader className="border-bottom">
@@ -91,7 +108,9 @@ class LoginForm extends React.PureComponent {
                   <Row form className={'row'}>
                     {/* First Name */}
                     <Col md="6" className="form-group">
-                      <label htmlFor="feFirstName">{t('International Code')}</label>
+                      <label htmlFor="feFirstName">
+                        {t('International Code')}
+                      </label>
                       <FormInput
                         id="juyghj"
                         placeholder={t('00xxxxxxxx')}
@@ -152,8 +171,6 @@ class LoginForm extends React.PureComponent {
                       </Button>
                     </Col>
                   </Row>
-
-
                 </Form>
               </Col>
             </Row>

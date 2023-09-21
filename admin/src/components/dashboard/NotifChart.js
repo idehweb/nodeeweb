@@ -29,7 +29,6 @@ import { dateFormat } from '@/functions';
 import CardWithIcon from './CardWithIcon';
 // import {Customer} from '../types';
 
-
 const lastDay = new Date();
 const lastMonthDays = Array.from({ length: 30 }, (_, i) => subDays(lastDay, i));
 // console.log('lastMonthDays', lastMonthDays);

@@ -23,10 +23,12 @@ export default {
       })
       .then((res) => {
         const { data: obj } = res;
-        console.log('res',obj)
+        console.log('res', obj);
         localStorage.setItem('email', obj.user.email);
         localStorage.setItem('active', obj.user.active);
-        localStorage.setItem('nickname', obj.user.nickname);
+        localStorage.setItem('firstName', obj.user.firstName);
+        localStorage.setItem('lastName', obj.user.lastName);
+        localStorage.setItem('phone', obj.user.phone);
         localStorage.setItem('username', obj.user.username);
         localStorage.setItem('token', obj.token);
         localStorage.setItem('user_id', obj.user._id);
@@ -37,7 +39,8 @@ export default {
   logout: () => {
     localStorage.removeItem('email');
     localStorage.removeItem('active');
-    localStorage.removeItem('nickname');
+    localStorage.removeItem('firstName');
+    localStorage.removeItem('lastName');
     localStorage.removeItem('username');
     localStorage.removeItem('user_id');
     localStorage.removeItem('token');

@@ -10,16 +10,20 @@ export class JwtStrategy extends AuthStrategy {
   async detect(req: Req, res: Res, next: NextFunction) {
     return this.login(req, res);
   }
-  async login(req: Req, res: Res) {
-    const onResponse = (isError?: any) => {
-      if (isError) throw isError;
-      return res.json({ data: req.user });
-    };
-    return authWithToken({ model: req.modelName, name: 'jwt' })(
-      req,
-      res,
-      onResponse
-    );
+  login(req: Req, res: Res) {
+    return new Promise((resolve, reject) => {
+      const onResponse = (isError?: any) => {
+        if (isError) return reject(isError);
+        res.json({ data: req.user });
+        resolve(null);
+      };
+
+      return authWithToken({ model: req.modelName, name: 'jwt' })(
+        req,
+        res,
+        onResponse
+      );
+    });
   }
   signup(req: Req, res: Res, next: NextFunction) {
     return next();

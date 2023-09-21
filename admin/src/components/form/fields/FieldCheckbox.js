@@ -4,7 +4,9 @@ import { Col } from 'shards-react';
 
 import { useTranslate } from 'react-admin';
 
-import { getEntitiesForAdmin, MainUrl, uploadMedia } from '@/functions/index';
+import {
+  getEntitiesForAdmin,
+} from '@/functions/index';
 import { EveryFields } from '@/components/form/fields';
 
 function FieldCheckbox(props) {

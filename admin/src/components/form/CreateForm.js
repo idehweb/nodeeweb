@@ -7,7 +7,8 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import SaveIcon from '@mui/icons-material/Save';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
-import { changeThemeData, MainUrl, uploadMedia } from '@/functions/index';
+import { changeThemeData, uploadMedia } from '@/functions/index';
+import { SERVER_URL } from '@/functions/API';
 import {
   EveryFields,
   FieldArray,
@@ -245,7 +246,7 @@ function CreateForm(props) {
               console.log('props', props);
               return (
                 <div className={'max-width100'}>
-                  {/* {props.input.value && <img style={{ width: "100px" }} src={MainUrl + "/" + props.input.value}/>} */}
+                  {/* {props.input.value && <img style={{ width: "100px" }} src={SERVER_URL + "/" + props.input.value}/>} */}
                   {!props.input.value && (
                     <input
                       name={props.input.name}
@@ -253,13 +254,12 @@ function CreateForm(props) {
                         let { target } = props;
                         uploadMedia(target.files[0], (e) => {
                           console.log('e', e);
-                        }).then((x) => {
-                          if (x.success && x.media && x.media.url) {
-                            console.log('set', name, x.media.url);
-
-                            field.setValue(name, x.media.url);
-                          }
-                        });
+                        })
+                          .then(({ data }) => {
+                            field.setValue(name, data.url);
+                          })
+                          .catch((err) => {
+                          });
                       }}
                       type={'file'}
                     />
@@ -267,7 +267,7 @@ function CreateForm(props) {
                   {props.input.value && (
                     <div className={'posrel'} style={{ margin: '0 auto' }}>
                       <img
-                        src={MainUrl + '/' + props.input.value}
+                        src={SERVER_URL + props.input.value}
                         style={{ width: '400px' }}
                       />
                       <Button
@@ -332,7 +332,7 @@ function CreateForm(props) {
                     />
                   )}
                   {props.input.value && (
-                    <img src={MainUrl + '/' + props.input.value} />
+                    <img src={SERVER_URL + props.input.value} />
                   )}
                 </div>
               );

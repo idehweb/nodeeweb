@@ -2,8 +2,8 @@ import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema(
   {
+    type: { type: String, required: true },
     title: String,
-    type: String,
     maxWidth: String,
     data: [],
     elements: [],

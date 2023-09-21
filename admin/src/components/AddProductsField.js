@@ -48,7 +48,6 @@ export default (props) => {
   };
   // const [progress, setProgress] = React.useState(0);
   const returnDefaultValue = (product_id, x = 'price') => {
-    console.clear();
     console.log('product_id', product_id);
     console.log('x', x);
 

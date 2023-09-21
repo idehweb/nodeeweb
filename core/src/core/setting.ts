@@ -1,10 +1,13 @@
 import store from '../../store';
 import { MiddleWare } from '../../types/global';
+import { TemplateDocument } from '../../types/template';
 
 export class SettingService {
   getTheme: MiddleWare = async (req, res, next) => {
     const isAdmin = req.modelName === 'admin';
     const setting = await this.settingPromise;
+
+    const templates = store.templates;
 
     return res.status(200).json({
       taxAmount: setting.taxAmount,
@@ -31,6 +34,7 @@ export class SettingService {
         },
       ],
       rules: isAdmin ? store.adminViews : undefined,
+      ...templates,
     });
   };
 

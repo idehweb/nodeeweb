@@ -650,7 +650,7 @@ const customFarsiMessages = {
       story: 'استوری',
       requireWarranty: 'ضرورت خرید با گارانتی',
       miniTitle: 'عنوان کوتاه',
-      type: 'نوع',
+      type: 'نوع اعمال قیمت',
       photo: 'رسانه',
       extra_attr: 'ویژگی های اضافه',
       sources: 'منابع ربات',

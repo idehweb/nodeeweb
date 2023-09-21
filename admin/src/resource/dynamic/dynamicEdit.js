@@ -20,7 +20,6 @@ const PostEditActions = ({ basePath, data, resource }) => (
   </CardActions>
 );
 const edit = (props) => {
-  console.clear();
   const transform = (data, { previousData }) => {
     console.log('transform={transform}', data, { previousData });
 

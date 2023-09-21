@@ -47,7 +47,7 @@ export function commonMiddleware(): (
   limiter['shadowName'] = 'RateLimiter';
   mw.push(limiter);
 
-  mw.push(bodyParser.json({ limit: '10kb' }));
+  mw.push(bodyParser.json({ limit: '1mb' }));
 
   mw.push(bodyParser.urlencoded({ extended: false }));
 
