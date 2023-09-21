@@ -7,7 +7,6 @@ import {
   useUpdate,
   useNotify,
 } from 'react-admin';
-import API from '@/functions/API';
 import Modal from '../Modal';
 
 export default function EditModal({ open, onClose, data, loading, reFetch }) {
