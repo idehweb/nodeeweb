@@ -1,7 +1,9 @@
 import mongoose, { Model, Types } from 'mongoose';
 import { Document } from 'mongoose';
+import { MultiLang } from './_base.schema';
 
 export interface IDiscount {
+  name?: { [key: string]: string };
   code: string;
   description?: string;
   consumers: Types.ObjectId[];
@@ -19,6 +21,7 @@ export type DiscountDocument = Document<Types.ObjectId, {}, IDiscount> &
 
 const schema = new mongoose.Schema(
   {
+    name: MultiLang,
     code: {
       type: String,
       required: false,
