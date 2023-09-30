@@ -1,31 +1,28 @@
-import React,{useState} from "react";
-import { Card, Col, Container, Row } from "shards-react";
-import { withTranslation } from "react-i18next";
-import { Link, useParams } from "react-router-dom";
+import React, { useState } from 'react';
+import { Card, Col, Container, Row } from 'shards-react';
+import { withTranslation } from 'react-i18next';
+import { Link, useParams } from 'react-router-dom';
 
-import PageTitle from "#c/components/common/PageTitle";
-import AdminLoginForm from "#c/components/components-overview/AdminLoginForm";
-import { defaultImg } from "#c/assets/index";
-import { savePost } from "#c/functions/index";
+import PageTitle from '#c/components/common/PageTitle';
+import AdminLoginForm from '#c/components/components-overview/AdminLoginForm';
+import { defaultImg } from '#c/assets/index';
+import { savePost } from '#c/functions/index';
 
 // class Login extends React.PureComponent {
 const Login = ({ t }) => {
-
   // constructor(props) {
   //   super(props);
   let params = useParams();
 
-  console.log("params", params);
-  if(params._state=='goToCheckout'){
-    savePost({goToCheckout: true})
+  if (params._state == 'goToCheckout') {
+    savePost({ goToCheckout: true });
   }
   const [state, setState] = useState({
     customer: {
-      phoneNumber: ""
+      phoneNumber: '',
     },
-    noImage: defaultImg
+    noImage: defaultImg,
   });
-
 
   return (
     <Container fluid className="main-content-container px-4">
@@ -33,8 +30,8 @@ const Login = ({ t }) => {
       <Row noGutters className="page-header py-4">
         <PageTitle
           sm="12"
-          title={t("login / register")}
-          subtitle={t("user account")}
+          title={t('login / register')}
+          subtitle={t('user account')}
           className="text-sm-left"
         />
       </Row>
@@ -42,8 +39,7 @@ const Login = ({ t }) => {
       <div className="w-100">
         <Col lg="4" className="mx-auto mb-4">
           <Card small>
-
-            <AdminLoginForm/>
+            <AdminLoginForm />
           </Card>
         </Col>
       </div>

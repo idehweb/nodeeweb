@@ -123,6 +123,23 @@ const CardSidebar = ({ props, t }) => {
       setSum(sum);
     });
   };
+  const returnTotalPrice = (cart) => {
+    let price = Object.values(cart)
+      .map((p) => (p.salePrice || p.price) * p.quantity)
+      .reduce((prev, curr) => (isNaN(curr) ? curr : prev + curr), 0);
+    if (!price) return price;
+    if (themeData.tax && themeData.taxAmount) {
+      let ta = parseInt(themeData.taxAmount);
+      price = parseInt((ta / 100 + 1) * parseInt(price));
+    }
+    if (price)
+      return (
+        price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+        ' ' +
+        t(themeData.currency)
+      );
+  };
+
   const returnPrice = (price) => {
     if (themeData.tax && themeData.taxAmount) {
       let ta = parseInt(themeData.taxAmount);
@@ -241,19 +258,21 @@ const CardSidebar = ({ props, t }) => {
           })}
       </div>
       <div className={'fdsdf pl-3 pr-3'} onClick={handleToggleCardbar}>
-        {cart && (
+        {Object.keys(cart).length && (
           <Link
             to={'/checkout'}
             className={
               'go-to-checkout ml-auto ffgg btn btn-accent btn-lg mt-4 posrel textAlignLeft'
             }>
             <span className={'gfdfghj'}>{t('Checkout')}</span>
-            <span className={'juytrftyu'}>
-              {<span className={'ttl gtrf'}>{returnPrice(cart)}</span>}
-            </span>
+            {returnTotalPrice(cart) ? (
+              <span className={'juytrftyu'}>
+                <span className={'ttl gtrf'}>{returnTotalPrice(cart)}</span>
+              </span>
+            ) : null}
           </Link>
         )}
-        {!cart || (
+        {!Object.keys(cart).length && (
           <Button
             onClick={() => handleToast}
             // to={'/'}
@@ -261,9 +280,11 @@ const CardSidebar = ({ props, t }) => {
               'go-to-checkout-without-items ml-auto ffgg btn btn-accent btn-lg mt-4 posrel textAlignLeft'
             }>
             <span className={'gfdfghj'}>{t('Checkout')}</span>
-            <span className={'juytrftyu'}>
-              {<span className={'ttl gtrf'}>{returnPrice(cart)}</span>}
-            </span>
+            {returnTotalPrice(cart) ? (
+              <span className={'juytrftyu'}>
+                <span className={'ttl gtrf'}>{returnTotalPrice(cart)}</span>
+              </span>
+            ) : null}
           </Button>
         )}
       </div>

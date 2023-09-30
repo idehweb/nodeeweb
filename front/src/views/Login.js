@@ -15,7 +15,7 @@ function useDetectRedirect() {
   const params = useParams();
   let redirect = params._state || searchParams.get('redirect') || '/profile';
   if (!redirect.startsWith('/')) redirect = '/' + redirect;
-  return redirect;
+  return `${redirect}?from=${encodeURIComponent(location.pathname)}`;
 }
 
 const Status = {

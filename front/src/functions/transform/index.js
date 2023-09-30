@@ -121,7 +121,6 @@ export default class Transform {
         })),
       };
     }
-
     return { ...product, ...out };
   }
   static getAllProduct(products) {

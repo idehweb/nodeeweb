@@ -52,7 +52,12 @@ function Checkout(props) {
       })
       .catch((e) => {
         if (e.code === 401) {
-          return navigate('/login/goToCheckout');
+          return navigate(
+            `/login?redirect=${encodeURIComponent('/checkout')}&check=false`,
+            {
+              replace: true,
+            },
+          );
         } else {
           toast.error(e.message);
         }

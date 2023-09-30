@@ -3,6 +3,11 @@ import API from '../API';
 import store from '../store';
 
 export class CartService {
+  static getCartLength(cart) {
+    const pIds = {};
+    Object.values(cart).forEach((v) => (pIds[v.id] = 1));
+    return Object.values(pIds).reduce((prev, curr) => prev + curr, 0);
+  }
   static parseCart(cart) {
     const newCart = {};
     for (const product of cart) {
@@ -56,6 +61,7 @@ export class CartService {
   static async modify(product, combination) {
     const localProduct = { ...product, ...combination };
     localProduct._id = product._id;
+    localProduct.id = product.id;
     const body = this.parseComb(combination);
     await this.query({
       method: 'put',
