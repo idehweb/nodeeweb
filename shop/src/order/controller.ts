@@ -124,6 +124,7 @@ export default function registerController() {
         crud: {
           parseFilter: orderService.getAllFilterParser,
           sort: { updatedAt: -1 },
+          queryFields: true,
           paramFields: {
             limit: 'limit',
             offset: 'offset',
