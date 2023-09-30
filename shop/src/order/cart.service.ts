@@ -439,4 +439,22 @@ export default class CartService {
 
     return res.status(204).send();
   };
+
+  static checkout: MiddleWare = async (req, res) => {
+    const order = await this.orderModel.findOneAndUpdate(
+      {
+        'customer._id': req.user.id,
+        status: OrderStatus.Cart,
+        active: true,
+      },
+      {
+        checkout: true,
+      },
+      { new: true }
+    );
+
+    if (!order) throw new NotFound('there is not any active cart');
+
+    return res.status(200).json({ data: order });
+  };
 }

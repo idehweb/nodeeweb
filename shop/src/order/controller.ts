@@ -67,6 +67,12 @@ export default function registerController() {
       validate: { reqPath: 'params', dto: DeleteCombParam },
     },
     {
+      method: 'put',
+      url: '/cart/checkout',
+      service: CartService.checkout,
+      access: AuthUserAccess,
+    },
+    {
       method: 'post',
       service: transactionService.createTransaction,
       url: '/transaction',

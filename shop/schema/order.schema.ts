@@ -4,7 +4,6 @@ import { MultiLang } from './_base.schema';
 
 export enum OrderStatus {
   Cart = 'cart',
-  Checkout = 'checkout',
   NeedToPay = 'need-to-pay',
   Paid = 'paid',
   Posting = 'posting',
@@ -78,6 +77,7 @@ export interface IOrder {
     createdAt: Date;
     expiredAt: Date;
   };
+  checkout?: boolean;
   status: OrderStatus;
   statusChangedAt: Date;
   active: boolean;
@@ -181,6 +181,7 @@ const schema = new mongoose.Schema(
       type: String,
       default: OrderStatus.Cart,
     },
+    checkout: { type: Boolean, default: false },
     statusChangedAt: Date,
     active: { type: Boolean, default: true },
   },
