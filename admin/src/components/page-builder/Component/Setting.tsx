@@ -15,7 +15,7 @@ const ComponentSetting = ({
 }) => {
   const cls = useStyles();
 
-  const DATA = _get(component, 'settings.general', null);
+  const DATA = _get(component, 'settings.general', undefined);
 
   return (
     <Modal

@@ -58,7 +58,7 @@ function CreateForm({
         if (fields[fi] instanceof Array) {
           typ = 'select';
         }
-        rules.fields.push({
+        rules.fields?.push({
           name: fi,
           type: typ,
         });
