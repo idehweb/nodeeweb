@@ -12,6 +12,7 @@ import { Modal, Card, Slide, Typography } from '@mui/material';
 
 import { makeStyles } from '@mui/styles';
 import { CloseRounded } from '@mui/icons-material';
+import { SERVER_URL } from '@/functions/API';
 import Tooltip from '@/components/Tooltip';
 
 const useStyles = makeStyles({
@@ -56,6 +57,10 @@ function UpdateModal({ open = false, onClose, data, submit }) {
   const cls = useStyles();
   const parseDefaultValue = () => ({
     title: data.title,
+    attachments: {
+      title: data.title,
+      src: SERVER_URL + data.url,
+    },
   });
   return (
     <Modal
@@ -91,7 +96,7 @@ function UpdateModal({ open = false, onClose, data, submit }) {
               <div>
                 <FileInput source="attachments">
                   <FileField source="src" title="title" />
-                </FileInput>                
+                </FileInput>
               </div>
               <div>
                 <SaveButton label="Update" />

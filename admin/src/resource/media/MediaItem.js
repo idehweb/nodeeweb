@@ -80,11 +80,9 @@ export default function MediaItem() {
       .catch((err) => notify(err.message, { type: 'error' }));
   };
   const editFileHandler = (data) => {
-    console.log(data);
-    const formData = new FormData();
-    formData.append('file', data.attachments.src);
+    const formData = new FormData();    
+    formData.append('file', data.attachments?.rawFile);
     formData.append('title', data.title);
-    console.log('FORM', formData);
     API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
     API.put(`/file/${editFile.id}`, formData)
       .then(() => {
