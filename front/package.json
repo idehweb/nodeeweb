@@ -69,10 +69,11 @@
   "prettier": {
     "bracketSpacing": true,
     "singleQuote": true,
-    "jsxBracketSameLine": true,
-    "trailingComma": "all",
+    "bracketSameLine": true,
+    "trailingComma": "es5",
     "printWidth": 80,
-    "semi": true
+    "semi": true,
+    "arrowParens": "always"
   },
   "imports": {
     "#json/*": "./*.json",
