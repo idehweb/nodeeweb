@@ -4,6 +4,7 @@ import { MultiLang } from './_base.schema';
 
 export enum OrderStatus {
   Cart = 'cart',
+  Checkout = 'checkout',
   NeedToPay = 'need-to-pay',
   Paid = 'paid',
   Posting = 'posting',
@@ -48,6 +49,7 @@ export interface IOrder {
     tracking?: string;
     postedAt?: Date;
     deliveredAt?: Date;
+    title?: string;
   };
   products: {
     _id: Types.ObjectId;
@@ -135,6 +137,7 @@ const schema = new mongoose.Schema(
         tracking: String,
         postedAt: Date,
         deliveredAt: Date,
+        title: String,
       },
       required: false,
     },
