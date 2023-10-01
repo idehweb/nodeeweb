@@ -1,14 +1,19 @@
+import { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
-
 import { Provider } from 'react-redux';
 
 import store from './store';
 import App from './App';
 
+const container = document.getElementById('root');
+const root = createRoot(container);
+
 const Store = store();
 
-createRoot(document.getElementById('root')).render(
+root.render(
   <Provider store={Store}>
-    <App />
+    <Suspense fallback="Loading...">
+      <App />
+    </Suspense>
   </Provider>
 );

@@ -1,7 +1,5 @@
 import englishMessages from 'ra-language-english';
 
-console.log('running english language...');
-
 const customEnglishMessages = {
   ...englishMessages,
   websiteName: 'Gameboss',
@@ -223,8 +221,6 @@ const customEnglishMessages = {
       nickname: 'nickname',
       password: 'password',
       username: 'username',
-      firstName: 'firstname',
-      lastName: 'lastname',
     },
 
     attributes: {
