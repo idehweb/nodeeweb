@@ -7,7 +7,8 @@ import {
 } from '@nodeeweb/core';
 import { plainToInstance } from 'class-transformer';
 import Service from './service';
-import { CreateAdminBody, UpdateAdminBody } from '../../dto/in/admin';
+import { CreateAdminBody, UpdateAdminBody } from '../../dto/in/user/admin';
+import { UserParamVal } from '../../dto/in/user';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
@@ -41,6 +42,10 @@ export default function registerController() {
       getOne: {
         controller: {
           access: AdminAccess,
+          validate: { dto: UserParamVal, reqPath: 'params' },
+        },
+        crud: {
+          parseFilter: Service.getOneParseFilter,
         },
       },
       getAll: {
@@ -67,7 +72,13 @@ export default function registerController() {
       updateOne: {
         controller: {
           access,
-          validate: { reqPath: 'body', dto: UpdateAdminBody },
+          validate: [
+            { reqPath: 'body', dto: UpdateAdminBody },
+            { dto: UserParamVal, reqPath: 'params' },
+          ],
+        },
+        crud: {
+          parseFilter: Service.getOneParseFilter,
         },
       },
       deleteOne: {

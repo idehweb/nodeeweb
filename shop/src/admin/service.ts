@@ -2,6 +2,7 @@ import { serviceOnError } from '../common/service';
 import {
   MiddleWare,
   NotImplement,
+  Req,
   setToCookie,
   signToken,
   store,
@@ -9,6 +10,17 @@ import {
 import { AdminModel, IAdmin } from '../../schema/admin.schema';
 
 export default class Service {
+  static _parseFilter(req: Req) {
+    if (req.params.id === 'me') return { _id: req.user._id };
+    return { _id: req.params.id };
+  }
+  static getOneParseFilter(req: Req) {
+    return Service._parseFilter(req);
+  }
+  static updateOneParseFilter(req: Req) {
+    return Service._parseFilter(req);
+  }
+
   static login: MiddleWare = async (req, res) => {
     const adminModel = store.db.model<IAdmin, AdminModel>('admin');
     const { username, password } = req.body;
