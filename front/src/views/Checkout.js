@@ -16,6 +16,7 @@ import _ from 'underscore';
 import { useSelector } from 'react-redux';
 
 function Checkout(props) {
+  console.log('##$$ hello from checkout');
   const { t } = useTranslation();
   // let ref = this;
   let navigate = useNavigate();
