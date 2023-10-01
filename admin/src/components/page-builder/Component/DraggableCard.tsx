@@ -19,7 +19,7 @@ export const Component = styled('div', {
   width: '-webkit-fill-available',
   display: 'flex',
   flexDirection: 'column',
-  '&:hover > div > .pb-actions': {
+  '&:hover > div > .pb-actions button': {
     opacity: 1,
   },
   '&:hover': {

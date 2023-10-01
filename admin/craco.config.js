@@ -46,6 +46,7 @@ const config = {
             analyzerMode: 'server',
             openAnalyzer: true,
           }),
+          // @ts-ignore
           new DuplicatePackageCheckerPlugin()
         );
       }

@@ -16,9 +16,9 @@ export default function OptionBox({ onClose, open, onAdd, exclude }) {
   const [Options, SetOptions] = useState([]);
 
   useEffect(() => {
-    let tempOption = [];
+    const tempOption = [];
 
-    let items = model === 'form' ? FormOptions : DefaultOptions;
+    const items = model === 'form' ? FormOptions : DefaultOptions;
 
     items.forEach((dO) => {
       if (exclude.indexOf(dO.name) === -1) tempOption.push(dO);
@@ -29,13 +29,10 @@ export default function OptionBox({ onClose, open, onAdd, exclude }) {
 
   useEffect(() => {
     if (themeData && themeData.components) {
-      let tempOption = Options;
-      themeData.components.forEach((dO) => {
-        tempOption.push(dO);
-      });
-      SetOptions(tempOption);
+      let newItems = Options;
+      newItems.concat(themeData.components);
+      SetOptions(newItems);
     }
-    //
   }, [themeData]);
 
   return (

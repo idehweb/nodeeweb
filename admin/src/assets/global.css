@@ -191,23 +191,12 @@ body .layout.rtl .the-color-popover * {
   max-height: 200px !important;
   transform: translate(0, -50%);
 }
-.remove-button {
-  display: none;
-  border-radius: 3px;
-  font-size: 20px;
-  padding: 0;
-  background-color: red;
-  border: red;
-}
+
 .redxxx {
   background-color: red;
   border: red;
 }
-.remove-button:hover,
-.remove-button:focus {
-  background-color: red;
-  border: red;
-}
+
 form .MGD input {
   border-radius: 0 !important;
 }
@@ -219,13 +208,6 @@ form .MGD label {
   text-transform: capitalize;
   font-weight: bolder;
   margin-bottom: 5px;
-}
-form .MGD:hover > .remove-button {
-  display: block;
-  position: absolute;
-  right: 0;
-  /* left:0; */
-  top: 0;
 }
 .item-box-parent {
   margin-top: 10px;

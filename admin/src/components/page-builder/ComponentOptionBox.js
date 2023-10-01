@@ -114,7 +114,6 @@ const ComponentOptionBox = (props) => {
                 handleSubmit(e);
               }}
               rules={{ fields: g }}
-              buttons={[]}
               fields={g}
             />
           </div>
