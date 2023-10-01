@@ -67,7 +67,7 @@ if(!href && link){
           <NavLink style={style} tag={(props) => <RouteNavLink {...props} />} to={href} className="">
             {text}
           </NavLink>}
-          {ch.children && <ChildItem setStyles={setStyles} children={ch.children} setStyles={setStyles}/>}
+          {ch.children && <ChildItem setStyles={setStyles} children={ch.children} />}
 
         </NavItem>)
       })}

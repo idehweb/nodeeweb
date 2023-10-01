@@ -1,21 +1,69 @@
 {
-  "env":{
-    "commonjs": true,
+  "extends": ["react-app", "prettier"],
+  "root": true,
+  "env": {
     "node": true,
-    "browser": true,
-    "es6": true,
-    "jest": true
+    "es6": true
   },
-  "parserOptions": {
-    "sourceType": "module",
-    "ecmaVersion": 2020,
-    "ecmaFeatures": {
-      "jsx": true
-    }
-  },
+  "plugins": ["prettier", "react"],
   "rules": {
-    "comma-dangle": "off",
-    "@typescript-eslint/comma-dangle": "off",
-    "jsx-a11y/anchor-is-valid": "off"
-  }
+    "prettier/prettier": [
+      "off",
+      {
+        "arrowParens": "always",
+        "singleQuote": true,
+        "trailingComma": "es5",
+        "endOfLine": "auto"
+      }
+    ],
+    "jsx-a11y/anchor-is-valid": 1,
+    "react-hooks/rules-of-hooks": 1,
+    "comma-dangle": [
+      "warn",
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "never"
+      }
+    ],
+
+    "no-undef": 1,
+    "react/jsx-no-undef": 1,
+    "import/newline-after-import": 1,
+    "import/first": 1,
+    "import/no-anonymous-default-export": 0,
+    "import/order": [
+      "warn",
+      {
+        "pathGroups": [
+          {
+            "pattern": "@/**",
+            "group": "unknown"
+          }
+        ],
+        "groups": [
+          // Then builtin and external and internal types. They can be mingled together
+          ["builtin", "external", "internal"],
+          "object",
+          "type",
+          ["unknown", "parent"],
+          "sibling",
+          "index"
+        ],
+        "newlines-between": "always-and-inside-groups"
+      }
+    ],
+    "no-restricted-globals": 1
+  },
+  "globals": {
+    "React": true
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "**/node_modules/",
+    "/**/node_modules/*",
+    "build/**"
+  ]
 }

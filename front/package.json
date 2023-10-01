@@ -3,57 +3,60 @@
   "version": "0.0.23",
   "homepage": "/",
   "dependencies": {
-    "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.8.1",
-    "@mui/icons-material": "^5.8.0",
-    "@mui/material": "^5.8.0",
-    "@mui/styles": "^5.8.0",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.11",
+    "@mui/material": "^5.14.11",
+    "@mui/styles": "^5.14.11",
     "@mui/x-data-grid": "^5.16.0",
-    "@splidejs/react-splide": "^0.7.8",
-    "@splidejs/splide": "^4.0.7",
+    "@splidejs/react-splide": "^0.7.12",
     "axios": "^0.27.2",
     "bootstrap": "^5.1.3",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "final-form": "^4.20.7",
+    "final-form": "^4.20.10",
     "firebase": "^9.8.1",
-    "i18next": "^21.8.2",
+    "i18next": "^23.5.1",
     "jalali-moment": "^3.3.11",
     "js-cookie": "^3.0.5",
     "notiflix": "^3.2.6",
     "parse-link-header": "^2.0.0",
-    "prettier": "^2.6.2",
     "querystring": "^0.2.1",
-    "react": "^18.1.0",
+    "react": "^18.2.0",
     "react-color": "^2.19.3",
-    "react-device-detect": "^2.2.2",
-    "react-dom": "^18.1.0",
+    "react-device-detect": "^2.2.3",
+    "react-dom": "^18.2.0",
     "react-file-drop": "^3.1.4",
     "react-final-form": "^6.5.9",
-    "react-i18next": "^11.16.9",
+    "react-i18next": "^13.2.2",
     "react-infinite-scroller": "^1.2.6",
     "react-loading": "^2.0.3",
-    "react-redux": "^8.0.1",
-    "react-router-dom": "^6.3.0",
+    "react-redux": "^8.1.2",
+    "react-router-dom": "^6.16.0",
     "react-scripts": "^5.0.1",
     "react-tagsinput": "^3.20.1",
-    "react-toastify": "^9.0.1",
-    "react-web-share": "^1.1.6",
-    "redux": "^4.2.0",
+    "react-toastify": "^9.1.3",
+    "react-web-share": "^2.0.2",
+    "redux": "^4.2.1",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
-    "redux-thunk": "^2.4.1",
+    "redux-thunk": "^2.4.2",
     "shards-react": "^1.0.3",
-    "socket.io-client": "^4.5.2",
+    "socket.io-client": "^4.7.2",
     "underscore": "^1.13.6",
     "use-offline-captcha": "^0.2.0"
   },
   "devDependencies": {
-    "@craco/craco": "^6.4.3",
-    "dotenv": "^16.0.1",
-    "eslint-plugin-babel": "^5.3.1",
-    "ftp-deploy": "^2.4.2",
-    "ssh2-sftp-client": "^9.1.0"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@craco/craco": "^7.1.0",
+    "@craco/types": "^7.1.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
+    "dotenv": "^16.3.1",
+    "duplicate-package-checker-webpack-plugin": "^3.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "ftp-deploy": "^2.4.5",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2",
+    "webpack-bundle-analyzer": "^4.9.1"
   },
   "scripts": {
     "dev": "craco start",
@@ -63,46 +66,17 @@
     "test": "craco test",
     "eject": "react-scripts eject",
     "deploy": "node deploy/index.js",
-    "build:d": "yarn build && yarn deploy"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "prettier"
-    ],
-    "root": true,
-    "env": {
-      "node": true,
-      "es6": true
-    },
-    "plugins": [
-      "prettier",
-      "react"
-    ],
-    "rules": {
-      "import/no-anonymous-default-export": 0,
-      "prettier/prettier": 0,
-      "jsx-a11y/anchor-is-valid": 0,
-      "jsx-a11y": 0,
-      "comma-dangle": [
-        "error",
-        {
-          "arrays": "always-multiline",
-          "objects": "always-multiline",
-          "imports": "always-multiline",
-          "exports": "always-multiline",
-          "functions": "never"
-        }
-      ]
-    }
+    "build:d": "yarn build && yarn deploy",
+    "anal": "export ANALYZE=true && set ANALYZE=true && yarn build"
   },
   "prettier": {
     "bracketSpacing": true,
     "singleQuote": true,
-    "jsxBracketSameLine": true,
-    "trailingComma": "all",
+    "bracketSameLine": true,
+    "trailingComma": "es5",
     "printWidth": 80,
-    "semi": true
+    "semi": true,
+    "arrowParens": "always"
   },
   "imports": {
     "#json/*": "./*.json",
