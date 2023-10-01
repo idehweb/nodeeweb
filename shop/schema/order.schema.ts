@@ -16,6 +16,20 @@ export enum TransactionProvider {
   Manual = 'manual',
 }
 
+export type AddressType = {
+  state: string;
+  city: string;
+  street: string;
+  postalCode: string;
+  receiver: {
+    firstName: string;
+    lastName: string;
+    username?: string;
+    phone?: string;
+    email?: string;
+  };
+};
+
 export interface IOrder {
   _id: string;
   customer: {
@@ -26,19 +40,7 @@ export interface IOrder {
     phone?: string;
     email?: string;
   };
-  address?: {
-    state: string;
-    city: string;
-    street: string;
-    postalCode: string;
-    receiver: {
-      firstName: string;
-      lastName: string;
-      username?: string;
-      phone?: string;
-      email?: string;
-    };
-  };
+  address?: AddressType;
   post?: {
     provider?: string;
     description?: string;
@@ -88,6 +90,24 @@ export interface IOrder {
 export type OrderModel = Model<IOrder>;
 export type OrderDocument = Document<unknown, {}, IOrder> & IOrder;
 
+export const AddressSchema = {
+  type: {
+    _id: false,
+    state: { type: String, required: true },
+    city: { type: String, required: true },
+    street: { type: String, required: true },
+    postalCode: { type: String, required: true },
+    receiver: {
+      firstName: String,
+      lastName: String,
+      username: String,
+      phone: String,
+      email: String,
+    },
+  },
+  required: false,
+};
+
 const schema = new mongoose.Schema(
   {
     _id: {
@@ -109,23 +129,7 @@ const schema = new mongoose.Schema(
       },
       required: true,
     },
-    address: {
-      type: {
-        _id: false,
-        state: { type: String, required: true },
-        city: { type: String, required: true },
-        street: { type: String, required: true },
-        postalCode: { type: String, required: true },
-        receiver: {
-          firstName: String,
-          lastName: String,
-          username: String,
-          phone: String,
-          email: String,
-        },
-      },
-      required: false,
-    },
+    address: AddressSchema,
     post: {
       type: {
         _id: false,

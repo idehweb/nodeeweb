@@ -20,8 +20,6 @@ import {
 import {toast} from "react-toastify";
 import State from '#c/data/state.json';
 import City from '#c/data/city.json';
-// import State from "#c/data/state";
-let supportedcity = ['اميريه-تهران', 'تهران', 'منطقه 11 پستي تهران', 'منطقه 13 پستي تهران', 'منطقه 14 پستي تهران', 'منطقه 15 پستي تهران', 'منطقه 16 پستي تهران', 'تجريش'];
 
 function setCity(s) {
   console.log('setCity', s);

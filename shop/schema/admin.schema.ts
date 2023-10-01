@@ -1,23 +1,14 @@
 import mongoose, { Model, model } from 'mongoose';
 import bcrypt from 'bcrypt';
+import { IUser } from '@nodeeweb/core/types/user';
+import { AddressSchema, AddressType } from './order.schema';
 
 export interface IAdminMethods {
   passwordVerify: (password: string) => Promise<boolean>;
 }
 
-export interface IAdmin {
-  email?: string;
-  username?: string;
-  firstName?: string;
-  lastName?: string;
-  password?: string;
-  role: string;
-  type: string;
-  active: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  passwordChangeAt?: Date;
-  credentialChangeAt: Date;
+export interface IAdmin extends IUser {
+  address: AddressType[];
 }
 
 export type AdminModel = Model<IAdmin, {}, IAdminMethods>;
@@ -61,6 +52,7 @@ const schema = new mongoose.Schema(
       default: Date.now,
       select: false,
     },
+    address: [AddressSchema],
     role: { type: String, default: 'admin' },
     type: { type: String, default: 'admin' },
     active: { type: Boolean, default: true },
