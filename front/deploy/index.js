@@ -67,7 +67,7 @@ async function main() {
   console.time('deploy');
 
   try {
-    // await build();
+    await build();
     await connect();
     await del();
     await scp();
