@@ -1,8 +1,5 @@
 import Admin from '#c/views/Admin';
-import CreatePage from '#c/views/CreatePage';
-// import Db from '#c/views/Db';
 import Home from '#c/views/Home';
-// import HomeDb from '#c/views/Home_db';
 import Product from '#c/views/Product';
 import Login from '#c/views/Login';
 import Contacts from '#c/views/Contacts';
@@ -16,9 +13,6 @@ import OrderDetails from '#c/views/OrderDetails';
 import Transaction from '#c/views/Transaction';
 import DynamicPage from '#c/views/DynamicPage';
 import Checkout from '#c/views/checkout/index';
-import CheckoutAddress from '#c/views/checkout/Address';
-import CheckoutPost from '#c/views/checkout/Post';
-import CheckoutFactor from '#c/views/checkout/Factor';
 import Post from '#c/views/Post';
 import { DefaultLayout, Nof, Nohf } from '#c/layouts/index';
 
@@ -85,7 +79,13 @@ export default function createRoutes(themeRoutes) {
       exact: true,
     },
     {
-      path: '/checkout/:state?',
+      path: '/checkout/:state',
+      element: Checkout,
+      layout: DefaultLayout,
+      exact: true,
+    },
+    {
+      path: '/checkout',
       element: Checkout,
       layout: DefaultLayout,
       exact: true,

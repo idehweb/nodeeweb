@@ -13,7 +13,7 @@ import OrderDetails from '#c/views/OrderDetails';
 import SubmitOrder from '#c/views/SubmitOrder';
 import Transaction from '#c/views/Transaction';
 import Transactions from '#c/views/Transactions';
-import Checkout from '#c/views/NewCheckout';
+import Checkout from '#c/views/checkout/index';
 import Order from '#c/views/Order';
 import Test from '#c/views/Test';
 import Best from '#c/views/Best';
@@ -199,7 +199,7 @@ export default [
     element: SubmitOrder,
   },
   {
-    path: '/checkout',
+    path: '/checkout/:state?',
     exact: true,
     layout: Nof,
     element: Checkout,

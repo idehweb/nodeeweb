@@ -1,7 +1,21 @@
-import { withTranslation } from 'react-i18next';
+import GetDelivery from '@/components/checkout/GetDelivery';
+import { Col, Row } from 'shards-react';
 
-function CheckoutPost() {
-  return <>Hello From Checkout Post</>;
+function CheckoutPost({ address, onNext, onPrev, onSetData }) {
+  return (
+    <Row>
+      <Col lg="2"></Col>
+      <Col lg="8">
+        <GetDelivery
+          onNext={onNext}
+          onChooseDelivery={onSetData}
+          addressChoosed={address}
+          onPrev={onPrev}
+        />
+      </Col>
+      <Col lg="2"></Col>
+    </Row>
+  );
 }
 
-export default withTranslation()(CheckoutPost);
+export default CheckoutPost;

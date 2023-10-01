@@ -123,7 +123,7 @@ const CardSidebar = ({ props, t }) => {
       setSum(sum);
     });
   };
-  const returnTotalPrice = (cart) => {
+  const returnTotalPrice = (cart={}) => {
     let price = Object.values(cart)
       .map((p) => (p.salePrice || p.price) * p.quantity)
       .reduce((prev, curr) => (isNaN(curr) ? curr : prev + curr), 0);
@@ -258,7 +258,7 @@ const CardSidebar = ({ props, t }) => {
           })}
       </div>
       <div className={'fdsdf pl-3 pr-3'} onClick={handleToggleCardbar}>
-        {Object.keys(cart).length && (
+        {Object.keys(cart ?? {}).length && (
           <Link
             to={'/checkout'}
             className={
@@ -272,7 +272,7 @@ const CardSidebar = ({ props, t }) => {
             ) : null}
           </Link>
         )}
-        {!Object.keys(cart).length && (
+        {!Object.keys(cart ?? {}).length && (
           <Button
             onClick={() => handleToast}
             // to={'/'}

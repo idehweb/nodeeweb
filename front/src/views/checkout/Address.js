@@ -1,7 +1,16 @@
-import { withTranslation } from 'react-i18next';
+import GetAddress from '@/components/checkout/GetAddress';
+import { Col, Row } from 'shards-react';
 
-function CheckoutAddress() {
-  return <>Hello From Checkout Address</>;
+function CheckoutAddress({ onNext, onPrev, onSetData }) {
+  return (
+    <Row>
+      <Col lg="2"></Col>
+      <Col lg="8">
+        <GetAddress onNext={onNext} onSetAddress={onSetData} onPrev={onPrev} />
+      </Col>
+      <Col lg="2"></Col>
+    </Row>
+  );
 }
 
-export default withTranslation()(CheckoutAddress);
+export default CheckoutAddress;
