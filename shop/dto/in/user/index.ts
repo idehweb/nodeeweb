@@ -1,6 +1,6 @@
 import { ToMongoID } from '@nodeeweb/core/utils/validation';
 import { Expose, Transform } from 'class-transformer';
-import { IsString, IsOptional, IsObject } from 'class-validator';
+import { IsString, IsOptional, IsObject, IsPostalCode } from 'class-validator';
 import { Types } from 'mongoose';
 import { IsProfileId } from './val';
 
@@ -18,7 +18,7 @@ export class Address {
   street: string;
 
   @Expose()
-  @IsString()
+  @IsPostalCode('IR')
   postalCode: string;
 
   @Expose()

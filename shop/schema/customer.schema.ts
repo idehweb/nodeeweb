@@ -115,7 +115,7 @@ const schema = new mongoose.Schema(
         url: String,
       },
     ],
-    role: { type: String, default: 'user' },
+    role: { type: String, default: 'customer' },
     active: { type: Boolean, default: true },
     address: [AddressSchema],
     companyName: String,

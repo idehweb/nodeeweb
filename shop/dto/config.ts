@@ -13,6 +13,7 @@ import {
   IsNumber,
   IsOptional,
   IsPositive,
+  IsPostalCode,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -49,7 +50,7 @@ class Factor {
 
   @Expose()
   @IsOptional()
-  @IsString()
+  @IsPostalCode('IR')
   postalCode?: string;
 
   @Expose()
