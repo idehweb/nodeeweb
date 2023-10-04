@@ -22,6 +22,7 @@ import {
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { getToken } from './utils';
 import API from './API';
+import UserService from './User';
 
 const DataContext = createContext(null);
 export const isClient = typeof window !== 'undefined';
@@ -2226,26 +2227,20 @@ export const setPassWithPhoneNumber = (data) => {
 export const updateAddress = (data) => {
   return new Promise(function (resolve, reject) {
     let { user } = store.getState().store;
-    let { address } = store.getState().store;
-    if (!address) {
-      address = [];
-    }
+    const address = user?.address ?? [];
+    console.log(JSON.parse(JSON.stringify({ address, data })));
     address.push(data);
-    putData(`${ApiUrl}/updateAddress`, { address: address }, true)
+    UserService.update({
+      address,
+    })
       .then((data) => {
-        let mainD = data['data'];
-        if (mainD.success) {
-          user = { ...user, ...mainD.customer.address };
-          SaveData({
-            // phoneNumber: mainD.customer.phoneNumber,
-            address: mainD.customer.address,
-            user: user,
-          });
-        }
-        resolve(mainD);
+        user = { ...user, address: data?.address ?? address };
+        SaveData({
+          user,
+        });
+        resolve(data);
       })
       .catch((err) => {
-        // console.log('sdf', err);
         handleErr(err);
         reject(err);
       });
@@ -2338,24 +2333,23 @@ export const getTheChaparPrice = (destination = 0, value = 0, weight = 1) => {
       });
   });
 };
-export const changeAddressArr = (data) => {
+export const changeAddressArr = (newAddress, validate) => {
   return new Promise(function (resolve, reject) {
     let { user } = store.getState().store;
-    putData(`${ApiUrl}/updateAddress`, { address: data }, true)
+    UserService.update(
+      {
+        address: newAddress,
+      },
+      { validateStatus: validate },
+    )
       .then((data) => {
-        let mainD = data['data'];
-        if (mainD.success) {
-          user = { ...user, ...mainD.customer.address };
-          SaveData({
-            // phoneNumber: mainD.customer.phoneNumber,
-            address: mainD.customer.address,
-            user: user,
-          });
-        }
-        resolve(mainD);
+        user = { ...user, address: data?.address ?? newAddress };
+        SaveData({
+          user,
+        });
+        resolve(data);
       })
       .catch((err) => {
-        // console.log('sdf', err);
         handleErr(err);
         reject(err);
       });
