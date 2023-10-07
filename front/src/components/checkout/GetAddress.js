@@ -211,7 +211,6 @@ function GetAddress(props) {
             lg: 6,
           },
           onClick: async (e) => {
-            console.log('##$$ on click cancel');
             onCloseModal();
           },
         },
@@ -234,7 +233,6 @@ function GetAddress(props) {
   // }
 
   const onCloseDeletModals = () => {
-    console.log('##$$', 'we are here', deletModals);
     setDeletModals(!deletModals);
   };
 
@@ -330,9 +328,9 @@ function GetAddress(props) {
                     <div className={'radio-button ' + hoverS}></div>
                     <div className={'theadds mb-3 posrel ' + hoverS}>
                       {/*<div className={'white p-2'}>*/}
-                      <div className={'ttl'}>{adr.PostalCode}</div>
+                      <div className={'ttl'}>{adr.postalCode}</div>
                       <div className={'desc'}>
-                        {adr.State} - {adr.City} - {adr.StreetAddress}
+                        {adr.state} - {adr.city} - {adr.street}
                       </div>
                       <div className={' d-flex posab bilar'}>
                         <div className={'flex-1 pl-2 textAlignRight theb'}>
