@@ -16,6 +16,7 @@ import CreateForm from '#c/components/components-overview/CreateForm_old';
 // import CreateForm from "#c/components/form/CreateForm";
 import { withTranslation } from 'react-i18next';
 import {
+  SaveData,
   buy,
   changeAddressArr,
   createOrder,
@@ -32,14 +33,12 @@ import City from '#c/data/city.json';
 import UserService from '@/functions/User';
 
 function setCity(s) {
-  console.log('setCity', s);
   let tttt = [];
   City().forEach((item) => {
     if (item.state_no == s) {
       tttt.push(item);
     }
   });
-  console.log('set city children:', tttt);
   return tttt;
 }
 
@@ -61,7 +60,6 @@ function GetAddress(props) {
           onChange: (text) => {
             checkOutBillingAddress.add.data['state'] = text;
             checkOutBillingAddress.add.fields[1].children = setCity(text);
-            setcheckOutBillingAddress({ ...checkOutBillingAddress });
           },
           selectOptionText: t('choose state...'),
           className: 'rtl',
@@ -82,7 +80,6 @@ function GetAddress(props) {
           returnEverything: true,
           onChange: (text) => {
             checkOutBillingAddress.add.data['city'] = text.name;
-            // checkOutBillingAddress.add.data['City_no'] = text.no;
           },
           selectOptionText: t('choose city...'),
           className: 'rtl',
@@ -217,12 +214,12 @@ function GetAddress(props) {
       ],
     },
   });
-  let [address, setAddress] = useState(
+  const [address, setAddress] = useState(
     store.getState().store.user?.address || [],
   );
   let [addressDelModal, setAddressDelModal] = useState(null);
   let [deletModals, setDeletModals] = useState(false);
-  let [hover, setHover] = useState(0);
+  let [hover, setHover] = useState(store.getState().store.address_hover ?? 0);
   let [modals, setModals] = useState(false);
 
   // this.getSettings();
@@ -230,14 +227,11 @@ function GetAddress(props) {
     onSetAddress(address[hover]);
   }, []);
 
-  // }
-
   const onCloseDeletModals = () => {
     setDeletModals(!deletModals);
   };
 
   const deleteThisAdd = async (ad) => {
-    console.log('on close', deletModals);
     if (!deletModals) {
       setDeletModals(!deletModals);
       setAddressDelModal(ad);
@@ -260,7 +254,6 @@ function GetAddress(props) {
 
   const hoverThis = (ad) => {
     let { onSetAddress } = props;
-    console.log('hoverThis...', ad);
 
     onSetAddress(address[ad]);
     setHover(ad);
@@ -400,8 +393,8 @@ function GetAddress(props) {
                 });
                 return;
               } else {
-                console.log('address is ', address[hover]);
-                onNext();
+                SaveData({ address_hover: hover });
+                onNext(address[hover]);
               }
             }}>
             {t('next')}

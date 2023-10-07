@@ -2227,8 +2227,7 @@ export const setPassWithPhoneNumber = (data) => {
 export const updateAddress = (data) => {
   return new Promise(function (resolve, reject) {
     let { user } = store.getState().store;
-    const address = user?.address ?? [];
-    console.log(JSON.parse(JSON.stringify({ address, data })));
+    const address = [...(user?.address ?? [])];
     address.push(data);
     UserService.update({
       address,
