@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Col, Container, Row } from 'shards-react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import PageTitle from '../../components/common/PageTitle';
 import { withTranslation } from 'react-i18next';
 import CheckoutAddress from './Address';
 import CheckoutPost from './Post';
 import CheckoutFactor from './Factor';
+import OrderViewValidation from '@/functions/order/validation';
 
 const CheckoutState = {
   Address: 'address',
@@ -14,6 +15,7 @@ const CheckoutState = {
 };
 
 function Checkout({ t }) {
+  const navigate = useNavigate();
   const params = useParams();
   const [state, setState] = useState(params?.state || CheckoutState.Address);
   const [data, setData] = useState({});
@@ -39,8 +41,6 @@ function Checkout({ t }) {
   const onSetData = useCallback(
     (newData) => {
       switch (state) {
-        case CheckoutState.Address:
-          return setData((data) => ({ ...data, address: newData }));
         case CheckoutState.Post:
           return setData((data) => ({ ...data, post: newData }));
         case CheckoutState.Factor:
@@ -50,16 +50,27 @@ function Checkout({ t }) {
     [state],
   );
 
+  useEffect(() => {
+    switch (state) {
+      case CheckoutState.Address:
+        if (!OrderViewValidation.address()) return history.back();
+      case CheckoutState.Post:
+        if (!OrderViewValidation.post()) {
+          navigate(`/checkout/${CheckoutState.Address}`, { replace: true });
+          setState(CheckoutState.Address);
+          return;
+        }
+        break;
+      case CheckoutState.Factor:
+        break;
+    }
+    navigate(`/checkout/${state}`);
+  }, [state]);
+
   const bodyCreator = () => {
     switch (state) {
       case CheckoutState.Address:
-        return (
-          <CheckoutAddress
-            onNext={onNext}
-            onPrev={onPrev}
-            onSetData={onSetData}
-          />
-        );
+        return <CheckoutAddress onNext={onNext} onPrev={onPrev} />;
       case CheckoutState.Post:
         return (
           <CheckoutPost

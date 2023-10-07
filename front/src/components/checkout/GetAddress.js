@@ -43,7 +43,7 @@ function setCity(s) {
 }
 
 function GetAddress(props) {
-  const { t, onSetAddress } = props;
+  const { t } = props;
   let [checkOutBillingAddress, setcheckOutBillingAddress] = useState({
     add: {
       data: UserService.getMeLocal().user?.address?.[hover] ?? {},
@@ -184,7 +184,6 @@ function GetAddress(props) {
               const response = await updateAddress(
                 checkOutBillingAddress.add.data,
               );
-              onSetAddress(checkOutBillingAddress.add.data);
               setAddress(response.address);
               setModals(false);
             } catch (err) {
@@ -222,11 +221,6 @@ function GetAddress(props) {
   let [hover, setHover] = useState(store.getState().store.address_hover ?? 0);
   let [modals, setModals] = useState(false);
 
-  // this.getSettings();
-  useEffect(() => {
-    onSetAddress(address[hover]);
-  }, []);
-
   const onCloseDeletModals = () => {
     setDeletModals(!deletModals);
   };
@@ -253,9 +247,6 @@ function GetAddress(props) {
   };
 
   const hoverThis = (ad) => {
-    let { onSetAddress } = props;
-
-    onSetAddress(address[ad]);
     setHover(ad);
   };
 
