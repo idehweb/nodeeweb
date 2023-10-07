@@ -281,7 +281,7 @@ class TransactionService {
     ) as PostGatewayPluginContent;
     if (!postPlugin) return;
 
-    return postPlugin.stack[0]({
+    return postPlugin.stack[1]({
       address: order.address,
       products: order.products.flatMap((p) => p.combinations),
     });

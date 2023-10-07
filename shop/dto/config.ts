@@ -120,10 +120,14 @@ export class ShopConfigLimit extends CoreConfigLimit {
   max_need_to_pay_transaction: number;
 }
 
-class ShopManualPost {
+export class ShopPost {
   @Expose()
   @IsString()
   id: string;
+
+  @Expose()
+  @IsString()
+  provider: string;
 
   @Expose()
   @IsString()
@@ -138,14 +142,25 @@ class ShopManualPost {
   active: boolean;
 
   @Expose()
+  @IsOptional()
   @IsNumber()
   @IsPositive()
-  price: number;
+  price?: number;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  priceFormula?: string;
 
   @Expose()
   @IsOptional()
   @IsString({ each: true })
   cities?: string[];
+
+  @Expose()
+  @IsOptional()
+  @IsString({ each: true })
+  states?: string[];
 
   @Expose()
   @IsOptional()
@@ -208,9 +223,9 @@ export class ShopConfigDto extends CoreConfigDto {
 
   @Expose()
   @IsOptional()
-  @Type(() => ShopManualPost)
+  @Type(() => ShopPost)
   @ValidateNested({ each: true })
-  manual_post: ShopManualPost[];
+  manual_post: ShopPost[];
 
   @Type(() => ShopConfigSmsOn)
   sms_message_on: ShopConfigSmsOn;

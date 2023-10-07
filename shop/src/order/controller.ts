@@ -19,6 +19,7 @@ import {
 } from '../../dto/in/order/cart';
 import { OrderIdParam, UpdateOrderBody } from '../../dto/in/order/order';
 import postService from './post.service';
+import { PostOptionQuery } from '../../dto/in/order/post';
 
 export default function registerController() {
   // api
@@ -91,9 +92,10 @@ export default function registerController() {
     },
     {
       method: 'get',
-      service: postService.getAll,
+      service: postService.get,
       url: '/post',
       access: AuthUserAccess,
+      validate: { reqPath: 'query', dto: PostOptionQuery },
     },
   ];
 
