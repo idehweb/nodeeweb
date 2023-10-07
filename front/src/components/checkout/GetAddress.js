@@ -184,7 +184,6 @@ function GetAddress(props) {
             });
 
             try {
-              console.log('##$$ call update address,', checkOutBillingAddress);
               const response = await updateAddress(
                 checkOutBillingAddress.add.data,
               );
@@ -212,6 +211,7 @@ function GetAddress(props) {
             lg: 6,
           },
           onClick: async (e) => {
+            console.log('##$$ on click cancel');
             onCloseModal();
           },
         },
@@ -234,6 +234,7 @@ function GetAddress(props) {
   // }
 
   const onCloseDeletModals = () => {
+    console.log('##$$', 'we are here', deletModals);
     setDeletModals(!deletModals);
   };
 
@@ -268,7 +269,9 @@ function GetAddress(props) {
   };
 
   const onCloseModal = () => {
-    setModals(!modals);
+    setModals((m) => {
+      return !m;
+    });
   };
 
   const { _id, onNext, onPrev } = props;
