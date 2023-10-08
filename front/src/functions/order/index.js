@@ -1,5 +1,8 @@
 import { ApiUrl } from '..';
 import API from '../API';
+import UserService from '../User';
+import store from '../store';
+import { OrderUtils } from './utils';
 
 export class OrderService {
   static async query(config) {
@@ -33,7 +36,8 @@ export class OrderService {
   }
 
   static getPostOptions() {
-    return this.query({ method: 'get', url: '/post' });
+    const address = OrderUtils.getAddressChose();
+    return this.query({ method: 'get', url: '/post', params: address });
   }
 
   static calcPrice(params = {}) {

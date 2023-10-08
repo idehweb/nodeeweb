@@ -9,7 +9,7 @@ function CheckoutPost({ address, onNext, onPrev, onSetData }) {
         <GetDelivery
           onNext={onNext}
           onChooseDelivery={onSetData}
-          addressChoosed={address}
+          address={address}
           onPrev={onPrev}
         />
       </Col>

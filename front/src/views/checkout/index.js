@@ -7,6 +7,7 @@ import CheckoutAddress from './Address';
 import CheckoutPost from './Post';
 import CheckoutFactor from './Factor';
 import OrderViewValidation from '@/functions/order/validation';
+import { OrderUtils } from '@/functions/order/utils';
 
 const CheckoutState = {
   Address: 'address',
@@ -77,7 +78,7 @@ function Checkout({ t }) {
             onNext={onNext}
             onPrev={onPrev}
             onSetData={onSetData}
-            address={data.address}
+            address={OrderUtils.getAddressChose()}
           />
         );
       case CheckoutState.Factor:

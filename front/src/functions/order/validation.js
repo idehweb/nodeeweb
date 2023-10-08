@@ -1,4 +1,4 @@
-import store from '../store';
+import { OrderUtils } from './utils';
 
 export default class OrderViewValidation {
   static address() {
@@ -6,10 +6,6 @@ export default class OrderViewValidation {
   }
 
   static post() {
-    const { user, address_hover } = store.getState().store;
-    const choseAddress = isNaN(address_hover)
-      ? null
-      : user?.address?.[address_hover];
-    return choseAddress;
+    return Boolean(OrderUtils.getAddressChose());
   }
 }
