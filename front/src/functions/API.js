@@ -1,7 +1,6 @@
 import axios from 'axios';
 import API_Conf, { ApiUrl } from '.';
 import { getToken } from './utils';
-import { Navigate } from 'react-router-dom';
 
 const API = axios.create({
   baseURL: ApiUrl,
@@ -38,17 +37,20 @@ API.interceptors.response.use(
   (err) => {
     if (err.isAxiosError) {
       // unauthorize
+      console.log('##$$', {
+        status: err.response?.status,
+        path: location.pathname,
+        no_redirect: err.config?.no_redirect,
+      });
       if (
         err.response?.status === 401 &&
         !location.pathname.startsWith('/login') &&
         !err.config?.no_redirect
       ) {
-        return (
-          <Navigate
-            replace={`/login?check=false&redirect=${encodeURIComponent(
-              location.pathname,
-            )}`}
-          />
+        location.assign(
+          `/login?check=false&redirect=${encodeURIComponent(
+            location.pathname,
+          )}`,
         );
       }
     }

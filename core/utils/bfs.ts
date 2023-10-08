@@ -10,8 +10,10 @@ export default function bfs(target: any, cb: (info: BFSInfo) => void) {
   const stack: BFSInfo[] = [{ parent: null, key: null, value: target }];
   do {
     const { parent, key, value } = stack.pop();
-    if (recorded.get(value)) continue;
-    recorded.set(value, true);
+    if (typeof value === 'object') {
+      if (recorded.has(value)) continue;
+      recorded.set(value, true);
+    }
 
     if (Array.isArray(value)) {
       stack.push(...value.map((c, i) => ({ parent: value, key: i, value: c })));

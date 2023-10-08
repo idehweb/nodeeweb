@@ -124,9 +124,8 @@ export function replaceValue({
     .map(
       (d) => {
         bfs(d, ({ key, value, parent }) => {
-          if (!key) return;
-          parent[`${boundary}${key.toString().toUpperCase()}${boundary}`] =
-            value;
+          if (!key || typeof key !== 'string') return;
+          parent[key.toString().toUpperCase()] = value;
         });
         return d;
       }
@@ -143,8 +142,10 @@ export function replaceValue({
   const pattern = new RegExp(`(${boundary}[^${boundary} ]+${boundary})`, 'ig');
   let value = pattern.exec(text);
   while (value) {
-    const upperV = value[0]?.toUpperCase();
-    const [target] = at(values as any, upperV);
+    const upperFilterV = value[0]
+      ?.toUpperCase()
+      .slice(boundary.length, -boundary.length);
+    const [target] = at(values as any, upperFilterV);
     if (target) newMsg = newMsg.replace(new RegExp(value[0], 'ig'), target);
     value = pattern.exec(text);
   }
