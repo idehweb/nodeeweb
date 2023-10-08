@@ -271,7 +271,7 @@ class TransactionService {
       await postPlugin.stack[1]({
         products: products.flatMap((p) => p.combinations),
         address,
-      })
+      } as any)
     ).price;
   }
 

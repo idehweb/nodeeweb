@@ -154,6 +154,24 @@ export class ShopPost {
 
   @Expose()
   @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  base_price?: number;
+
+  @Expose()
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  min_price?: number;
+
+  @Expose()
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  max_price?: number;
+
+  @Expose()
+  @IsOptional()
   @IsString({ each: true })
   cities?: string[];
 

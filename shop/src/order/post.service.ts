@@ -86,25 +86,36 @@ class PostService {
     return _min_price && _max_price && _min_weight && _max_weight;
   }
 
-  public calculatePrice(post: ShopPost, cart: OrderDocument['products']) {
+  public calculatePrice(
+    post: ShopPost,
+    cart: OrderDocument['products'],
+    address: PostOptionQuery
+  ) {
     if (post.price === undefined && post.priceFormula === undefined)
       throw new Error('post price and price formula are undefined');
 
     if (post.price !== undefined) return post.price;
 
-    return cart.reduce((acc, p) => {
-      const fillValue = replaceValue({
-        data: [p],
-        text: post.priceFormula,
-        boundary: '$',
-      });
-      const price = math.evaluate(fillValue);
-      if (isNaN(+price))
-        throw new Error(
-          `post price formula has error\nexpr:${fillValue}, price:${price}`
-        );
-      return acc + +price;
+    let calcPrice = cart.reduce((acc, p) => {
+      return (
+        acc +
+        p.combinations.reduce((acc, c) => {
+          const fillValue = replaceValue({
+            data: [p, c, address],
+            text: post.priceFormula,
+            boundary: '$',
+          });
+          const price = math.evaluate(fillValue);
+          if (isNaN(+price))
+            throw new Error(
+              `post price formula has error\nexpr:${fillValue}, price:${price}`
+            );
+          return acc + +price;
+        }, 0)
+      );
     }, 0);
+
+    if (post.base_price) calcPrice += post.base_price;
   }
 
   get: MiddleWare = async (req, res) => {
@@ -135,7 +146,7 @@ class PostService {
     providers = providers.map((p) => ({
       ...p,
       priceFormula: undefined,
-      price: this.calculatePrice(p, order?.products ?? []),
+      price: this.calculatePrice(p, order?.products ?? [], postOpt),
     }));
 
     return res.json({ data: providers });
