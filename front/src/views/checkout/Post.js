@@ -1,7 +1,7 @@
 import GetDelivery from '@/components/checkout/GetDelivery';
 import { Col, Row } from 'shards-react';
 
-function CheckoutPost({ address, onNext, onPrev, onSetData }) {
+function CheckoutPost({ onNext, onPrev, onSetData }) {
   return (
     <Row>
       <Col lg="2"></Col>
@@ -9,7 +9,6 @@ function CheckoutPost({ address, onNext, onPrev, onSetData }) {
         <GetDelivery
           onNext={onNext}
           onChooseDelivery={onSetData}
-          address={address}
           onPrev={onPrev}
         />
       </Col>

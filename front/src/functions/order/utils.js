@@ -8,4 +8,8 @@ export class OrderUtils {
       : user?.address?.[address_hover];
     return choseAddress;
   }
+
+  static getPostChose() {
+    return store.getState().store?.postChose;
+  }
 }

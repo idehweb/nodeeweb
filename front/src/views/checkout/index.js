@@ -63,6 +63,12 @@ function Checkout({ t }) {
         }
         break;
       case CheckoutState.Factor:
+        if (!OrderViewValidation.factor()) {
+          navigate(`/checkout/${CheckoutState.Post}`, { replace: true });
+          setState(CheckoutState.Post);
+          return;
+        }
+
         break;
     }
     navigate(`/checkout/${state}`);
@@ -73,14 +79,7 @@ function Checkout({ t }) {
       case CheckoutState.Address:
         return <CheckoutAddress onNext={onNext} onPrev={onPrev} />;
       case CheckoutState.Post:
-        return (
-          <CheckoutPost
-            onNext={onNext}
-            onPrev={onPrev}
-            onSetData={onSetData}
-            address={OrderUtils.getAddressChose()}
-          />
-        );
+        return <CheckoutPost onNext={onNext} onPrev={onPrev} />;
       case CheckoutState.Factor:
         return (
           <CheckoutFactor

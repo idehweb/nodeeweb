@@ -36,8 +36,12 @@ export class OrderService {
   }
 
   static getPostOptions() {
-    const address = OrderUtils.getAddressChose();
-    return this.query({ method: 'get', url: '/post', params: address });
+    const address = OrderUtils.getAddressChose() ?? {};
+    return this.query({
+      method: 'get',
+      url: '/post',
+      params: { state: address.state, city: address.city },
+    });
   }
 
   static calcPrice(params = {}) {

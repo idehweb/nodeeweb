@@ -8,4 +8,8 @@ export default class OrderViewValidation {
   static post() {
     return Boolean(OrderUtils.getAddressChose());
   }
+
+  static factor() {
+    return Boolean(OrderUtils.getPostChose());
+  }
 }

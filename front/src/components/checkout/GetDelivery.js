@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Button,
   ButtonGroup,
@@ -13,24 +13,25 @@ import LoadingComponent from '#c/components/components-overview/LoadingComponent
 
 import store from '#c/functions/store';
 import { useTranslation, withTranslation } from 'react-i18next';
-import { getTheSettings } from '#c/functions/index';
+import { SaveData, getTheSettings } from '#c/functions/index';
+import { OrderService } from '@/functions/order';
+import { toast } from 'react-toastify';
 
-function GetDelivery({ address, ...props }) {
-  console.log('##$$', address);
+function GetDelivery({ ...props }) {
   const { t } = useTranslation();
-  let [renTimes, setRenTimes] = useState([]);
-  let [loading, setLoading] = useState(false);
-  let [loading2, setLoading2] = useState(false);
-  let [hoverD, setHoverD] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
+  const [postProviders, setPostProviders] = useState([]);
+  const [hoverD, setHoverD] = useState(0);
   useEffect(() => {
     getSettings();
   }, []);
 
-  const countDelivery = (sum, renTimes, hoverD = 0) => {
+  const countDelivery = (sum, postProviders, hoverD = 0) => {
     return new Promise(function (resolve, reject) {
       let varprice = 0;
 
-      let setting = renTimes[hoverD];
+      let setting = postProviders[hoverD];
 
       if (setting && setting.condition) {
         if (parseInt(setting.condition) > sum) {
@@ -55,20 +56,20 @@ function GetDelivery({ address, ...props }) {
     });
   };
 
-  const getSettings = () => {
-    getTheSettings().then((res) => {
-      if (!res || (res && !res.length)) {
-        props.onNext();
-      } else {
-        setSettings(res);
-        calculateAddress(res, hoverD, address)
-          .then((obj) => {
-            setRenTimes(obj);
-            setLoading(true);
-          })
-          .catch((e) => console.error('e', e));
-      }
-    });
+  const getSettings = async () => {
+    setLoading(false);
+    setLoading2(false);
+
+    try {
+      const response = await OrderService.getPostOptions();
+      setPostProviders(response);
+      setLoading(true);
+      setLoading2(true);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message);
+      setLoading(true);
+    }
   };
 
   const countSum = (card) => {
@@ -95,16 +96,16 @@ function GetDelivery({ address, ...props }) {
     });
   };
 
-  const hoverThisD = (ad, renTimes) => {
+  const hoverThisD = (ad, postProviders) => {
     countSum(card).then((sum) => {
-      countDelivery(sum, renTimes, ad).then((obj) => {
+      countDelivery(sum, postProviders, ad).then((obj) => {
         setDeliveryPrice(obj.deliveryPrice);
         setTotal(obj.total);
         setSum(sum);
         setHoverD(ad);
         setLoading2(true);
         chooseDelivery({
-          setting: renTimes[ad],
+          setting: postProviders[ad],
           deliveryPrice: obj.deliveryPrice,
           total: obj.total,
           sum: sum,
@@ -115,7 +116,7 @@ function GetDelivery({ address, ...props }) {
   };
 
   const calculateAddress = (settings, hoverD = hoverD, address = address) => {
-    let renTimes = [];
+    let postProviders = [];
 
     return new Promise(function (resolve, reject) {
       if (!address) return reject({});
@@ -126,31 +127,36 @@ function GetDelivery({ address, ...props }) {
               address.State == adr.city &&
               supportedcity.indexOf(address.City) > -1
             ) {
-              renTimes.push(adr);
+              postProviders.push(adr);
             }
           } else if (adr.is === 'isnt') {
             if (address && address.State && address.State != adr.city) {
-              renTimes.push(adr);
+              postProviders.push(adr);
             } else if (
               address &&
               address.State &&
               address.State == adr.city &&
               !(supportedcity.indexOf(address.City) > -1)
             ) {
-              renTimes.push(adr);
+              postProviders.push(adr);
             }
           } else {
-            renTimes.push(adr);
+            postProviders.push(adr);
           }
         });
-        hoverThisD(0, renTimes);
+        hoverThisD(0, postProviders);
 
-        resolve(renTimes);
+        resolve(postProviders);
       }
     });
   };
 
-  const { _id, onNext, onPrev } = props;
+  const { onNext, onPrev } = props;
+  const onNextPress = useCallback(() => {
+    const postChose = postProviders[hoverD];
+    SaveData({ postChose });
+    onNext();
+  }, [hoverD, postProviders, onNext]);
   const loader = (
     <div className="loadNotFound loader " key={23}>
       {t('loading...')}
@@ -176,9 +182,9 @@ function GetDelivery({ address, ...props }) {
         <Col lg="12">
           {loading && (
             <Row>
-              {renTimes &&
-                renTimes.length > 0 &&
-                renTimes.map((adr, ad) => {
+              {postProviders &&
+                postProviders.length > 0 &&
+                postProviders.map((adr, ad) => {
                   let hoverS = '';
                   if (ad === hoverD) {
                     hoverS = 'hover';
@@ -191,12 +197,13 @@ function GetDelivery({ address, ...props }) {
                       lg={12}
                       sm={12}
                       onClick={() => {
-                        hoverThisD(ad, renTimes);
+                        hoverThisD(ad, postProviders);
                       }}>
                       <div className={'radio-button ' + hoverS}></div>
                       <div className={'theadds uytghui87 ' + hoverS}>
                         <div className={'ttl'}>{adr.title}</div>
                         <div className={'desc'}>{adr.description}</div>
+                        <div className={'price'}>{adr.price}</div>
                       </div>
                     </Col>
                   );
@@ -222,7 +229,7 @@ function GetDelivery({ address, ...props }) {
               key={'xo1'}
               className={'go-to-checkout-part-last'}
               left={'true'}
-              onClick={onNext}>
+              onClick={onNextPress}>
               {t('next')}
               <i className="material-icons">{'chevron_left'}</i>
             </Button>,
