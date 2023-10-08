@@ -124,7 +124,9 @@ export function replaceValue({
     .map(
       (d) => {
         bfs(d, ({ key, value, parent }) => {
-          parent[key.toString().toUpperCase()] = value;
+          if (!key) return;
+          parent[`${boundary}${key.toString().toUpperCase()}${boundary}`] =
+            value;
         });
         return d;
       }

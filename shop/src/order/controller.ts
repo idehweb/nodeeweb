@@ -20,6 +20,7 @@ import {
 import { OrderIdParam, UpdateOrderBody } from '../../dto/in/order/order';
 import postService from './post.service';
 import { PostOptionQuery } from '../../dto/in/order/post';
+import { CreateTransactionBody } from '../../dto/in/order/transaction';
 
 export default function registerController() {
   // api
@@ -78,6 +79,7 @@ export default function registerController() {
       service: transactionService.createTransaction,
       url: '/transaction',
       access: AuthUserAccess,
+      validate: { reqPath: 'body', dto: CreateTransactionBody },
     },
     {
       method: 'get',

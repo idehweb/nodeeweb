@@ -30,6 +30,8 @@ import discountService from '../discount/service';
 import logger from '../../utils/log';
 import { axiosError2String, replaceValue } from '@nodeeweb/core/utils/helpers';
 import store from '../../store';
+import postService from './post.service';
+import { CreateTransactionBody } from '../../dto/in/order/transaction';
 
 class TransactionService {
   transactionSupervisors = new Map<string, NodeJS.Timer>();
@@ -58,6 +60,8 @@ class TransactionService {
   }
 
   createTransaction: MiddleWare = async (req, res) => {
+    const body: CreateTransactionBody = req.body;
+
     // 0. check shop available
     if (!store.config.shop_active)
       throw new GeneralError(
@@ -98,7 +102,7 @@ class TransactionService {
 
     // 4. discount
     let discount: DiscountDocument;
-    if (req.body.discount) {
+    if (body.discount) {
       discount = await discountService.consumeDiscount(req);
     }
 
@@ -110,7 +114,8 @@ class TransactionService {
       discount: discountPrice,
     } = await this.calculatePrice(order, {
       discount,
-      post: req.body.post,
+      post: body.post,
+      address: body.address,
       tax: true,
       total: true,
     });
@@ -123,10 +128,13 @@ class TransactionService {
       req.user.phone
     );
 
-    // 7. post if not payment issue
-    let post: IOrder['post'] = {};
+    // 7. fill post, post if not payment issue
+    let post: IOrder['post'] = await postService.getPostProvider(
+      body.post.id,
+      body.address
+    );
     if (!totalPrice) {
-      post = await this.submitPostReq(order);
+      post = { ...post, ...(await this.submitPostReq(order)) };
     }
 
     // 8. update order
@@ -138,14 +146,12 @@ class TransactionService {
       },
       {
         $set: {
-          address: req.body.address,
+          address: body.address,
           discount: {
-            code: req.body.discount,
+            code: body.discount,
             amount: discountPrice,
           },
-          post: req.body.post
-            ? { ...req.body.post, ...post, price: postPrice }
-            : post,
+          post: body.post ? { ...body.post, ...post, price: postPrice } : post,
           status: totalPrice ? OrderStatus.NeedToPay : OrderStatus.Posting,
           tax: taxesPrice,
           totalPrice,
@@ -259,20 +265,15 @@ class TransactionService {
   }
 
   private async getPostPrice(
+    postId: string,
     products: ProductDocument[],
     address: Omit<IOrder['address'], 'receiver'>
   ) {
-    const postPlugin = store.plugins.get(
-      ShopPluginType.POST_GATEWAY
-    ) as PostGatewayPluginContent;
-    if (!postPlugin) return 0;
+    const provider = await postService.getPostProvider(postId, address);
+    if (!provider)
+      throw new NotFound(`post provider not found with ID ${postId}`);
 
-    return (
-      await postPlugin.stack[1]({
-        products: products.flatMap((p) => p.combinations),
-        address,
-      } as any)
-    ).price;
+    return postService.calculatePrice(provider, products, address);
   }
 
   private submitPostReq(order: OrderDocument): Promise<IOrder['post']> {
@@ -291,9 +292,10 @@ class TransactionService {
     order: OrderDocument,
     opt: {
       post?: {
+        id: string;
         provider?: string;
-        address: Omit<IOrder['address'], 'receiver'>;
       };
+      address?: Omit<IOrder['address'], 'receiver'>;
       tax?: boolean;
       discount?: DiscountDocument;
       products?: boolean;
@@ -315,7 +317,7 @@ class TransactionService {
         ? postPrice
         : opt.post
         ? roundPrice(
-            await this.getPostPrice(products as any, opt.post?.address)
+            await this.getPostPrice(opt.post?.id, products as any, opt.address)
           )
         : 0;
     const _products = () =>

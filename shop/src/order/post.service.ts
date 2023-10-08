@@ -8,8 +8,9 @@ import {
   OrderModel,
   OrderStatus,
 } from '../../schema/order.schema';
-import math from 'mathjs';
+import { evaluate } from 'mathjs';
 import { replaceValue } from '@nodeeweb/core/utils/helpers';
+import { ProductDocument } from '../../schema/product.schema';
 
 class PostService {
   get orderModel(): OrderModel {
@@ -17,7 +18,7 @@ class PostService {
   }
 
   public async getPostProviders(
-    address: PostOptionQuery,
+    address: PostOptionQuery = {},
     opt: { fromAdmin?: boolean; fromPlugin?: boolean } = {
       fromAdmin: true,
       fromPlugin: true,
@@ -37,9 +38,17 @@ class PostService {
         );
       }
     }
-    return [...fromAdmin, ...fromPlugin].filter((p) =>
-      this.filterByAddress(p, address)
-    );
+    return [...fromAdmin, ...fromPlugin]
+      .filter((p) => p.active)
+      .filter((p) => this.filterByAddress(p, address));
+  }
+
+  public async getPostProvider(postId: string, address?: PostOptionQuery) {
+    const providers = await this.getPostProviders(address, {
+      fromAdmin: true,
+      fromPlugin: true,
+    });
+    return providers.find((p) => p.id === postId && p.active);
   }
 
   public filterByAddress(post: ShopPost, { city, state }: PostOptionQuery) {
@@ -88,8 +97,8 @@ class PostService {
 
   public calculatePrice(
     post: ShopPost,
-    cart: OrderDocument['products'],
-    address: PostOptionQuery
+    cart: OrderDocument['products'] | ProductDocument[],
+    address: PostOptionQuery = {}
   ) {
     if (post.price === undefined && post.priceFormula === undefined)
       throw new Error('post price and price formula are undefined');
@@ -103,9 +112,9 @@ class PostService {
           const fillValue = replaceValue({
             data: [p, c, address],
             text: post.priceFormula,
-            boundary: '$',
+            boundary: '%',
           });
-          const price = math.evaluate(fillValue);
+          const price = evaluate(fillValue);
           if (isNaN(+price))
             throw new Error(
               `post price formula has error\nexpr:${fillValue}, price:${price}`
@@ -116,19 +125,23 @@ class PostService {
     }, 0);
 
     if (post.base_price) calcPrice += post.base_price;
+
+    calcPrice = Math.min(
+      Math.max(calcPrice, post.min_price ?? 0),
+      post.max_price ?? Number.MAX_SAFE_INTEGER
+    );
+
+    return Math.ceil(calcPrice);
   }
 
   get: MiddleWare = async (req, res) => {
     const postOpt: PostOptionQuery = req.query;
-    const isAdmin = req.user.type === 'admin';
 
-    const order = isAdmin
-      ? null
-      : await this.orderModel.findOne({
-          'customer._id': req.user._id,
-          status: OrderStatus.Cart,
-          active: true,
-        });
+    const order = await this.orderModel.findOne({
+      'customer._id': req.user._id,
+      status: OrderStatus.Cart,
+      active: true,
+    });
 
     // get providers
     let providers = await this.getPostProviders(postOpt, {

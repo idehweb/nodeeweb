@@ -1,6 +1,8 @@
 import {
+  CoreConfigBody,
   CoreConfigDto,
   CoreConfigLimit,
+  CoreConfigLimitBody,
   CoreConfigSmsOn,
 } from '@nodeeweb/core';
 import { Expose, Type } from 'class-transformer';
@@ -63,6 +65,7 @@ class Factor {
   @IsString()
   economicCode?: string;
 }
+class FactorBody extends Factor {}
 class ShopConfigSmsOn extends CoreConfigSmsOn {
   @Expose()
   @IsOptional()
@@ -88,6 +91,11 @@ class ShopConfigSmsOn extends CoreConfigSmsOn {
   @IsOptional()
   @IsString()
   complete_order: string;
+}
+
+class ShopConfigSmsOnBody extends ShopConfigSmsOn {
+  @IsOptional()
+  otp: string;
 }
 
 export class ShopConfigLimit extends CoreConfigLimit {
@@ -118,6 +126,14 @@ export class ShopConfigLimit extends CoreConfigLimit {
   @IsNumber()
   @IsInt()
   max_need_to_pay_transaction: number;
+}
+
+class ShopConfigLimitBody extends ShopConfigLimit {
+  @IsOptional()
+  request_limit: number;
+
+  @IsOptional()
+  request_limit_window_s: number;
 }
 
 export class ShopPost {
@@ -257,4 +273,26 @@ export class ShopConfigDto extends CoreConfigDto {
   @IsOptional()
   @IsArray()
   consumer_status: { key: string; value: string }[];
+}
+
+export class ShopConfConfBody extends ShopConfigDto {
+  @IsOptional()
+  app_name: string;
+
+  @IsOptional()
+  @Type(() => FactorBody)
+  factor: Factor;
+
+  @IsOptional()
+  @Type(() => ShopConfigLimitBody)
+  limit: ShopConfigLimitBody;
+
+  @IsOptional()
+  @Type(() => ShopConfigSmsOnBody)
+  sms_message_on: ShopConfigSmsOnBody;
+}
+
+export class ShopConfigBody extends CoreConfigBody {
+  @Type(() => ShopConfConfBody)
+  config: ShopConfConfBody;
 }

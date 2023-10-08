@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 import { MultiLang } from './_base.schema';
+import { string } from 'mathjs';
 
 export enum OrderStatus {
   Cart = 'cart',
@@ -42,6 +43,7 @@ export interface IOrder {
   };
   address?: AddressType;
   post?: {
+    id: string;
     provider?: string;
     description?: string;
     logo?: string;
@@ -133,6 +135,7 @@ const schema = new mongoose.Schema(
     post: {
       type: {
         _id: false,
+        id: { type: String, required: true },
         provider: String,
         description: String,
         logo: String,
