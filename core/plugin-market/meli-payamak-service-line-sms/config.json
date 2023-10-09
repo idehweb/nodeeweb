@@ -8,9 +8,9 @@
     "type" : "sms-gateway",
     "icon": "",
     "author": "Nodeeweb",
-    "main":"index.ts",
+    "main":"index",
     "slug":"meli-payamak-service-line-sms",
-    "add": {
+    "config": {
         "inputs": [
             {
                 "key": "username",
@@ -40,8 +40,12 @@
                 "description": {}
             }
         ],
-        "dto":"dto/add.ts",
-        "run":"add"
+        "dto":"dto/config",
+        "run":"config"
+    },
+    "active":{
+        "dto" :"dto/config",
+        "run":"active"
     },
     "edit":{
         "inputs": [
@@ -73,7 +77,7 @@
                 "description": {}
             }
         ],
-        "dto":"dto/edit.ts",
+        "dto":"dto/edit",
         "run":"edit"
     }
 }

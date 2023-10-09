@@ -1,7 +1,6 @@
 import { useEffect, useState, memo, useCallback, Fragment } from 'react';
 import { useParams } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { useDispatch } from 'react-redux';
 import { useNotify, useTranslate } from 'react-admin';
 import _get from 'lodash/get';
 
@@ -18,12 +17,7 @@ import {
   OnDropType,
 } from '@/components/page-builder/Component/types';
 
-import {
-  changeThemeData,
-  changeThemeDataFunc,
-  GetBuilder,
-  SaveBuilder,
-} from '@/functions';
+import { GetBuilder, SaveBuilder } from '@/functions';
 
 import Header from './Header';
 import Container from './Container';
@@ -48,7 +42,6 @@ interface StateType {
 
 const Core = (props) => {
   const translate = useTranslate();
-  const dispatch = useDispatch();
   const notify = useNotify();
   const { _id, model = 'page' } = useParams();
 
@@ -71,18 +64,17 @@ const Core = (props) => {
   const LoadData = useCallback(() => {
     if (!_id) return;
 
-    setLoading(true);
-    changeThemeDataFunc().then((e) => {
-      dispatch(changeThemeData(e));
-    });
     GetBuilder(model, _id)
       .then((r) => {
-        if (r && r.elements) {
-          setState((s) => ({ ...s, components: r.elements }));
-        }
+        const elements = _get(r, 'data.elements', []);
+        setState((s) => ({ ...s, components: elements }));
+      })
+      .catch((err) => {
+        console.error('err =>', err);
+        notify('Some thing went Wrong!!', { type: 'error' });
       })
       .finally(() => setLoading(false));
-  }, [_id, model, dispatch]);
+  }, [_id, model, notify]);
 
   useEffect(() => {
     LoadData();
@@ -94,15 +86,13 @@ const Core = (props) => {
       setLoading(true);
       SaveBuilder(model, _id, { elements: data })
         .then((r) => {
-          if (r._id)
-            notify(translate('saved successfully.'), {
-              type: 'success',
-            });
-        })
-        .catch((f) => {
-          notify(translate('shit!'), {
-            type: 'warning',
+          notify(translate('saved successfully.'), {
+            type: 'success',
           });
+        })
+        .catch((err) => {
+          console.error('err =>', err);
+          notify('Some thing went Wrong!!', { type: 'error' });
         })
         .finally(() => setLoading(false));
     },
@@ -120,7 +110,6 @@ const Core = (props) => {
       let tempArray = [];
       the_com['settings'][method].fields = element;
       let array = Object.keys(element);
-      console.log('array', array);
 
       if (
         the_com &&
@@ -171,8 +160,6 @@ const Core = (props) => {
         }
       });
 
-      console.log('save components:', tempArray);
-      console.log('save components:', address);
       setState((s) => ({ ...s, components: tempArray }));
     },
     [components]
@@ -196,6 +183,15 @@ const Core = (props) => {
       }));
     },
     [components, sourceAddress]
+  );
+
+  // TODO: fix duplicate ids lead to error, we should regenerate ids
+  const handleDuplicate = useCallback(
+    (item) => {
+      const newComponents = PushItem(item.id, components, item);
+      setState((s) => ({ ...s, components: newComponents }));
+    },
+    [components]
   );
 
   const handleDrop = useCallback<OnDropType>(
@@ -257,6 +253,7 @@ const Core = (props) => {
                   onAdd={toggleOptionBox}
                   onEdit={(v) => setEditItem(v)}
                   onDrop={handleDrop}
+                  onDuplicate={handleDuplicate}
                 />
 
                 {idx === components.length - 1 ? (

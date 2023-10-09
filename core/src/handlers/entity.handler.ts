@@ -11,8 +11,9 @@ import { BASE_API_URL, CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { isAsyncFunction } from 'util/types';
 import { BadRequestError, GeneralError, NotFound } from '../../types/error';
 import { call } from '../../utils/helpers';
-import { CrudParamDto } from '../../dto/in/crud.dto';
+import { CrudParamDto, MultiIDParam } from '../../dto/in/crud.dto';
 import _, { lowerFirst, orderBy } from 'lodash';
+import { ClassConstructor } from 'class-transformer';
 
 export class EntityCreator {
   constructor(private modelName: string) {}
@@ -89,11 +90,10 @@ export class EntityCreator {
     }: Partial<CRUDCreatorOpt>
   ) {
     let result: any = query;
-    let mySort: any =
-      sort ?? queryFields?.sort ? req.query[queryFields?.sort] : undefined;
+    const mySort: any =
+      sort ?? (queryFields?.sort ? req.query[queryFields?.sort] : undefined);
     if (mySort) query.sort(mySort);
     if (project) query.projection(project);
-
     const offset = +this.getFrom(
       req,
       [
@@ -121,10 +121,12 @@ export class EntityCreator {
       if (!Array.isArray(populate)) populate = [populate];
       populate.forEach((p) => query.populate(p));
     }
-
     if (executeQuery) result = await query.exec();
     if (autoSetCount)
-      res.setHeader('X-Total-Count', await query.clone().countDocuments());
+      res.setHeader(
+        'X-Total-Count',
+        await query.clone().countDocuments({}, { limit: null, skip: null })
+      );
 
     // handle result and output
     await this.handleResult(req, res, next, {
@@ -178,15 +180,24 @@ export class EntityCreator {
   }
   getOneCreator({
     parseFilter,
-    paramFields = { id: 'id' },
+    paramFields: pf = { id: 'id', slug: 'slug' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = parseFilter
         ? await call(parseFilter, req)
         : {
-            _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+            _id:
+              pf.id &&
+              req.params[pf.id] &&
+              new mongoose.Types.ObjectId(req.params[pf.id]),
+            slug: req.params[pf.slug],
           };
+
+      for (const key in f) {
+        if (f[key] === undefined) delete f[key];
+      }
+
       const query = this.model.findOne(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
@@ -201,15 +212,24 @@ export class EntityCreator {
   updateOneCreator({
     parseFilter,
     parseUpdate,
-    paramFields = { id: 'id' },
+    paramFields: pf = { id: 'id', slug: 'slug' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = parseFilter
         ? await call(parseFilter, req)
         : {
-            _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+            _id:
+              pf.id &&
+              req.params[pf.id] &&
+              new mongoose.Types.ObjectId(req.params[pf.id]),
+            slug: req.params[pf.slug],
           };
+
+      for (const key in f) {
+        if (f[key] === undefined) delete f[key];
+      }
+
       const u = parseUpdate ? await call(parseUpdate, req) : req.body;
       const query = this.model.findOneAndUpdate(f, u, { new: true });
       return await this.baseCreator(query, req, res, next, opt);
@@ -219,15 +239,24 @@ export class EntityCreator {
     parseFilter,
     forceDelete,
     parseUpdate,
-    paramFields = { id: 'id' },
+    paramFields: pf = { id: 'id', slug: 'slug' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = parseFilter
         ? await call(parseFilter, req)
         : {
-            _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+            _id:
+              pf.id &&
+              req.params[pf.id] &&
+              new mongoose.Types.ObjectId(req.params[pf.id]),
+            slug: req.params[pf.slug],
           };
+
+      for (const key in f) {
+        if (f[key] === undefined) delete f[key];
+      }
+
       const u = parseUpdate ? await call(parseUpdate, req) : { active: false };
       const query = forceDelete
         ? this.model.findOneAndDelete(f)
@@ -283,6 +312,8 @@ export function registerEntityCRUD(
     // set default values
     opt.crud = _.merge({ ...defaultCrudOpt }, opt.crud ?? {});
 
+    const defValidator = detectDefaultParamValidation(cName, opt);
+
     schemas.push({
       method: opt.controller.method ?? translateCRUD2Method(cName),
       url: opt.controller.url ?? translateCRUD2Url(cName, opt.crud),
@@ -292,8 +323,8 @@ export function registerEntityCRUD(
         creator[translateCRUD2Creator(cName)](opt.crud),
         ...[opt.controller.service ?? []].flat(),
       ],
-      validate: canUseDefaultParamValidation(cName, opt)
-        ? { reqPath: 'params', dto: CrudParamDto }
+      validate: defValidator
+        ? { reqPath: 'params', dto: defValidator }
         : opt.controller.validate,
     });
   }
@@ -354,18 +385,29 @@ function translateCRUD2Url(
     case CRUD.GET_ONE:
     case CRUD.UPDATE_ONE:
     case CRUD.DELETE_ONE:
-      return `/:${opt.paramFields?.id ?? 'id'}`;
+      const identifier = opt.paramFields?.id ?? opt.paramFields?.slug ?? 'id';
+      return `/:${identifier}`;
     default:
       throw new Error(`Invalid CRUD name : ${name}`);
   }
 }
 
-function canUseDefaultParamValidation(name: CRUD, opt: EntityCRUDOpt) {
-  return (
+function detectDefaultParamValidation(
+  name: CRUD,
+  opt: EntityCRUDOpt
+): ClassConstructor<unknown> | null {
+  const canUse =
     opt.controller.validate === undefined &&
     [CRUD.UPDATE_ONE, CRUD.DELETE_ONE, CRUD.GET_ONE].includes(name) &&
-    (!opt.crud.paramFields || ['id', 'slug'].includes(opt.crud.paramFields.id))
-  );
+    (!opt.crud?.paramFields ||
+      ['id', 'slug'].includes(opt.crud?.paramFields.id));
+
+  return !canUse
+    ? null
+    : !opt.crud?.paramFields ||
+      (opt.crud.paramFields.id && opt.crud.paramFields.slug)
+    ? MultiIDParam
+    : CrudParamDto;
 }
 
 function order(opts: EntityOpts): EntityOpts {

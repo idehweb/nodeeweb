@@ -342,7 +342,14 @@ const FormOptions = [
     settings: {
       general: {
         fields: { height: '', ...fields },
-        rules: [{ name: 'height', type: 'string' }, ...rules],
+        rules: [
+          { name: 'height', type: 'string' },
+          { name: 'maxWidth', type: 'string' },
+          { name: 'border', type: 'string' },
+          { name: 'borderRadius', type: 'string' },
+          { name: 'boxShadow', type: 'string' },
+          ...rules,
+        ],
       },
       design: [{ name: 'padding', type: 'string' }],
     },
@@ -354,7 +361,13 @@ const FormOptions = [
     settings: {
       general: {
         fields: { width: '', ...fields },
-        rules: [{ name: 'width', type: 'string' }, ...rules],
+        rules: [
+          { name: 'width', type: 'string' },
+          { name: 'border', type: 'string' },
+          { name: 'borderRadius', type: 'string' },
+          { name: 'boxShadow', type: 'string' },
+          ...rules,
+        ],
       },
       design: [{ name: 'padding', type: 'string' }],
     },

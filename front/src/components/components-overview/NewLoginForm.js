@@ -32,7 +32,7 @@ import Captcha from '#c/components/captcha';
 import { fNum } from '#c/functions/utils';
 
 import CircularProgress from '@mui/material/CircularProgress';
-import otpHandler from '@/functions/auth';
+import { otpHandler } from '@/functions/auth';
 import { SaveData } from '@/functions';
 
 const globalTimerSet = 120;
@@ -77,12 +77,13 @@ class LoginForm extends React.Component {
 
   async detect(phone, signup = false) {
     try {
-      const {
-        data: { data },
-      } = await otpHandler.detect(phone, {
-        login: true,
-        signup,
-      });
+      const data = await otpHandler.detect(
+        { phone },
+        {
+          login: true,
+          signup,
+        },
+      );
 
       return {
         isOk: true,
@@ -103,9 +104,7 @@ class LoginForm extends React.Component {
 
   async login(phone, code) {
     try {
-      const {
-        data: { data },
-      } = await otpHandler.login(phone, code);
+      const data = await otpHandler.login({ phone, code });
       this.afterAuth(data.user, data.token);
       return { isOk: true };
     } catch (err) {
@@ -118,9 +117,7 @@ class LoginForm extends React.Component {
 
   async signup(user) {
     try {
-      const {
-        data: { data },
-      } = await otpHandler.signup(user);
+      const data = await otpHandler.signup(user);
       this.afterAuth(data.user, data.token);
       return { isOk: true };
     } catch (err) {
@@ -220,8 +217,6 @@ class LoginForm extends React.Component {
     const response = await this.detect(fd + phoneNumber, true);
     if (!response.isOk) return toast.error(response.message);
 
-    console.log('##$$ set', response.sms_time);
-
     return this.setState((s) => ({
       ...s,
       authStatus: 'signup:active',
@@ -280,7 +275,6 @@ class LoginForm extends React.Component {
 
     if (this.state.authStatus.includes('active'))
       this.myInterval = setInterval(() => {
-        console.log('##$$ timer call');
         this.setState(({ timer }) => ({
           timer: timer > 0 ? timer - 1 : this.handleClearInterval(),
         }));
@@ -314,29 +308,10 @@ class LoginForm extends React.Component {
     }
   }
   render() {
-    const {
-      goToProfile,
-      token,
-      firstName,
-      lastName,
-      username,
-      CameFromPost,
-      goToProduct,
-      goToCheckout,
-      goToChat,
-      timer,
-      authStatus,
-    } = this.state;
+    const { firstName, lastName, username, timer, authStatus } = this.state;
     const { t } = this.props;
     if (authStatus === 'success') {
-      let redirect_url;
-
-      if (goToCheckout) redirect_url = '/checkout/';
-      if (goToChat) redirect_url = '/chat/';
-      if (CameFromPost) redirect_url = '/add-new-post/publish';
-      if (goToProfile) redirect_url = '/profile';
-
-      return <Navigate to={redirect_url} />;
+      return <Navigate to={this.props.redirectTo} />;
     }
     return (
       <ListGroup flush>

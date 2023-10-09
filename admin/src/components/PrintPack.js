@@ -94,7 +94,6 @@ export default (props) => {
       });
   };
   useEffect(() => {
-    console.clear();
     console.log('getShopData');
     getShopData();
   }, []);

@@ -30,8 +30,12 @@ export const actionShow = (props) => {
           label={translate('resources.action.lastName')}
         />
         <TextField
-          source="user.nickname"
-          label={translate('resources.action.nickname')}
+          source="user.firstName"
+          label={translate('resources.action.firstName')}
+        />
+        <TextField
+          source="user.lastName"
+          label={translate('resources.action.lastName')}
         />
         <TextField
           source="user.username"

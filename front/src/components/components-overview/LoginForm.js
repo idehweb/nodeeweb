@@ -1,5 +1,5 @@
-import React from "react";
-import store from "#c/functions/store";
+import React from 'react';
+import store from '#c/functions/store';
 
 import {
   Button,
@@ -11,8 +11,8 @@ import {
   InputGroupAddon,
   ListGroup,
   ListGroupItem,
-  Row
-} from "shards-react";
+  Row,
+} from 'shards-react';
 import {
   active,
   authCustomerForgotPass,
@@ -23,27 +23,29 @@ import {
   Logout,
   register,
   savePost,
-  setPassWithPhoneNumber
-} from "#c/functions/index";
-import {withTranslation} from "react-i18next";
-import {Navigate} from "react-router-dom";
-import {toast} from "react-toastify";
-import Captcha from '#c/components/captcha'
-import {fNum} from "#c/functions/utils";
+  setPassWithPhoneNumber,
+} from '#c/functions/index';
+import { withTranslation } from 'react-i18next';
+import { Navigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Captcha from '#c/components/captcha';
+import { fNum } from '#c/functions/utils';
 
-import CircularProgress from "@mui/material/CircularProgress";
+import CircularProgress from '@mui/material/CircularProgress';
 
-const globalTimerSet = 60
+const globalTimerSet = 60;
 
 class LoginForm extends React.Component {
   constructor(props) {
     super(props);
     let st = store.getState().store;
     let shallweshowsubmitpass = false;
-    if (st.user.token && (!st.user.firstName || !st.user.lastName || !st.user.internationalCode)) {
+    if (
+      st.user.token &&
+      (!st.user.firstName || !st.user.lastName || !st.user.internationalCode)
+    ) {
       shallweshowsubmitpass = true;
     }
-    console.log(props);
 
     this.state = {
       captcha: false,
@@ -58,17 +60,19 @@ class LoginForm extends React.Component {
       getPassword: false,
       firstName: st.user.firstName,
       lastName: st.user.lastName,
-      internationalCodeClass: (checkCodeMeli(st.user.internationalCode)) ? "true" : null,
+      internationalCodeClass: checkCodeMeli(st.user.internationalCode)
+        ? 'true'
+        : null,
       internationalCode: st.user.internationalCode,
-      email: "",
+      email: '',
       goToProfile: false,
-      loginMethod: "sms",
+      loginMethod: 'sms',
       token: st.user.token,
       CameFromPost: st.CameFromPost,
       goToProduct: st.goToProduct,
       goToCheckout: st.goToCheckout,
       goToChat: st.goToChat,
-      timer: globalTimerSet
+      timer: globalTimerSet,
     };
     window.scrollTo(0, 0);
     this.captchaAction = this.captchaAction.bind(this);
@@ -83,55 +87,51 @@ class LoginForm extends React.Component {
   }
 
   handleSendCodeAgain = (e) => {
-    console.log('==> handleSendCodeAgain()')
-    this.handleRegister = (e)
-  }
+    console.log('==> handleSendCodeAgain()');
+    this.handleRegister = e;
+  };
   handleRegister = (e) => {
     e.preventDefault();
-    console.log('==> handleRegister()')
+    console.log('==> handleRegister()');
 
-    let fd = this.state.countryCode || "98";
-    let number = this.state.phoneNumber || "0";
+    let fd = this.state.countryCode || '98';
+    let number = this.state.phoneNumber || '0';
     let captcha = this.state.captcha;
-    if (!number || number == "" || number == 0) {
-      alert("enter phone number!");
+    if (!number || number == '' || number == 0) {
+      alert('enter phone number!');
       return;
     }
-    if (!captcha || captcha == false || captcha == "undefined") {
-      alert("enter captcha");
+    if (!captcha || captcha == false || captcha == 'undefined') {
+      alert('enter captcha');
       return;
     }
     number = number.substring(number.length - 10);
-    
+
     this.setState({
       thePhoneNumber: number,
       countryCode: fd,
-      phoneNumber: number
+      phoneNumber: number,
     });
     let phoneNumber = fd + fNum(number);
-
-
-
-
 
     register(phoneNumber, fd, this.state.loginMethod).then((r) => {
       // new user
       if (r.shallWeSetPass) {
         this.state.timer = globalTimerSet;
         this.myInterval = setInterval(() => {
-          this.setState(({timer}) => ({
-            timer: timer > 0 ? timer - 1 : (this.handleClearInterval())
+          this.setState(({ timer }) => ({
+            timer: timer > 0 ? timer - 1 : this.handleClearInterval(),
           }));
         }, 1000);
         this.setState({
           enterActivationCodeMode: true,
           activationCode: null,
-          isDisplay: false
+          isDisplay: false,
         });
       } else if (!r.shallWeSetPass && r.userWasInDbBefore) {
         this.setState({
           isDisplay: false,
-          getPassword: true
+          getPassword: true,
         });
       }
     });
@@ -143,30 +143,39 @@ class LoginForm extends React.Component {
   handlePassword = (e) => {
     e.preventDefault();
 
-    console.log('this.props',this.props)
+    console.log('this.props', this.props);
     // return;
-    let fd = this.state.countryCode || "98";
+    let fd = this.state.countryCode || '98';
     let ph = fd + this.state.phoneNumber;
     authCustomerWithPassword({
       phoneNumber: ph,
-      password: this.state.password
+      password: this.state.password,
     })
       .then((res) => {
-        console.log('store.getState().store',res);
+        console.log('store.getState().store', res);
         if (res.success) {
-          if(this.props && this.props.goToCheckout){
-            console.log('this.props.goToCheckout',this.props.goToCheckout)
+          if (this.props && this.props.goToCheckout) {
+            console.log('this.props.goToCheckout', this.props.goToCheckout);
             this.setState({
               token: res.customer.token,
-              firstName: (res.customer && res.customer.firstName) ? res.customer.firstName : null,
-              lastName: (res.customer && res.customer.lastName) ? res.customer.lastName : null,
-              internationalCode: (res.customer && res.customer.internationalCode) ? res.customer.internationalCode : null,
-              goToCheckout: true
+              firstName:
+                res.customer && res.customer.firstName
+                  ? res.customer.firstName
+                  : null,
+              lastName:
+                res.customer && res.customer.lastName
+                  ? res.customer.lastName
+                  : null,
+              internationalCode:
+                res.customer && res.customer.internationalCode
+                  ? res.customer.internationalCode
+                  : null,
+              goToCheckout: true,
             });
-          }else {
+          } else {
             this.setState({
               token: res.customer.token,
-              goToProfile: true
+              goToProfile: true,
             });
           }
         } else {
@@ -174,44 +183,45 @@ class LoginForm extends React.Component {
         }
       })
       .catch((e) => {
-        console.log("eee", e);
+        console.log('eee', e);
         toast(this.props.t(e.message), {
-          type: "error"
+          type: 'error',
         });
         // return;
       });
   };
   handleForgotPass = (e) => {
     e.preventDefault();
-    let fd = this.state.countryCode || "98";
-    let number = this.state.phoneNumber || "0";
+    let fd = this.state.countryCode || '98';
+    let number = this.state.phoneNumber || '0';
 
     let phoneNumber = fd + fNum(number);
 
-    authCustomerForgotPass(phoneNumber, fd, this.state.loginMethod).then((r) => {
-      // new user
-      // if (r.shallWeSetPass) {
-      this.setState({
-        enterActivationCodeMode: true,
-        isDisplay: false,
-        getPassword: false,
-        firstName: r.firstName,
-        lastName: r.lastName
-
-      });
-      this.state.timer = globalTimerSet;
-      this.myInterval = setInterval(() => {
-        this.setState(({timer}) => ({
-          timer: timer > 0 ? timer - 1 : (this.handleClearInterval())
-        }));
-      }, 1000);
-      // } else if (!r.shallWeSetPass && r.userWasInDbBefore) {
-      //   this.setState({
-      //     isDisplay: false,
-      //     getPassword: true,
-      //   });
-      // }
-    });
+    authCustomerForgotPass(phoneNumber, fd, this.state.loginMethod).then(
+      (r) => {
+        // new user
+        // if (r.shallWeSetPass) {
+        this.setState({
+          enterActivationCodeMode: true,
+          isDisplay: false,
+          getPassword: false,
+          firstName: r.firstName,
+          lastName: r.lastName,
+        });
+        this.state.timer = globalTimerSet;
+        this.myInterval = setInterval(() => {
+          this.setState(({ timer }) => ({
+            timer: timer > 0 ? timer - 1 : this.handleClearInterval(),
+          }));
+        }, 1000);
+        // } else if (!r.shallWeSetPass && r.userWasInDbBefore) {
+        //   this.setState({
+        //     isDisplay: false,
+        //     getPassword: true,
+        //   });
+        // }
+      },
+    );
   };
   handleWrongPhoneNumber = (e) => {
     this.handleClearInterval();
@@ -225,7 +235,7 @@ class LoginForm extends React.Component {
       setPassword: false,
       getPassword: false,
       goToProfile: false,
-      timer: globalTimerSet
+      timer: globalTimerSet,
     });
   };
   savePasswordAndData = (e) => {
@@ -240,61 +250,72 @@ class LoginForm extends React.Component {
       password,
       internationalCode,
       internationalCodeClass,
-      address
+      address,
     } = this.state;
-    const {t} = this.props;
-    let fd = countryCode || "98";
+    const { t } = this.props;
+    let fd = countryCode || '98';
     console.log(firstName, !firstName);
     console.log(lastName, !lastName);
     console.log(password, !password);
     console.log(internationalCode, !internationalCode);
     console.log(internationalCodeClass, internationalCodeClass != true);
-    if (!firstName || firstName == "") {
-      console.log("firstName", firstName, !firstName);
-      toast(t("fill everything!"), {
-        type: "error"
+    if (!firstName || firstName == '') {
+      console.log('firstName', firstName, !firstName);
+      toast(t('fill everything!'), {
+        type: 'error',
       });
       return;
     }
     console.log(lastName, !lastName);
 
-    if (!lastName || lastName == "") {
-      console.log("lastName", lastName, !lastName);
-      toast(t("fill everything!"), {
-        type: "error"
+    if (!lastName || lastName == '') {
+      console.log('lastName', lastName, !lastName);
+      toast(t('fill everything!'), {
+        type: 'error',
       });
       return;
     }
-    if (!password || password == undefined || password == "") {
-      console.log("password", password, !password);
+    if (!password || password == undefined || password == '') {
+      console.log('password', password, !password);
 
-      toast(t("fill everything!"), {
-        type: "error"
+      toast(t('fill everything!'), {
+        type: 'error',
       });
       return;
     }
-    if (!internationalCode || internationalCode == undefined || internationalCode == "") {
-      console.log("internationalCode", internationalCode, !internationalCode);
+    if (
+      !internationalCode ||
+      internationalCode == undefined ||
+      internationalCode == ''
+    ) {
+      console.log('internationalCode', internationalCode, !internationalCode);
 
-      toast(t("fill everything!"), {
-        type: "error"
+      toast(t('fill everything!'), {
+        type: 'error',
       });
       return;
     }
-    if (!internationalCodeClass || internationalCodeClass == undefined || internationalCodeClass == "") {
-      console.log("internationalCodeClass", internationalCodeClass, !internationalCodeClass);
+    if (
+      !internationalCodeClass ||
+      internationalCodeClass == undefined ||
+      internationalCodeClass == ''
+    ) {
+      console.log(
+        'internationalCodeClass',
+        internationalCodeClass,
+        !internationalCodeClass,
+      );
       if (internationalCode) {
         if (checkCodeMeli(internationalCode)) {
-
         } else {
-          toast(t("fill everything!"), {
-            type: "error"
+          toast(t('fill everything!'), {
+            type: 'error',
           });
           return;
         }
       } else {
-        toast(t("fill everything!"), {
-          type: "error"
+        toast(t('fill everything!'), {
+          type: 'error',
         });
         return;
       }
@@ -311,18 +332,18 @@ class LoginForm extends React.Component {
     }
 
     if (!just_persian(firstName)) {
-      toast(t("Enter first name in persian!"), {
-        type: "error"
+      toast(t('Enter first name in persian!'), {
+        type: 'error',
       });
       return;
     }
     if (!just_persian(lastName)) {
-      toast(t("Enter last name in persian!"), {
-        type: "error"
+      toast(t('Enter last name in persian!'), {
+        type: 'error',
       });
       return;
     }
-    console.log('setPassWithPhoneNumber...')
+    console.log('setPassWithPhoneNumber...');
     setPassWithPhoneNumber({
       phoneNumber: fd + phoneNumber,
       firstName,
@@ -330,46 +351,47 @@ class LoginForm extends React.Component {
       address,
       email,
       internationalCode,
-      password
+      password,
     }).then((res) => {
-      console.log('store.getState().store', store.getState().store.user.token, res);
-      if (res.success || (res.firstName && res.lastName && res.internationalCode)) {
+      console.log(
+        'store.getState().store',
+        store.getState().store.user.token,
+        res,
+      );
+      if (
+        res.success ||
+        (res.firstName && res.lastName && res.internationalCode)
+      ) {
         this.setState({
           // token: res.token,
           setPassword: false,
-          goToProfile: true
+          goToProfile: true,
         });
       }
     });
   };
 
   checkResponse(res) {
-    this.setState({loginMethod: res});
+    this.setState({ loginMethod: res });
   }
 
   handleActivation = (e) => {
     e.preventDefault();
 
-    let {
-      activationCode,
-      countryCode,
-      phoneNumber = "0"
-    } = this.state;
-    let {
-      t
-    } = this.props;
+    let { activationCode, countryCode, phoneNumber = '0' } = this.state;
+    let { t } = this.props;
     if (!countryCode) {
-      countryCode = "98";
+      countryCode = '98';
     }
     if (!activationCode) {
-      alert("enter activation code!");
+      alert('enter activation code!');
     }
     let req = {
       activationCode,
-      phoneNumber: countryCode + fNum(phoneNumber)
+      phoneNumber: countryCode + fNum(phoneNumber),
     };
     active(req).then((res = {}) => {
-      console.log("==> activate account()", res);
+      console.log('==> activate account()', res);
       if (!res.success) return toast.error(t(res.message));
 
       if (res.shallWeSetPass) {
@@ -380,31 +402,29 @@ class LoginForm extends React.Component {
           setPassword: true,
           firstName: res.firstName,
           lastName: res.lastName,
-          internationalCode: res.internationalCode
+          internationalCode: res.internationalCode,
         };
         if (res.internationalCode) {
-          th["internationalCodeClass"] = checkCodeMeli(res.internationalCode);
+          th['internationalCodeClass'] = checkCodeMeli(res.internationalCode);
         }
         this.setState(th);
-      } else this.setState({token: res.token});
+      } else this.setState({ token: res.token });
     });
   };
 
-  componentDidMount() {
-
-  }
+  componentDidMount() {}
 
   componentWillUnmount() {
     clearInterval(this.myInterval);
   }
-  captchaValue(cVal){
+  captchaValue(cVal) {
     // console.log('parentReCaptchaaaaaa',cVal);
   }
-  captchaAction(e){
-    if(e === true){
-          this.setState({
-              captcha: true
-            });
+  captchaAction(e) {
+    if (e === true) {
+      this.setState({
+        captcha: true,
+      });
     }
   }
   render() {
@@ -425,9 +445,9 @@ class LoginForm extends React.Component {
       goToCheckout,
       goToChat,
       loginMethod,
-      timer
+      timer,
     } = this.state;
-    const {t} = this.props;
+    const { t } = this.props;
     if (token && !firstName && !lastName && !internationalCode) {
       // this.setState({setPassword: true});
       // return <Navigate to={'/login/'} />;
@@ -435,26 +455,41 @@ class LoginForm extends React.Component {
     if (token && goToProduct) {
       this.fc(false);
 
-      return <Navigate to={"/submit-order/" + goToProduct}/>;
+      return <Navigate to={'/submit-order/' + goToProduct} />;
     }
-    if (token && goToCheckout && firstName && lastName && internationalCode && !setPassword) {
-      savePost({goToCheckout: false});
+    if (
+      token &&
+      goToCheckout &&
+      firstName &&
+      lastName &&
+      internationalCode &&
+      !setPassword
+    ) {
+      savePost({ goToCheckout: false });
 
-      return <Navigate to={"/checkout/"}/>;
+      return <Navigate to={'/checkout/'} />;
     }
     // if (token && goToChat && firstName && lastName && internationalCode && !setPassword) {
     if (token && goToChat) {
-      savePost({goToChat: false});
+      savePost({ goToChat: false });
 
-      return <Navigate to={"/chat/"}/>;
+      return <Navigate to={'/chat/'} />;
     }
     if (token && CameFromPost && !setPassword) {
       this.fd(false);
-      return <Navigate to="/add-new-post/publish"/>;
-    } else if ((token && !CameFromPost && !setPassword && firstName && lastName && internationalCode) || goToProfile) {
+      return <Navigate to="/add-new-post/publish" />;
+    } else if (
+      (token &&
+        !CameFromPost &&
+        !setPassword &&
+        firstName &&
+        lastName &&
+        internationalCode) ||
+      goToProfile
+    ) {
       // window.location.replace('/my-posts');
-      console.log("go to profile...", token, CameFromPost, setPassword);
-      return <Navigate to="/profile"/>;
+      console.log('go to profile...', token, CameFromPost, setPassword);
+      return <Navigate to="/profile" />;
       // window.location.reload();
     } else {
       return (
@@ -465,36 +500,34 @@ class LoginForm extends React.Component {
                 <Col>
                   <Form onSubmit={this.handleRegister}>
                     <Row form>
-
                       <Col md="12" className="form-group ltr">
-                        <label htmlFor="thepho">{t("phone number")}</label>
+                        <label htmlFor="thepho">{t('phone number')}</label>
 
                         <InputGroup className="mb-3">
                           <InputGroupAddon type="prepend">
                             <FormSelect
                               onChange={(e) =>
-                                this.setState({countryCode: e.target.value})
+                                this.setState({ countryCode: e.target.value })
                               }>
-
                               <option value="98">+98</option>
-
                             </FormSelect>
                           </InputGroupAddon>
                           <FormInput
                             placeholder="**********"
                             id="thepho"
-                            className={"iuygfghuji"}
+                            className={'iuygfghuji'}
                             type="tel"
                             dir="ltr"
                             onChange={(e) =>
-
-                              this.setState({phoneNumber: e.target.value})
+                              this.setState({ phoneNumber: e.target.value })
                             }
                           />
                         </InputGroup>
-                        <Captcha onActionValue={this.captchaValue} onActionSubmit={this.captchaAction}/>
+                        <Captcha
+                          onActionValue={this.captchaValue}
+                          onActionSubmit={this.captchaAction}
+                        />
                       </Col>
-
                     </Row>
                     <Row form>
                       {/*<Col md="12" className="form-group">*/}
@@ -526,7 +559,6 @@ class LoginForm extends React.Component {
                       {/*}}*/}
                       {/*/>*/}
 
-
                       {/*</RadioGroup>*/}
                       {/*</Col>*/}
                     </Row>
@@ -535,7 +567,7 @@ class LoginForm extends React.Component {
                       type="submit"
                       className="center"
                       onClick={this.handleRegister}>
-                      {t("get enter code")}
+                      {t('get enter code')}
                     </Button>
                   </Form>
                 </Col>
@@ -549,42 +581,52 @@ class LoginForm extends React.Component {
                   <Form onSubmit={this.handleActivation}>
                     <Row form>
                       <Col md="12" className="form-group">
-                        <div className={"your-phone-number d-flex justify-content-sb"}>
-                          <div className={"flex-item "}>
-                            {t("your phone number") + ":"}
+                        <div
+                          className={
+                            'your-phone-number d-flex justify-content-sb'
+                          }>
+                          <div className={'flex-item '}>
+                            {t('your phone number') + ':'}
                           </div>
-                          <div className={"flex-item ltr"}>
-                            {"+" + this.state.countryCode + this.state.thePhoneNumber}
-
+                          <div className={'flex-item ltr'}>
+                            {'+' +
+                              this.state.countryCode +
+                              this.state.thePhoneNumber}
                           </div>
                         </div>
-                        <div className={"your-timer"}>
-                          <div className={"flex-item "}>
-                            {Boolean(timer) && <div className={"flex-item-relative center "}>
-                              <CircularProgress className={'red-progress'} thickness={2} size={60} variant="determinate"
-                                                value={parseInt((timer * 100) / globalTimerSet)}/>
-                              <div className={"flex-item-absolute "}>
-                                {timer}
+                        <div className={'your-timer'}>
+                          <div className={'flex-item '}>
+                            {Boolean(timer) && (
+                              <div className={'flex-item-relative center '}>
+                                <CircularProgress
+                                  className={'red-progress'}
+                                  thickness={2}
+                                  size={60}
+                                  variant="determinate"
+                                  value={parseInt(
+                                    (timer * 100) / globalTimerSet,
+                                  )}
+                                />
+                                <div className={'flex-item-absolute '}>
+                                  {timer}
+                                </div>
                               </div>
-                            </div>}
-
+                            )}
                           </div>
-
                         </div>
                         <div
                           style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "start"
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'start',
                           }}>
-
                           {/*<label htmlFor="feEmailAddress">*/}
                           {/*{t("get enter code")}*/}
                           {/*</label>*/}
                           <label
-                            style={{fontSize: 12}}
+                            style={{ fontSize: 12 }}
                             htmlFor="feEmailAddress">
-                            {t("enter sent code")}
+                            {t('enter sent code')}
                           </label>
                         </div>
 
@@ -592,11 +634,10 @@ class LoginForm extends React.Component {
                           <FormInput
                             placeholder="_ _ _ _ _ _"
                             type="number"
-                            className={"iuygfghuji"}
+                            className={'iuygfghuji'}
                             dir="ltr"
                             onChange={(e) => {
-
-                              this.setState({activationCode: e.target.value});
+                              this.setState({ activationCode: e.target.value });
                             }}
                           />
                         </InputGroup>
@@ -612,24 +653,26 @@ class LoginForm extends React.Component {
                       type="submit"
                       className="center"
                       onClick={this.handleActivation}>
-                      {t("login")}
+                      {t('login')}
                     </Button>
                     <Button
                       outline={true}
                       type="button"
                       className="center btn-block outline the-less-important"
                       onClick={this.handleWrongPhoneNumber}>
-                      {t("Change phone number?")}
+                      {t('Change phone number?')}
                     </Button>
-                    {Boolean(!timer) && <div className={"flex-item-relative center "}>
-                      <Button
-                        outline={true}
-                        type="button"
-                        className="center btn-block outline the-less-important the-no-border"
-                        onClick={(e) => this.handleRegister(e)}>
-                        {t("Send code again?")}
-                      </Button>
-                    </div>}
+                    {Boolean(!timer) && (
+                      <div className={'flex-item-relative center '}>
+                        <Button
+                          outline={true}
+                          type="button"
+                          className="center btn-block outline the-less-important the-no-border"
+                          onClick={(e) => this.handleRegister(e)}>
+                          {t('Send code again?')}
+                        </Button>
+                      </div>
+                    )}
                   </Form>
                 </Col>
               </Row>
@@ -643,18 +686,18 @@ class LoginForm extends React.Component {
                     <Row form>
                       <Col md="12" className="form-group">
                         <label htmlFor="olfirstname">
-                          {t("Your first name")}
+                          {t('Your first name')}
                         </label>
 
                         <InputGroup className="mb-3">
                           <FormInput
-                            placeholder={t("First name (persian)")}
+                            placeholder={t('First name (persian)')}
                             type="text"
                             id="olfirstname"
                             dir="rtl"
                             value={firstName}
                             onChange={(e) =>
-                              this.setState({firstName: e.target.value})
+                              this.setState({ firstName: e.target.value })
                             }
                           />
                         </InputGroup>
@@ -662,31 +705,33 @@ class LoginForm extends React.Component {
 
                       <Col md="12" className="form-group">
                         <label htmlFor="ollastname">
-                          {t("Your last name")}
+                          {t('Your last name')}
                         </label>
 
                         <InputGroup className="mb-3">
                           <FormInput
-                            placeholder={t("Last name (persian)")}
+                            placeholder={t('Last name (persian)')}
                             type="text"
                             value={lastName}
                             id="ollastname"
                             dir="rtl"
                             onChange={(e) =>
-                              this.setState({lastName: e.target.value})
+                              this.setState({ lastName: e.target.value })
                             }
                           />
                         </InputGroup>
                       </Col>
-                      <Col md="12" className={"form-group " + internationalCodeClass}>
+                      <Col
+                        md="12"
+                        className={'form-group ' + internationalCodeClass}>
                         <label htmlFor="internationalCode">
-                          {t("International Code")}
+                          {t('International Code')}
                         </label>
 
                         <InputGroup className="mb-3">
                           <FormInput
-                            className={"iuygfghuji "}
-                            placeholder={t("xxxxxxxxxx")}
+                            className={'iuygfghuji '}
+                            placeholder={t('xxxxxxxxxx')}
                             type="number"
                             value={internationalCode}
                             id="internationalCode"
@@ -695,7 +740,9 @@ class LoginForm extends React.Component {
                               // console.log(checkCodeMeli(e.target.value));
                               this.setState({
                                 internationalCode: e.target.value,
-                                internationalCodeClass: checkCodeMeli(e.target.value)
+                                internationalCodeClass: checkCodeMeli(
+                                  e.target.value,
+                                ),
                               });
                             }}
                           />
@@ -704,7 +751,7 @@ class LoginForm extends React.Component {
 
                       <Col md="12" className="form-group">
                         <label htmlFor="oiuytpaswword">
-                          {t("set new password")}
+                          {t('set new password')}
                         </label>
 
                         <InputGroup className="mb-3">
@@ -714,7 +761,7 @@ class LoginForm extends React.Component {
                             id="oiuytpaswword"
                             dir="ltr"
                             onChange={(e) =>
-                              this.setState({password: e.target.value})
+                              this.setState({ password: e.target.value })
                             }
                           />
                         </InputGroup>
@@ -728,13 +775,13 @@ class LoginForm extends React.Component {
                       type="submit"
                       className="center btn-block"
                       onClick={this.savePasswordAndData}>
-                      {t("Register")}
+                      {t('Register')}
                     </Button>
                     <Button
                       type="submit"
                       className="center btn-block"
                       onClick={Logout}>
-                      {t("Logout")}
+                      {t('Logout')}
                     </Button>
                   </Form>
                 </Col>
@@ -748,22 +795,31 @@ class LoginForm extends React.Component {
                   <Form onSubmit={this.handlePassword}>
                     <Row form>
                       <Col md="12" className="form-group">
-                        <div className={"your-phone-number d-flex justify-content-sb"}>
-                          <div className={"mb-2 flex-item"}>
-                            {t("You registered before, please enter your password.")}
+                        <div
+                          className={
+                            'your-phone-number d-flex justify-content-sb'
+                          }>
+                          <div className={'mb-2 flex-item'}>
+                            {t(
+                              'You registered before, please enter your password.',
+                            )}
                           </div>
-
                         </div>
-                        <div className={"your-phone-number d-flex justify-content-sb"}>
-                          <div className={"flex-item "}>
-                            {t("your phone number") + ":"}
+                        <div
+                          className={
+                            'your-phone-number d-flex justify-content-sb'
+                          }>
+                          <div className={'flex-item '}>
+                            {t('your phone number') + ':'}
                           </div>
-                          <div className={"flex-item ltr"}>
-                            {"+" + this.state.countryCode + this.state.thePhoneNumber}
+                          <div className={'flex-item ltr'}>
+                            {'+' +
+                              this.state.countryCode +
+                              this.state.thePhoneNumber}
                           </div>
                         </div>
                         <label htmlFor="oiuytgpaswword">
-                          {t("Enter password")}
+                          {t('Enter password')}
                         </label>
 
                         <InputGroup className="mb-3">
@@ -773,7 +829,7 @@ class LoginForm extends React.Component {
                             id="oiuytgpaswword"
                             dir="ltr"
                             onChange={(e) =>
-                              this.setState({password: e.target.value})
+                              this.setState({ password: e.target.value })
                             }
                           />
                         </InputGroup>
@@ -788,20 +844,20 @@ class LoginForm extends React.Component {
                       type="submit"
                       className="center"
                       onClick={this.handlePassword}>
-                      {t("Login")}
+                      {t('Login')}
                     </Button>
                     <Button
                       type="button"
                       className="center btn-block"
                       onClick={this.handleForgotPass}>
-                      {t("Forgot Password")}
+                      {t('Forgot Password')}
                     </Button>
                     <Button
                       outline={true}
                       type="button"
                       className="center btn-block outline the-less-important"
                       onClick={this.handleWrongPhoneNumber}>
-                      {t("Wrong phone number?")}
+                      {t('Wrong phone number?')}
                     </Button>
                   </Form>
                 </Col>

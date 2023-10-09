@@ -50,6 +50,7 @@ export type CRUDCreatorOpt = {
     id?: string;
     offset?: string;
     limit?: string;
+    slug?: string;
   };
   queryFields?: {
     offset?: string;

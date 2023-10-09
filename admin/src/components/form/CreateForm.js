@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { Button, Col, Container, Row } from 'shards-react';
 import { useSelector } from 'react-redux';
+import clsx from 'clsx';
 
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import SaveIcon from '@mui/icons-material/Save';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
-import { changeThemeData, MainUrl, uploadMedia } from '@/functions/index';
+import { changeThemeData, uploadMedia } from '@/functions/index';
+import { SERVER_URL } from '@/functions/API';
 import {
   EveryFields,
   FieldArray,
@@ -29,12 +31,18 @@ import {
   ConditionRow,
 } from '@/components/form/fields';
 
-function CreateForm(props) {
-  let { fields, rules = { fields: [] }, t, componentType, childrens } = props;
+function CreateForm({
+  fields,
+  rules = { fields: [] },
+  componentType = '',
+  children = undefined,
+  onSubmit,
+}) {
+  // @ts-ignore
   const themeData = useSelector((st) => st.themeData);
-  if (!themeData) {
-    return;
-  }
+
+  const [optionInputs, setOptionInputs] = useState(null);
+
   const [theRules, setTheRules] = useState(rules);
   const [theF, setTheF] = useState('');
   useEffect(() => {
@@ -46,11 +54,11 @@ function CreateForm(props) {
     ) {
       Object.keys(fields).forEach((fi) => {
         let typ = typeof fields[fi];
-        // console.log('typ instanceof' ,fields[fi]);
+
         if (fields[fi] instanceof Array) {
           typ = 'select';
         }
-        rules.fields.push({
+        rules.fields?.push({
           name: fi,
           type: typ,
         });
@@ -58,6 +66,9 @@ function CreateForm(props) {
       setTheRules(rules);
     }
   }, []);
+
+  if (!themeData) return;
+
   const addField = (e) => {
     e.preventDefault();
     if (theF) {
@@ -69,7 +80,6 @@ function CreateForm(props) {
       };
       f.push(fi);
       setTheF('');
-      console.log('rules', rules);
       setTheRules({ fields: [...f] });
     }
   };
@@ -96,7 +106,7 @@ function CreateForm(props) {
         <Col
           sm={size ? size.sm : ''}
           lg={size ? size.lg : ''}
-          className={'MGD ' + className}>
+          className={clsx('MGD', className)}>
           <label htmlFor={name}>{label}</label>
           <EveryFields onClick={(e) => removeField(e)} />
 
@@ -112,14 +122,13 @@ function CreateForm(props) {
     }
     if (type === 'string' || !type) {
       if (componentType === 'form' && name === '_id') {
-        console.log('typeInitilatypeInitila', componentType);
         return <FieldSelect typeInitila={'form'} field={field} />;
       }
       return (
         <Col
           sm={size ? size.sm : ''}
           lg={size ? size.lg : ''}
-          className={'MGD ' + className}>
+          className={clsx('MGD', className)}>
           <label htmlFor={name}>{label}</label>
           <EveryFields onClick={(e) => removeField(e)} />
           <Field
@@ -134,13 +143,9 @@ function CreateForm(props) {
       );
     }
     if (type === 'price') {
-      // console.log('string')
-
       return <FieldPrice field={field} removeField={(e) => removeField(e)} />;
     }
     if (type === 'json') {
-      // console.log('string')
-
       return <FieldJson field={field} />;
     }
     if (type === 'object') {
@@ -160,13 +165,9 @@ function CreateForm(props) {
       return <FieldCheckbox field={field} />;
     }
     if (type === 'checkboxes') {
-      // console.clear()
-      // console.log(field)
       return <FieldCheckboxes field={field} />;
     }
     if (type === 'radio') {
-      // console.clear()
-      // console.log(field)
       return <FieldCheckbox field={field} />;
     }
     if (type === 'select') {
@@ -181,7 +182,7 @@ function CreateForm(props) {
       // return <Col
       //   sm={size ? size.sm : ''}
       //   lg={size ? size.lg : ''}
-      //   className={'MGD ' + className}>
+      //   className={clsx('MGD', className)}>
       //   <label htmlFor={name}>{t(label)}</label>
       //   <Field
       //     name={name}
@@ -197,7 +198,7 @@ function CreateForm(props) {
         <Col
           sm={size ? size.sm : ''}
           lg={size ? size.lg : ''}
-          className={'MGD ' + className}>
+          className={clsx('MGD', className)}>
           <label htmlFor={name}>{label}</label>
           <EveryFields onClick={(e) => removeField(e)} />
 
@@ -231,35 +232,29 @@ function CreateForm(props) {
       return <FieldBoolean field={field} removeField={(e) => removeField(e)} />;
     }
     if (type === 'image') {
-      // console.log('image')
       return (
         <Col
           sm={size ? size.sm : ''}
           lg={size ? size.lg : ''}
-          className={'MGD ' + className}>
+          className={clsx('MGD', className)}>
           <label htmlFor={name}>{label}</label>
           <EveryFields onClick={(e) => removeField(e)} />
 
           <Field name={name} className="mb-2 form-control">
             {(props) => {
-              console.log('props', props);
               return (
                 <div className={'max-width100'}>
-                  {/* {props.input.value && <img style={{ width: "100px" }} src={MainUrl + "/" + props.input.value}/>} */}
+                  {/* {props.input.value && <img style={{ width: "100px" }} src={SERVER_URL + "/" + props.input.value}/>} */}
                   {!props.input.value && (
                     <input
                       name={props.input.name}
                       onChange={(props) => {
                         let { target } = props;
-                        uploadMedia(target.files[0], (e) => {
-                          console.log('e', e);
-                        }).then((x) => {
-                          if (x.success && x.media && x.media.url) {
-                            console.log('set', name, x.media.url);
-
-                            field.setValue(name, x.media.url);
-                          }
-                        });
+                        uploadMedia(target.files[0], (e) => {})
+                          .then(({ data }) => {
+                            field.setValue(name, data.url);
+                          })
+                          .catch((err) => {});
                       }}
                       type={'file'}
                     />
@@ -267,7 +262,9 @@ function CreateForm(props) {
                   {props.input.value && (
                     <div className={'posrel'} style={{ margin: '0 auto' }}>
                       <img
-                        src={MainUrl + '/' + props.input.value}
+                        loading="lazy"
+                        alt="img"
+                        src={SERVER_URL + props.input.value}
                         style={{ width: '400px' }}
                       />
                       <Button
@@ -286,7 +283,6 @@ function CreateForm(props) {
           {/*<Field*/}
           {/*name={field.name}*/}
           {/*onClick={() => {*/}
-          {/*console.log('open box')*/}
           {/*}}*/}
           {/*component="input"*/}
           {/*type="file"*/}
@@ -299,18 +295,16 @@ function CreateForm(props) {
       );
     }
     if (type === 'images') {
-      // console.log('image')
       return (
         <Col
           sm={size ? size.sm : ''}
           lg={size ? size.lg : ''}
-          className={'MGD ' + className}>
+          className={clsx('MGD', className)}>
           <label htmlFor={name}>{label}</label>
           <EveryFields onClick={(e) => removeField(e)} />
 
           <Field name={name} className="mb-2 form-control">
             {(props) => {
-              // console.log('props', props)
               return (
                 <div className={'max-width100'}>
                   {!props.input.value && (
@@ -318,12 +312,8 @@ function CreateForm(props) {
                       name={props.input.name}
                       onChange={(props) => {
                         let { target } = props;
-                        uploadMedia(target.files[0], (e) => {
-                          console.log('e', e);
-                        }).then((x) => {
+                        uploadMedia(target.files[0], (e) => {}).then((x) => {
                           if (x.success && x.media && x.media.url) {
-                            console.log('set', name, x.media.url);
-
                             field.setValue(name, x.media.url);
                           }
                         });
@@ -332,7 +322,7 @@ function CreateForm(props) {
                     />
                   )}
                   {props.input.value && (
-                    <img src={MainUrl + '/' + props.input.value} />
+                    <img src={SERVER_URL + props.input.value} />
                   )}
                 </div>
               );
@@ -341,7 +331,6 @@ function CreateForm(props) {
           {/*<Field*/}
           {/*name={field.name}*/}
           {/*onClick={() => {*/}
-          {/*console.log('open box')*/}
           {/*}}*/}
           {/*component="input"*/}
           {/*type="file"*/}
@@ -357,13 +346,12 @@ function CreateForm(props) {
       return <ChatBase field={field} />;
     }
     if (type === 'conditionRow') {
-      return <ConditionRow field={field} childrens={childrens} />;
+      return <ConditionRow field={field} childrens={children} />;
     }
   };
-  const [optionInputs, setOptionInputs] = useState(null);
-  const onSubmit = async (v) => {
+  const handleSubmit = async (v) => {
     let values = [];
-    if (props.onSubmit) {
+    if (onSubmit) {
       values = v;
       if (theRules && theRules.fields)
         theRules.fields.forEach((item, i) => {
@@ -372,7 +360,6 @@ function CreateForm(props) {
             values[item.name] instanceof Array &&
             item.value
           ) {
-            console.log('can we fix:', item);
             let obj = {};
             item.value.forEach((its) => {
               if (its) obj[its.property] = its.value;
@@ -385,7 +372,7 @@ function CreateForm(props) {
       if (optionInputs) {
         Object.assign(values, { options: optionInputs });
       }
-      props.onSubmit(values);
+      onSubmit(values);
     }
   };
   const saveInputOptions = (options) => {
@@ -395,140 +382,129 @@ function CreateForm(props) {
     setOptionInputs(options);
   };
   const removeField = (e, mindex) => {
-    // console.log("index ,fields", e, mindex, fields);
-    // console.log("theRules", theRules);
     let tempR = { ...theRules };
     let p = tempR.fields.filter((element, index) => index !== mindex);
-    console.log('p', p);
+
     let px = { fields: p };
-    // console.log("new theRules", px);
 
     setTheRules(px);
   };
-  if (themeData)
-    return (
-      <div className="fields pt-2">
-        <Form
-          onSubmit={onSubmit}
-          // validate={v => {
-          //   // console.clear()
-          //   let values = v;
-          //   if (theRules && theRules.fields)
-          //     theRules.fields.forEach((item, i) => {
-          //       if (item.type == 'object' && values[item.name] instanceof Object && item.value) {
-          //         console.log('can we fix:', item)
-          //         let arr = [];
-          //         Object.keys(item.value).forEach((it) => {
-          //           let obj = {
-          //             property: it,
-          //             value: item.value[it]
-          //           }
-          //           arr.push(obj)
-          //         })
-          //         values[item.name] = arr;
-          //       }
-          //     })
-          //   console.log('validate*********', values)
-          //   console.log('theRules*********', theRules)
-          //   // return values
-          // }}
-          initialValues={fields}
-          mutators={{
-            setValue: ([field, value], state, { changeValue }) => {
-              // console.clear();
 
-              console.log('setValue', field, value);
-              changeValue(state, field, () => value);
-            },
-            // setMin: (args, state, utils) => {
-            //   utils.changeValue(state, 'apples', () => 1)
-            // },
-          }}
-          render={({ handleSubmit, form, submitting, pristine, values }) => (
-            <form onSubmit={handleSubmit} draggable={false}>
-              <Container>
-                <Row style={{ direction: 'ltr !important' }}>
-                  {theRules?.fields?.map((field, index) => {
-                    if (fields[field.name]) {
-                      field.value = fields[field.name];
-                    }
-                    let lastObj = {
-                      id: index,
-                      type: field.type,
-                      label: field.name,
-                      name: field.name,
-                      size: {
-                        sm: 12,
-                        lg: 12,
-                      },
-                      onChange: (text) => {
-                        // setFields([...fields,])
-                        // this.state.checkOutBillingAddress.add.data[d] = text;
-                      },
-                      className: '',
-                      placeholder: '',
-                      child: [],
-                      ...field,
-                    };
-                    if (field.value) {
-                      // console.log('##########################the vvalue is:',field.value)
-                      lastObj['value'] = field.value;
-                    }
-                    // console.log('lastObj', lastObj, form.mutators.setValue)
-                    return (
-                      <TheField
-                        key={index}
-                        removeField={(e) => removeField(e, index)}
-                        {...lastObj}
-                        setValue={form.mutators.setValue}
-                      />
-                    );
-                  })}
+  return (
+    <div className="fields pt-2">
+      <Form
+        onSubmit={handleSubmit}
+        // validate={v => {
 
-                  <ConditionFiled
-                    data={fields.options}
-                    type={componentType}
-                    saveOptions={saveInputOptions}
-                  />
+        //   let values = v;
+        //   if (theRules && theRules.fields)
+        //     theRules.fields.forEach((item, i) => {
+        //       if (item.type == 'object' && values[item.name] instanceof Object && item.value) {
+        //         let arr = [];
+        //         Object.keys(item.value).forEach((it) => {
+        //           let obj = {
+        //             property: it,
+        //             value: item.value[it]
+        //           }
+        //           arr.push(obj)
+        //         })
+        //         values[item.name] = arr;
+        //       }
+        //     })
 
+        //   // return values
+        // }}
+        initialValues={fields}
+        mutators={{
+          setValue: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => value);
+          },
+          // setMin: (args, state, utils) => {
+          //   utils.changeValue(state, 'apples', () => 1)
+          // },
+        }}
+        render={({ handleSubmit, form, submitting, pristine, values }) => (
+          <form onSubmit={handleSubmit} draggable={false}>
+            <Container>
+              <Row style={{ direction: 'ltr !important' }}>
+                {theRules?.fields?.map((field, index) => {
+                  if (fields[field.name]) {
+                    field.value = fields[field.name];
+                  }
+                  let lastObj = {
+                    id: index,
+                    type: field.type,
+                    label: field.name,
+                    name: field.name,
+                    size: {
+                      sm: 12,
+                    },
+                    onChange: (text) => {
+                      // setFields([...fields,])
+                      // this.state.checkOutBillingAddress.add.data[d] = text;
+                    },
+                    className: 'mb-2',
+                    placeholder: '',
+                    child: [],
+                    ...field,
+                  };
+                  if (field.value) {
+                    lastObj['value'] = field.value;
+                  }
+
+                  return (
+                    <TheField
+                      key={index}
+                      removeField={(e) => removeField(e, index)}
+                      {...lastObj}
+                      setValue={form.mutators.setValue}
+                    />
+                  );
+                })}
+
+                <ConditionFiled
+                  data={fields.options}
+                  type={componentType}
+                  saveOptions={saveInputOptions}
+                />
+
+                <div
+                  className="buttons absolute-bottom bottom-bar-settings"
+                  style={{ direction: 'ltr' }}>
                   <div
-                    className="buttons absolute-bottom bottom-bar-settings"
-                    style={{ direction: 'ltr' }}>
-                    <div
-                      className={'d-flex ltr'}
-                      style={{ marginBottom: '20px' }}>
-                      <input
-                        className={'form-control d-flex-inputs'}
-                        style={{ height: '45px', padding: '0px 10px' }}
-                        value={theF}
-                        onChange={(e) => {
-                          setTheF(e.target.value);
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        className={'whitespace-nowrap'}
-                        onClick={(e) => {
-                          addField(e);
-                        }}>
-                        <AddCircleOutlineIcon />
-                        {'Add Field'}
-                      </Button>
-                    </div>
-                    <hr />
-                    <Button type="submit">
-                      <SaveIcon />
-                      {'Save'}
+                    className={'d-flex ltr'}
+                    style={{ marginBottom: '20px' }}>
+                    <input
+                      className={'form-control d-flex-inputs'}
+                      style={{ height: '45px', padding: '0px 10px' }}
+                      value={theF}
+                      onChange={(e) => {
+                        setTheF(e.target.value);
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      className={'whitespace-nowrap'}
+                      onClick={(e) => {
+                        addField(e);
+                      }}>
+                      <AddCircleOutlineIcon />
+                      {'Add Field'}
                     </Button>
                   </div>
-                </Row>
-              </Container>
-            </form>
-          )}
-        />
-      </div>
-    );
-  else return <></>;
+                  <hr />
+                  <Button type="submit">
+                    <SaveIcon />
+                    {'Save'}
+                  </Button>
+                </div>
+              </Row>
+            </Container>
+          </form>
+        )}
+      />
+    </div>
+  );
 }
 
 export default CreateForm;

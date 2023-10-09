@@ -50,7 +50,7 @@ const Welcome = () => {
           </Typography>
           <Box maxWidth="40em">
             <Typography variant="body1" component="p" gutterBottom>
-              {localStorage.getItem('nickname')}
+              {localStorage.getItem('firstName')}
             </Typography>
             <Typography variant="body1" component="p" gutterBottom>
               {localStorage.getItem('email')}

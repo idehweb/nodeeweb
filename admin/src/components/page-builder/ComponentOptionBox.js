@@ -11,20 +11,6 @@ import TextFieldsIcon from '@mui/icons-material/TextFields';
 
 import CreateForm from '@/components/form/CreateForm';
 
-import {
-  addBookmark,
-  clearPost,
-  getBlogPost,
-  GetBuilder,
-  isClient,
-  loadPost,
-  loveIt,
-  MainUrl,
-  SaveBuilder,
-  savePost,
-} from '@/functions/index';
-import { SnapChatIcon } from '@/assets/index';
-
 const ComponentOptionBox = (props) => {
   const [tab, setTab] = useState('general');
   let {
@@ -128,7 +114,6 @@ const ComponentOptionBox = (props) => {
                 handleSubmit(e);
               }}
               rules={{ fields: g }}
-              buttons={[]}
               fields={g}
             />
           </div>

@@ -142,7 +142,7 @@ const schema = new mongoose.Schema(
       {
         _id: { type: Schema.Types.ObjectId, required: true },
         title: { type: MultiLang, required: true },
-        miniTitle: { type: MultiLang, required: true },
+        miniTitle: { type: MultiLang, required: false },
         image: String,
         combinations: [
           {

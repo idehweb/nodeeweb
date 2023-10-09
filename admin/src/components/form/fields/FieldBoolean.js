@@ -5,7 +5,6 @@ import { Col } from 'shards-react';
 import Switch from '@mui/material/Switch';
 import { useTranslate } from 'react-admin';
 
-import { MainUrl, uploadMedia } from '@/functions/index';
 import { EveryFields } from '@/components/form/fields';
 
 function FieldBoolean(props) {

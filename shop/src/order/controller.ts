@@ -10,7 +10,13 @@ import CartService from './cart.service';
 import { AuthUserAccess } from '@nodeeweb/core';
 import transactionService from './transaction.service';
 import orderService from './order.service';
-import { AddToCartBody, UpdateCartBody } from '../../dto/in/order/cart';
+import {
+  AddToCartBody,
+  DeleteCombParam,
+  ModifyCombBody,
+  ModifyCombParam,
+  UpdateCartBody,
+} from '../../dto/in/order/cart';
 import { OrderIdParam, UpdateOrderBody } from '../../dto/in/order/order';
 import postService from './post.service';
 
@@ -42,6 +48,23 @@ export default function registerController() {
       url: '/cart/:productId',
       service: CartService.removeFromCart,
       access: AuthUserAccess,
+    },
+    {
+      method: 'put',
+      url: '/cart/:productId/:combId',
+      service: CartService.modifyComb,
+      access: AuthUserAccess,
+      validate: [
+        { reqPath: 'params', dto: ModifyCombParam },
+        { reqPath: 'body', dto: ModifyCombBody },
+      ],
+    },
+    {
+      method: 'delete',
+      url: '/cart/:productId/:combId',
+      service: CartService.deleteComb,
+      access: AuthUserAccess,
+      validate: { reqPath: 'params', dto: DeleteCombParam },
     },
     {
       method: 'post',

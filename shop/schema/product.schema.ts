@@ -10,7 +10,7 @@ export enum PriceType {
 
 export interface IProduct {
   title: { [key: string]: string };
-  miniTitle: { [key: string]: string };
+  miniTitle?: { [key: string]: string };
   metatitle?: { [key: string]: string };
   metadescription?: { [key: string]: string };
   keywords?: any;
@@ -21,8 +21,8 @@ export interface IProduct {
   combinations: {
     _id: string;
     options?: { [key: string]: string };
-    price: number;
-    salePrice: number;
+    price?: number;
+    salePrice?: number;
     weight: number;
     quantity: number;
     in_stock: boolean;
@@ -64,12 +64,12 @@ const schema = new mongoose.Schema(
     labels: [{ title: String, _id: false }],
     combinations: [
       {
-        _id: { type: String, default: () => crypto.randomUUID() },
+        _id: { type: String, default: crypto.randomUUID },
         options: {},
-        price: { type: Number, required: true },
+        price: { type: Number, required: false },
         weight: { type: Number, default: 0 },
         quantity: { type: Number, default: 1 },
-        salePrice: { type: Number, required: true },
+        salePrice: { type: Number, required: false },
         sku: String,
         in_stock: { type: Boolean, default: true },
       },

@@ -1,29 +1,59 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card, Col, Container, Row } from 'shards-react';
 import { withTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 
 import PageTitle from '#c/components/common/PageTitle';
 import LoginForm from '#c/components/components-overview/NewLoginForm';
-import { defaultImg } from '#c/assets/index';
-import { savePost } from '#c/functions/index';
+import { SaveData, savePost } from '../functions/index';
+import { getToken } from '../functions/utils';
+import { jwtHandler } from '#c/functions/auth';
+import Loading from '../components/Loading';
+
+function useDetectRedirect() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const params = useParams();
+  let redirect = params._state || searchParams.get('redirect') || '/profile';
+  if (!redirect.startsWith('/')) redirect = '/' + redirect;
+  return redirect;
+}
+
+const Status = {
+  NeedToCheck: 'need-to-check',
+  Authenticated: 'authenticated',
+  NeedAuth: 'need-auth',
+};
 
 const Login = ({ t }) => {
-  console.clear();
-  let params = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const redirectTo = useDetectRedirect();
+  const [status, setStatus] = useState(
+    searchParams.get('check') === 'false'
+      ? Status.NeedAuth
+      : Status.NeedToCheck,
+  );
 
-  if (params._state === 'goToCheckout') {
-    savePost({ goToCheckout: true });
+  const check = useCallback(async () => {
+    try {
+      const token = getToken();
+      if (!token) return setStatus(Status.NeedAuth);
+
+      const user = await jwtHandler.login();
+      SaveData({ user });
+      setStatus(Status.Authenticated);
+    } catch (err) {
+      console.error(err);
+      return setStatus(Status.NeedAuth);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (status === Status.NeedToCheck) check();
+  }, []);
+
+  if (status === Status.Authenticated) {
+    return <Navigate to={redirectTo} />;
   }
-  if (params._state === 'goToChat') {
-    savePost({ goToChat: true });
-  }
-  const [state, setState] = useState({
-    customer: {
-      phoneNumber: '',
-    },
-    noImage: defaultImg,
-  });
 
   return (
     <Container fluid className="main-content-container px-4">
@@ -40,7 +70,11 @@ const Login = ({ t }) => {
       <div className="w-100">
         <Col lg="4" className="mx-auto mb-4">
           <Card small>
-            <LoginForm goToCheckout={params._state === 'goToCheckout'} />
+            {status === Status.NeedToCheck ? (
+              <Loading />
+            ) : status === Status.NeedAuth ? (
+              <LoginForm redirectTo={redirectTo} />
+            ) : null}
           </Card>
         </Col>
       </div>

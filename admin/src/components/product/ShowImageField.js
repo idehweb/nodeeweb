@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import API, { BASE_URL, SERVER_URL } from '@/functions/API';
+import API, { SERVER_URL } from '@/functions/API';
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 

@@ -14,4 +14,3 @@ export default function CreatePage(props) {
     </DndProvider>
   );
 }
-export const PageServer = [{}];

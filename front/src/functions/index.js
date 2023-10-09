@@ -6,7 +6,6 @@ import store, {
   storeProduct,
   storeProducts,
 } from '#c/functions/store';
-import CONFIG from '#c/config';
 import { createContext } from 'react';
 import {
   clearState,
@@ -22,22 +21,23 @@ import {
 } from '#c/functions/utils';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { getToken } from './utils';
+import API from './API';
 
 const DataContext = createContext(null);
 export const isClient = typeof window !== 'undefined';
 // clearState
-export const MainUrl = CONFIG.SERVER_URL;
+export const ServerUrl = process.env.REACT_APP_SERVER_URL;
+export const MainUrl = ServerUrl;
 if (isClient) {
   // import { createContext } from "react";
 }
 // export const MainUrl = "http://localhost:3003";
-export const ApiUrl = CONFIG.BASE_URL;
-export const AdminRoute = CONFIG.BASE_URL + '/admin';
+export const ApiUrl = process.env.REACT_APP_API_URL;
+export const AdminRoute = ServerUrl + '/admin';
 export const InstanceManagerUrl = 'https://instancemanager.nodeeweb.com/api/v1';
-export const THEME_URL = CONFIG.THEME_URL || CONFIG.BASE_URL;
-export const ServerUrl = CONFIG.SERVER_URL;
+export const THEME_URL = ApiUrl + '/theme';
+const token = getToken();
 
-export const token = getToken();
 export const admin_token = getToken();
 export const setStyles = (fields) => {
   let style = {};
@@ -527,8 +527,6 @@ export const isStringified = (jsonValue) => {
   try {
     return JSON.parse(jsonValue);
   } catch (err) {
-    console.log('not need to parse');
-
     return jsonValue;
   }
 };
@@ -1011,7 +1009,7 @@ export const getEntities = (
       });
   });
 };
-export const getEntitiesWithCount = (
+export const getEntitiesWithCount = async (
   entity,
   offset = 0,
   limit = 24,
@@ -1019,52 +1017,32 @@ export const getEntitiesWithCount = (
   filter,
   populate,
 ) => {
-  return new Promise(function (resolve, reject) {
-    // console.log('filter', filter)
-    // console.log('getPosts...',store.getState().store.country)
-    // if(typeof filter!='object'){
-    //   filter=false
-    // }
-    let params = {};
-    const { country } = store.getState().store;
-    if (country) {
-      params = {
-        country: country,
-      };
-    }
+  let params = {};
+  const { country } = store.getState().store;
+  if (country) {
+    params = {
+      country: country,
+    };
+  }
 
-    let url = `${ApiUrl}/${entity}/${offset}/${limit}/`;
+  let url = `${ApiUrl}/${entity}/${offset}/${limit}/`;
 
-    if (search) url += search;
-    // if (filter) {
+  if (search) url += search;
 
+  if (filter) {
+    url += '?filter=' + filter;
     // if (filter["type"]) params["type"] = filter["type"];
-    // }
-    // console.log('filter', filter)
+  }
+  if (filter && populate) {
+    url += '&populate=' + populate;
+  }
+  if (!filter && populate) {
+    url += '?populate=' + populate;
+  }
 
-    if (filter) {
-      url += '?filter=' + filter;
-      // if (filter["type"]) params["type"] = filter["type"];
-    }
-    if (filter && populate) {
-      url += '&populate=' + populate;
-    }
-    if (!filter && populate) {
-      url += '?populate=' + populate;
-    }
-    getData(url, { params }, true)
-      .then((d) => {
-        let { data, headers } = d;
-        resolve({
-          items: data,
-          count: headers ? headers['x-total-count'] : 0,
-        });
-      })
-      .catch((err) => {
-        handleErr(err);
-        reject(err);
-      });
-  });
+  const { data, headers } = await API.get(url, { params });
+
+  return { items: data.data, count: headers ? headers['x-total-count'] : 0 };
 };
 export const getEntitiesForAdmin = (
   entity,
@@ -1273,7 +1251,7 @@ export const contactBoy = (d, obj) => {
 };
 export const addBookmark = (_id) => {
   return new Promise(function (resolve, reject) {
-   const token = getToken();
+    const token = getToken();
     console.log('token', token);
     if (!token) {
       reject({

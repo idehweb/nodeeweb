@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Field } from 'react-final-form';
 import { Col } from 'shards-react';
 
-// import {MainUrl, uploadMedia} from "@/functions/index";
 import { useTranslate } from 'react-admin';
 
-import { getEntitiesForAdmin, MainUrl, uploadMedia } from '@/functions/index';
+import { getEntitiesForAdmin } from '@/functions/index';
 import API, { BASE_URL } from '@/functions/API';
 
 function FieldSelect(props) {
@@ -36,11 +35,10 @@ function FieldSelect(props) {
     if (limit) {
       limit = parseInt(limit);
     }
-    // ttps://parts.arvandguarantee.shop/admin/form/0/10?_order=ASC&_sort=id
     if (typeInitila === 'form') {
-      API.get(BASE_URL + `/admin/form/0/${limit}?_order=ASC&_sort=id`)
-        .then((res) => {
-          setList(res.data);
+      API.get(`/form/0/${limit}`)
+        .then(({ data: { data } }) => {
+          setList(data);
         })
         .catch((err) => {});
     }

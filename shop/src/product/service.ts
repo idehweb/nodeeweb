@@ -352,7 +352,14 @@ export default class Service {
       }
 
       body.photos = files as any;
-      body['thumbnail'] = files[0].url;
+      let thumbnail = files[0].url;
+      if (body.thumbnail) {
+        if (!files.map((f) => f.url).includes(body.thumbnail))
+          throw new NotFound('thumbnail not exist in files url');
+        thumbnail = body.thumbnail;
+      }
+
+      body['thumbnail'] = thumbnail;
     }
 
     return body;
@@ -374,7 +381,7 @@ export default class Service {
   };
 
   static updateBodyParser = async (req: Req) => {
-    const body = req.body;
+    let body = req.body;
     if (req.body.slug) {
       req.body.slug = req.body.slug.replace(/\s+/g, '-').toLowerCase();
     }
@@ -402,7 +409,7 @@ export default class Service {
     });
 
     // file
-    if (body.photos?.length) {
+    if (body.photos) {
       const files = await this.fileModel.find({ _id: { $in: body.photos } });
       if (files.length !== body.photos.length) {
         const notFoundIds = body.photos.filter(
@@ -416,9 +423,13 @@ export default class Service {
       }
 
       body.photos = files as any;
-      body['thumbnail'] = files[0].url;
+
+      if (!body.photos.length) {
+        delete body.thumbnail;
+        body = { $set: body, $unset: { thumbnail: '' } };
+      } else if (!body.thumbnail) body['thumbnail'] = files[0].url;
     }
-    return req.body;
+    return body;
   };
 
   static updateAfter: MiddleWare = async (req, res) => {

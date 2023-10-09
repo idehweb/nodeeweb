@@ -183,15 +183,10 @@
 .splide {
   min-height: 80px;
 }
-/*.recharts-surface{*/
-/*width:100%;*/
-/*}*/
+
 .modal {
   overflow-y: scroll !important;
 }
-/*.recharts-wrapper{*/
-/*width: 100% !important;*/
-/*}*/
 .nodeeweb-fixed-bottom-bar {
   position: fixed;
   bottom: 0;

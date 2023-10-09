@@ -3,11 +3,11 @@ import API from '@/functions/API';
 import { Button, Box } from '@mui/material';
 import Modal from '../Modal';
 
-export default function RemovePlugin({
+export default function RemoveModal({
   open,
   onClose,
   data,
-  isLoading,
+  loading,
   reFetch,
 }) {
   const notify = useNotify();
@@ -24,7 +24,7 @@ export default function RemovePlugin({
   return (
     <Modal
       title={'Are you sure unistall ' + data.name}
-      loading={isLoading}
+      loading={loading}
       open={open}
       onClose={onClose}>
       <Box sx={{ display: 'flex', justifyContent: 'center' }} mt={1}>

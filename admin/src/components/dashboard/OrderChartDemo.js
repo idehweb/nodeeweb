@@ -50,7 +50,7 @@ const OrderChartDemo = (props) => {
   //   }
   // );
 
-  const aggregateOrdersByDay = (order = []) => {
+  const aggregateOrdersByDay = ({ data: order = [] }) => {
     return order.reduce((acc, curr) => {
       const day = dateFormat(curr.createdAt, 'YYYY/MM/DD');
       if (!acc[day]) {
@@ -60,9 +60,7 @@ const OrderChartDemo = (props) => {
       return acc;
     }, {});
   };
-  const aggregateOrdersCompletedByDay = (order = []) => {
-    // console.log('aggregateOrdersByDay()',order);
-    // return order;
+  const aggregateOrdersCompletedByDay = ({ data: order = [] }) => {
     return order.reduce((acc, curr) => {
       // console.log('acc',acc)
       // console.log('curr',curr.createdAt)
@@ -76,9 +74,7 @@ const OrderChartDemo = (props) => {
       return acc;
     }, {});
   };
-  const aggregateOrdersSuccessPaymentByDay = (order = []) => {
-    // console.log('aggregateOrdersByDay()',order);
-    // return order;
+  const aggregateOrdersSuccessPaymentByDay = ({ data: order = [] }) => {
     return order.reduce((acc, curr) => {
       // console.log('acc',acc)
       // console.log('curr',curr.createdAt)

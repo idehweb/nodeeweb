@@ -40,7 +40,7 @@ const Component = styled('header')({
 
 const Header = ({ tabValue, setTabValue, onAdd, onSave }) => {
   return (
-    <Component>
+    <Component style={{ position: 'sticky', width: '100%', top: 0 }}>
       <div>
         <Button onClick={onAdd} variant="contained" endIcon={<AddIcon />}>
           Add Element

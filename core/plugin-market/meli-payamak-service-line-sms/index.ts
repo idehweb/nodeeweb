@@ -74,11 +74,13 @@ async function sendBulkSMS({
     return err;
   }
 }
-export function add(arg: SMSConfig): SMSPluginContent['stack'] {
+function add(arg: SMSConfig): SMSPluginContent['stack'] {
   config = arg;
   return [sendSMS, sendBulkSMS];
 }
-export function edit(arg: Partial<SMSConfig>): SMSPluginContent['stack'] {
+function edit(arg: Partial<SMSConfig>): SMSPluginContent['stack'] {
   config = merge(config, arg);
   return [sendSMS, sendBulkSMS];
 }
+
+export { add as config, add as active, edit };

@@ -4,32 +4,25 @@ import {
   TextInput,
   Form,
   useLocale,
-  useUpdate,
+  useCreate,
   useNotify,
 } from 'react-admin';
 import API from '@/functions/API';
 import Modal from '../Modal';
 
-export default function RemovePlugin({
-  open,
-  onClose,
-  data,
-  isLoading,
-  reFetch,
-}) {
+export default function ConfigModal({ open, onClose, data, loading, reFetch }) {
   const locale = useLocale();
   const notify = useNotify();
-  const [updateOne, { loading }] = useUpdate('/plugin/local', {
-    id: data.slug,
-  });
+  const [create, { isLoading }] = useCreate();
 
   const handleSubmit = (values) => {
-    updateOne(
-      'plugin/local',
-      { id: data.slug, data: values },
+    create(
+      'plugin/local/config/' + data.slug,
+      { data: values },
       {
         onSuccess: (data) => {
-          notify('Update Plugin Successfuly');
+          notify('Config Plugin Successfuly');
+          reFetch();
           onClose();
         },
         onError: (err) => {
@@ -38,20 +31,11 @@ export default function RemovePlugin({
       }
     );
   };
-
-  const parseDefaultValue = () => {
-    const res = {};
-    data?.edit?.inputs?.forEach((i) => {
-      res[i.key] = i.value;
-    });
-    return res;
-  };
-
   return (
-    <Modal title={data.name} loading={isLoading} open={open} onClose={onClose}>
-      <Form onSubmit={handleSubmit} defaultValues={parseDefaultValue}>
+    <Modal title={data.name} loading={loading} open={open} onClose={onClose}>
+      <Form onSubmit={handleSubmit}>
         <div>
-          {data?.edit?.inputs.map((i) => (
+          {data?.config?.inputs.map((i) => (
             <TextInput
               source={i.key}
               autoComplete="off"
@@ -63,7 +47,7 @@ export default function RemovePlugin({
           ))}
         </div>
         <div>
-          <SaveButton label="Update" disabled={loading} />
+          <SaveButton label="Config" disabled={isLoading} />
         </div>
       </Form>
     </Modal>

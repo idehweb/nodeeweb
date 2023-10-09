@@ -1,49 +1,19 @@
 import { styled } from '@mui/material';
 
-export const BaseButton = styled('button')({
-  border: 'none',
-  backgroundColor: 'transparent',
-  cursor: 'pointer',
-  padding: '4px 8px',
-  '& > svg': {
-    height: 16,
-    width: 16,
-    fill: '#464D55',
-  },
-});
-
-export const EditButton = styled(BaseButton)({
-  '& > svg': {
-    fill: 'none',
-    stroke: '#464D55',
-  },
-});
-EditButton.defaultProps = {
-  title: 'Edit',
-};
-
-export const MoveButton = styled(BaseButton)({
-  cursor: 'grab !important',
-});
-MoveButton.defaultProps = {
-  title: 'Move',
-};
-
-export const AddButton = styled(BaseButton)({});
-AddButton.defaultProps = {
-  title: 'Add',
-};
-
-export const DeleteButton = styled(BaseButton)({});
-DeleteButton.defaultProps = {
-  title: 'Delete',
-};
-
 export const Actions = styled('div')({
   display: 'flex',
-  marginInlineStart: 16,
-  opacity: 0,
+  alignItems: 'center',
   transition: '0.2s ease-in-out',
+  '& button': {
+    opacity: 0,
+  },
+  '& svg': {
+    fontSize: 18,
+    color: '#464D55',
+  },
+  '& p': {
+    margin: '0 16px',
+  },
 });
 Actions.defaultProps = {
   className: 'pb-actions',
@@ -74,9 +44,6 @@ export const Container = styled('div')({
   width: '-webkit-fill-available',
   display: 'flex',
   flexDirection: 'column',
-  '&:hover > div > .pb-actions': {
-    opacity: 1,
-  },
 });
 export const Footer = styled('div')({
   display: 'flex',

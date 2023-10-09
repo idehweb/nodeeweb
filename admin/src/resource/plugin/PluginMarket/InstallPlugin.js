@@ -33,13 +33,12 @@ export default function InstallPlugin({ open, onClose, slug }) {
   }, [slug]);
 
   const handleSubmit = (values) => {
-    console.log('values', values);
     create(
-      'plugin/local/' + slug,
+      'plugin/local/install' + slug,
       { data: values },
       {
         onSuccess: (data) => {
-          notify('Create Plugin Successfuly');
+          notify('install Plugin Successfuly');
           redirect('/plugin/local');
         },
         onError: (err) => {
