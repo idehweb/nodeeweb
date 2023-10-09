@@ -191,6 +191,9 @@ class TransactionService {
     if (req.query.post) {
       extraOpt.post = JSON.parse(req.query.post as string);
     }
+    if (req.query.address) {
+      extraOpt.address = JSON.parse(req.query.address as string);
+    }
 
     return res.json({
       data: await this.calculatePrice(order, { ...req.query, ...extraOpt }),
@@ -308,6 +311,7 @@ class TransactionService {
       discount: number,
       totalPrice_before_taxes: number,
       totalPrice_before_discount: number,
+      taxRate: string,
       totalPrice: number;
 
     const products = order?.products ?? [];
@@ -339,14 +343,19 @@ class TransactionService {
       if (!pp) pp = _products();
       return roundPrice(p + pp);
     };
-    const _taxes = async () => {
+    const _taxesPrice = async () => {
       if (taxesPrice) return taxesPrice;
       return roundPrice(store.config.tax * (await _total_before_tax()));
+    };
+    const _taxRate = () => {
+      if (taxRate) return taxRate;
+      taxRate = `${store.config.tax * 100}%`;
+      return taxRate;
     };
     const _total_before_discount = async () => {
       return totalPrice_before_discount
         ? totalPrice_before_discount
-        : roundPrice((await _taxes()) + (await _total_before_tax()));
+        : roundPrice((await _taxesPrice()) + (await _total_before_tax()));
     };
     const _discount = async () => {
       if (discount !== undefined) return discount;
@@ -372,17 +381,19 @@ class TransactionService {
     productsPrice = opt.products ? _products() : undefined;
     totalPrice_before_taxes = opt.total ? await _total_before_tax() : undefined;
     discount = opt.discount ? await _discount() : undefined;
-    taxesPrice = opt.tax ? await _taxes() : undefined;
+    taxesPrice = opt.tax ? await _taxesPrice() : undefined;
     totalPrice_before_discount = opt.total
       ? await _total_before_discount()
       : undefined;
     totalPrice = opt.total ? await _total() : undefined;
+    taxRate = opt.tax ? _taxRate() : undefined;
 
     return {
       postPrice,
       productsPrice,
       totalPrice_before_taxes,
       taxesPrice,
+      taxRate,
       totalPrice_before_discount,
       discount,
       totalPrice,
