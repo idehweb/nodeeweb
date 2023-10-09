@@ -331,7 +331,10 @@ class TransactionService {
             products.reduce(
               (acc, { combinations }) =>
                 acc +
-                combinations.reduce((acc, { salePrice }) => acc + salePrice, 0),
+                combinations.reduce(
+                  (acc, { salePrice, quantity }) => acc + salePrice * quantity,
+                  0
+                ),
               0
             )
           );
