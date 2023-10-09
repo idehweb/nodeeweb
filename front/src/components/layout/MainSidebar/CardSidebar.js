@@ -22,6 +22,7 @@ const CardSidebar = ({ props, t }) => {
   }
   const cardVisible = useSelector((st) => !!st.store.cardVisible);
   const cart = useSelector((st) => st.store.cart);
+  console.log('cart', JSON.parse(JSON.stringify(cart)));
   const handleToggleCardbar = () => toggleCardbar(true);
 
   const classes = clsx(
@@ -123,7 +124,7 @@ const CardSidebar = ({ props, t }) => {
       setSum(sum);
     });
   };
-  const returnTotalPrice = (cart={}) => {
+  const returnTotalPrice = (cart = {}) => {
     let price = Object.values(cart)
       .map((p) => (p.salePrice || p.price) * p.quantity)
       .reduce((prev, curr) => (isNaN(curr) ? curr : prev + curr), 0);
@@ -170,7 +171,7 @@ const CardSidebar = ({ props, t }) => {
   const onDelete = useCallback(async (combId, product) => {
     await CartService.delete(product._id, combId);
   }, []);
-
+  console.log('##$$', cart);
   return (
     <Col tag="aside" className={classes} lg={{ size: 3 }} md={{ size: 4 }}>
       <CardbarMainNavbar />

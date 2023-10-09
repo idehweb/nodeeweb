@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Col, Container, Row } from 'shards-react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import PageTitle from '../../components/common/PageTitle';
 import { withTranslation } from 'react-i18next';
 import CheckoutAddress from './Address';
@@ -8,6 +8,7 @@ import CheckoutPost from './Post';
 import CheckoutFactor from './Factor';
 import OrderViewValidation from '@/functions/order/validation';
 import { OrderUtils } from '@/functions/order/utils';
+import { CartService } from '@/functions/order/cart';
 
 const CheckoutState = {
   Address: 'address',
@@ -18,6 +19,7 @@ const CheckoutState = {
 function Checkout({ t }) {
   const navigate = useNavigate();
   const params = useParams();
+  const [query] = useSearchParams();
   const [state, setState] = useState(params?.state || CheckoutState.Address);
   const [data, setData] = useState({});
 
@@ -73,6 +75,12 @@ function Checkout({ t }) {
     }
     navigate(`/checkout/${state}`);
   }, [state]);
+
+  useEffect(() => {
+    const from = query.get('from');
+    if (from !== '/login') return;
+    CartService.sync();
+  }, [query.get('from')]);
 
   const bodyCreator = () => {
     switch (state) {

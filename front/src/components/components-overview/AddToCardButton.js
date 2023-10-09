@@ -21,7 +21,7 @@ function AddToCardButton({
   product,
   combination,
 }) {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(CartService.getQuantity(combination._id));
   let [Navigate, SetNavigate] = useState(null);
   const onCreate = useCallback(
     async (e) => {
@@ -50,7 +50,7 @@ function AddToCardButton({
         toast.error(t('Can not add to cart'));
       }
     },
-    [product, combination],
+    [product, combination, count],
   );
   const onDecrease = useCallback(
     async (e) => {
@@ -64,7 +64,7 @@ function AddToCardButton({
         toast.error(t('Can not delete from cart'));
       }
     },
-    [product, combination],
+    [product, combination, count],
   );
 
   const refreshCard = () => {};
@@ -107,6 +107,7 @@ function AddToCardButton({
       );
     }
   }
+  console.log('##$$', 'here');
 
   return (
     <div className="AddToCardButton">
