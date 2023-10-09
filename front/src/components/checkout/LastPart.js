@@ -16,7 +16,7 @@ import style from '#c/assets/styles/Checkout.module.css';
 import store from '#c/functions/store';
 import PriceChunker from './PriceChunker';
 import { withTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import GetDiscount from './GetDiscount';
 import GetGateways from './GetGateways';
@@ -29,6 +29,7 @@ import { CartService } from '@/functions/order/cart';
 
 const LastPart = (props) => {
   const { t, theParams } = props;
+  const navigate = useNavigate();
   const address = OrderUtils.getAddressChose();
   const post = OrderUtils.getPostChose();
 
@@ -44,6 +45,7 @@ const LastPart = (props) => {
   );
 
   const [price, setPrice] = useState({ data: null, state: 'none' });
+
   const updatePrice = useCallback(async (discount) => {
     try {
       setPrice(({ data }) => ({ data, state: 'loading' }));
@@ -67,6 +69,33 @@ const LastPart = (props) => {
       toast.error(err.message);
     }
   }, []);
+
+  const onCreateTransaction = useCallback(async () => {
+    setCard((data) => ({ ...data, state: 'loading' }));
+    try {
+      const { transaction } = await OrderService.createTransaction({
+        post: { id: post.id },
+        address,
+        discount: discountCode ?? undefined,
+      });
+
+      // clear cart
+      CartService.clear();
+
+      toast.success(t('Place Order'), {
+        autoClose: 1000,
+        onClose() {
+          if (transaction.payment_link)
+            return location.replace(transaction.payment_link);
+          return navigate('/profile', { replace: true });
+        },
+      });
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setCard((data) => ({ ...data, state: 'none' }));
+    }
+  }, [discountCode]);
 
   const returnAmount = (amount) => {
     return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -346,7 +375,7 @@ const LastPart = (props) => {
           <Button
             className={'place-order '}
             left={'true'}
-            onClick={() => onPlaceOrder(0)}>
+            onClick={() => onCreateTransaction()}>
             {t('Place Order')}
           </Button>
         </ButtonGroup>

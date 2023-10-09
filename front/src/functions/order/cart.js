@@ -148,4 +148,8 @@ export class CartService {
 
     await this.set(products);
   }
+
+  static clear() {
+    SaveData({ cart: {} });
+  }
 }

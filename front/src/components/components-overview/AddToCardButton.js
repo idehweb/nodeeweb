@@ -29,6 +29,7 @@ function AddToCardButton({
         await CartService.modify(product, { ...combination, quantity: 1 });
         toggleCardbar();
         toast.success(t('Added to cart successfully!'));
+        setCount(1);
       } catch (err) {
         toast.error(t('Can not add to cart'));
         console.log(err);
@@ -55,10 +56,16 @@ function AddToCardButton({
   const onDecrease = useCallback(
     async (e) => {
       try {
-        await CartService.modify(product, {
-          ...combination,
-          quantity: count - 1,
-        });
+        if (count === 1) {
+          // delete
+          await CartService.delete(product._id, combination._id);
+        } else {
+          // modify
+          await CartService.modify(product, {
+            ...combination,
+            quantity: count - 1,
+          });
+        }
         setCount(count - 1);
       } catch (err) {
         toast.error(t('Can not delete from cart'));
@@ -107,8 +114,7 @@ function AddToCardButton({
       );
     }
   }
-  console.log('##$$', 'here');
-
+  console.log('##$$', count);
   return (
     <div className="AddToCardButton">
       {count !== 0 && (

@@ -447,7 +447,7 @@ class TransactionService {
   }
 
   async handlePayment(
-    order: OrderDocument,
+    order: OrderDocument | null,
     successAction: boolean,
     failedAction: boolean,
     extraFields?: any,
@@ -560,6 +560,9 @@ class TransactionService {
 
       return { status, order };
     };
+
+    // not found
+    if (!order) return { status: PaymentVerifyStatus.Failed };
 
     // clear timer
     _clearTimer(order.transaction.authority);
