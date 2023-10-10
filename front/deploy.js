@@ -1,10 +1,12 @@
-var FtpDeploy = require('ftp-deploy');
-var axios = require('axios');
-var ftpDeploy = new FtpDeploy();
+const FtpDeploy = require('ftp-deploy');
+const axios = require('axios');
 
-require('dotenv').config({path: '.env.local'});
+const ftpDeploy = new FtpDeploy();
 
-var config = {
+require('dotenv').config({ path: '.env.local' });
+
+const config = {
+  sftp: process.env.FTP_SFTP,
   user: process.env.FTP_USER,
   // Password optional, prompted if none given
   password: process.env.FTP_PASS,
@@ -12,6 +14,7 @@ var config = {
   port: process.env.FTP_PORT || 21,
   localRoot: __dirname + '/build',
   remoteRoot: process.env.FTP_REMOTE_ROOT,
+
   // this would upload everything
   include: ['*'],
   // e.g. exclude sourcemaps, and ALL files in node_modules (including dot files)
@@ -20,14 +23,16 @@ var config = {
   deleteRemote: process.env.FTP_DELETE,
   // Passive mode is forced (EPSV command is not sent)
   forcePasv: true,
+  debugMode: false,
 };
+
 ftpDeploy
   .deploy(config)
   .then((res) => {
     return axios
       .get(`${process.env.PUBLIC_URL}/settings/reset`, {}, {})
       .then((res) => {
-        console.log('finished ;)\n',res.data)
+        console.log('finished ;)\n', res.data);
         // return res.data;
       })
       .catch((err) => {

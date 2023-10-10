@@ -27,7 +27,7 @@ API.interceptors.request.use(
   },
   (err) => {
     throw err;
-  },
+  }
 );
 
 API.interceptors.response.use(
@@ -37,26 +37,19 @@ API.interceptors.response.use(
   (err) => {
     if (err.isAxiosError) {
       // unauthorize
-      console.log('##$$', {
-        status: err.response?.status,
-        path: location.pathname,
-        no_redirect: err.config?.no_redirect,
-      });
       if (
         err.response?.status === 401 &&
         !location.pathname.startsWith('/login') &&
         !err.config?.no_redirect
       ) {
         location.assign(
-          `/login?check=false&redirect=${encodeURIComponent(
-            location.pathname,
-          )}`,
+          `/login?check=false&redirect=${encodeURIComponent(location.pathname)}`
         );
       }
     }
 
     throw err;
-  },
+  }
 );
 
 export default API;

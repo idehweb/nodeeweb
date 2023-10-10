@@ -21,13 +21,8 @@ import { dateFormat, jToM, getDays } from '@/functions';
 import EntryFormChartFilters from '@/components/dashboard/EntryFormChartFilters';
 import API from '@/functions/API';
 
-const aMonthAgo = subDays(new Date(), 30);
-console.log('aMonthAgo', aMonthAgo);
 const dateFormatter = (date) => {
   return dateFormat(new Date(date), 'YYYY/MM/DD');
-};
-const dateFormatterDashed = (date) => {
-  return dateFormat(new Date(date), 'YYYY-MM-DD');
 };
 
 const EntryFormChart = (props) => {

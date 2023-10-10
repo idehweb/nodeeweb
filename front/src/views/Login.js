@@ -28,9 +28,7 @@ const Login = ({ t }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const redirectTo = useDetectRedirect();
   const [status, setStatus] = useState(
-    searchParams.get('check') === 'false'
-      ? Status.NeedAuth
-      : Status.NeedToCheck,
+    searchParams.get('check') === 'false' ? Status.NeedAuth : Status.NeedToCheck
   );
 
   const check = useCallback(async () => {

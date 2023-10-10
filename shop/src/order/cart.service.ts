@@ -2,20 +2,17 @@ import {
   MiddleWare,
   NotFound,
   DuplicateError,
-  ForbiddenError,
   LimitError,
   ValidationError,
-  BadRequestError,
 } from '@nodeeweb/core';
 import store from '../../store';
 import {
-  IOrder,
   OrderDocument,
   OrderModel,
   OrderStatus,
 } from '../../schema/order.schema';
 import { ProductDocument, ProductModel } from '../../schema/product.schema';
-import { FilterQuery, Types, UpdateQuery } from 'mongoose';
+import { Types } from 'mongoose';
 import {
   AddToCartBody,
   ProductBody,

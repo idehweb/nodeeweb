@@ -5,24 +5,26 @@ import { Button, Col, ListGroupItem } from 'shards-react';
 import { Link } from 'react-router-dom';
 
 import { useSelector } from 'react-redux';
-import { MainUrl, toggleCardbar, updateCard } from '#c/functions/index';
 
 import { toast } from 'react-toastify';
 import { withTranslation } from 'react-i18next';
-import CardbarMainNavbar from './CardbarMainNavbar';
+
+import { MainUrl, toggleCardbar, updateCard } from '#c/functions/index';
+
 import Swiper from '#c/components/swiper';
 
 import store from '#c/functions/store';
 import { CartService } from '@/functions/order/cart';
 
-const CardSidebar = ({ props, t }) => {
+import CardbarMainNavbar from './CardbarMainNavbar';
+
+const CardSidebar = ({ t }) => {
   const themeData = useSelector((st) => st.store.themeData);
   if (!themeData.currency) {
     themeData.currency = 'toman';
   }
   const cardVisible = useSelector((st) => !!st.store.cardVisible);
   const cart = useSelector((st) => st.store.cart);
-  console.log('cart', JSON.parse(JSON.stringify(cart)));
   const handleToggleCardbar = () => toggleCardbar(true);
 
   const classes = clsx(
@@ -30,98 +32,14 @@ const CardSidebar = ({ props, t }) => {
     'card-sidebar',
     'px-0',
     'col-12',
-    cardVisible && 'open',
+    cardVisible && 'open'
   );
   let [sum, setSum] = useState(0);
   let [lan, setLan] = useState(store.getState().store.lan || 'fa');
 
-  const removeItem = async (idx) => {
-    let arr = [];
-    await card.forEach(async (c, i) => {
-      if (idx !== i) {
-        console.log(i, idx);
-        await arr.push(c);
-      } else if (idx === i) {
-        sum -= (c.salePrice || c.price) * c.count;
-      }
-      return;
-    });
-    // console.log("cardddd", arr);
-    if (sum < 0 || arr.length < 1) {
-      sum = 0;
-    }
-    await updateCard(arr, sum).then(() => {
-      // this.setState({
-      //   card: arr,
-      //   sum: sum
-      // })
-      setSum(sum);
-      console.log('toasts,,', arr);
-
-      toast(t('Item deleted!'), {
-        type: 'warning',
-      });
-    });
-  };
-
-  const addItem = async (idx) => {
-    sum = 0;
-    let arr = [];
-    await card.forEach(async (c, i) => {
-      sum += (c.salePrice || c.price) * c.count;
-
-      if (idx === i) {
-        console.log(i, idx);
-        c.count = c.count + 1;
-        sum += (c.salePrice || c.price) * c.count;
-      }
-      await arr.push(c);
-
-      return;
-    });
-    console.log('cardddd', arr);
-
-    await updateCard(arr, sum).then(() => {
-      // this.setState({
-      //   card: arr,
-      //   sum: sum
-      // })
-      setSum(sum);
-    });
-  };
-
   const handleToast = async () => {
     toast(t('You did not add anything to cart!'), {
       type: 'error',
-    });
-  };
-  const minusItem = async (idx) => {
-    sum = 0;
-    let arr = [];
-    await card.forEach(async (c, i) => {
-      sum += (c.salePrice || c.price) * c.count;
-
-      if (idx === i) {
-        console.log(i, idx);
-        c.count = c.count - 1;
-        sum -= (c.salePrice || c.price) * c.count;
-        if (c.count === 0) {
-          removeItem(idx);
-          return;
-        }
-      }
-      await arr.push(c);
-
-      return;
-    });
-    console.log('cardddd', arr);
-
-    await updateCard(arr, sum).then(() => {
-      // this.setState({
-      //   card: arr,
-      //   sum: sum
-      // })
-      setSum(sum);
     });
   };
   const returnTotalPrice = (cart = {}) => {
@@ -171,7 +89,7 @@ const CardSidebar = ({ props, t }) => {
   const onDelete = useCallback(async (combId, product) => {
     await CartService.delete(product._id, combId);
   }, []);
-  console.log('##$$', cart);
+
   return (
     <Col tag="aside" className={classes} lg={{ size: 3 }} md={{ size: 4 }}>
       <CardbarMainNavbar />
@@ -205,7 +123,7 @@ const CardSidebar = ({ props, t }) => {
                     perPage={1}
                     arrows={false}
                     interval={Math.floor(
-                      1000 + Math.random() * (5000 - 1000 + 1),
+                      1000 + Math.random() * (5000 - 1000 + 1)
                     )}
                     breakpoints={{
                       1024: {
@@ -229,6 +147,7 @@ const CardSidebar = ({ props, t }) => {
                             key={phk}
                             className={'gfdsdf'}
                             src={MainUrl + '/' + ph}
+                            alt={product.title?.fa}
                           />
                         );
                       })}

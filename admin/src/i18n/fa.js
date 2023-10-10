@@ -1,7 +1,5 @@
 import farsiMessages from 'ra-language-farsi';
 
-console.log('running farsi language...');
-
 const customFarsiMessages = {
   ...farsiMessages,
   perPage: 'perPage',
@@ -101,6 +99,7 @@ const customFarsiMessages = {
       automation: 'اتوماسیون',
       upgrade: 'ارتقا',
       plugins: 'افزونه ها',
+      plugin: 'افزونه ها',
       messagesSettings: 'تنظیمات پیام ها',
       restart: 'ری استارت سیستم',
       entry: 'ورودی',
@@ -303,8 +302,6 @@ const customFarsiMessages = {
       lastName: 'نام خانوادگی',
       nickname: 'لقب',
       username: 'نام کاربری',
-      firstName: 'نام',
-      lastName: 'نام خانوادگی',
       difference: 'تفاوت داده ها',
       createdAt: 'در تاریخ',
     },
@@ -355,7 +352,10 @@ const customFarsiMessages = {
       version: 'نسخه',
       install: 'نصب',
       unistall: 'حذف',
+      configuration: 'پیکربندی',
       edit: 'ویرایش',
+      status: 'وضعیت',
+      activation: 'فعال سازی',
     },
     category: {
       priceType: 'نوع اعمال قیمت',

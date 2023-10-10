@@ -2405,10 +2405,6 @@ input[type='number'] {
   overflow: hidden;
 }
 
-.the-order-number {
-  float: left;
-}
-
 .the-order-body {
   padding-top: 20px;
 }

@@ -56,7 +56,6 @@ function CustomModal({
   title,
   className,
   children,
-  t,
 }) {
   const cls = useStyles();
   return (

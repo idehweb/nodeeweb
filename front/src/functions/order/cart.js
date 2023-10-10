@@ -23,11 +23,11 @@ export class CartService {
     for (const product of cart) {
       const totalQ = product.combinations.reduce(
         (prev, curr) => curr.quantity + prev,
-        0,
+        0
       );
       const totalP = product.combinations.reduce(
         (prev, curr) => (curr.salePrice ?? curr.price) + prev,
-        0,
+        0
       );
 
       newCart.push({ ...product, count: totalQ, price: totalP });
@@ -133,7 +133,7 @@ export class CartService {
           if (prev[curr._id]) prev[curr._id].push(curr);
           else prev[curr._id] = [curr];
           return prev;
-        }, {}),
+        }, {})
     ).map((combs) =>
       combs.reduce(
         (prev, curr) => {
@@ -142,8 +142,8 @@ export class CartService {
             combinations: [...prev.combinations, ...curr.combinations],
           };
         },
-        { combinations: [] },
-      ),
+        { combinations: [] }
+      )
     );
 
     await this.set(products);

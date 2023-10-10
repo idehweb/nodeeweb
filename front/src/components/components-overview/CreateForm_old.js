@@ -127,6 +127,34 @@ class CreateForm extends React.Component {
                 lg={field.size.lg}
                 className={'MGD ' + field.className}>
                 <label htmlFor="feLastName">{field.label}</label>
+
+                {/*<YMaps query={{apikey: "",lang: 'en_US' }}>*/}
+                {/*<div style={{width: '100%'}} className={'locationabrel'}>*/}
+                {/*<Map instanceRef={ref => (myMap = ref)} onLoad={(e) => {*/}
+                {/*console.log('e', e);*/}
+                {/*ym = e;*/}
+                {/*let m = 0;*/}
+                {/*interval=setInterval(function () {*/}
+                {/*console.log('m', m += 2);*/}
+                {/*handleAddress();*/}
+                {/*}, 2000);*/}
+                {/*}} modules={["Placemark", "geocode"]}*/}
+                {/*onClick={(e) => {*/}
+                {/*// const coords = e.get("coords");*/}
+                {/*// console.log('coords', coords);*/}
+                {/*// ym.events.add('actionend', function (e) {*/}
+                {/*//   console.log('hghjk');*/}
+                {/*// });*/}
+                {/*handleAddress();*/}
+                {/*// this.setState({ coords: coords })35.69562931522265, 51.342168285405606*/}
+                {/*}} width={'100%'} height={'300px'} defaultState={{center: [35.69562931522265, 51.342168285405606], zoom: 9}}>*/}
+                {/*<SearchControl options={{float: 'right'}}/>*/}
+                {/*/!*<ZoomControl options={{ float: 'right' }} />*!/*/}
+                {/*<i className="material-icons locationab" onClick={handleAddress}>location_on</i>*/}
+                {/*<GeolocationControl/>*/}
+                {/*</Map>*/}
+                {/*</div>*/}
+                {/*</YMaps>*/}
               </Col>
             );
           }

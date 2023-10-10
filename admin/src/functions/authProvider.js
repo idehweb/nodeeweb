@@ -1,4 +1,5 @@
 import { BASE_URL } from './API-v1';
+
 const url = BASE_URL;
 
 export default {
@@ -56,9 +57,7 @@ export default {
   },
   // called when the user navigates to a new location, to check for authentication
   checkAuth: () => {
-    return localStorage.getItem('token')
-      ? Promise.resolve({ redirectTo: '/post' })
-      : Promise.reject();
+    return localStorage.getItem('token') ? Promise.resolve() : Promise.reject();
   },
   // called when the user navigates to a new location, to check for permissions / roles
   getPermissions: () => Promise.resolve(),

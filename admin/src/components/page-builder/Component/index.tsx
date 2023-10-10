@@ -1,16 +1,14 @@
 import { Fragment, memo } from 'react';
 import { AnimatePresence } from 'framer-motion';
-
-import { EditIconSvg, CloseIconSvg, AddIconSvg } from '../base/Icon';
-
 import {
-  AddButton,
-  EditButton,
-  DeleteButton,
-  Actions,
-  Header,
-  Content,
-} from './components';
+  CloseRounded,
+  EditRounded,
+  ContentCopyRounded,
+  AddRounded,
+} from '@mui/icons-material';
+import { IconButton } from '@mui/material';
+
+import { Actions, Header, Content } from './components';
 import DraggableCard from './DraggableCard';
 import { ItemType, OnDropType } from './types';
 import { AnimatedComponent, AnimatedEmptyDropSlot } from './AnimationComponent';
@@ -21,6 +19,7 @@ export interface ComponentProps {
   onDelete: (id: string) => void;
   onAdd: (payload: any) => void;
   onEdit: (item: ItemType) => void;
+  onDuplicate: (item: ItemType) => void;
   onDrop: OnDropType;
   animationKey?: React.Key;
 }
@@ -32,6 +31,7 @@ const Component = ({
   onAdd,
   onEdit,
   onDrop,
+  onDuplicate,
 }: ComponentProps) => {
   return (
     <DraggableCard
@@ -40,16 +40,22 @@ const Component = ({
       item={item}
       onDropEnd={onDrop}>
       <Header>
-        {`${item.name} ${index + 1}: ${item.id}`}
         <Actions>
-          <EditButton onClick={() => onEdit(item)}>
-            <EditIconSvg />
-          </EditButton>
-          <DeleteButton onClick={() => onDelete(item.id)}>
-            <CloseIconSvg width="20px" height="20px" background="#464D55" />
-          </DeleteButton>
+          {/* <IconButton title="Duplicate" onClick={() => onDuplicate(item)}>
+            <ContentCopyRounded />
+          </IconButton> */}
+          <IconButton title="Delete" onClick={() => onDelete(item.id)}>
+            <CloseRounded />
+          </IconButton>
+
+          <p>{`${item.name} ${index + 1}: ${item.id}`}</p>
+
+          <IconButton title="Edit" onClick={() => onEdit(item)}>
+            <EditRounded />
+          </IconButton>
           {item.addable && (
-            <AddButton
+            <IconButton
+              title="Add"
               onClick={(e) => {
                 let address = item.id + '_';
                 let mainAddress = address.split('_');
@@ -61,8 +67,8 @@ const Component = ({
                 }
                 onAdd(update);
               }}>
-              <AddIconSvg />
-            </AddButton>
+              <AddRounded />
+            </IconButton>
           )}
         </Actions>
       </Header>
@@ -86,6 +92,7 @@ const Component = ({
                   onDelete={onDelete}
                   onAdd={onAdd}
                   onDrop={onDrop}
+                  onDuplicate={onDuplicate}
                 />
 
                 {idx === item.children.length - 1 ? (

@@ -35,7 +35,7 @@ function AddToCardButton({
         console.log(err);
       }
     },
-    [product, combination, toggleCardbar],
+    [product, combination, toggleCardbar]
   );
   const onIncrease = useCallback(
     async (e) => {
@@ -51,7 +51,7 @@ function AddToCardButton({
         toast.error(t('Can not add to cart'));
       }
     },
-    [product, combination, count],
+    [product, combination, count]
   );
   const onDecrease = useCallback(
     async (e) => {
@@ -71,7 +71,7 @@ function AddToCardButton({
         toast.error(t('Can not delete from cart'));
       }
     },
-    [product, combination, count],
+    [product, combination, count]
   );
 
   const refreshCard = () => {};
