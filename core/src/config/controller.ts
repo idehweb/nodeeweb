@@ -30,8 +30,8 @@ export default function registerConfigControllers() {
     },
     {
       method: 'get',
-      url: '/view',
-      service: configService.getViewConf,
+      url: '/website',
+      service: configService.getWebConf,
     }
   );
 

@@ -26,6 +26,7 @@ export class Store {
   adminViews: { [key: AdminViewSchema['name']]: AdminViewSchema['content'] } =
     {};
   templates: { [key: string]: StoreTemplate } = {};
+  routes: { [k: string]: { isDynamic?: boolean; path: string } } = {};
   strategies = new Map<string, AuthStrategy>();
   plugins = new PluginCore();
   config: ConfigType;
