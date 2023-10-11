@@ -12,6 +12,7 @@ import { StoreEnv } from './types/store';
 import EventEmitter from 'events';
 import { PluginCore } from './src/plugin/plugin';
 import { StoreTemplate } from './types/template';
+import { StoreRoute } from './types/route';
 export class Store {
   env: StoreEnv;
   db: typeof mongoose;
@@ -26,7 +27,7 @@ export class Store {
   adminViews: { [key: AdminViewSchema['name']]: AdminViewSchema['content'] } =
     {};
   templates: { [key: string]: StoreTemplate } = {};
-  routes: { [k: string]: { isDynamic?: boolean; path: string } } = {};
+  routes: { [k: string]: StoreRoute } = {};
   strategies = new Map<string, AuthStrategy>();
   plugins = new PluginCore();
   config: ConfigType;
