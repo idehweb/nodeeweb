@@ -57,13 +57,16 @@ export function registerRoute(
   { route, name }: { name: string; route: StoreRoute },
   { from, logger = store.systemLogger }: RegisterOptions
 ) {
+  if (!route.path) throw new Error(`path in ${name} route is undefined`);
+
+  if (!route.path.startsWith('/')) route.path = `/${route.path}`;
   store.routes[name] = route;
   logger.log(
     color(
       'Magenta',
-      `## ${from ? `${from} ` : ''}Register ${_.startCase(
-        _.kebabCase(name)
-      )} Route ##`
+      `## ${from ? `${from} ` : ''}Register ${_.startCase(name)} ==> ${
+        route.path
+      } Route ##`
     )
   );
 }
