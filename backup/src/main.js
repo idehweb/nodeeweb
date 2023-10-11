@@ -135,7 +135,9 @@ async function sendTelegramNotif(msg) {
 
 async function removeOld() {
   if (!sftp_client && process.env.SFTP_USERNAME)
-    sftp_client = await getSftpClient();
+    try {
+      sftp_client = await getSftpClient();
+    } catch (err) {}
 
   const size = await dirSize(process.env.LOCAL_PATH);
   if (size <= +process.env.MAX_BACKUP_STORAGE_MB) return;
