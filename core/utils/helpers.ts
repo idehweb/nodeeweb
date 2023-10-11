@@ -3,6 +3,11 @@ import _, { at } from 'lodash';
 import { Document } from 'mongoose';
 import { SimpleError } from '../types/error';
 import bfs from './bfs';
+import { StoreRoute } from '../types/route';
+
+export function page2Route(page: any): StoreRoute {
+  return { path: page.path || page.slug };
+}
 
 export function convertToString(a: any, pretty = true) {
   if (a instanceof SimpleError)
