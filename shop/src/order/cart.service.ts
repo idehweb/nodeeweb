@@ -2,20 +2,17 @@ import {
   MiddleWare,
   NotFound,
   DuplicateError,
-  ForbiddenError,
   LimitError,
   ValidationError,
-  BadRequestError,
 } from '@nodeeweb/core';
 import store from '../../store';
 import {
-  IOrder,
   OrderDocument,
   OrderModel,
   OrderStatus,
 } from '../../schema/order.schema';
 import { ProductDocument, ProductModel } from '../../schema/product.schema';
-import { FilterQuery, Types, UpdateQuery } from 'mongoose';
+import { Types } from 'mongoose';
 import {
   AddToCartBody,
   ProductBody,
@@ -85,6 +82,7 @@ export default class CartService {
     type,
     user,
     order,
+    strict,
   }: {
     type: 'add' | 'edit' | 'modify-comb';
     order?: OrderDocument;
@@ -96,6 +94,7 @@ export default class CartService {
       }[];
     };
     user: UserDocument;
+    strict?: boolean;
   }) {
     // existence
     const productDoc = await this.productModel.findOne({
@@ -124,8 +123,12 @@ export default class CartService {
     if (!productDoc) throw new NotFound('Product not found');
     if (type === 'edit') {
       if (!orderDoc) throw new NotFound('Order not found');
-      if (!productInOrder) throw new NotFound('Product in order must exist');
-      if (productCombinationsInOrder?.length !== product.combinations.length)
+      if (!productInOrder && strict)
+        throw new NotFound('Product in order must exist');
+      if (
+        productCombinationsInOrder?.length !== product.combinations.length &&
+        ProductCombinationsInDoc?.length !== product.combinations.length
+      )
         throw new NotFound('Some product combinations not exits');
     } else {
       if (ProductCombinationsInDoc?.length !== product.combinations.length)
@@ -146,7 +149,7 @@ export default class CartService {
       )
         throw new LimitError('products in order limit exceeded');
 
-      if (productInOrder && type === 'add')
+      if (productInOrder && type === 'add' && strict)
         throw new DuplicateError('Can not add product in cart twice');
     }
   }
@@ -255,11 +258,10 @@ export default class CartService {
       status: OrderStatus.Cart,
       active: true,
     });
-
     // validate
     for (const product of body.products) {
       await CartService._checkProduct({
-        type: 'edit',
+        type: order ? 'add' : 'edit',
         product,
         user: req.user,
         order,
@@ -267,16 +269,29 @@ export default class CartService {
     }
 
     // merge products
-    const products = order.products.map((p) =>
-      this.pDoc2pCart(p, body.products)
-    );
+    const products = (
+      await this.productModel.find({
+        _id: { $in: body.products.map((p) => p._id) },
+      })
+    ).map((p) => this.pDoc2pCart(p, body.products));
 
-    const newOrder = await this.orderModel.findOneAndUpdate(
-      { _id: order._id },
-      { products },
-      { new: true }
-    );
-    return res.json({ data: newOrder });
+    if (!order) {
+      // create order
+      const order = await CartService.orderModel.create({
+        customer: req.user.toObject(),
+        products,
+      });
+      return res.status(201).json({
+        data: order,
+      });
+    } else {
+      const newOrder = await this.orderModel.findOneAndUpdate(
+        { _id: order._id },
+        { products },
+        { new: true }
+      );
+      return res.json({ data: newOrder });
+    }
   };
   static removeFromCart: MiddleWare = async (req, res) => {
     const order = await CartService.orderModel.updateOne(
@@ -438,5 +453,23 @@ export default class CartService {
     else await popComb();
 
     return res.status(204).send();
+  };
+
+  static checkout: MiddleWare = async (req, res) => {
+    const order = await this.orderModel.findOneAndUpdate(
+      {
+        'customer._id': req.user.id,
+        status: OrderStatus.Cart,
+        active: true,
+      },
+      {
+        checkout: true,
+      },
+      { new: true }
+    );
+
+    if (!order) throw new NotFound('there is not any active cart');
+
+    return res.status(200).json({ data: order });
   };
 }

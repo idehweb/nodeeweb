@@ -52,11 +52,12 @@ export type CRUDCreatorOpt = {
     limit?: string;
     slug?: string;
   };
-  queryFields?: {
-    offset?: string;
-    limit?: string;
-    sort?: string;
-  };
+  queryFields?:
+    | {
+        [key: string]: string;
+      }
+    | ((key: string) => string | undefined)
+    | boolean;
   sort?: { [k: string]: mongoose.SortValues };
   project?: mongoose.ProjectionType<any>;
   executeQuery?: boolean;

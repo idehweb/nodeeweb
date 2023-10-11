@@ -1,7 +1,8 @@
 import * as fs from 'fs';
-import _ from 'lodash';
+import _, { at } from 'lodash';
 import { Document } from 'mongoose';
 import { SimpleError } from '../types/error';
+import bfs from './bfs';
 
 export function convertToString(a: any, pretty = true) {
   if (a instanceof SimpleError)
@@ -119,14 +120,21 @@ export function replaceValue({
   text: string;
   boundary?: string;
 }) {
-  const values = data
-    .map((d) =>
-      Object.fromEntries(
-        Object.entries(d).map(([k, v]) => [
-          `${boundary}${k.toUpperCase()}${boundary}`,
-          v,
-        ])
-      )
+  const values = (JSON.parse(JSON.stringify(data)) as object[])
+    .map(
+      (d) => {
+        bfs(d, ({ key, value, parent }) => {
+          if (!key || typeof key !== 'string') return;
+          parent[key.toString().toUpperCase()] = value;
+        });
+        return d;
+      }
+      // Object.fromEntries(
+      //   Object.entries(d).map(([k, v]) => [
+      //     `${boundary}${k.toUpperCase()}${boundary}`,
+      //     v,
+      //   ])
+      // )
     )
     .reduce((acc, curr) => ({ ...acc, ...curr }), {});
 
@@ -134,9 +142,11 @@ export function replaceValue({
   const pattern = new RegExp(`(${boundary}[^${boundary} ]+${boundary})`, 'ig');
   let value = pattern.exec(text);
   while (value) {
-    const upperV = value[0]?.toUpperCase();
-    if (values[upperV])
-      newMsg = newMsg.replace(new RegExp(value[0], 'ig'), values[upperV]);
+    const upperFilterV = value[0]
+      ?.toUpperCase()
+      .slice(boundary.length, -boundary.length);
+    const [target] = at(values as any, upperFilterV);
+    if (target) newMsg = newMsg.replace(new RegExp(value[0], 'ig'), target);
     value = pattern.exec(text);
   }
   return newMsg;

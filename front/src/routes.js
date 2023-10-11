@@ -1,4 +1,4 @@
-import {DefaultLayout, Nof, Nohf} from '#c/layouts/index';
+import { DefaultLayout, Nof, Nohf } from '#c/layouts/index';
 import Profile from '#c/views/Profile';
 import Link from '#c/views/Link';
 import PlaceOrder from '#c/views/PlaceOrder';
@@ -13,12 +13,12 @@ import OrderDetails from '#c/views/OrderDetails';
 import SubmitOrder from '#c/views/SubmitOrder';
 import Transaction from '#c/views/Transaction';
 import Transactions from '#c/views/Transactions';
-import Checkout from '#c/views/Checkout';
+import Checkout from '#c/views/checkout/index';
 import Order from '#c/views/Order';
 import Test from '#c/views/Test';
 import Best from '#c/views/Best';
-import Wishlist from "#c/views/Wishlist";
-import CreatePage from "#c/views/CreatePage";
+import Wishlist from '#c/views/Wishlist';
+import CreatePage from '#c/views/CreatePage';
 export default [
   {
     path: '/',
@@ -163,51 +163,52 @@ export default [
     element: Page,
   },
   {
-    path: "/transactions",
+    path: '/transactions',
     layout: DefaultLayout,
-    element: Transactions
+    element: Transactions,
   },
   {
-    path: "/transaction/:method",
+    path: '/transaction/:method',
     exact: true,
 
     layout: DefaultLayout,
-    element: Transaction
-  }, {
-    path: "/transaction",
+    element: Transaction,
+  },
+  {
+    path: '/transaction',
     exact: true,
 
     layout: DefaultLayout,
-    element: Transaction
+    element: Transaction,
   },
   {
-    path: "/transaction/order/:_token/:_id",
+    path: '/transaction/order/:_token/:_id',
     layout: DefaultLayout,
-    element: PlaceOrder
+    element: PlaceOrder,
   },
   {
-    path: "/submit-order",
+    path: '/submit-order',
     exact: true,
     layout: DefaultLayout,
-    element: SubmitOrder
+    element: SubmitOrder,
   },
   {
-    path: "/submit-order/:_id",
+    path: '/submit-order/:_id',
     exact: true,
     layout: DefaultLayout,
-    element: SubmitOrder
+    element: SubmitOrder,
   },
   {
-    path: "/checkout",
+    path: '/checkout/:state?',
     exact: true,
     layout: Nof,
-    element: Checkout
+    element: Checkout,
   },
   {
-    path: "/:_id",
+    path: '/:_id',
     exact: true,
     layout: DefaultLayout,
-    element: Page
+    element: Page,
   },
   {
     path: '/:_firstCategory/:_product_slug/',

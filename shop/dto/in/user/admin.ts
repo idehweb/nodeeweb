@@ -1,5 +1,12 @@
-import { Expose, Transform } from 'class-transformer';
-import { IsString, Length, IsEmail, IsOptional } from 'class-validator';
+import { Expose, Transform, Type } from 'class-transformer';
+import {
+  IsString,
+  Length,
+  IsEmail,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
+import { Address } from '.';
 
 export class CreateAdminBody {
   @Expose()
@@ -23,6 +30,12 @@ export class CreateAdminBody {
   @IsOptional()
   @IsEmail()
   email?: string;
+
+  @Expose()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => Address)
+  address?: Address[];
 }
 
 export class UpdateAdminBody {
@@ -51,4 +64,10 @@ export class UpdateAdminBody {
   @IsOptional()
   @IsEmail()
   email?: string;
+
+  @Expose()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => Address)
+  address?: Address[];
 }

@@ -1,6 +1,8 @@
 import {
+  CoreConfigBody,
   CoreConfigDto,
   CoreConfigLimit,
+  CoreConfigLimitBody,
   CoreConfigSmsOn,
 } from '@nodeeweb/core';
 import { Expose, Type } from 'class-transformer';
@@ -13,6 +15,7 @@ import {
   IsNumber,
   IsOptional,
   IsPositive,
+  IsPostalCode,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -49,7 +52,7 @@ class Factor {
 
   @Expose()
   @IsOptional()
-  @IsString()
+  @IsPostalCode('IR')
   postalCode?: string;
 
   @Expose()
@@ -62,6 +65,7 @@ class Factor {
   @IsString()
   economicCode?: string;
 }
+class FactorBody extends Factor {}
 class ShopConfigSmsOn extends CoreConfigSmsOn {
   @Expose()
   @IsOptional()
@@ -87,6 +91,11 @@ class ShopConfigSmsOn extends CoreConfigSmsOn {
   @IsOptional()
   @IsString()
   complete_order: string;
+}
+
+class ShopConfigSmsOnBody extends ShopConfigSmsOn {
+  @IsOptional()
+  otp: string;
 }
 
 export class ShopConfigLimit extends CoreConfigLimit {
@@ -119,10 +128,22 @@ export class ShopConfigLimit extends CoreConfigLimit {
   max_need_to_pay_transaction: number;
 }
 
-class ShopManualPost {
+class ShopConfigLimitBody extends ShopConfigLimit {
+  @IsOptional()
+  request_limit: number;
+
+  @IsOptional()
+  request_limit_window_s: number;
+}
+
+export class ShopPost {
   @Expose()
   @IsString()
   id: string;
+
+  @Expose()
+  @IsString()
+  provider: string;
 
   @Expose()
   @IsString()
@@ -137,14 +158,43 @@ class ShopManualPost {
   active: boolean;
 
   @Expose()
+  @IsOptional()
   @IsNumber()
   @IsPositive()
-  price: number;
+  price?: number;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  priceFormula?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  base_price?: number;
+
+  @Expose()
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  min_price?: number;
+
+  @Expose()
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  max_price?: number;
 
   @Expose()
   @IsOptional()
   @IsString({ each: true })
   cities?: string[];
+
+  @Expose()
+  @IsOptional()
+  @IsString({ each: true })
+  states?: string[];
 
   @Expose()
   @IsOptional()
@@ -207,9 +257,9 @@ export class ShopConfigDto extends CoreConfigDto {
 
   @Expose()
   @IsOptional()
-  @Type(() => ShopManualPost)
+  @Type(() => ShopPost)
   @ValidateNested({ each: true })
-  manual_post: ShopManualPost[];
+  manual_post: ShopPost[];
 
   @Type(() => ShopConfigSmsOn)
   sms_message_on: ShopConfigSmsOn;
@@ -223,4 +273,26 @@ export class ShopConfigDto extends CoreConfigDto {
   @IsOptional()
   @IsArray()
   consumer_status: { key: string; value: string }[];
+}
+
+export class ShopConfConfBody extends ShopConfigDto {
+  @IsOptional()
+  app_name: string;
+
+  @IsOptional()
+  @Type(() => FactorBody)
+  factor: Factor;
+
+  @IsOptional()
+  @Type(() => ShopConfigLimitBody)
+  limit: ShopConfigLimitBody;
+
+  @IsOptional()
+  @Type(() => ShopConfigSmsOnBody)
+  sms_message_on: ShopConfigSmsOnBody;
+}
+
+export class ShopConfigBody extends CoreConfigBody {
+  @Type(() => ShopConfConfBody)
+  config: ShopConfConfBody;
 }

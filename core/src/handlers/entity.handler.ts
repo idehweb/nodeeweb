@@ -1,4 +1,5 @@
 import mongoose, { PopulateOptions } from 'mongoose';
+import { isJSON } from 'class-validator';
 import store from '../../store';
 import { CRUD, CRUDCreatorOpt, MiddleWare, Req, Res } from '../../types/global';
 import { NextFunction, Response } from 'express';
@@ -19,6 +20,40 @@ export class EntityCreator {
   constructor(private modelName: string) {}
   private get model() {
     return store.db.model(this.modelName);
+  }
+
+  private exportQueryParams(
+    reqQuery: Req['query'],
+    queryFields?: CRUDCreatorOpt['queryFields']
+  ) {
+    if (!queryFields) return {};
+
+    let mapper: (key: string) => string | undefined;
+    const defaultMapper = (key: string) =>
+      ['sort', 'limit', 'offset'].includes(key) ? `_${key}` : key;
+
+    switch (typeof queryFields) {
+      case 'function':
+        mapper = queryFields;
+        break;
+      case 'object':
+        mapper = (key) => queryFields[key];
+        break;
+      case 'boolean':
+      default:
+        mapper = defaultMapper;
+        break;
+    }
+
+    const query: any = {};
+    Object.entries(reqQuery).forEach(([k, v]) => {
+      const newKey = mapper(k);
+      if (!newKey) return;
+      if (isJSON(v)) v = JSON.parse(v as any);
+      query[newKey] = v;
+    });
+
+    return query as { [k: string]: string | string[] | object };
   }
 
   private async handleResult(
@@ -90,31 +125,41 @@ export class EntityCreator {
     }: Partial<CRUDCreatorOpt>
   ) {
     let result: any = query;
-    const mySort: any =
-      sort ?? (queryFields?.sort ? req.query[queryFields?.sort] : undefined);
-    if (mySort) query.sort(mySort);
+    const reqQuery = this.exportQueryParams(req.query, queryFields);
+    const mySort: any = reqQuery['_sort'] ?? sort;
+    if (mySort) query.sort(Array.isArray(mySort) ? mySort.pop() : mySort);
     if (project) query.projection(project);
-    const offset = +this.getFrom(
-      req,
-      [
-        { reqKey: 'query', objKey: queryFields },
-        { reqKey: 'params', objKey: paramFields },
-      ],
-      'offset',
-      0
+    const offset = +(
+      reqQuery['_offset'] ??
+      this.getFrom(
+        req,
+        [{ reqKey: 'params', objKey: paramFields }],
+        'offset',
+        0
+      )
     );
 
-    const limit = +this.getFrom(
-      req,
-      [
-        { reqKey: 'query', objKey: queryFields },
-        { reqKey: 'params', objKey: paramFields },
-      ],
-      'limit',
-      req.method === 'GET' ? 12 : 0
+    const limit = +(
+      reqQuery['_limit'] ??
+      this.getFrom(
+        req,
+        [
+          { reqKey: 'query', objKey: queryFields },
+          { reqKey: 'params', objKey: paramFields },
+        ],
+        'limit',
+        req.method === 'GET' ? 12 : 0
+      )
     );
     if (offset) query.skip(offset);
     if (limit) query.limit(limit);
+
+    // filter
+    const filterFromQuery = Object.fromEntries(
+      Object.entries(reqQuery).filter(([k, v]) => !k.startsWith('_'))
+    );
+
+    query.setQuery({ ...query.getQuery(), ...filterFromQuery });
 
     // populate
     if (populate) {

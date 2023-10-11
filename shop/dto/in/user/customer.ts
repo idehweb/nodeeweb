@@ -1,4 +1,3 @@
-import { ValidationError } from '@nodeeweb/core';
 import { UserSex } from '@nodeeweb/core/types/user';
 import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
 import { Expose, Transform, Type } from 'class-transformer';
@@ -14,9 +13,10 @@ import {
   IsBoolean,
   IsPhoneNumber,
   IsDate,
-  IsMongoId,
+  ValidateNested,
 } from 'class-validator';
 import { Types } from 'mongoose';
+import { Address } from '.';
 
 export class CreateCustomerBody {
   @Expose()
@@ -91,6 +91,12 @@ export class CreateCustomerBody {
   @IsOptional()
   @IsMongoID({ each: true })
   customerGroup?: Types.ObjectId[];
+
+  @Expose()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => Address)
+  address?: Address[];
 }
 
 export class UpdateCustomerBody {
@@ -169,4 +175,10 @@ export class UpdateCustomerBody {
   @ToMongoID()
   @IsMongoID({ each: true })
   customerGroup?: Types.ObjectId[];
+
+  @Expose()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => Address)
+  address?: Address[];
 }

@@ -1,6 +1,7 @@
 import mongoose, { Document, Model, Types } from 'mongoose';
 import bcrypt from 'bcrypt';
 import { IUser } from '@nodeeweb/core/types/user';
+import { AddressSchema, AddressType } from './order.schema';
 
 export enum CustomerSource {
   Web = 'WEBSITE',
@@ -14,6 +15,7 @@ export interface ICustomerMethods {
 export interface ICustomer extends IUser {
   customerGroup: Types.ObjectId[];
   source: CustomerSource;
+  address: AddressType[];
 }
 
 export type CustomerModel = Model<ICustomer, {}, ICustomerMethods>;
@@ -113,9 +115,9 @@ const schema = new mongoose.Schema(
         url: String,
       },
     ],
-    role: { type: String, default: 'user' },
+    role: { type: String, default: 'customer' },
     active: { type: Boolean, default: true },
-    address: [],
+    address: [AddressSchema],
     companyName: String,
     companyTelNumber: String,
   },

@@ -118,9 +118,16 @@ export class Service {
     return res.json({ data: Object.values(obj) });
   };
 
-  static updateOneParseFilter(req: Req) {
-    if (req.modelName === 'customer') return { _id: req.user._id };
+  static _parseFilter(req: Req) {
+    if (req.modelName === 'customer' || req.params.id === 'me')
+      return { _id: req.user._id };
     return { _id: req.params.id };
+  }
+  static getOneParseFilter(req: Req) {
+    return Service._parseFilter(req);
+  }
+  static updateOneParseFilter(req: Req) {
+    return Service._parseFilter(req);
   }
   static updateOneParseUpdate(req: Req) {
     let body: any;

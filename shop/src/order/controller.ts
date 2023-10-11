@@ -19,6 +19,8 @@ import {
 } from '../../dto/in/order/cart';
 import { OrderIdParam, UpdateOrderBody } from '../../dto/in/order/order';
 import postService from './post.service';
+import { PostOptionQuery } from '../../dto/in/order/post';
+import { CreateTransactionBody } from '../../dto/in/order/transaction';
 
 export default function registerController() {
   // api
@@ -67,10 +69,17 @@ export default function registerController() {
       validate: { reqPath: 'params', dto: DeleteCombParam },
     },
     {
+      method: 'put',
+      url: '/cart/checkout',
+      service: CartService.checkout,
+      access: AuthUserAccess,
+    },
+    {
       method: 'post',
       service: transactionService.createTransaction,
       url: '/transaction',
       access: AuthUserAccess,
+      validate: { reqPath: 'body', dto: CreateTransactionBody },
     },
     {
       method: 'get',
@@ -85,9 +94,10 @@ export default function registerController() {
     },
     {
       method: 'get',
-      service: postService.getAll,
+      service: postService.get,
       url: '/post',
       access: AuthUserAccess,
+      validate: { reqPath: 'query', dto: PostOptionQuery },
     },
   ];
 
@@ -118,6 +128,7 @@ export default function registerController() {
         crud: {
           parseFilter: orderService.getAllFilterParser,
           sort: { updatedAt: -1 },
+          queryFields: true,
           paramFields: {
             limit: 'limit',
             offset: 'offset',

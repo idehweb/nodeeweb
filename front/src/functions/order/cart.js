@@ -3,6 +3,38 @@ import API from '../API';
 import store from '../store';
 
 export class CartService {
+  static getQuantity(comId) {
+    return this.getLocal()[comId]?.quantity ?? 0;
+  }
+  static async getAndSync(opt) {
+    await this.sync();
+    const resFromServer = await this.get(true, opt);
+    return resFromServer;
+  }
+
+  static getCartLength(cart) {
+    const pIds = {};
+    Object.values(cart).forEach((v) => (pIds[v.id] = 1));
+    return Object.values(pIds).reduce((prev, curr) => prev + curr, 0);
+  }
+
+  static parse2List(cart) {
+    const newCart = [];
+    for (const product of cart) {
+      const totalQ = product.combinations.reduce(
+        (prev, curr) => curr.quantity + prev,
+        0
+      );
+      const totalP = product.combinations.reduce(
+        (prev, curr) => (curr.salePrice ?? curr.price) + prev,
+        0
+      );
+
+      newCart.push({ ...product, count: totalQ, price: totalP });
+    }
+    return newCart;
+  }
+
   static parseCart(cart) {
     const newCart = {};
     for (const product of cart) {
@@ -39,7 +71,11 @@ export class CartService {
     return response?.data?.data;
   }
 
-  static async get(notLocal) {
+  static getLocal() {
+    return store.getState().store?.cart ?? {};
+  }
+
+  static async get(notLocal, { listForm, objectForm } = { objectForm: true }) {
     try {
       const cart = await this.query({
         method: 'get',
@@ -47,15 +83,17 @@ export class CartService {
 
       if (!cart) throw new Error('no cart');
 
-      return this.parseCart(cart);
+      return listForm ? this.parse2List(cart) : this.parseCart(cart);
     } catch (err) {
-      if (!notLocal) return store.getState().store?.cart ?? {};
+      if (!notLocal) return this.getLocal();
+      throw err;
     }
   }
 
   static async modify(product, combination) {
     const localProduct = { ...product, ...combination };
     localProduct._id = product._id;
+    localProduct.id = product.id;
     const body = this.parseComb(combination);
     await this.query({
       method: 'put',
@@ -66,6 +104,10 @@ export class CartService {
     const localCart = store.getState().store?.cart ?? {};
     localCart[combination._id] = localProduct;
     SaveData({ cart: { ...localCart } });
+  }
+
+  static set(products) {
+    return this.query({ method: 'put', data: { products } });
   }
 
   static async delete(productId, combinationId) {
@@ -81,18 +123,33 @@ export class CartService {
 
   static async sync() {
     const localCart = store.getState().store?.cart ?? {};
-    const onlineCart = (await this.get(true)) ?? {};
+    const products = Object.values(
+      Object.entries(localCart)
+        .map(([comId, p]) => ({
+          _id: p._id,
+          combinations: [{ _id: comId, quantity: p.quantity }],
+        }))
+        .reduce((prev, curr) => {
+          if (prev[curr._id]) prev[curr._id].push(curr);
+          else prev[curr._id] = [curr];
+          return prev;
+        }, {})
+    ).map((combs) =>
+      combs.reduce(
+        (prev, curr) => {
+          return {
+            _id: curr._id,
+            combinations: [...prev.combinations, ...curr.combinations],
+          };
+        },
+        { combinations: [] }
+      )
+    );
 
-    const modifyComIds = [];
+    await this.set(products);
+  }
 
-    for (const comId in localCart) {
-      const matchProduct = onlineCart[comId];
-      if (!matchProduct || matchProduct.quantity !== localCart[comId].quantity)
-        modifyComIds(comId);
-    }
-
-    for (const comId of modifyComIds) {
-      await this.modify(localCart[comId], { ...localCart[comId], _id: comId });
-    }
+  static clear() {
+    SaveData({ cart: {} });
   }
 }

@@ -22,6 +22,7 @@ import {
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { getToken } from './utils';
 import API from './API';
+import UserService from './User';
 
 const DataContext = createContext(null);
 export const isClient = typeof window !== 'undefined';
@@ -597,7 +598,7 @@ export const addToMyContacts = (phoneNumber) => {
     putData(
       `${ApiUrl}/session/contacts/mine`,
       { phoneNumber: phoneNumber },
-      true,
+      true
     )
       .then(({ data = {} }) => {
         console.clear();
@@ -679,13 +680,13 @@ export const getTheData = (
   model,
   headers,
   offset = 0,
-  limit = 50,
+  limit = 50
 ) => {
   console.log('getTheData header...', headers);
   return getAdminData(
     `${AdminRoute}/${model}/${offset}/${limit}`,
     { headers: headers },
-    true,
+    true
   )
     .then((res) => {
       // console.clear();
@@ -729,7 +730,7 @@ export const updateStatus = (S, A) => {
         Status: S,
         Authority: A,
       },
-      false,
+      false
     )
       .then((data) => {
         let mainD = data['data'];
@@ -964,7 +965,7 @@ export const getEntities = (
   limit = 24,
   search = false,
   filter,
-  populate,
+  populate
 ) => {
   return new Promise(function (resolve, reject) {
     console.log('filter', filter);
@@ -1015,7 +1016,7 @@ export const getEntitiesWithCount = async (
   limit = 24,
   search = false,
   filter,
-  populate,
+  populate
 ) => {
   let params = {};
   const { country } = store.getState().store;
@@ -1049,7 +1050,7 @@ export const getEntitiesForAdmin = (
   offset = 0,
   limit = 24,
   search = false,
-  filter = {},
+  filter = {}
 ) => {
   return new Promise(function (resolve, reject) {
     // console.log('getPosts...',store.getState().store.country)
@@ -1082,7 +1083,7 @@ export const getPostsByCat = (
   _id,
   search,
   filter = {},
-  include = [],
+  include = []
 ) => {
   return new Promise(function (resolve, reject) {
     let params = {};
@@ -1103,7 +1104,7 @@ export const getPostsByCat = (
     getData(
       `${ApiUrl}/product/productsByCat/${_id}/${offset}/${limit}/${search}`,
       { params },
-      true,
+      true
     )
       .then((data) => {
         let mainD = data['data'];
@@ -1125,7 +1126,7 @@ export const getBlogPostsByCat = (
   _id,
   search,
   filter = {},
-  include = [],
+  include = []
 ) => {
   return new Promise(function (resolve, reject) {
     let params = {};
@@ -1144,7 +1145,7 @@ export const getBlogPostsByCat = (
     getData(
       `${ApiUrl}/post/postsByCat/${_id}/${offset}/${limit}/${search}`,
       { params },
-      true,
+      true
     )
       .then((data) => {
         let mainD = data['data'];
@@ -1683,7 +1684,7 @@ export const buy = (_id, obj = {}, price = 0) => {
     postData(
       `${ApiUrl}/transaction/buy/${_id}/` + (price != 0 ? price : ''),
       obj,
-      true,
+      true
     )
       .then((data) => {
         let mainD = data['data'];
@@ -1722,7 +1723,7 @@ export const sendPaymePrepare = (obj = {}) => {
         accept:
           'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
       },
-      true,
+      true
     )
       .then((data) => {
         let mainD = data['data'];
@@ -2065,7 +2066,7 @@ export const submitPost = () => {
             price,
             data: allPostData,
           },
-          true,
+          true
         )
           .then((data) => {
             let mainD = data['data'];
@@ -2226,26 +2227,19 @@ export const setPassWithPhoneNumber = (data) => {
 export const updateAddress = (data) => {
   return new Promise(function (resolve, reject) {
     let { user } = store.getState().store;
-    let { address } = store.getState().store;
-    if (!address) {
-      address = [];
-    }
+    const address = [...(user?.address ?? [])];
     address.push(data);
-    putData(`${ApiUrl}/updateAddress`, { address: address }, true)
+    UserService.update({
+      address,
+    })
       .then((data) => {
-        let mainD = data['data'];
-        if (mainD.success) {
-          user = { ...user, ...mainD.customer.address };
-          SaveData({
-            // phoneNumber: mainD.customer.phoneNumber,
-            address: mainD.customer.address,
-            user: user,
-          });
-        }
-        resolve(mainD);
+        user = { ...user, address: data?.address ?? address };
+        SaveData({
+          user,
+        });
+        resolve(data);
       })
       .catch((err) => {
-        // console.log('sdf', err);
         handleErr(err);
         reject(err);
       });
@@ -2320,7 +2314,7 @@ export const getTheChaparPrice = (destination = 0, value = 0, weight = 1) => {
         weight +
         '"\n' +
         '   }\n' +
-        '}',
+        '}'
     );
     const config = {
       headers: {
@@ -2338,24 +2332,23 @@ export const getTheChaparPrice = (destination = 0, value = 0, weight = 1) => {
       });
   });
 };
-export const changeAddressArr = (data) => {
+export const changeAddressArr = (newAddress, validate) => {
   return new Promise(function (resolve, reject) {
     let { user } = store.getState().store;
-    putData(`${ApiUrl}/updateAddress`, { address: data }, true)
+    UserService.update(
+      {
+        address: newAddress,
+      },
+      { validateStatus: validate }
+    )
       .then((data) => {
-        let mainD = data['data'];
-        if (mainD.success) {
-          user = { ...user, ...mainD.customer.address };
-          SaveData({
-            // phoneNumber: mainD.customer.phoneNumber,
-            address: mainD.customer.address,
-            user: user,
-          });
-        }
-        resolve(mainD);
+        user = { ...user, address: data?.address ?? newAddress };
+        SaveData({
+          user,
+        });
+        resolve(data);
       })
       .catch((err) => {
-        // console.log('sdf', err);
         handleErr(err);
         reject(err);
       });

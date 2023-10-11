@@ -21,7 +21,7 @@ function AddToCardButton({
   product,
   combination,
 }) {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(CartService.getQuantity(combination._id));
   let [Navigate, SetNavigate] = useState(null);
   const onCreate = useCallback(
     async (e) => {
@@ -29,12 +29,13 @@ function AddToCardButton({
         await CartService.modify(product, { ...combination, quantity: 1 });
         toggleCardbar();
         toast.success(t('Added to cart successfully!'));
+        setCount(1);
       } catch (err) {
         toast.error(t('Can not add to cart'));
         console.log(err);
       }
     },
-    [product, combination, toggleCardbar],
+    [product, combination, toggleCardbar]
   );
   const onIncrease = useCallback(
     async (e) => {
@@ -50,21 +51,27 @@ function AddToCardButton({
         toast.error(t('Can not add to cart'));
       }
     },
-    [product, combination],
+    [product, combination, count]
   );
   const onDecrease = useCallback(
     async (e) => {
       try {
-        await CartService.modify(product, {
-          ...combination,
-          quantity: count - 1,
-        });
+        if (count === 1) {
+          // delete
+          await CartService.delete(product._id, combination._id);
+        } else {
+          // modify
+          await CartService.modify(product, {
+            ...combination,
+            quantity: count - 1,
+          });
+        }
         setCount(count - 1);
       } catch (err) {
         toast.error(t('Can not delete from cart'));
       }
     },
-    [product, combination],
+    [product, combination, count]
   );
 
   const refreshCard = () => {};
@@ -107,7 +114,7 @@ function AddToCardButton({
       );
     }
   }
-
+  console.log('##$$', count);
   return (
     <div className="AddToCardButton">
       {count !== 0 && (

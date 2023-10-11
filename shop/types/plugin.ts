@@ -1,6 +1,7 @@
 import { PluginContent } from '@nodeeweb/core/types/plugin';
 import { IOrder } from '../schema/order.schema';
 import { PaymentVerifyStatus } from './order';
+import { ShopPost } from '../dto/config';
 
 export enum ShopPluginType {
   BANK_GATEWAY = 'bank-gateway',
@@ -36,18 +37,9 @@ export type PostGatewaySendPostReq = (args: {
   }
 >;
 
-export type PostGatewayCalcPrice = (args: {
-  products: {
-    size?: string;
-    weight?: number;
-    price?: number;
-  }[];
-  address: Omit<IOrder['address'], 'receiver'>;
-}) => Promise<
-  IOrder['post'] & {
-    price: number;
-  }
->;
+export type PostGatewayConfigs = (args: {
+  address: Partial<Omit<IOrder['address'], 'receiver'>>;
+}) => Promise<ShopPost | ShopPost[] | null>;
 
 export type BankGatewayVerifyArgs = {
   authority: string;
@@ -71,7 +63,7 @@ export interface BankGatewayPluginContent extends PluginContent {
   ];
 }
 export interface PostGatewayPluginContent extends PluginContent {
-  stack: [PostGatewaySendPostReq, PostGatewayCalcPrice];
+  stack: [PostGatewayConfigs, PostGatewaySendPostReq];
 }
 
 export enum PostProvider {
