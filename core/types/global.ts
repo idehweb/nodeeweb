@@ -77,3 +77,7 @@ export enum CRUD {
   UPDATE_ONE = 'updateOne',
   DELETE_ONE = 'deleteOne',
 }
+
+export interface SupervisorEmitter {
+  emit(event: string, body?: any): Promise<boolean>;
+}

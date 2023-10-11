@@ -9,7 +9,25 @@ import {
   IsString,
   ValidateNested,
   IsObject,
+  IsUrl,
 } from 'class-validator';
+
+class ConfigSupervisor {
+  @Expose()
+  @IsOptional()
+  @IsUrl({
+    require_host: true,
+    require_protocol: true,
+
+    host_whitelist: [/./],
+  })
+  url?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  token?: string;
+}
 
 export class CoreConfigLimit {
   @Expose()
@@ -72,6 +90,12 @@ export class CoreConfigDto {
   @IsObject()
   @ValidateNested()
   sms_message_on: CoreConfigSmsOn;
+
+  @Expose()
+  @Type(() => ConfigSupervisor)
+  @IsOptional()
+  @ValidateNested()
+  supervisor?: ConfigSupervisor;
 }
 
 class CoreConfConfBody extends CoreConfigDto {

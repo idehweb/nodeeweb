@@ -19,6 +19,8 @@ class ConfigService {
       internal_wait: false,
     });
 
+    store.event.emit('config', body.config);
+
     return res.status(200).json({ data: store.config });
   };
 

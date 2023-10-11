@@ -130,6 +130,13 @@ class CoreConfig extends Config<CoreConfigDto> {
     return {
       app_name: store.env.APP_NAME ?? 'Nodeeweb Core',
       auth: {},
+      supervisor:
+        store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
+          ? {
+              url: store.env.SUPERVISOR_URL,
+              token: store.env.SUPERVISOR_TOKEN,
+            }
+          : undefined,
       limit: {
         request_limit: DEFAULT_REQ_LIMIT,
         request_limit_window_s: DEFAULT_REQ_WINDOW_LIMIT,

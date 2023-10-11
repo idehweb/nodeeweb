@@ -11,9 +11,9 @@ import { activeAuthControllers } from './auth';
 import { registerValidationPipe } from '../handlers/validate.handler';
 import { registerDefaultConfig } from '../config/config';
 import { registerDefaultEvent } from './event';
-import { registerPluginControllers } from '../plugin/controller';
 import { initPlugins } from '../plugin';
 import { initRoutes } from './view';
+import initSupervisor from '../supervisor';
 
 const app = express();
 
@@ -32,6 +32,9 @@ export default async function buildApp() {
 
   // register event
   registerDefaultEvent();
+
+  // supervisor;
+  initSupervisor();
 
   // register models
   await dbRegisterModels();
