@@ -56,7 +56,7 @@ schema.index(
   {
     name: 'slug',
     unique: true,
-    partialFilterExpression: { status: { $ne: 'trash' } },
+    partialFilterExpression: { active: true },
   }
 );
 

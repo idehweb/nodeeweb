@@ -2,7 +2,7 @@ import express from 'express';
 import 'reflect-metadata';
 import { registerCommonHandlers } from './middleware';
 import prepare from './prepare';
-import { dbRegisterModels } from './db';
+import { dbRegisterModels, dbSyncIndex } from './db';
 import store from '../../store';
 import { dbInit } from './db';
 import { setErrorPackage } from './error';
@@ -35,6 +35,9 @@ export default async function buildApp() {
 
   // register models
   await dbRegisterModels();
+
+  // sync index
+  await dbSyncIndex();
 
   // initial first records in db , do some initial stuff
   await dbInit();
