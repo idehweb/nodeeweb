@@ -72,7 +72,13 @@ export class ShopConfig extends Config<ShopConfigDto> {
     });
   }
   public getPublic(): Partial<ShopConfigDto> {
-    return {};
+    return {
+      app_name: this._config.app_name,
+      currency: this._config.currency,
+      shop_active: this._config.shop_active,
+      shop_inactive_message: this._config.shop_inactive_message,
+      tax: this._config.tax,
+    };
   }
 }
 
