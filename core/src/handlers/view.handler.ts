@@ -4,6 +4,7 @@ import { RegisterOptions } from '../../types/register';
 import { AdminViewSchema } from '../../types/view';
 import { color } from '../../utils/color';
 import { StoreTemplate, TemplateDocument } from '../../types/template';
+import { StoreRoute } from '../../types/route';
 
 export function registerAdminView(
   view: AdminViewSchema,
@@ -50,4 +51,35 @@ export function unregisterTemplate(
       }${_.startCase(_.kebabCase(type))} Template ##`
     )
   );
+}
+
+export function registerRoute(
+  { route, name }: { name: string; route: StoreRoute },
+  { from, logger = store.systemLogger }: RegisterOptions
+) {
+  store.routes[name] = route;
+  logger.log(
+    color(
+      'Magenta',
+      `## ${from ? `${from} ` : ''}Register ${_.startCase(
+        _.kebabCase(name)
+      )} Route ##`
+    )
+  );
+}
+
+export function unregisterRoute(
+  { name }: { name: string },
+  { from, logger = store.systemLogger }: RegisterOptions
+) {
+  const canDelete = delete store.routes[name];
+  canDelete &&
+    logger.log(
+      color(
+        'Magenta',
+        `## ${from ? `${from} ` : ''}Unregister ${_.startCase(
+          _.kebabCase(name)
+        )} Route ##`
+      )
+    );
 }
