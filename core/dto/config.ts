@@ -18,7 +18,6 @@ class ConfigSupervisor {
   @IsUrl({
     require_host: true,
     require_protocol: true,
-
     host_whitelist: [/./],
   })
   url?: string;

@@ -28,6 +28,11 @@ export function registerTemplate(
   { from, logger = store.systemLogger }: RegisterOptions
 ) {
   store.templates[type] = template;
+  store.supervisor?.emit('registerTemplate', {
+    template,
+    type,
+    title,
+  });
   logger.log(
     color(
       'Magenta',
@@ -43,6 +48,7 @@ export function unregisterTemplate(
   { from, logger = store.systemLogger }: RegisterOptions
 ) {
   delete store.templates[type];
+  store.supervisor?.emit('unregisterTemplate', { type, title });
   logger.log(
     color(
       'Magenta',
@@ -61,6 +67,8 @@ export function registerRoute(
 
   if (!route.path.startsWith('/')) route.path = `/${route.path}`;
   store.routes[name] = route;
+  store.supervisor?.emit('registerRoute', { route, name });
+
   logger.log(
     color(
       'Magenta',
@@ -76,6 +84,8 @@ export function unregisterRoute(
   { from, logger = store.systemLogger }: RegisterOptions
 ) {
   const canDelete = delete store.routes[name];
+  store.supervisor?.emit('unregisterRoute', { name });
+
   canDelete &&
     logger.log(
       color(

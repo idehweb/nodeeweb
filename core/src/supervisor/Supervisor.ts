@@ -2,6 +2,7 @@ import axios from 'axios';
 import store from '../../store';
 import logger from '../handlers/log.handler';
 import { SupervisorEmitter } from '../../types/global';
+import { axiosError2String } from '../../utils/helpers';
 
 export default class Supervisor implements SupervisorEmitter {
   url: string;
@@ -23,7 +24,10 @@ export default class Supervisor implements SupervisorEmitter {
       );
       return true;
     } catch (err) {
-      logger.error('[Supervisor] on emit:', err);
+      logger.error(
+        '[Supervisor] on emit:',
+        axiosError2String(err, true).message
+      );
       return false;
     }
   }
