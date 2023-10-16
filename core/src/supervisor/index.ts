@@ -23,3 +23,6 @@ function updateSupervisor() {
   store.supervisor = s;
   logger.log(color('Green', 'Supervisor activate'));
 }
+
+// TODO
+need an api to recieve supervisor event action
