@@ -70,15 +70,15 @@
   dependencies:
     sparse-bitfield "^3.0.3"
 
-"@nodeeweb/admin-build@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@nodeeweb/admin-build/-/admin-build-0.0.5.tgz#b7d03f5169fe753818569631d5a837d085775950"
-  integrity sha512-Pp0NfLcn9LBtVBiIPaA1ePDmMTP4LifLxuUsxOzam/yp4xx8DPKjbw/GUrkuqAI79Rm1aN6u5XoitrOouO5bzg==
+"@nodeeweb/admin-build@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@nodeeweb/admin-build/-/admin-build-0.1.0.tgz#259a6fef6431534b24e85b4f5e5f728acac37df4"
+  integrity sha512-G7ib7VgBqw4dHIOwbbNFyNPbnG3im5LGSleWO/4OUHmFdRHjphqFfI+ZUEG22V2rsMWOWHfhN15ia8lJ20wwDw==
 
-"@nodeeweb/front-build@^0.0.23":
-  version "0.0.23"
-  resolved "https://registry.yarnpkg.com/@nodeeweb/front-build/-/front-build-0.0.23.tgz#778e5a90fa303b59f7a21c31dbb2a3e97675b409"
-  integrity sha512-I/eyaG2g9rKheUTlcAf8xgWw3yFyVbEJYAnjy3TK14iWyN87ReGs84svmFYSrIolnE9/3Ph+UnFIP839BljGoA==
+"@nodeeweb/front-build@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@nodeeweb/front-build/-/front-build-0.1.0.tgz#9b18876e69eb85d318e8b532f2d4a648045cb62e"
+  integrity sha512-sdID6pX8NlVw/y92BIoGLQ9ywq2iaU7/uwLGAyuV1X+Zs3f7w17g9ojPHlxrX64Nd1ZUwRZfle/41Yx4C6jicw==
 
 "@sindresorhus/is@^0.7.0":
   version "0.7.0"
