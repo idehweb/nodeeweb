@@ -114,7 +114,6 @@ function AddToCardButton({
       );
     }
   }
-  console.log('##$$', count);
   return (
     <div className="AddToCardButton">
       {count !== 0 && (
