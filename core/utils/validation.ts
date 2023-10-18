@@ -131,7 +131,7 @@ export function isSlug(str: string, options: SlugOpt = {}) {
   }
 
   // let regex_charset = new RegExp(`^[${charset}]+$`);
-  let regex_charset = new RegExp(`^[^\s]+$`);
+  let regex_charset = /^[^\s]+$/;
   let regex_boundaries_consecutive = /[-_]{3,}/;
   let regex_boundaries_leading = /^[-_]/;
   let regex_boundaries_trailing = /[-_]$/;
