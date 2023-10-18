@@ -1,7 +1,8 @@
 import crypto from 'crypto';
 import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 import { MultiLang } from './_base.schema';
-import { string } from 'mathjs';
+import { Currency } from '../dto/config';
+import store from '../store';
 
 export enum OrderStatus {
   Cart = 'cart',
@@ -33,6 +34,7 @@ export type AddressType = {
 
 export interface IOrder {
   _id: string;
+  currency: Currency;
   customer: {
     _id: Types.ObjectId;
     firstName: string;
@@ -120,6 +122,7 @@ const schema = new mongoose.Schema(
           .map(() => crypto.randomInt(0, 10))
           .join(''),
     },
+    currency: { type: String, default: () => store.config.currency },
     customer: {
       type: {
         _id: Schema.Types.ObjectId,

@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Col, Container, Row } from 'shards-react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
@@ -9,6 +10,8 @@ import CheckoutFactor from './Factor';
 import OrderViewValidation from '@/functions/order/validation';
 import { OrderUtils } from '@/functions/order/utils';
 import { CartService } from '@/functions/order/cart';
+import UserService from '@/functions/User';
+import { toast } from 'react-toastify';
 
 const CheckoutState = {
   Address: 'address',
@@ -50,13 +53,21 @@ function Checkout({ t }) {
           return setData((data) => ({ ...data, ...newData }));
       }
     },
-    [state],
+    [state]
   );
 
   useEffect(() => {
+    const user = UserService.getMeLocal(null);
+    if (!user?._id)
+      return navigate(
+        `/login?check=false&redirect=${encodeURIComponent('/checkout')}`,
+        { replace: true }
+      );
+
     switch (state) {
       case CheckoutState.Address:
         if (!OrderViewValidation.address()) return history.back();
+        break;
       case CheckoutState.Post:
         if (!OrderViewValidation.post()) {
           navigate(`/checkout/${CheckoutState.Address}`, { replace: true });
@@ -79,7 +90,19 @@ function Checkout({ t }) {
   useEffect(() => {
     const from = query.get('from');
     if (from !== '/login') return;
-    CartService.sync();
+    CartService.sync().catch((err) => {
+      if (err.response?.status === 400) {
+        CartService.clear();
+        const tId = toast.error('some products change', {
+          autoClose: true,
+          closeOnClick: true,
+        });
+        toast.onChange((t) => {
+          if (t.id !== tId || t.status !== 'removed') return;
+          return navigate('/', { replace: true });
+        });
+      }
+    });
   }, [query.get('from')]);
 
   const bodyCreator = () => {
