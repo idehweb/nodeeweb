@@ -93,14 +93,13 @@ function Checkout({ t }) {
     CartService.sync().catch((err) => {
       if (err.response?.status === 400) {
         CartService.clear();
-        const tId = toast.error('some products change', {
+        toast.error('some products change', {
           autoClose: true,
           closeOnClick: true,
         });
-        toast.onChange((t) => {
-          if (t.id !== tId || t.status !== 'removed') return;
+        setTimeout(() => {
           return navigate('/', { replace: true });
-        });
+        }, 1500);
       }
     });
   }, [query.get('from')]);

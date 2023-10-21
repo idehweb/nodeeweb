@@ -26,9 +26,12 @@ function AddToCardButton({
   const onCreate = useCallback(
     async (e) => {
       try {
-        await CartService.modify(product, { ...combination, quantity: 1 });
+        const canAdd = await CartService.modify(product, {
+          ...combination,
+          quantity: 1,
+        });
         toggleCardbar();
-        toast.success(t('Added to cart successfully!'));
+        canAdd && toast.success(t('Added to cart successfully!'));
         setCount(1);
       } catch (err) {
         toast.error(t('Can not add to cart'));
@@ -40,13 +43,13 @@ function AddToCardButton({
   const onIncrease = useCallback(
     async (e) => {
       try {
-        await CartService.modify(product, {
+        const canAdd = await CartService.modify(product, {
           ...combination,
           quantity: count + 1,
         });
         setCount(count + 1);
         toggleCardbar();
-        toast.success(t('Added to cart successfully!'));
+        canAdd && toast.success(t('Added to cart successfully!'));
       } catch (err) {
         toast.error(t('Can not add to cart'));
       }

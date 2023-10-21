@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import _, { at } from 'lodash';
+import _, { at, isNil } from 'lodash';
 import { Document } from 'mongoose';
 import store from '../store';
 import { SimpleError } from '../types/error';
@@ -152,7 +152,8 @@ export function replaceValue({
       ?.toUpperCase()
       .slice(boundary.length, -boundary.length);
     const [target] = at(values as any, upperFilterV);
-    if (target) newMsg = newMsg.replace(new RegExp(value[0], 'ig'), target);
+    if (!isNil(target))
+      newMsg = newMsg.replace(new RegExp(value[0], 'ig'), target);
     value = pattern.exec(text);
   }
   return newMsg;

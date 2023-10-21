@@ -95,7 +95,7 @@ export class CartService {
     localProduct._id = product._id;
     localProduct.id = product.id;
     const body = this.parseComb(combination);
-    await this.query({
+    const canAdd = await this.query({
       method: 'put',
       url: `/${product._id}/${combination._id}`,
       data: body,
@@ -104,6 +104,7 @@ export class CartService {
     const localCart = store.getState().store?.cart ?? {};
     localCart[combination._id] = localProduct;
     SaveData({ cart: { ...localCart } });
+    return canAdd;
   }
 
   static set(products) {
