@@ -379,6 +379,7 @@ export default () => ({
   'order number': 'شماره سفارش',
   'Transaction was successful!': 'پرداخت شما موفقیت آمیز بود!',
   'Transaction was unsuccessful!': 'پرداخت شما ناموفق بود!',
+  'Transaction was checked before!': 'پرداخت شما قبلا تایید شده است!',
   'Go Back': 'بازگشت به وب سایت',
   'my sells': 'سفارش / فروش های من',
   'payment status': 'وضعیت پرداخت',

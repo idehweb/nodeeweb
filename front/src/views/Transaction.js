@@ -1,87 +1,60 @@
-import React, {useEffect, useState} from "react";
-import {Button, Container} from "shards-react";
-import {useTranslation, withTranslation} from "react-i18next";
-import {Link, useParams} from "react-router-dom";
-import {updateTransactionStatus} from "../functions/index";
+import React, { useEffect, useState } from 'react';
+import { Button, Container } from 'shards-react';
+import { useTranslation, withTranslation } from 'react-i18next';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { updateTransactionStatus } from '../functions/index';
 // import Loading from "#c/components/Loading";
-import LoadingComponent from "#c/components/components-overview/LoadingComponent";
+import LoadingComponent from '#c/components/components-overview/LoadingComponent';
+
+const Status = {
+  Paid: '1',
+  CheckBefore: '2',
+  Failed: '-1',
+};
 
 function Transaction(props) {
+  const [theload, setTheLoad] = useState(true);
+  const { t } = useTranslation();
+  const [params] = useSearchParams();
+  const status = params.get('status') ?? Status.Failed;
+  const orderId = params.get('order_id');
 
-  const [Status, setStatus] = useState(false);
-  const [orderNumber, setOrderNumber] = useState(0);
-  const [theload, setTheLoad] = useState(false);
-  console.log('theload', theload)
-  const {t} = useTranslation();
-  const theParams = useParams();
-  // let url = new URL(window.location.href);
-  // const urlParams = new URLSearchParams(url);
-  // console.log('urlParams',url,urlParams)
-
-  const urlSearchParams = new URLSearchParams(window.location.search);
-  const params = Object.fromEntries(urlSearchParams.entries());
-  console.log('params', params, theParams)
-  // let Status=false;
-  // let Status = url.searchParams.get("Status") || url.searchParams.get("status") || "";
-  // let Authority = url.searchParams.get("Authority") || url.searchParams.get("trackId") || "";
-  // if (Status == '1' || Status == 1) {
-  //
-  //   Status = 'OK';
-  // }
-  // if (Status == '2' || Status == 2) {
-  //
-  //   Status = 'OK';
-  // }
-  // this.state = {
-  //   Status: Status,
-  //   Authority: Authority
-  // };
-  useEffect(() => {
-    if (params)
-      updateTransactionStatus(theParams.method, params).then((theres) => {
-        console.log('theres', theres)
-        if (theres && theres.success) {
-          setStatus('OK');
-        }
-        if (theres && theres.orderNumber) {
-          setOrderNumber(theres.orderNumber);
-        }
-        setTheLoad(true)
-      });
-  }, [])
-
-
-  // const {Status} = this.state;
-  // const {t} = this.props;
-  let tel = {};
-  if (Status) {
-    tel['title'] = t('Transaction was successful!');
-    // tel['description']=t('Transaction was successful!');
-  } else {
-    tel['title'] = t('Transaction was unsuccessful!');
-    // tel['description']=t('Transaction was successful! Please contact the admin!');
+  let msg = '';
+  switch (status) {
+    case Status.Paid:
+      msg = t('Transaction was successful!');
+      break;
+    case Status.CheckBefore:
+      msg = t('Transaction was checked before!');
+      break;
+    case Status.Failed:
+    default:
+      msg = t('Transaction was unsuccessful!');
+      break;
   }
+
   const Loading = (
     <div className="loadNotFound loader " key={23}>
-      {t("loading...")}
-      <LoadingComponent height={30} width={30} type="spin" color="#3d5070"/>
+      {t('loading...')}
+      <LoadingComponent height={30} width={30} type="spin" color="#3d5070" />
     </div>
   );
   // return Loading;
   return (
     <Container fluid className="main-content-container px-4 pb-4">
-      {/*<Loading/>*/}
-      {/*{Loading}*/}
       <div className="error">
         <div className="error__content">
           {!theload && <>{Loading}</>}
-          {theload && <div>
-            <h2>{t('order number') + ":" + orderNumber}</h2>
-            <h3>{(Status ? t('Transaction was successful!') : t('Transaction was unsuccessful!'))}</h3>
-            <p></p>
-            {/*<p>{tel['description']}</p>*/}
-            <Link to={"/"}><Button pill>&larr; {t('Go Back')}</Button></Link>
-          </div>}
+          {theload && (
+            <div>
+              {orderId && <h2>{t('order number') + ':' + orderId}</h2>}
+              <h3>{msg}</h3>
+              <p></p>
+              <Link to={'/'}>
+                <Button pill>&larr; {t('Go Back')}</Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </Container>
