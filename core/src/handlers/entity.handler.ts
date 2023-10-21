@@ -8,8 +8,7 @@ import {
   ControllerRegisterOptions,
   controllerRegister,
 } from './controller.handler';
-import { BASE_API_URL, CRUD_DEFAULT_REQ_KEY } from '../constants/String';
-import { isAsyncFunction } from 'util/types';
+import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { BadRequestError, GeneralError, NotFound } from '../../types/error';
 import { call } from '../../utils/helpers';
 import { CrudParamDto, MultiIDParam } from '../../dto/in/crud.dto';
@@ -30,7 +29,7 @@ export class EntityCreator {
 
     let mapper: (key: string) => string | undefined;
     const defaultMapper = (key: string) =>
-      ['sort', 'limit', 'offset'].includes(key) ? `_${key}` : key;
+      ['sort', 'limit', 'offset', 'filter'].includes(key) ? `_${key}` : key;
 
     switch (typeof queryFields) {
       case 'function':
@@ -158,8 +157,12 @@ export class EntityCreator {
     const filterFromQuery = Object.fromEntries(
       Object.entries(reqQuery).filter(([k, v]) => !k.startsWith('_'))
     );
-
-    query.setQuery({ ...query.getQuery(), ...filterFromQuery });
+    const directFilterQ: any = reqQuery._filter ?? {};
+    query.setQuery({
+      ...query.getQuery(),
+      ...filterFromQuery,
+      ...directFilterQ,
+    });
 
     // populate
     if (populate) {
