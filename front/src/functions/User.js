@@ -15,7 +15,7 @@ export default class UserService {
     return response?.data?.data;
   }
 
-  static getMeLocal() {
+  static getMeLocal(def = {}) {
     return store.getState().store.user ?? {};
   }
   static getMe() {
