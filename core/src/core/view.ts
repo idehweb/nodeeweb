@@ -27,7 +27,7 @@ export async function initRoutes() {
   for (const page of pages) {
     registerRoute(
       { name: page.slug, route: { path: page.path || page.slug } },
-      { from: 'CoreView', logger }
+      { from: 'CoreView', logger, onStartup: true }
     );
   }
 }

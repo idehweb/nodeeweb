@@ -8,7 +8,7 @@ import { StoreRoute } from '../../types/route';
 
 export function registerAdminView(
   view: AdminViewSchema,
-  { from, logger = store.systemLogger }: RegisterOptions
+  { from, logger = store.systemLogger, onStartup }: RegisterOptions
 ) {
   store.adminViews[view.name] = view.content;
   logger.log(
@@ -25,14 +25,19 @@ export function registerTemplate(
     type,
     title,
   }: { type: string; template: StoreTemplate; title?: string },
-  { from, logger = store.systemLogger }: RegisterOptions
+  { from, logger = store.systemLogger, onStartup }: RegisterOptions
 ) {
   store.templates[type] = template;
-  store.supervisor?.emit('registerTemplate', {
-    template,
-    type,
-    title,
-  });
+  onStartup ||
+    store.supervisor?.emit(
+      'register-template',
+      {
+        template,
+        type,
+        title,
+      },
+      { from: `Supervisor-${from}` }
+    );
   logger.log(
     color(
       'Magenta',
@@ -45,10 +50,15 @@ export function registerTemplate(
 
 export function unregisterTemplate(
   { type, title }: { type: string; title?: string },
-  { from, logger = store.systemLogger }: RegisterOptions
+  { from, logger = store.systemLogger, onStartup }: RegisterOptions
 ) {
   delete store.templates[type];
-  store.supervisor?.emit('unregisterTemplate', { type, title });
+  onStartup ||
+    store.supervisor?.emit(
+      'unregister-template',
+      { type, title },
+      { from: `Supervisor-${from}` }
+    );
   logger.log(
     color(
       'Magenta',
@@ -61,13 +71,13 @@ export function unregisterTemplate(
 
 export function registerRoute(
   { route, name }: { name: string; route: StoreRoute },
-  { from, logger = store.systemLogger }: RegisterOptions
+  { from, logger = store.systemLogger, onStartup }: RegisterOptions
 ) {
   if (!route.path) throw new Error(`path in ${name} route is undefined`);
 
   if (!route.path.startsWith('/')) route.path = `/${route.path}`;
   store.routes[name] = route;
-  store.supervisor?.emit('registerRoute', { route, name });
+  onStartup || store.supervisor?.emit('register-route', { route, name });
 
   logger.log(
     color(
@@ -81,10 +91,15 @@ export function registerRoute(
 
 export function unregisterRoute(
   { name }: { name: string },
-  { from, logger = store.systemLogger }: RegisterOptions
+  { from, logger = store.systemLogger, onStartup }: RegisterOptions
 ) {
   const canDelete = delete store.routes[name];
-  store.supervisor?.emit('unregisterRoute', { name });
+  onStartup ||
+    store.supervisor?.emit(
+      'unregister-route',
+      { name },
+      { from: `Supervisor-${from}` }
+    );
 
   canDelete &&
     logger.log(

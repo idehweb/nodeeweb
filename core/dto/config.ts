@@ -10,6 +10,7 @@ import {
   ValidateNested,
   IsObject,
   IsUrl,
+  IsArray,
 } from 'class-validator';
 
 class ConfigSupervisor {
@@ -26,6 +27,11 @@ class ConfigSupervisor {
   @IsOptional()
   @IsString()
   token?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString({ each: true })
+  whitelist?: string[];
 }
 
 export class CoreConfigLimit {

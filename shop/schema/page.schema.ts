@@ -51,14 +51,14 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
-schema.index(
-  { slug: 1 },
-  {
-    name: 'slug',
-    unique: true,
-    partialFilterExpression: { active: true },
-  }
-);
+// schema.index(
+//   { slug: 1 },
+//   {
+//     name: 'slug',
+//     unique: true,
+//     partialFilterExpression: { active: true },
+//   }
+// );
 
 schema.pre('save', function (next) {
   this.slug = this.slug?.replace(/\s+/g, '-').toLowerCase();

@@ -79,5 +79,6 @@ export enum CRUD {
 }
 
 export interface SupervisorEmitter {
-  emit(event: string, body?: any): Promise<boolean>;
+  id: string;
+  emit(event: string, ...body: any[]): Promise<boolean>;
 }
