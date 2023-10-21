@@ -184,3 +184,36 @@ export function getEnv(
       return value;
   }
 }
+
+export function toMs(time: string) {
+  const milliseconds = time.match(/\d+\s?\w/g).reduce((acc, cur, i) => {
+    let multiplier = 1000;
+    switch (cur.slice(-1)) {
+      case 'd':
+        multiplier *= 24;
+      case 'h':
+        multiplier *= 60;
+      case 'm':
+        multiplier *= 60;
+      case 's':
+        return (parseInt(cur) ? parseInt(cur) : 0) * multiplier + acc;
+    }
+    return acc;
+  }, 0);
+  return milliseconds;
+}
+
+export function combineUrl({
+  host,
+  url,
+  protocol = 'https',
+}: {
+  host: string;
+  url: string;
+  protocol?: string;
+}) {
+  const protocolRegex = /^(https?:\/\/)?(.+)$/;
+  const pathRegex = /\/+/g;
+  const [, , path] = protocolRegex.exec(`${host}/${url}`);
+  return `${protocol}://${path.replace(pathRegex, '/')}`;
+}

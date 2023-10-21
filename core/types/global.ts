@@ -82,3 +82,8 @@ export interface SupervisorEmitter {
   id: string;
   emit(event: string, ...body: any[]): Promise<boolean>;
 }
+
+export interface Seo {
+  getSitemap: MiddleWare;
+  getPage: MiddleWare;
+}

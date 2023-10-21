@@ -76,6 +76,11 @@ export class CoreConfigDto {
   app_name: string;
 
   @Expose()
+  @IsUrl({ allow_fragments: false, require_host: true })
+  @IsOptional()
+  host?: string;
+
+  @Expose()
   @IsOptional()
   @IsString()
   favicon?: string;
