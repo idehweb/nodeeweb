@@ -334,6 +334,7 @@ const defaultCrudOpt: Omit<CRUDCreatorOpt, 'httpCode'> = {
   sendResponse: true,
   saveToReq: false,
   autoSetCount: true,
+  queryFields: true,
 };
 
 export function registerEntityCRUD(

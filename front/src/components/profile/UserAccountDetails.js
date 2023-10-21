@@ -21,14 +21,14 @@ import { toast } from 'react-toastify';
 class LoginForm extends React.PureComponent {
   constructor(props) {
     super(props);
-    let st = store.getState().store.user;
+    let st = store.getState().store.user ?? {};
     this.state = {
       phoneNumber: st?.phoneNumber || st?.phone,
       firstName: st?.firstName,
       lastName: st?.lastName,
       email: st?.email,
       internationalCode: st?.internationalCode,
-      isUserExist: Boolean(st),
+      isUserExist: Boolean(st._id || st.id),
     };
   }
 
@@ -63,7 +63,10 @@ class LoginForm extends React.PureComponent {
     } = this.state;
     const { title, t } = this.props;
 
-    if (!isUserExist) return <Navigate replace={'/login?check=false'} />;
+    if (!isUserExist) {
+      location.replace('/login?check=false');
+      return <></>;
+    }
 
     return (
       <Card small={'true'} className="mb-4">

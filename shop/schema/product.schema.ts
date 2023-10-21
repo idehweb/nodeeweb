@@ -108,7 +108,7 @@ const schema = new mongoose.Schema(
     keywords: {},
     slug: {
       type: String,
-      unique: true,
+      // unique: true,
       required: true,
       trim: true,
     },

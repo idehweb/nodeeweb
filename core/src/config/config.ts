@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { SingleJobProcess } from '../handlers/singleJob.handler';
-import { isExistsSync } from '../../utils/helpers';
+import { getEnv, isExistsSync } from '../../utils/helpers';
 import { getSharedPath } from '../../utils/path';
 import { CoreConfigDto } from '../../dto/config';
 import { plainToInstance } from 'class-transformer';
@@ -130,6 +130,16 @@ class CoreConfig extends Config<CoreConfigDto> {
     return {
       app_name: store.env.APP_NAME ?? 'Nodeeweb Core',
       auth: {},
+      supervisor:
+        store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
+          ? {
+              url: store.env.SUPERVISOR_URL,
+              token: store.env.SUPERVISOR_TOKEN,
+              whitelist:
+                (getEnv('supervisor-whitelist', { format: 'array' }) as any) ??
+                [],
+            }
+          : undefined,
       limit: {
         request_limit: DEFAULT_REQ_LIMIT,
         request_limit_window_s: DEFAULT_REQ_WINDOW_LIMIT,

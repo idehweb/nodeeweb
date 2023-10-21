@@ -1,4 +1,30 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model, Types } from 'mongoose';
+
+export interface IPage {
+  active: boolean;
+  data: any;
+  description: any;
+  excerpt: any;
+  views: any[];
+  slug?: string;
+  title: any;
+  elements: any;
+  access: string;
+  kind: string;
+  classes: string;
+  backgroundColor?: string;
+  padding?: string;
+  margin?: string;
+  path?: string;
+  maxWidth: string;
+  status: string;
+  photos: any[];
+  thumbnail?: string;
+}
+
+export type PageDocument = Document<Types.ObjectId, {}, IPage> & IPage;
+
+export type PageModel = Model<IPage, {}>;
 
 const schema = new mongoose.Schema(
   {
@@ -7,7 +33,7 @@ const schema = new mongoose.Schema(
     description: {},
     excerpt: {},
     views: [],
-    slug: String,
+    slug: { type: String, require: true },
     title: {},
     elements: {},
     access: { type: String, default: 'public' },
@@ -24,6 +50,15 @@ const schema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// schema.index(
+//   { slug: 1 },
+//   {
+//     name: 'slug',
+//     unique: true,
+//     partialFilterExpression: { active: true },
+//   }
+// );
 
 schema.pre('save', function (next) {
   this.slug = this.slug?.replace(/\s+/g, '-').toLowerCase();

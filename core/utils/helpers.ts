@@ -1,8 +1,14 @@
 import * as fs from 'fs';
 import _, { at } from 'lodash';
 import { Document } from 'mongoose';
+import store from '../store';
 import { SimpleError } from '../types/error';
 import bfs from './bfs';
+import { StoreRoute } from '../types/route';
+
+export function page2Route(page: any): StoreRoute {
+  return { path: page.path || page.slug };
+}
 
 export function convertToString(a: any, pretty = true) {
   if (a instanceof SimpleError)
@@ -154,4 +160,26 @@ export function replaceValue({
 
 export function slugify(str: string) {
   return _.kebabCase(str);
+}
+
+export function getEnv(
+  key: string,
+  { format }: { format: 'array' | 'string' | 'auto' } = { format: 'auto' }
+) {
+  const value = store.env[key.toUpperCase().replace(/-/g, '_')];
+  if (typeof value !== 'string') return value;
+  const newValue = value
+    .split(',')
+    .map((v) => v.trim())
+    .filter((v) => v);
+
+  switch (format) {
+    case 'auto':
+      if (newValue.length <= 1) return value;
+      else return newValue;
+    case 'array':
+      return newValue;
+    case 'string':
+      return value;
+  }
 }

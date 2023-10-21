@@ -8,8 +8,7 @@ class ConfigService {
     return res.json({ data: store.config });
   };
 
-  update: MiddleWare = async (req, res) => {
-    const body: CoreConfigBody = req.body;
+  async updateConf(body: CoreConfigBody) {
     if (!store.config) throw new GeneralError('config not resister yet!', 500);
 
     await store.config.change(body.config, {
@@ -18,12 +17,24 @@ class ConfigService {
       external_wait: true,
       internal_wait: false,
     });
+  }
+
+  update: MiddleWare = async (req, res) => {
+    const body: CoreConfigBody = req.body;
+
+    await this.updateConf(body);
+
+    store.event.emit('config-update', body);
 
     return res.status(200).json({ data: store.config });
   };
 
-  getViewConf: MiddleWare = (req, res) => {
-    return res.status(200).json({ data: { config: store.config.getPublic() } });
+  getWebConf: MiddleWare = (req, res) => {
+    const config = store.config.getPublic();
+    const templates = store.templates;
+    const routes = store.routes;
+
+    return res.status(200).json({ data: { config, templates, routes } });
   };
   getAdminDashConf: MiddleWare = (req, res) => {
     return res.status(200).json({ data: store.adminViews });

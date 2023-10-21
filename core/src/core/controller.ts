@@ -7,6 +7,7 @@ import {
   controllersBatchRegister,
 } from '../handlers/controller.handler';
 import logger from '../handlers/log.handler';
+import { registerSupervisorController } from '../supervisor/controller';
 import restartService from './restart';
 import settingService from './setting';
 import { getViewHandler } from './view';
@@ -39,6 +40,9 @@ export function registerDefaultControllers() {
 
   // config
   registerConfigControllers();
+
+  // supervisor
+  registerSupervisorController();
 
   // view
   const [viewPath, viewService] = getViewHandler();

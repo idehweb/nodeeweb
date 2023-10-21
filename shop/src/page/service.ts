@@ -2,37 +2,45 @@ import { MiddleWare, Req } from '@nodeeweb/core/types/global';
 import { submitAction, updateThemeConfig } from '../common/mustImplement';
 import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
 import store from '@nodeeweb/core/store';
+import {
+  registerRoute,
+  unregisterRoute,
+} from '@nodeeweb/core/src/handlers/view.handler';
+import { PageDocument } from '../../schema/page.schema';
+import { page2Route } from '@nodeeweb/core/utils/helpers';
+import { Query } from 'mongoose';
 
 export default class Service {
   static createAfter: MiddleWare = async (req, res) => {
-    const menu = req[CRUD_DEFAULT_REQ_KEY];
-    const modelName = 'Page';
-    const action = {
-      user: req.user._id,
-      title: 'create ' + modelName + ' ' + menu._id,
-      action: 'create-' + modelName,
-      data: menu,
-      history: req.body,
-    };
-    action[modelName] = menu;
-    submitAction(action);
-    updateThemeConfig(req.props);
-    return res.status(201).json({ data: menu });
+    const page: PageDocument = req[CRUD_DEFAULT_REQ_KEY];
+
+    registerRoute(
+      {
+        name: page.slug,
+        route: page2Route(page),
+      },
+      { from: 'PageService' }
+    );
+    console.log('after call register');
+
+    return res.status(201).json({ data: page });
   };
   static updateAfter: MiddleWare = async (req, res) => {
-    const menu = req[CRUD_DEFAULT_REQ_KEY];
-    const modelName = 'Page';
-    const action = {
-      user: req.user._id,
-      title: 'edit ' + modelName + ' ' + menu._id,
-      action: 'edit-' + modelName,
-      data: menu,
-      history: req.body,
-    };
-    action[modelName] = menu;
-    submitAction(action);
-    updateThemeConfig(req.props);
-    return res.status(200).json({ data: menu });
+    const pageQuery: Query<PageDocument, PageDocument> =
+      req[CRUD_DEFAULT_REQ_KEY];
+    pageQuery.setOptions({ ...pageQuery.getOptions(), new: false });
+    const oldPage = await pageQuery;
+    const newPage = { ...oldPage.toObject(), ...req.body };
+    unregisterRoute({ name: oldPage.slug }, { from: 'PageService' });
+    registerRoute(
+      {
+        name: newPage.slug,
+        route: page2Route(newPage),
+      },
+      { from: 'PageService' }
+    );
+
+    return res.status(200).json({ data: newPage });
   };
 
   static getOneFilterParser(req: Req) {
@@ -59,5 +67,11 @@ export default class Service {
       }
     }
     return res.json({ data: menu });
+  };
+
+  static deleteAfter: MiddleWare = (req, res) => {
+    const page = req.crud;
+    unregisterRoute({ name: page.slug }, { from: 'PageService' });
+    return res.status(204).send();
   };
 }

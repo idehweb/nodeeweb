@@ -2,7 +2,7 @@ import express from 'express';
 import 'reflect-metadata';
 import { registerCommonHandlers } from './middleware';
 import prepare from './prepare';
-import { dbRegisterModels } from './db';
+import { dbRegisterModels, dbSyncIndex } from './db';
 import store from '../../store';
 import { dbInit } from './db';
 import { setErrorPackage } from './error';
@@ -11,8 +11,9 @@ import { activeAuthControllers } from './auth';
 import { registerValidationPipe } from '../handlers/validate.handler';
 import { registerDefaultConfig } from '../config/config';
 import { registerDefaultEvent } from './event';
-import { registerPluginControllers } from '../plugin/controller';
 import { initPlugins } from '../plugin';
+import { initRoutes } from './view';
+import initSupervisor from '../supervisor';
 
 const app = express();
 
@@ -32,8 +33,14 @@ export default async function buildApp() {
   // register event
   registerDefaultEvent();
 
+  // supervisor;
+  initSupervisor();
+
   // register models
   await dbRegisterModels();
+
+  // sync index
+  await dbSyncIndex();
 
   // initial first records in db , do some initial stuff
   await dbInit();
@@ -55,6 +62,9 @@ export default async function buildApp() {
 
   // plugins
   await initPlugins();
+
+  // routes
+  await initRoutes();
 
   return app;
 }
