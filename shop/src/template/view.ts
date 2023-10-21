@@ -97,7 +97,7 @@ export function updateTemplate(
     };
     registerTemplate(
       { type: t.type, title: t.title, template: storeTemplate },
-      { from: 'ShopEntity' }
+      { from: 'ShopEntity', onStartup: action === 'create' }
     );
   }
   function _unregister(t = template) {
