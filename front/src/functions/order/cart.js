@@ -95,7 +95,7 @@ export class CartService {
     localProduct._id = product._id;
     localProduct.id = product.id;
     const body = this.parseComb(combination);
-    await this.query({
+    const canAdd = await this.query({
       method: 'put',
       url: `/${product._id}/${combination._id}`,
       data: body,
@@ -104,10 +104,11 @@ export class CartService {
     const localCart = store.getState().store?.cart ?? {};
     localCart[combination._id] = localProduct;
     SaveData({ cart: { ...localCart } });
+    return canAdd;
   }
 
-  static set(products) {
-    return this.query({ method: 'put', data: { products } });
+  static set(products, configs = {}) {
+    return this.query({ ...configs, method: 'put', data: { products } });
   }
 
   static async delete(productId, combinationId) {
@@ -146,7 +147,12 @@ export class CartService {
       )
     );
 
-    await this.set(products);
+    await this.set(products, {
+      validateStatus(code) {
+        return code < 400;
+      },
+      no_redirect: false,
+    });
   }
 
   static clear() {

@@ -88,22 +88,24 @@ function Checkout({ t }) {
   }, [state]);
 
   useEffect(() => {
-    const from = query.get('from');
-    if (from !== '/login') return;
+    // const from = query.get('from');
+    // if (from !== '/login') return;
     CartService.sync().catch((err) => {
-      if (err.response?.status === 400) {
-        CartService.clear();
-        const tId = toast.error('some products change', {
+      CartService.clear();
+      toast.error(
+        err.response?.status === 400
+          ? 'some products change'
+          : 'there is some problem',
+        {
           autoClose: true,
           closeOnClick: true,
-        });
-        toast.onChange((t) => {
-          if (t.id !== tId || t.status !== 'removed') return;
-          return navigate('/', { replace: true });
-        });
-      }
+        }
+      );
+      setTimeout(() => {
+        return navigate('/', { replace: true });
+      }, 1500);
     });
-  }, [query.get('from')]);
+  }, []);
 
   const bodyCreator = () => {
     switch (state) {

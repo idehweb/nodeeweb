@@ -114,6 +114,7 @@ const default_slug_options: SlugOpt = {
 
 export function isSlug(str: string, options: SlugOpt = {}) {
   if (typeof str !== 'string') return false;
+  return true;
 
   options = _.merge(options, default_slug_options);
 
