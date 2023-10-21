@@ -107,8 +107,8 @@ export class CartService {
     return canAdd;
   }
 
-  static set(products) {
-    return this.query({ method: 'put', data: { products } });
+  static set(products, configs = {}) {
+    return this.query({ ...configs, method: 'put', data: { products } });
   }
 
   static async delete(productId, combinationId) {
@@ -147,7 +147,12 @@ export class CartService {
       )
     );
 
-    await this.set(products);
+    await this.set(products, {
+      validateStatus(code) {
+        return code < 400;
+      },
+      no_redirect: false,
+    });
   }
 
   static clear() {

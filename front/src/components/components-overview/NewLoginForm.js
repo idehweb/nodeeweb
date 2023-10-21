@@ -82,7 +82,7 @@ class LoginForm extends React.Component {
         {
           login: true,
           signup,
-        },
+        }
       );
 
       return {
@@ -350,10 +350,7 @@ class LoginForm extends React.Component {
                           }}
                         />
                       </InputGroup>
-                      <Captcha
-                        onActionValue={() => {}}
-                        onActionSubmit={this.captchaAction}
-                      />
+                      <Captcha onActionSubmit={this.captchaAction} />
                     </Col>
                   </Row>
                   <Row form></Row>
@@ -561,10 +558,7 @@ class LoginForm extends React.Component {
                         />
                       </InputGroup>
 
-                      <Captcha
-                        onActionValue={this.captchaValue}
-                        onActionSubmit={this.captchaAction}
-                      />
+                      <Captcha onActionSubmit={this.captchaAction} />
                     </Col>
                   </Row>
 

@@ -88,21 +88,24 @@ function Checkout({ t }) {
   }, [state]);
 
   useEffect(() => {
-    const from = query.get('from');
-    if (from !== '/login') return;
+    // const from = query.get('from');
+    // if (from !== '/login') return;
     CartService.sync().catch((err) => {
-      if (err.response?.status === 400) {
-        CartService.clear();
-        toast.error('some products change', {
+      CartService.clear();
+      toast.error(
+        err.response?.status === 400
+          ? 'some products change'
+          : 'there is some problem',
+        {
           autoClose: true,
           closeOnClick: true,
-        });
-        setTimeout(() => {
-          return navigate('/', { replace: true });
-        }, 1500);
-      }
+        }
+      );
+      setTimeout(() => {
+        return navigate('/', { replace: true });
+      }, 1500);
     });
-  }, [query.get('from')]);
+  }, []);
 
   const bodyCreator = () => {
     switch (state) {

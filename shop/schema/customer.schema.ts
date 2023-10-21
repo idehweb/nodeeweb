@@ -59,7 +59,7 @@ const schema = new mongoose.Schema(
     },
     credentialChangeAt: {
       type: Date,
-      default: Date.now,
+      default: () => Date.now() - 1000,
       select: false,
     },
     expire: Date,
