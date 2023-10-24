@@ -6,9 +6,8 @@ on:
       - main
       - 'releases/**'
       - dev
-      - ci/cd
-    # paths:
-    #   - 'front/**'
+    paths:
+      - 'front/**'
 
 jobs:
   build:

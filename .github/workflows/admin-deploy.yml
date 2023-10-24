@@ -6,7 +6,6 @@ on:
       - main
       - 'releases/**'
       - dev
-      - ci/cd
     paths:
       - 'admin/**'
 
