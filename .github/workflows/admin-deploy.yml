@@ -7,8 +7,8 @@ on:
       - 'releases/**'
       - dev
       - ci/cd
-    # paths:
-    #   - 'admin/**'
+    paths:
+      - 'admin/**'
 
 jobs:
   build:
@@ -120,8 +120,12 @@ jobs:
         id: setup_metadata
         run: |
           if [ $GITHUB_REF_NAME == 'main' ] || [[ $GITHUB_REF_NAME == release/* ]]
-          then echo "TARGET_PATH=/var/instances/nwi-shop/public/admin/" >> $GITHUB_OUTPUT
-          else echo "TARGET_PATH=/var/instances/nwi-shop-dev/public/admin/" >> $GITHUB_OUTPUT
+          then 
+            echo "TARGET_PATH=/var/instances/nwi-shop/public/admin/" >> $GITHUB_OUTPUT
+            echo "IS_PRO=true" >> $GITHUB_OUTPUT
+          else 
+            echo "TARGET_PATH=/var/instances/nwi-shop-dev/public/admin/" >> $GITHUB_OUTPUT
+            echo "IS_PRO=false" >> $GITHUB_OUTPUT
           fi
         shell: bash
 
@@ -137,6 +141,7 @@ jobs:
 
       - name: 'FTP to iran server'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        if: ${{steps.setup_metadata.outputs.IS_PRO == 'true'}}
         with:
           server: ${{secrets.IRAN_HOST}}
           username: ${{secrets.IRAN_FTP_USER}}
