@@ -96,6 +96,7 @@ jobs:
           password: ${{secrets.GERMAN_FTP_PASS}}
           local-dir: '/tmp/image/'
           server-dir: '/tmp/'
+          timeout: 600000
 
       - name: 'FTP to iran server'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -105,6 +106,7 @@ jobs:
           password: ${{secrets.IRAN_FTP_PASS}}
           local-dir: '/tmp/image/'
           server-dir: '/tmp/'
+          timeout: 600000
 
       - name: 'SSH on german server'
         uses: appleboy/ssh-action@v1.0.0

@@ -118,8 +118,8 @@ jobs:
         id: setup_metadata
         run: |
           if [ $GITHUB_REF_NAME == 'main' ] || [[ $GITHUB_REF_NAME == release/* ]]
-          then echo "TARGET_PATH=/var/nodeeweb/public/front/" >> $GITHUB_OUTPUT
-          else echo "TARGET_PATH=/var/instances/nwi-dev/public/front/" >> $GITHUB_OUTPUT
+          then echo "TARGET_PATH=/var/instances/nwi-shop/public/front/" >> $GITHUB_OUTPUT
+          else echo "TARGET_PATH=/var/instances/nwi-shop-dev/public/front/" >> $GITHUB_OUTPUT
           fi
         shell: bash
 
@@ -131,6 +131,7 @@ jobs:
           password: ${{secrets.GERMAN_FTP_PASS}}
           local-dir: 'build/'
           server-dir: ${{steps.setup_metadata.outputs.TARGET_PATH}}
+          timeout: 600000
 
       - name: 'FTP to iran server'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -140,6 +141,7 @@ jobs:
           password: ${{secrets.IRAN_FTP_PASS}}
           local-dir: 'build/'
           server-dir: ${{steps.setup_metadata.outputs.TARGET_PATH}}
+          timeout: 600000
 
   cleanup:
     name: Cleanup actions
