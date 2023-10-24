@@ -1,10 +1,11 @@
-name: Publish front on npm
+name: Publish & Deploy front on npm
 
 on:
   push:
     branches:
       - main
       - 'releases/**'
+      - dev
     paths:
       - 'front/**'
 
@@ -62,33 +63,89 @@ jobs:
       - name: 'Checkout to repository'
         uses: actions/checkout@v4
 
+      - name: 'Check Branch'
+        id: 'check_branch'
+        run: |
+          if [ $GITHUB_REF_NAME == 'main' ] || [[ $GITHUB_REF_NAME == release/* ]]
+          then echo 'IS_PRO=true' >> $GITHUB_OUTPUT
+          else echo 'IS_PRO=false' >> $GITHUB_OUTPUT
+          fi
       - name: 'Setup nodeJs'
         uses: actions/setup-node@v3
+        if: ${{steps.check_branch.outputs.IS_PRO == 'true' }}
         with:
           node-version: 18
 
       - name: 'Download build artifacts'
         uses: actions/download-artifact@v3
+        if: ${{steps.check_branch.outputs.IS_PRO == 'true' }}
         with:
           name: build
           path: front/build
 
       - name: 'Download diagram artifacts'
         uses: actions/download-artifact@v3
+        if: ${{steps.check_branch.outputs.IS_PRO == 'true' }}
         with:
           name: diagram
           path: front/build
 
       - name: 'Publish'
         working-directory: front
+        if: ${{steps.check_branch.outputs.IS_PRO == 'true' }}
         run: npm run publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+
+  deploy-server:
+    name: 'Deploy on server'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Download build artifacts'
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: build
+
+      - name: 'Download diagram artifacts'
+        uses: actions/download-artifact@v3
+        with:
+          name: diagram
+          path: build
+
+      - name: 'Setup metadata'
+        id: setup_metadata
+        run: |
+          if [ $GITHUB_REF_NAME == 'main' ] || [[ $GITHUB_REF_NAME == release/* ]]
+          then echo "TARGET_PATH=/var/nodeeweb/public/front" >> $GITHUB_OUTPUT
+          else echo "TARGET_PATH=/var/instances/nwi-dev/public/front" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
+      - name: 'FTP to german server'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{secrets.GERMAN_HOST}}
+          username: ${{secrets.GERMAN_FTP_USER}}
+          password: ${{secrets.GERMAN_FTP_PASS}}
+          local-dir: 'build/'
+          server-dir: ${{steps.setup_metadata.outputs.TARGET_PATH}}
+
+      - name: 'FTP to iran server'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{secrets.IRAN_HOST}}
+          username: ${{secrets.IRAN_FTP_USER}}
+          password: ${{secrets.IRAN_FTP_PASS}}
+          local-dir: 'build/'
+          server-dir: ${{steps.setup_metadata.outputs.TARGET_PATH}}
 
   cleanup:
     name: Cleanup actions
     needs:
       - publish-npm
+      - deploy-server
     runs-on: ubuntu-latest
     steps:
       - name: 'Remove build artifacts'

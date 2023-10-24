@@ -1,0 +1,156 @@
+name: Publish & Deploy shop on npm
+
+# Trigger when:
+#   push on main or dev or release/**   AND   change shop or core files
+#   push tag
+
+on:
+  push:
+    branches:
+      - main
+      - 'releases/**'
+      - dev
+    paths:
+      - 'shop/**'
+      - 'core/**'
+    tags:
+      - 'v*'
+
+jobs:
+  docker:
+    name: 'Build Application'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout to repository'
+        uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            idehweb/nodeeweb-shop
+          tags: |
+            type=sha,prefix=semi-
+            type=schedule,pattern={{date 'YYYYMMDD'}},prefix=semi-
+            type=semver,pattern={{version}},prefix=semi-
+            type=semver,pattern={{major}}.{{minor}},prefix=semi-
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=docker,dest=/tmp/nodeeweb-image.tar
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: image
+          path: /tmp/nodeeweb-image.tar
+
+  deploy:
+    name: Deploy image on server
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Download image artifact'
+        uses: actions/download-artifact@v3
+        with:
+          name: image
+          path: /tmp/image
+
+      - name: 'Setup metadata'
+        id: metadata
+        run: |
+          if [[ $GITHUB_REF_NAME == *dev ]]
+          then 
+            echo "IRAN_SERVICE_NAME=nwi-dev" >> $GITHUB_OUTPUT
+            echo "GERMAN_SERVICE_NAME=nwi-dev2 nwi-shop-dev" >> $GITHUB_OUTPUT
+          else 
+            echo "IRAN_SERVICE_NAME=nodeeweb_nodeeweb-server" >> $GITHUB_OUTPUT
+            echo "GERMAN_SERVICE_NAME=nodeeweb_nodeeweb-server nwi-shop" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
+      - name: 'FTP to german server'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{secrets.GERMAN_HOST}}
+          username: ${{secrets.GERMAN_FTP_USER}}
+          password: ${{secrets.GERMAN_FTP_PASS}}
+          local-dir: '/tmp/image/'
+          server-dir: '/tmp'
+
+      - name: 'FTP to iran server'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{secrets.IRAN_HOST}}
+          username: ${{secrets.IRAN_FTP_USER}}
+          password: ${{secrets.IRAN_FTP_PASS}}
+          local-dir: '/tmp/image/'
+          server-dir: '/tmp'
+
+      - name: 'SSH on german server'
+        uses: appleboy/ssh-action@v1.0.0
+        env:
+          SERVICE_NAME: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
+        with:
+          host: ${{secrets.GERMAN_HOST}}
+          username: ${{secrets.GERMAN_USER}}
+          password: ${{secrets.GERMAN_PASS}}
+          envs: SERVICE_NAME
+          script_stop: true
+          script: |
+            out=`docker image load -i /tmp/nodeeweb-image.tar -q`
+            tag=`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`
+            for service in $SERVICE_NAME
+              do
+                docker service update --image $tag $service
+            done
+
+      - name: 'SSH on iran server'
+        uses: appleboy/ssh-action@v1.0.0
+        env:
+          SERVICE_NAME: ${{steps.metadata.outputs.IRAN_SERVICE_NAME}}
+        with:
+          host: ${{secrets.IRAN_HOST}}
+          username: ${{secrets.IRAN_USER}}
+          password: ${{secrets.IRAN_PASS}}
+          envs: SERVICE_NAME
+          script_stop: true
+          script: |
+            out=`docker image load -i /tmp/nodeeweb-image.tar -q`
+            tag=`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`
+            for service in $SERVICE_NAME
+                do
+                docker service update --image $tag $service
+            done
+
+  cleanup:
+    name: Cleanup actions
+    needs:
+      - docker
+      - deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Remove build artifacts'
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: |
+            image
