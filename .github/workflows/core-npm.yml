@@ -36,7 +36,7 @@ jobs:
         uses: githubocto/repo-visualizer@0.9.1
         with:
           excluded_paths: 'node_modules,build,.storybook,.github'
-          output_file: 'public/diagram.svg'
+          output_file: 'core/diagram.svg'
           should_push: false
           root_path: 'core/src/'
           artifact_name: 'diagram'
