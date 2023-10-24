@@ -6,8 +6,9 @@ on:
       - main
       - 'releases/**'
       - dev
-    paths:
-      - 'admin/**'
+      - ci/cd
+    # paths:
+    #   - 'admin/**'
 
 jobs:
   build:
@@ -70,6 +71,7 @@ jobs:
           then echo 'IS_PRO=true' >> $GITHUB_OUTPUT
           else echo 'IS_PRO=false' >> $GITHUB_OUTPUT
           fi
+
       - name: 'Setup nodeJs'
         uses: actions/setup-node@v3
         if: ${{steps.check_branch.outputs.IS_PRO == 'true' }}
@@ -131,6 +133,7 @@ jobs:
           password: ${{secrets.GERMAN_FTP_PASS}}
           local-dir: 'build/'
           server-dir: ${{steps.setup_metadata.outputs.TARGET_PATH}}
+          timeout: 120000
 
       - name: 'FTP to iran server'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -140,6 +143,7 @@ jobs:
           password: ${{secrets.IRAN_FTP_PASS}}
           local-dir: 'build/'
           server-dir: ${{steps.setup_metadata.outputs.TARGET_PATH}}
+          timeout: 120000
 
   cleanup:
     name: Cleanup actions
