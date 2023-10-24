@@ -95,7 +95,7 @@ jobs:
           username: ${{secrets.GERMAN_FTP_USER}}
           password: ${{secrets.GERMAN_FTP_PASS}}
           local-dir: '/tmp/image/'
-          server-dir: '/tmp'
+          server-dir: '/tmp/'
 
       - name: 'FTP to iran server'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -104,7 +104,7 @@ jobs:
           username: ${{secrets.IRAN_FTP_USER}}
           password: ${{secrets.IRAN_FTP_PASS}}
           local-dir: '/tmp/image/'
-          server-dir: '/tmp'
+          server-dir: '/tmp/'
 
       - name: 'SSH on german server'
         uses: appleboy/ssh-action@v1.0.0

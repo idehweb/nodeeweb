@@ -118,8 +118,8 @@ jobs:
         id: setup_metadata
         run: |
           if [ $GITHUB_REF_NAME == 'main' ] || [[ $GITHUB_REF_NAME == release/* ]]
-          then echo "TARGET_PATH=/var/nodeeweb/public/front" >> $GITHUB_OUTPUT
-          else echo "TARGET_PATH=/var/instances/nwi-dev/public/front" >> $GITHUB_OUTPUT
+          then echo "TARGET_PATH=/var/nodeeweb/public/front/" >> $GITHUB_OUTPUT
+          else echo "TARGET_PATH=/var/instances/nwi-dev/public/front/" >> $GITHUB_OUTPUT
           fi
         shell: bash
 
