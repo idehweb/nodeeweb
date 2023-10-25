@@ -95,20 +95,26 @@ jobs:
           username: ${{secrets.GERMAN_FTP_USER}}
           password: ${{secrets.GERMAN_FTP_PASS}}
           local-dir: '/tmp/image/'
-          server-dir: '/tmp/'
+          server-dir: '/tmp/img/'
           timeout: 600000
 
-      - name: 'FTP to iran server'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: 'Upload Image on iran server'
+        uses: appleboy/ssh-action@v1.0.0
+        env:
+          TARGET_PATH: /tmp/img
+          USER_PASS: ${{secrets.IRAN_FTP_PASS}}
+          RUN_ID: ${{github.run_id}}
+          REPO_NAME: ${{github.repository}}
+          ARTIFACT_NAME: image
         with:
-          server: ${{secrets.IRAN_HOST}}
+          host: ${{secrets.IRAN_HOST}}
           username: ${{secrets.IRAN_FTP_USER}}
           password: ${{secrets.IRAN_FTP_PASS}}
-          local-dir: '/tmp/image/'
-          server-dir: '/tmp/'
-          timeout: 600000
+          envs: TARGET_PATH,USER_PASS,RUN_ID,REPO_NAME,ACTIONS_RUNTIME_TOKEN,ACTIONS_RUNTIME_URL,GITHUB_RUN_ID,OUTPUT_PATH,ARTIFACT_NAME
+          script_stop: true
+          script: /download-artifact.sh
 
-      - name: 'SSH on german server'
+      - name: 'Update Image and Service on German'
         uses: appleboy/ssh-action@v1.0.0
         env:
           SERVICE_NAME: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
@@ -120,15 +126,15 @@ jobs:
           envs: SERVICE_NAME,USER_PASS
           script_stop: true
           script: |
-            echo $USER_PASS | sudo -S chmod 755 /tmp/nodeeweb-image.tar
-            out=`docker image load -i /tmp/nodeeweb-image.tar -q`
+            echo $USER_PASS | sudo -S chmod 755 /tmp/img/nodeeweb-image.tar
+            out=`docker image load -i /tmp/img/nodeeweb-image.tar -q`
             tag=`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`
             for service in $SERVICE_NAME
               do
                 docker service update --image $tag $service
             done
 
-      - name: 'SSH on iran server'
+      - name: 'Update Image and Service on Iran'
         uses: appleboy/ssh-action@v1.0.0
         env:
           SERVICE_NAME: ${{steps.metadata.outputs.IRAN_SERVICE_NAME}}
@@ -140,8 +146,8 @@ jobs:
           envs: SERVICE_NAME,USER_PASS
           script_stop: true
           script: |
-            echo $USER_PASS | sudo -S chmod 755 /tmp/nodeeweb-image.tar
-            out=`docker image load -i /tmp/nodeeweb-image.tar -q`
+            echo $USER_PASS | sudo -S chmod 755 /tmp/img/nodeeweb-image.tar
+            out=`docker image load -i /tmp/img/nodeeweb-image.tar -q`
             tag=`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`
             for service in $SERVICE_NAME
                 do
