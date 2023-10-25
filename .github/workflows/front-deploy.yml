@@ -137,6 +137,20 @@ jobs:
           server-dir: ${{steps.setup_metadata.outputs.TARGET_PATH}}
           timeout: 600000
 
+      - name: 'Chmod on german server'
+        uses: appleboy/ssh-action@v1.0.0
+        env:
+          TARGET_PATH: ${{steps.setup_metadata.outputs.TARGET_PATH}}
+          USER_PASS: ${{secrets.GERMAN_FTP_PASS}}
+        with:
+          host: ${{secrets.GERMAN_HOST}}
+          username: ${{secrets.GERMAN_FTP_USER}}
+          password: ${{secrets.GERMAN_FTP_PASS}}
+          envs: TARGET_PATH,USER_PASS
+          script_stop: true
+          script: |
+            echo $USER_PASS | sudo -S chmod -R 755 $TARGET_PATH
+
       - name: 'FTP to iran server'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         if: ${{steps.setup_metadata.outputs.IS_PRO == 'true'}}
@@ -147,6 +161,21 @@ jobs:
           local-dir: 'build/'
           server-dir: ${{steps.setup_metadata.outputs.TARGET_PATH}}
           timeout: 600000
+
+      - name: 'Chmod on iran server'
+        uses: appleboy/ssh-action@v1.0.0
+        if: ${{steps.setup_metadata.outputs.IS_PRO == 'true'}}
+        env:
+          TARGET_PATH: ${{steps.setup_metadata.outputs.TARGET_PATH}}
+          USER_PASS: ${{secrets.IRAN_FTP_PASS}}
+        with:
+          host: ${{secrets.IRAN_HOST}}
+          username: ${{secrets.IRAN_FTP_USER}}
+          password: ${{secrets.IRAN_FTP_PASS}}
+          envs: TARGET_PATH,USER_PASS
+          script_stop: true
+          script: |
+            echo $USER_PASS | sudo -S chmod -R 755 $TARGET_PATH
 
   cleanup:
     name: Cleanup actions

@@ -112,13 +112,15 @@ jobs:
         uses: appleboy/ssh-action@v1.0.0
         env:
           SERVICE_NAME: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
+          USER_PASS: ${{secrets.GERMAN_PASS}}
         with:
           host: ${{secrets.GERMAN_HOST}}
           username: ${{secrets.GERMAN_USER}}
           password: ${{secrets.GERMAN_PASS}}
-          envs: SERVICE_NAME
+          envs: SERVICE_NAME,USER_PASS
           script_stop: true
           script: |
+            echo $USER_PASS | sudo -S chmod 755 /tmp/nodeeweb-image.tar
             out=`docker image load -i /tmp/nodeeweb-image.tar -q`
             tag=`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`
             for service in $SERVICE_NAME
@@ -130,13 +132,15 @@ jobs:
         uses: appleboy/ssh-action@v1.0.0
         env:
           SERVICE_NAME: ${{steps.metadata.outputs.IRAN_SERVICE_NAME}}
+          USER_PASS: ${{secrets.IRAN_PASS}}
         with:
           host: ${{secrets.IRAN_HOST}}
           username: ${{secrets.IRAN_USER}}
           password: ${{secrets.IRAN_PASS}}
-          envs: SERVICE_NAME
+          envs: SERVICE_NAME,USER_PASS
           script_stop: true
           script: |
+            echo $USER_PASS | sudo -S chmod 755 /tmp/nodeeweb-image.tar
             out=`docker image load -i /tmp/nodeeweb-image.tar -q`
             tag=`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`
             for service in $SERVICE_NAME
