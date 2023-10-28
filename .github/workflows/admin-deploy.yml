@@ -1,5 +1,9 @@
 name: Publish & Deploy admin on npm
 
+# Trigger when:
+#   push on main or dev or release/**   AND   change admin files
+#   manually trigger
+
 on:
   push:
     branches:

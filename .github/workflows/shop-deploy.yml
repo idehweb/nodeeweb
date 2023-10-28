@@ -3,6 +3,7 @@ name: Publish & Deploy shop on npm
 # Trigger when:
 #   push on main or dev or release/**   AND   change shop or core files
 #   push tag
+#   manually trigger
 
 on:
   push:
@@ -10,10 +11,9 @@ on:
       - main
       - 'releases/**'
       - dev
-      - ci/cd
-    # paths:
-    #   - 'shop/**'
-    #   - 'core/**'
+    paths:
+      - 'shop/**'
+      - 'core/**'
     tags:
       - 'v*'
   workflow_dispatch:
