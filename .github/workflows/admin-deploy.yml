@@ -6,9 +6,8 @@ on:
       - main
       - 'releases/**'
       - dev
-      - ci/cd
-    # paths:
-    #   - 'admin/**'
+    paths:
+      - 'admin/**'
   workflow_dispatch:
     inputs:
       target:
@@ -47,6 +46,23 @@ jobs:
       - name: Setup node-gyp
         run: yarn global add node-gyp
 
+      - name: 'Setup metadata'
+        id: 'metadata'
+        env:
+          INPUT_MAN: ${{inputs.publish_npm}}
+        run: |
+          input=${INPUT_MAN:-'null'}
+          if [ $input == 'false' ] 
+          then
+            echo 'IS_PRO=false' >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $GITHUB_REF_NAME == 'main' ] || [[ $GITHUB_REF_NAME == release/* ]] || [ $input == 'true' ]
+          then echo 'IS_PRO=true' >> $GITHUB_OUTPUT
+          else echo 'IS_PRO=false' >> $GITHUB_OUTPUT
+          fi
+
       - name: 'Install dependencies'
         working-directory: admin
         run: yarn
@@ -66,7 +82,7 @@ jobs:
         working-directory: admin
         env:
           CI: 'false'
-          GENERATE_SOURCEMAP: 'false'
+          GENERATE_SOURCEMAP: ${{steps.metadata.outputs.IS_PRO != 'true' }}
 
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v3
