@@ -23,6 +23,11 @@ on:
           - dev.nodeeweb.com
           - nodeeweb.ir
           - dev.nodeeweb.ir
+      publish_npm:
+        description: 'publish on npm'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -80,8 +85,11 @@ jobs:
 
       - name: 'Check Branch'
         id: 'check_branch'
+        env:
+          INPUT_MAN: ${{inputs.publish_npm}}
         run: |
-          if [ $GITHUB_REF_NAME == 'main' ] || [[ $GITHUB_REF_NAME == release/* ]]
+          input=${INPUT_MAN:-'false'}
+          if [ $GITHUB_REF_NAME == 'main' ] || [[ $GITHUB_REF_NAME == release/* ]] || [ $input == 'true' ]
           then echo 'IS_PRO=true' >> $GITHUB_OUTPUT
           else echo 'IS_PRO=false' >> $GITHUB_OUTPUT
           fi
@@ -134,8 +142,9 @@ jobs:
         id: setup_metadata
         env:
           INPUT_MAN: ${{inputs.target}}
+        continue-on-error: false
         run: |
-          input=${INPUT_MAN:-''}
+          input=${INPUT_MAN:-'null'}
 
           if [ $input == 'shop' ]
           then
