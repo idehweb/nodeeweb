@@ -13,8 +13,7 @@ on:
     inputs:
       target:
         description: 'which target you want to deploy?'
-        required: true
-        default: 'dev.shop'
+        required: false
         type: choice
         options:
           - shop
@@ -88,7 +87,13 @@ jobs:
         env:
           INPUT_MAN: ${{inputs.publish_npm}}
         run: |
-          input=${INPUT_MAN:-'false'}
+          input=${INPUT_MAN:-'null'}
+          if [ $input == 'false' ] 
+          then
+            echo 'IS_PRO=false' >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           if [ $GITHUB_REF_NAME == 'main' ] || [[ $GITHUB_REF_NAME == release/* ]] || [ $input == 'true' ]
           then echo 'IS_PRO=true' >> $GITHUB_OUTPUT
           else echo 'IS_PRO=false' >> $GITHUB_OUTPUT
@@ -105,13 +110,6 @@ jobs:
         if: ${{steps.check_branch.outputs.IS_PRO == 'true' }}
         with:
           name: build
-          path: admin/build
-
-      - name: 'Download diagram artifacts'
-        uses: actions/download-artifact@v3
-        if: ${{steps.check_branch.outputs.IS_PRO == 'true' }}
-        with:
-          name: diagram
           path: admin/build
 
       - name: 'Publish'
@@ -201,8 +199,8 @@ jobs:
             echo "IN_IRAN=false" >> $GITHUB_OUTPUT
           else 
             echo "TARGET_PATH=/var/instances/nwi-dev-shop/public/admin/" >> $GITHUB_OUTPUT
-            echo "IN_GERMAN=false" >> $GITHUB_OUTPUT  
-            echo "IN_IRAN=true" >> $GITHUB_OUTPUT
+            echo "IN_GERMAN=true" >> $GITHUB_OUTPUT  
+            echo "IN_IRAN=false" >> $GITHUB_OUTPUT
           fi
         shell: bash
 
