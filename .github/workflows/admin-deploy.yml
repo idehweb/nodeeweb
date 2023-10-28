@@ -1,0 +1,282 @@
+name: Publish & Deploy admin on npm
+
+# Trigger when:
+#   push on main or dev or release/**   AND   change admin files
+#   manually trigger
+
+on:
+  push:
+    branches:
+      - main
+      - 'releases/**'
+      - dev
+    paths:
+      - 'admin/**'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'which target you want to deploy?'
+        required: false
+        type: choice
+        options:
+          - shop
+          - dev.shop
+          - nodeeweb.com
+          - dev.nodeeweb.com
+          - nodeeweb.ir
+          - dev.nodeeweb.ir
+      publish_npm:
+        description: 'publish on npm'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    name: 'Build Application'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout to repository'
+        uses: actions/checkout@v4
+
+      - name: 'Setup nodeJs'
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 'Install yarn'
+        run: npm i -g yarn
+
+      - name: Setup node-gyp
+        run: yarn global add node-gyp
+
+      - name: 'Setup metadata'
+        id: 'metadata'
+        env:
+          INPUT_MAN: ${{inputs.publish_npm}}
+        run: |
+          input=${INPUT_MAN:-'null'}
+          if [ $input == 'false' ] 
+          then
+            echo 'IS_PRO=false' >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $GITHUB_REF_NAME == 'main' ] || [[ $GITHUB_REF_NAME == release/* ]] || [ $input == 'true' ]
+          then echo 'IS_PRO=true' >> $GITHUB_OUTPUT
+          else echo 'IS_PRO=false' >> $GITHUB_OUTPUT
+          fi
+
+      - name: 'Install dependencies'
+        working-directory: admin
+        run: yarn
+
+      - name: 'Repository visualizer'
+        id: diagram
+        uses: githubocto/repo-visualizer@0.9.1
+        with:
+          excluded_paths: 'node_modules,build,.storybook,.github'
+          output_file: 'admin/diagram.svg'
+          should_push: false
+          root_path: 'admin/src/'
+          artifact_name: 'diagram'
+
+      - name: 'Build App'
+        run: yarn build
+        working-directory: admin
+        env:
+          CI: 'false'
+          GENERATE_SOURCEMAP: ${{steps.metadata.outputs.IS_PRO != 'true' }}
+
+      - name: 'Upload build artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: admin/build
+
+  publish-npm:
+    needs: build
+    name: Publish on npm
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout to repository'
+        uses: actions/checkout@v4
+
+      - name: 'Setup metadata'
+        id: 'meta'
+        env:
+          INPUT_MAN: ${{inputs.publish_npm}}
+        run: |
+          input=${INPUT_MAN:-'null'}
+          if [ $input == 'false' ] 
+          then
+            echo 'IS_PRO=false' >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $GITHUB_REF_NAME == 'main' ] || [[ $GITHUB_REF_NAME == release/* ]] || [ $input == 'true' ]
+          then echo 'IS_PRO=true' >> $GITHUB_OUTPUT
+          else echo 'IS_PRO=false' >> $GITHUB_OUTPUT
+          fi
+
+      - name: 'Setup nodeJs'
+        uses: actions/setup-node@v3
+        if: ${{steps.meta.outputs.IS_PRO == 'true' }}
+        with:
+          node-version: 18
+
+      - name: 'Download build artifacts'
+        uses: actions/download-artifact@v3
+        if: ${{steps.meta.outputs.IS_PRO == 'true' }}
+        with:
+          name: build
+          path: admin/build
+
+      - name: 'Publish'
+        working-directory: admin
+        if: ${{steps.meta.outputs.IS_PRO == 'true' }}
+        run: npm run publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+
+  deploy-server:
+    name: 'Deploy on server'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Download build artifacts'
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: build
+
+      - name: 'Download diagram artifacts'
+        uses: actions/download-artifact@v3
+        with:
+          name: diagram
+          path: build
+
+      - name: 'Setup metadata'
+        id: setup_metadata
+        env:
+          INPUT_MAN: ${{inputs.target}}
+        continue-on-error: false
+        run: |
+          input=${INPUT_MAN:-'null'}
+
+          if [ $input == 'shop' ]
+          then
+            echo "TARGET_PATH=/var/instances/nwi-shop/public/admin/" >> $GITHUB_OUTPUT
+            echo "IN_GERMAN=true" >> $GITHUB_OUTPUT  
+            echo "IN_IRAN=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $input == 'dev.shop' ]
+          then
+            echo "TARGET_PATH=/var/instances/nwi-dev-shop/public/admin/" >> $GITHUB_OUTPUT
+            echo "IN_GERMAN=true" >> $GITHUB_OUTPUT  
+            echo "IN_IRAN=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $input == 'nodeeweb.com' ]
+          then
+            echo "TARGET_PATH=/var/nodeeweb/public/admin/" >> $GITHUB_OUTPUT
+            echo "IN_GERMAN=true" >> $GITHUB_OUTPUT  
+            echo "IN_IRAN=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $input == 'dev.nodeeweb.com' ]
+          then
+            echo "TARGET_PATH=/var/instances/nwi-dev/public/admin/" >> $GITHUB_OUTPUT
+            echo "IN_GERMAN=true" >> $GITHUB_OUTPUT  
+            echo "IN_IRAN=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $input == 'nodeeweb.ir' ]
+          then
+            echo "TARGET_PATH=/var/nodeeweb/public/admin/" >> $GITHUB_OUTPUT
+            echo "IN_GERMAN=false" >> $GITHUB_OUTPUT  
+            echo "IN_IRAN=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $input == 'dev.nodeeweb.ir' ]
+          then
+            echo "TARGET_PATH=/var/instances/nwi-dev/public/admin/" >> $GITHUB_OUTPUT
+            echo "IN_GERMAN=false" >> $GITHUB_OUTPUT  
+            echo "IN_IRAN=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $GITHUB_REF_NAME == 'main' ] || [[ $GITHUB_REF_NAME == release/* ]]
+          then 
+            echo "TARGET_PATH=/var/instances/nwi-shop/public/admin/" >> $GITHUB_OUTPUT
+            echo "IN_GERMAN=true" >> $GITHUB_OUTPUT  
+            echo "IN_IRAN=false" >> $GITHUB_OUTPUT
+          else 
+            echo "TARGET_PATH=/var/instances/nwi-dev-shop/public/admin/" >> $GITHUB_OUTPUT
+            echo "IN_GERMAN=true" >> $GITHUB_OUTPUT  
+            echo "IN_IRAN=false" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
+      - name: 'FTP to german server'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        if: ${{steps.setup_metadata.outputs.IN_GERMAN == 'true'}}
+        with:
+          server: ${{secrets.GERMAN_HOST}}
+          username: ${{secrets.GERMAN_FTP_USER}}
+          password: ${{secrets.GERMAN_FTP_PASS}}
+          local-dir: 'build/'
+          server-dir: ${{steps.setup_metadata.outputs.TARGET_PATH}}
+          timeout: 600000
+
+      - name: 'Chmod on german server'
+        uses: appleboy/ssh-action@v1.0.0
+        if: ${{steps.setup_metadata.outputs.IN_GERMAN == 'true'}}
+        env:
+          TARGET_PATH: ${{steps.setup_metadata.outputs.TARGET_PATH}}
+          USER_PASS: ${{secrets.GERMAN_FTP_PASS}}
+        with:
+          host: ${{secrets.GERMAN_HOST}}
+          username: ${{secrets.GERMAN_FTP_USER}}
+          password: ${{secrets.GERMAN_FTP_PASS}}
+          envs: TARGET_PATH,USER_PASS
+          script_stop: true
+          script: |
+            echo $USER_PASS | sudo -S chmod -R 755 $TARGET_PATH
+
+      - name: 'SSH on iran server'
+        uses: appleboy/ssh-action@v1.0.0
+        if: ${{steps.setup_metadata.outputs.IN_IRAN == 'true'}}
+        env:
+          TARGET_PATH: ${{steps.setup_metadata.outputs.TARGET_PATH}}
+          USER_PASS: ${{secrets.IRAN_FTP_PASS}}
+          RUN_ID: ${{github.run_id}}
+          REPO_NAME: ${{github.repository}}
+          ARTIFACT_NAME: build
+        with:
+          host: ${{secrets.IRAN_HOST}}
+          username: ${{secrets.IRAN_FTP_USER}}
+          password: ${{secrets.IRAN_FTP_PASS}}
+          envs: TARGET_PATH,USER_PASS,RUN_ID,REPO_NAME,ACTIONS_RUNTIME_TOKEN,ACTIONS_RUNTIME_URL,GITHUB_RUN_ID,OUTPUT_PATH,ARTIFACT_NAME
+          script_stop: true
+          script: /download-artifact.sh
+
+  cleanup:
+    name: Cleanup actions
+    needs:
+      - publish-npm
+      - deploy-server
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Remove build artifacts'
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: |
+            build
+            diagram

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "## Copy pakcage.build.json ##"
+echo "## Copy package.build.json ##"
 
 cp package.build.json build/package.json
 
