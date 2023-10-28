@@ -46,7 +46,7 @@ on:
 
 jobs:
   docker:
-    name: 'Build Application'
+    name: 'Build Docker Image'
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout to repository'
@@ -91,9 +91,9 @@ jobs:
           images: |
             idehweb/nodeeweb-shop
           tags: |
-            type=semver,pattern={{version}}
+            type=semver,pattern={{version}},suffix=
             type=sha
-            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}.{{minor}},suffix=
             type=raw,value=${{steps.custom_meta.outputs.TAG}},priority=${{steps.custom_meta.outputs.PRIORITY}}
 
       - name: Set up QEMU
@@ -184,8 +184,8 @@ jobs:
 
           if [ $input == 'nodeeweb.ir' ]
           then
-            echo "IRAN_SERVICE_NAME=nodeeweb_nodeeweb-server" >> $GITHUB_OUTPUT
-            echo "IRAN_SERVICE_NAME=nodeeweb_nodeeweb-server" >> $GITHUB_OUTPUT
+            echo "IRAN_SERVICE_NAME=nwi-fa" >> $GITHUB_OUTPUT
+            exit 0
           fi
 
           if [ $input == 'dev.nodeeweb.ir' ]
@@ -199,7 +199,7 @@ jobs:
             echo "IRAN_SERVICE_NAME=nwi-dev" >> $GITHUB_OUTPUT
             echo "GERMAN_SERVICE_NAME=nwi-dev2 nwi-dev-shop" >> $GITHUB_OUTPUT
           else 
-            echo "IRAN_SERVICE_NAME=nodeeweb_nodeeweb-server" >> $GITHUB_OUTPUT
+            echo "IRAN_SERVICE_NAME=nwi-fa" >> $GITHUB_OUTPUT
             echo "GERMAN_SERVICE_NAME=nodeeweb_nodeeweb-server nwi-shop" >> $GITHUB_OUTPUT
           fi
         shell: bash
