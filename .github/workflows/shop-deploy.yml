@@ -130,7 +130,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           target: ${{steps.custom_meta.outputs.TARGET}}
           outputs: type=docker,dest=/tmp/nodeeweb-image.tar
-          file: Dockerfile
+          file: shop/Dockerfile
 
       - name: Upload image artifact
         uses: actions/upload-artifact@v3
