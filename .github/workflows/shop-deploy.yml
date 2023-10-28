@@ -116,10 +116,7 @@ jobs:
           CUSTOM_TAG: ${{join(steps.custom_meta.outputs.TAG)}}
           CUSTOM_SUFFIX: ${{join(steps.custom_meta.outputs.SUFFIX)}}
         run: |
-          echo $CUSTOM_TAG
-          echo $CUSTOM_SUFFIX
-          echo $TAGS
-          echo $TARGET
+          echo CUSTOM_TAG: $CUSTOM_TAG, CUSTOM_SUFFIX: $CUSTOM_SUFFIX, TAGS: $TAGS, TARGET: $TARGET
 
       - name: Docker Build and push
         uses: docker/build-push-action@v5
@@ -232,6 +229,7 @@ jobs:
             out=`sudo docker image load -i /tmp/img/nodeeweb-image.tar -q`
             tag=(`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`)
             sudo /update-service.sh $tag "$SERVICE_NAME"
+
       - name: 'Upload Image on Iran server'
         if: ${{steps.metadata.outputs.IRAN_SERVICE_NAME}}
         uses: appleboy/ssh-action@v1.0.0
@@ -242,6 +240,8 @@ jobs:
           REPO_NAME: ${{github.repository}}
           ARTIFACT_NAME: image
         with:
+          timeout: 1m
+          command_timeout: 1h
           host: ${{secrets.IRAN_HOST}}
           username: ${{secrets.IRAN_FTP_USER}}
           password: ${{secrets.IRAN_FTP_PASS}}
