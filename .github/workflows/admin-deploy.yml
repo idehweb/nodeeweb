@@ -98,8 +98,8 @@ jobs:
       - name: 'Checkout to repository'
         uses: actions/checkout@v4
 
-      - name: 'Check Branch'
-        id: 'check_branch'
+      - name: 'Setup metadata'
+        id: 'meta'
         env:
           INPUT_MAN: ${{inputs.publish_npm}}
         run: |
@@ -117,20 +117,20 @@ jobs:
 
       - name: 'Setup nodeJs'
         uses: actions/setup-node@v3
-        if: ${{steps.check_branch.outputs.IS_PRO == 'true' }}
+        if: ${{steps.meta.outputs.IS_PRO == 'true' }}
         with:
           node-version: 18
 
       - name: 'Download build artifacts'
         uses: actions/download-artifact@v3
-        if: ${{steps.check_branch.outputs.IS_PRO == 'true' }}
+        if: ${{steps.meta.outputs.IS_PRO == 'true' }}
         with:
           name: build
           path: admin/build
 
       - name: 'Publish'
         working-directory: admin
-        if: ${{steps.check_branch.outputs.IS_PRO == 'true' }}
+        if: ${{steps.meta.outputs.IS_PRO == 'true' }}
         run: npm run publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

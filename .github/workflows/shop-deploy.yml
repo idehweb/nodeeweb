@@ -10,11 +10,39 @@ on:
       - main
       - 'releases/**'
       - dev
-    paths:
-      - 'shop/**'
-      - 'core/**'
+      - ci/cd
+    # paths:
+    #   - 'shop/**'
+    #   - 'core/**'
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'which target you want to deploy?'
+        required: true
+        default: dev.shop
+        type: choice
+        options:
+          - shop
+          - dev.shop
+          - nodeeweb.com
+          - dev.nodeeweb.com
+          - nodeeweb.ir
+          - dev.nodeeweb.ir
+      tag:
+        description: 'docker tag'
+        required: true
+        type: string
+
+      node_env:
+        description: 'environment'
+        required: false
+        default: dev
+        type: choice
+        options:
+          - dev
+          - pro
 
 jobs:
   docker:
@@ -24,17 +52,49 @@ jobs:
       - name: 'Checkout to repository'
         uses: actions/checkout@v4
 
+      - name: Custom meta
+        id: custom_meta
+        shell: bash
+        continue-on-error: false
+        env:
+          NODE_ENV: ${{inputs.node_env}}
+          TAG: ${{inputs.tag}}
+        run: |
+          node_env=${NODE_ENV:-'null'}
+          tag=${TAG:-'null'}
+
+          if [ $tag == 'null' ]
+          then
+            tag=`printf '%(%Y%m%d)T' -1`
+            echo PRIORITY=50 >> $GITHUB_OUTPUT
+          else
+            echo PRIORITY=200 >> $GITHUB_OUTPUT
+            fi
+
+          echo TAG=$tag >> $GITHUB_OUTPUT
+
+          if [ $node_env == 'pro' ] || [[ $GITHUB_REF_NAME != *dev ]]
+          then
+            echo 'SUFFIX=-semi' >> $GITHUB_OUTPUT
+            echo 'TARGET=semi-pro' >> $GITHUB_OUTPUT
+            exit 0
+          fi;
+          echo 'SUFFIX=-dev' >> $GITHUB_OUTPUT
+          echo 'TARGET=dev' >> $GITHUB_OUTPUT
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
+          flavor: |
+            suffix=${{steps.custom_meta.outputs.SUFFIX}}
           images: |
             idehweb/nodeeweb-shop
           tags: |
-            type=sha,prefix=semi-
-            type=schedule,pattern={{date 'YYYYMMDD'}},prefix=semi-
-            type=semver,pattern={{version}},prefix=semi-
-            type=semver,pattern={{major}}.{{minor}},prefix=semi-
+            type=semver,pattern={{version}}
+            type=sha
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=${{steps.custom_meta.outputs.TAG}},priority=${{steps.custom_meta.outputs.PRIORITY}}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -49,6 +109,18 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Echo
+        env:
+          TAGS: ${{join(steps.meta.outputs.tags)}}
+          TARGET: ${{steps.custom_meta.outputs.TARGET}}
+          CUSTOM_TAG: ${{join(steps.custom_meta.outputs.TAG)}}
+          CUSTOM_SUFFIX: ${{join(steps.custom_meta.outputs.SUFFIX)}}
+        run: |
+          echo $CUSTOM_TAG
+          echo $CUSTOM_SUFFIX
+          echo $TAGS
+          echo $TARGET
+
       - name: Docker Build and push
         uses: docker/build-push-action@v5
         with:
@@ -56,7 +128,9 @@ jobs:
           push: ${{ startsWith(github.ref, 'refs/tags/v') }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          target: ${{steps.custom_meta.outputs.TARGET}}
           outputs: type=docker,dest=/tmp/nodeeweb-image.tar
+          file: Dockerfile
 
       - name: Upload image artifact
         uses: actions/upload-artifact@v3
@@ -77,19 +151,62 @@ jobs:
 
       - name: 'Setup metadata'
         id: metadata
+        continue-on-error: false
+        env:
+          INPUT_MAN: ${{inputs.target}}
+
         run: |
+          input=${INPUT_MAN:-'null'}
+
+          if [ $input == 'shop' ]
+          then
+            echo "GERMAN_SERVICE_NAME=nwi-shop" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $input == 'dev.shop' ]
+          then
+            echo "GERMAN_SERVICE_NAME=nwi-dev-shop" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $input == 'nodeeweb.com' ]
+          then
+            echo "GERMAN_SERVICE_NAME=nodeeweb_nodeeweb-server" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $input == 'dev.nodeeweb.com' ]
+          then
+            echo "GERMAN_SERVICE_NAME=nwi-dev2" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ $input == 'nodeeweb.ir' ]
+          then
+            echo "IRAN_SERVICE_NAME=nodeeweb_nodeeweb-server" >> $GITHUB_OUTPUT
+            echo "IRAN_SERVICE_NAME=nodeeweb_nodeeweb-server" >> $GITHUB_OUTPUT
+          fi
+
+          if [ $input == 'dev.nodeeweb.ir' ]
+          then
+            echo "IRAN_SERVICE_NAME=nwi-dev" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           if [[ $GITHUB_REF_NAME == *dev ]]
           then 
             echo "IRAN_SERVICE_NAME=nwi-dev" >> $GITHUB_OUTPUT
-            echo "GERMAN_SERVICE_NAME=nwi-dev2 nwi-shop-dev" >> $GITHUB_OUTPUT
+            echo "GERMAN_SERVICE_NAME=nwi-dev2 nwi-dev-shop" >> $GITHUB_OUTPUT
           else 
             echo "IRAN_SERVICE_NAME=nodeeweb_nodeeweb-server" >> $GITHUB_OUTPUT
             echo "GERMAN_SERVICE_NAME=nodeeweb_nodeeweb-server nwi-shop" >> $GITHUB_OUTPUT
           fi
         shell: bash
 
-      - name: 'FTP to german server'
+      - name: 'Upload Image on German server'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        if: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
         with:
           server: ${{secrets.GERMAN_HOST}}
           username: ${{secrets.GERMAN_FTP_USER}}
@@ -98,7 +215,25 @@ jobs:
           server-dir: '/tmp/img/'
           timeout: 600000
 
-      - name: 'Upload Image on iran server'
+      - name: 'Update Image and Service on German'
+        if: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
+        uses: appleboy/ssh-action@v1.0.0
+        env:
+          SERVICE_NAME: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
+          USER_PASS: ${{secrets.GERMAN_FTP_PASS}}
+        with:
+          host: ${{secrets.GERMAN_HOST}}
+          username: ${{secrets.GERMAN_FTP_USER}}
+          password: ${{secrets.GERMAN_FTP_PASS}}
+          envs: SERVICE_NAME,USER_PASS
+          script_stop: true
+          script: |
+            echo $USER_PASS | sudo -S chmod 755 /tmp/img/nodeeweb-image.tar
+            out=`sudo docker image load -i /tmp/img/nodeeweb-image.tar -q`
+            tag=(`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`)
+            sudo /update-service.sh $tag "$SERVICE_NAME"
+      - name: 'Upload Image on Iran server'
+        if: ${{steps.metadata.outputs.IRAN_SERVICE_NAME}}
         uses: appleboy/ssh-action@v1.0.0
         env:
           TARGET_PATH: /tmp/img
@@ -114,45 +249,23 @@ jobs:
           script_stop: true
           script: /download-artifact.sh
 
-      - name: 'Update Image and Service on German'
-        uses: appleboy/ssh-action@v1.0.0
-        env:
-          SERVICE_NAME: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
-          USER_PASS: ${{secrets.GERMAN_PASS}}
-        with:
-          host: ${{secrets.GERMAN_HOST}}
-          username: ${{secrets.GERMAN_USER}}
-          password: ${{secrets.GERMAN_PASS}}
-          envs: SERVICE_NAME,USER_PASS
-          script_stop: true
-          script: |
-            echo $USER_PASS | sudo -S chmod 755 /tmp/img/nodeeweb-image.tar
-            out=`docker image load -i /tmp/img/nodeeweb-image.tar -q`
-            tag=`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`
-            for service in $SERVICE_NAME
-              do
-                docker service update --image $tag $service
-            done
-
       - name: 'Update Image and Service on Iran'
         uses: appleboy/ssh-action@v1.0.0
+        if: ${{steps.metadata.outputs.IRAN_SERVICE_NAME}}
         env:
           SERVICE_NAME: ${{steps.metadata.outputs.IRAN_SERVICE_NAME}}
-          USER_PASS: ${{secrets.IRAN_PASS}}
+          USER_PASS: ${{secrets.IRAN_FTP_PASS}}
         with:
           host: ${{secrets.IRAN_HOST}}
-          username: ${{secrets.IRAN_USER}}
-          password: ${{secrets.IRAN_PASS}}
+          username: ${{secrets.IRAN_FTP_USER}}
+          password: ${{secrets.IRAN_FTP_PASS}}
           envs: SERVICE_NAME,USER_PASS
           script_stop: true
           script: |
             echo $USER_PASS | sudo -S chmod 755 /tmp/img/nodeeweb-image.tar
-            out=`docker image load -i /tmp/img/nodeeweb-image.tar -q`
-            tag=`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`
-            for service in $SERVICE_NAME
-                do
-                docker service update --image $tag $service
-            done
+            out=`sudo docker image load -i /tmp/img/nodeeweb-image.tar -q`
+            tag=(`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`)
+            sudo /update-service.sh $tag "$SERVICE_NAME"
 
   cleanup:
     name: Cleanup actions
