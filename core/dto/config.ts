@@ -76,7 +76,12 @@ export class CoreConfigDto {
   app_name: string;
 
   @Expose()
-  @IsUrl({ allow_fragments: false, require_host: true })
+  @IsUrl({
+    allow_fragments: false,
+    require_protocol: true,
+    require_host: true,
+    host_whitelist: [/.+/],
+  })
   @IsOptional()
   host?: string;
 

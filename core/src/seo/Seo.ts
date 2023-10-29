@@ -3,24 +3,36 @@ import {
   streamToPromise,
   SitemapItem,
   EnumChangefreq,
+  IndexItem,
+  SitemapAndIndexStream,
+  SitemapIndexStream,
+  SitemapItemStream,
+  ErrorLevel,
 } from 'sitemap';
-import { MiddleWare, Seo } from '../../types/global';
+import { MiddleWare, Res, Seo } from '../../types/global';
 import { createGzip } from 'zlib';
 import { merge } from 'lodash';
 import store from '../../store';
 import { PageDocument, PageModel } from '../../schema/page.schema';
-import { combineUrl, toMs } from '../../utils/helpers';
+import {
+  call,
+  combineUrl,
+  normalizeColName,
+  rawPath,
+  toMs,
+} from '../../utils/helpers';
 import logger, { Logger } from '../handlers/log.handler';
 import mongoose from 'mongoose';
 import { PublishStatus } from '../../schema/_base.schema';
 import { NotFound } from '../../types/error';
+import TimeMap from '../../utils/TimeMap';
+import { Transform } from 'stream';
 
 type Conf = { logger: Logger };
 const defaultConf: Conf = { logger };
 
 export class SeoCore implements Seo {
-  private sitemaps = new Map<string, any>();
-  private last_sitemap_fetch: Date;
+  private sitemaps = new TimeMap<string, Partial<SitemapItem>[]>();
   private conf: Conf;
 
   constructor(conf: Partial<Conf>) {
@@ -31,9 +43,9 @@ export class SeoCore implements Seo {
     return store.db.model('page');
   }
 
-  private async fetchPage(
+  async _fetchPage(
     filter: mongoose.FilterQuery<PageDocument> = {}
-  ): Promise<Partial<SitemapItem>[]> {
+  ): Promise<SitemapItem[]> {
     const dynamicPathRegex = /^(.*)\/([^/:]+)\/:([^/?]+)\??(.*)$/;
 
     // get all
@@ -61,24 +73,33 @@ export class SeoCore implements Seo {
           try {
             const [, pre = '', modelName, atrKey, post = ''] =
               dynamicPathRegex.exec(p.path) ?? [];
-            if (!atrKey)
+            if (!atrKey || ['offset', 'limit'].includes(atrKey))
               return {
                 ...p.toObject(),
                 path: combineUrl({ host: store.config.host, url: p.slug }),
               };
 
             // dynamic page
-            const targetModel = store.db.model(modelName);
+            const targetModel = store.db.model(normalizeColName(modelName));
             const targetValues = await targetModel.find(
-              { active: true },
+              {
+                $or: [
+                  {
+                    active: { $exists: false },
+                  },
+                  { active: true },
+                ],
+                [atrKey]: { $exists: true },
+              },
               { [atrKey]: 1 }
             );
+            const cleanPost = post.replace(/\/:[^/]+/g, '');
             return targetValues
               .filter((t) => t[atrKey])
               .map((t) => {
                 const newP = {
                   ...p.toObject(),
-                  path: `${pre}/${modelName}/${t[atrKey]}${post}`,
+                  path: `${pre}/${modelName}/${t[atrKey]}${cleanPost}`,
                 } as any;
                 return newP;
               });
@@ -93,58 +114,107 @@ export class SeoCore implements Seo {
     ).flat();
 
     return pages.map((p) => {
-      const item: Partial<SitemapItem> = {
+      const item: SitemapItem = {
         url: p.path,
         changefreq: EnumChangefreq.DAILY,
         priority: 0.5,
         lastmod: new Date(p['updatedAt']).toISOString(),
+        img: [],
+        links: [],
+        video: [],
       };
       return item;
     });
   }
 
-  private async fetch() {
-    const pages = await this.pageModel.find();
-    this.last_sitemap_fetch = new Date();
-    return pages;
+  async fetchAndSavePage(filter: mongoose.FilterQuery<PageDocument>) {
+    const pages = await this._fetchPage(filter);
+    const pageSitemap = this.sitemaps.get('page') ?? [];
+    pageSitemap.push(...pages);
+    this.sitemaps.set('page', pageSitemap);
+  }
+
+  clear() {
+    this.sitemaps.clear();
+  }
+  async initial() {
+    const allChildFetchMethods = Object.getOwnPropertyNames(
+      this['__proto__']
+    ).filter((m) => m.startsWith('_fetch'));
+
+    for (const key of allChildFetchMethods) {
+      const name = key.replace('_fetch', '').toLowerCase();
+      const value = (await call(
+        this[key].bind(this)
+      )) as Partial<SitemapItem>[];
+      this.sitemaps.set(name, value);
+    }
   }
 
   getSitemap: MiddleWare = async (req, res, next) => {
-    res.header('Content-Type', 'application/xml');
-    res.header('Content-Encoding', 'gzip');
+    const childRegex = /^([^-._]+)-sitemap$/;
+    const indexRegex = /^sitemap(_index)?$/;
 
-    const targetSitemapName = req.params.sitemap.replace('.xml', '');
+    const indexTest = indexRegex.test(req.params.sitemap);
+    const [, childMatch] = childRegex.exec(req.params.sitemap) ?? [];
 
-    if (targetSitemapName === 'sitemap') {
+    let chunks: any[], stream: Transform;
+    if (indexTest) {
       // get parent
-    } else {
-      // get child
-      const sm = this.sitemaps.get(targetSitemapName);
-      if (!sm)
-        throw new NotFound(`sitemap not found, target: ${targetSitemapName}`);
-      // present
-    }
+      const basePath = rawPath(req).split('/').slice(0, -1).join('/');
+      const sitemapIndexes = this.sitemaps.keys().map((k) => {
+        const { modifyAt } = this.sitemaps.getWithTime(k);
+        return {
+          lastmod: modifyAt.toISOString(),
+          url: `${basePath}/${k}-sitemap.xml`,
+        } as IndexItem;
+      });
 
-    try {
-      const sm = new SitemapStream({
+      stream = new SitemapIndexStream({ level: ErrorLevel.WARN });
+      chunks = sitemapIndexes;
+    } else if (childMatch) {
+      // get child
+      const sm = this.sitemaps.get(childMatch);
+      if (!sm) throw new NotFound(`sitemap not found, target: ${childMatch}`);
+
+      stream = new SitemapStream({
+        level: ErrorLevel.WARN,
         hostname: store.config.host,
       });
-      const pipeline = sm.pipe(createGzip());
-      for (const value of values) {
-        pipeline.write(value);
-      }
+      chunks = sm;
+    } else
+      throw new NotFound(`sitemap not found, target: ${req.params.sitemap}`);
 
-      // This takes the result and stores it in memory - > 50mb
-      streamToPromise(pipeline).then((sm) => (this.sitemap = sm));
-
-      // stream the response to the client at the same time
-      pipeline.pipe(res).on('error', (e) => {
-        throw e;
-      });
-    } catch (e) {
-      logger.error(e);
-      res.status(500).end();
-    }
+    return await this.sendSitemap(res, chunks, stream);
   };
+  protected sendSitemap(res: Res, chunks: any[], sm: Transform) {
+    res.header('Content-Type', 'application/xml');
+    res.header('Content-Encoding', 'gzip');
+    return new Promise<void>((resolve, reject) => {
+      try {
+        if (!chunks.length) return res.send();
+
+        const pipeline = sm.pipe(createGzip());
+
+        for (const chunk of chunks) {
+          sm.write(chunk);
+        }
+        sm.end();
+        sm.on('error', (e) => reject(e));
+
+        // stream the response to the client at the same time
+        pipeline.pipe(res).on('error', (e) => {
+          reject(e);
+        });
+
+        // on end
+        pipeline.on('close', () => {
+          resolve();
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
   getPage: MiddleWare = async (req, res) => {};
 }

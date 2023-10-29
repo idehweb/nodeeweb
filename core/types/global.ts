@@ -86,4 +86,5 @@ export interface SupervisorEmitter {
 export interface Seo {
   getSitemap: MiddleWare;
   getPage: MiddleWare;
+  initial: () => Promise<void> | void;
 }

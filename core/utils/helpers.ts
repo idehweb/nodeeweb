@@ -5,6 +5,7 @@ import store from '../store';
 import { SimpleError } from '../types/error';
 import bfs from './bfs';
 import { StoreRoute } from '../types/route';
+import { Req } from '../types/global';
 
 export function page2Route(page: any): StoreRoute {
   return { path: page.path || page.slug };
@@ -206,7 +207,7 @@ export function toMs(time: string) {
 export function combineUrl({
   host,
   url,
-  protocol = 'https',
+  protocol,
 }: {
   host: string;
   url: string;
@@ -214,6 +215,36 @@ export function combineUrl({
 }) {
   const protocolRegex = /^(https?:\/\/)?(.+)$/;
   const pathRegex = /\/+/g;
-  const [, , path] = protocolRegex.exec(`${host}/${url}`);
-  return `${protocol}://${path.replace(pathRegex, '/')}`;
+  const [, proto, path] = protocolRegex.exec(`${host}/${url}`);
+  return `${protocol || proto.replace('://', '')}://${path.replace(
+    pathRegex,
+    '/'
+  )}`;
+}
+
+export function rawPath(req: Req) {
+  return `${req.protocol}://${req.get('host')}${req.path}`;
+}
+
+export function normalizeColName(col: string) {
+  // replace all "-" , " " with upper letter
+  let result = '',
+    act = 'none';
+  for (const char of col) {
+    if (char !== ' ' && char !== '-') {
+      switch (act) {
+        case 'upper':
+          result += char.toUpperCase();
+          break;
+        case 'none':
+        default:
+          result += char;
+          break;
+      }
+      act = 'none';
+    } else {
+      act = 'upper';
+    }
+  }
+  return result;
 }
