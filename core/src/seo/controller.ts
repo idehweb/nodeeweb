@@ -1,19 +1,19 @@
 import store from '../../store';
+import { RegisterOptions } from '../../types/register';
+import { allPathExceptApi } from '../core/view';
 import { controllerRegister } from '../handlers/controller.handler';
 import logger from '../handlers/log.handler';
 
-function log(...args: any) {
-  logger.log('[CoreSeo]', ...args);
-}
-function error(...args: any) {
-  logger.error('[CoreSeo]', ...args);
-}
-
-export default function registerSeoController() {
-  if (!store.seo) return log('not found any seo provider in store');
+export default function registerSeoController({ logger }: RegisterOptions) {
+  if (!store.seo) return logger.log('not found any seo provider in store');
 
   controllerRegister(
     { method: 'get', service: store.seo.getSitemap, url: '/:sitemap.xml' },
-    { from: 'CoreSeo', logger }
+    { logger, strategy: 'insertFirst' }
+  );
+
+  controllerRegister(
+    { method: 'get', service: store.seo.getPage, url: allPathExceptApi },
+    { logger, strategy: 'insertFirst' }
   );
 }

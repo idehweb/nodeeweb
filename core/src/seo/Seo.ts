@@ -1,12 +1,11 @@
+import * as fs from 'fs';
+import { isMongoId } from 'class-validator';
 import {
   SitemapStream,
-  streamToPromise,
   SitemapItem,
   EnumChangefreq,
   IndexItem,
-  SitemapAndIndexStream,
   SitemapIndexStream,
-  SitemapItemStream,
   ErrorLevel,
 } from 'sitemap';
 import { CRUD, MiddleWare, Res, Seo } from '../../types/global';
@@ -30,6 +29,10 @@ import { NotFound } from '../../types/error';
 import TimeMap from '../../utils/TimeMap';
 import { Transform } from 'stream';
 import { getEntityEventName } from '../handlers/entity.handler';
+import isbot from 'isbot';
+import { getPublicDir } from '../../utils/path';
+import { join } from 'path';
+import parse from 'node-html-parser';
 
 type Conf = { logger: Logger };
 const defaultConf: Conf = { logger };
@@ -264,5 +267,50 @@ export class SeoCore implements Seo {
       }
     });
   }
-  getPage: MiddleWare = async (req, res) => {};
+  getPage: MiddleWare = async (req, res, next) => {
+    if (!isbot(req.get('user-agent'))) {
+      return next();
+    }
+
+    // is bot
+    const [, slug] = /^\/([^/]+)$/.exec(req.path) ?? [];
+    if (!slug) {
+      // not cover
+      return next();
+    }
+
+    const page = await this.pageModel.findOne(
+      {
+        [isMongoId(slug) ? '_id' : 'slug']: slug,
+        active: true,
+        status: PublishStatus.Published,
+      },
+      { metadescription: 1, metatitle: 1 }
+    );
+
+    if (!page) {
+      //not cover
+      return next();
+    }
+
+    const des = Object.values(page.metadescription ?? {}).filter((d) => d)[0];
+    const title = Object.values(page.title ?? {}).filter((d) => d)[0];
+
+    const htmlStr = await fs.promises.readFile(
+      join(getPublicDir('front', true)[0], 'index.html'),
+      'utf8'
+    );
+    const html = parse(htmlStr, { comment: false });
+    if (title)
+      html
+        .querySelector('head')
+        .appendChild(parse(`<title>${title}</title>">`));
+    if (des)
+      html
+        .querySelector('head')
+        .appendChild(parse(`<meta name="description" content="${des}" />`));
+
+    res.setHeader('content-type', 'text/html');
+    return res.status(200).send(html.toString());
+  };
 }

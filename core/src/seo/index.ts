@@ -13,6 +13,9 @@ export default function initSeo(seo?: Seo) {
     store.seo.clear();
   }
   store.seo = seo;
+  registerSeoController({
+    logger: { log: seo.log.bind(seo), error: seo.error.bind(seo) } as any,
+  });
   call(seo.initial.bind(seo))
     .then(() => {
       seo.log('initial successfully!', fromMs(Date.now() - start));
@@ -20,5 +23,4 @@ export default function initSeo(seo?: Seo) {
     .catch((e) => {
       seo.error('error in seo initialize\n', e);
     });
-  registerSeoController();
 }
