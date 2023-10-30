@@ -10,11 +10,10 @@ function error(...args: any) {
 }
 
 export default function registerSeoController() {
-  const seo = store.seo;
-  if (!seo) return log('not found any seo provider in store');
+  if (!store.seo) return log('not found any seo provider in store');
 
   controllerRegister(
-    { method: 'get', service: seo.getSitemap, url: '/:sitemap.xml' },
+    { method: 'get', service: store.seo.getSitemap, url: '/:sitemap.xml' },
     { from: 'CoreSeo', logger }
   );
 }

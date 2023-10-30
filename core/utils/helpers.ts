@@ -203,6 +203,35 @@ export function toMs(time: string) {
   }, 0);
   return milliseconds;
 }
+export function fromMs(duration: number) {
+  const portions: string[] = [];
+
+  const msInHour = 1000 * 60 * 60;
+  const hours = Math.trunc(duration / msInHour);
+  if (hours > 0) {
+    portions.push(hours + 'h');
+    duration = duration - hours * msInHour;
+  }
+
+  const msInMinute = 1000 * 60;
+  const minutes = Math.trunc(duration / msInMinute);
+  if (minutes > 0) {
+    portions.push(minutes + 'm');
+    duration = duration - minutes * msInMinute;
+  }
+
+  const seconds = Math.trunc(duration / 1000);
+  if (seconds > 0) {
+    portions.push(seconds + 's');
+    duration = duration - seconds * 1000;
+  }
+
+  if (duration > 0) {
+    portions.push(duration + 'ms');
+  }
+
+  return portions.join(' ');
+}
 
 export function combineUrl({
   host,
@@ -247,4 +276,19 @@ export function normalizeColName(col: string) {
     }
   }
   return result;
+}
+
+export function getAllPropertyNames(obj: object = {}, maxDepth = 5) {
+  const names: string[] = [];
+  const recorded = new Map();
+  names.push(...Object.getOwnPropertyNames(obj));
+  let depth = 0,
+    target = obj;
+  while (target['__proto__']) {
+    if (recorded.has(target['__proto__']) || ++depth > maxDepth) break;
+    names.push(...Object.getOwnPropertyNames(target['__proto__']));
+    recorded.set(target['__proto__'], true);
+    target = target['__proto__'];
+  }
+  return [...new Set(names)];
 }

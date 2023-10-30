@@ -88,4 +88,8 @@ export interface Seo {
   getSitemap: MiddleWare;
   getPage: MiddleWare;
   initial: () => Promise<void> | void;
+  clear: () => void;
+  log: (...args: any[]) => void;
+  error: (...args: any[]) => void;
+  warn: (...args: any[]) => void;
 }

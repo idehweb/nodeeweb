@@ -17,6 +17,8 @@ import { PageDocument, PageModel } from '../../schema/page.schema';
 import {
   call,
   combineUrl,
+  fromMs,
+  getAllPropertyNames,
   normalizeColName,
   rawPath,
   toMs,
@@ -33,11 +35,24 @@ type Conf = { logger: Logger };
 const defaultConf: Conf = { logger };
 
 export class SeoCore implements Seo {
-  private sitemaps = new TimeMap<string, Partial<SitemapItem>[]>();
-  private conf: Conf;
+  protected sitemaps = new TimeMap<string, SitemapItem[]>();
+  protected listeners = new Map<string, (...args: any[]) => void>();
+  protected conf: Conf;
+  protected isCleared: boolean;
 
   constructor(conf: Partial<Conf>) {
     this.conf = merge({ ...defaultConf }, conf);
+    this.isCleared = false;
+  }
+
+  log(...args: any[]) {
+    this.conf.logger.log('[SeoCore]', ...args);
+  }
+  error(...args: any[]) {
+    this.conf.logger.error('[SeoCore]', ...args);
+  }
+  warn(...args: any[]) {
+    this.conf.logger.warn('[SeoCore]', ...args);
   }
 
   get pageModel(): PageModel {
@@ -130,8 +145,9 @@ export class SeoCore implements Seo {
 
   async updatePage(data: any, crud: CRUD) {
     // TODO optimize update page
+    const start = Date.now();
     await this.fetchAndSavePage();
-    this.conf.logger.log('[CoreSeo] update pages sitemap');
+    this.log('update pages sitemap', fromMs(Date.now() - start));
   }
 
   async fetchAndSavePage(filter: mongoose.FilterQuery<PageDocument> = {}) {
@@ -144,36 +160,41 @@ export class SeoCore implements Seo {
 
   clear() {
     this.sitemaps.clear();
+    [...this.listeners.entries()].forEach(([k, f]) =>
+      store.event.removeListener(k, f)
+    );
+    this.isCleared = true;
   }
   async initial() {
-    const allChildFetchMethods = Object.getOwnPropertyNames(
-      this['__proto__']
-    ).filter((m) => m.startsWith('fetch') && !m.startsWith('fetchAndSave'));
+    const allChildFetchMethods = getAllPropertyNames(this).filter(
+      (m) => m.startsWith('fetch') && !m.startsWith('fetchAndSave')
+    );
 
     for (const key of allChildFetchMethods) {
+      if (this.isCleared) return;
       const entity = key.replace('fetch', '');
-      const value = (await call(
-        this[key].bind(this)
-      )) as Partial<SitemapItem>[];
+      const value = (await call(this[key].bind(this))) as SitemapItem[];
+      if (this.isCleared) return;
       this.sitemaps.set(entity, value);
 
       // on create,update,delete
-      [CRUD.CREATE, CRUD.DELETE_ONE, CRUD.UPDATE_ONE].map((crud) =>
-        store.event.on(
-          getEntityEventName(entity, { post: true, type: crud }),
-          async (data) => {
-            try {
-              if (this[`update${entity}`])
-                await call(this[`update${entity}`].bind(this, data, crud));
-            } catch (err) {
-              this.conf.logger.error(
-                `[CoreSeo] error on update${entity} ${crud}`,
-                err
-              );
-            }
+      [CRUD.CREATE, CRUD.DELETE_ONE, CRUD.UPDATE_ONE].map((crud) => {
+        const eventName = getEntityEventName(entity, {
+          post: true,
+          type: crud,
+        });
+        const eventFunc = async (data) => {
+          try {
+            if (this[`update${entity}`])
+              await call(this[`update${entity}`].bind(this, data, crud));
+          } catch (err) {
+            this.error(`error on update${entity} ${crud}`, err);
           }
-        )
-      );
+        };
+
+        store.event.on(eventName, eventFunc);
+        this.listeners.set(eventName, eventFunc);
+      });
     }
   }
 

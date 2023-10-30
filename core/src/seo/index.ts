@@ -1,19 +1,24 @@
 import store from '../../store';
+import { Seo } from '../../types/global';
 import { color } from '../../utils/color';
+import { call, fromMs } from '../../utils/helpers';
 import logger from '../handlers/log.handler';
 import { SeoCore } from './Seo';
 import registerSeoController from './controller';
 
-export default function initSeo() {
-  const seo = new SeoCore({ logger });
+export default function initSeo(seo?: Seo) {
+  const start = Date.now();
+  seo = seo ?? new SeoCore({ logger });
+  if (store.seo) {
+    store.seo.clear();
+  }
   store.seo = seo;
-  seo
-    .initial()
+  call(seo.initial.bind(seo))
     .then(() => {
-      logger.log(color('Green', '[CoreSeo] initial successfully!'));
+      seo.log('initial successfully!', fromMs(Date.now() - start));
     })
     .catch((e) => {
-      logger.error('[CoreSeo] error in seo initialize\n', e);
+      seo.error('error in seo initialize\n', e);
     });
   registerSeoController();
 }
