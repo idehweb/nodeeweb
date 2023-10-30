@@ -67,6 +67,7 @@ export type CRUDCreatorOpt = {
   forceDelete?: boolean;
   autoSetCount?: boolean;
   populate?: mongoose.PopulateOptions | mongoose.PopulateOptions[];
+  type?: CRUD;
 };
 
 export enum CRUD {

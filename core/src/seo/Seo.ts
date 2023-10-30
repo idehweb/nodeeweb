@@ -9,9 +9,9 @@ import {
   SitemapItemStream,
   ErrorLevel,
 } from 'sitemap';
-import { MiddleWare, Res, Seo } from '../../types/global';
+import { CRUD, MiddleWare, Res, Seo } from '../../types/global';
 import { createGzip } from 'zlib';
-import { merge } from 'lodash';
+import { capitalize, merge } from 'lodash';
 import store from '../../store';
 import { PageDocument, PageModel } from '../../schema/page.schema';
 import {
@@ -27,6 +27,7 @@ import { PublishStatus } from '../../schema/_base.schema';
 import { NotFound } from '../../types/error';
 import TimeMap from '../../utils/TimeMap';
 import { Transform } from 'stream';
+import { getEntityEventName } from '../handlers/entity.handler';
 
 type Conf = { logger: Logger };
 const defaultConf: Conf = { logger };
@@ -43,7 +44,7 @@ export class SeoCore implements Seo {
     return store.db.model('page');
   }
 
-  async _fetchPage(
+  async fetchPage(
     filter: mongoose.FilterQuery<PageDocument> = {}
   ): Promise<SitemapItem[]> {
     const dynamicPathRegex = /^(.*)\/([^/:]+)\/:([^/?]+)\??(.*)$/;
@@ -127,11 +128,18 @@ export class SeoCore implements Seo {
     });
   }
 
-  async fetchAndSavePage(filter: mongoose.FilterQuery<PageDocument>) {
-    const pages = await this._fetchPage(filter);
-    const pageSitemap = this.sitemaps.get('page') ?? [];
+  async updatePage(data: any, crud: CRUD) {
+    // TODO optimize update page
+    await this.fetchAndSavePage();
+    this.conf.logger.log('[CoreSeo] update pages sitemap');
+  }
+
+  async fetchAndSavePage(filter: mongoose.FilterQuery<PageDocument> = {}) {
+    const pages = await this.fetchPage(filter);
+    // const pageSitemap = this.sitemaps.get('Page') ?? [];
+    const pageSitemap = [];
     pageSitemap.push(...pages);
-    this.sitemaps.set('page', pageSitemap);
+    this.sitemaps.set('Page', pageSitemap);
   }
 
   clear() {
@@ -140,14 +148,32 @@ export class SeoCore implements Seo {
   async initial() {
     const allChildFetchMethods = Object.getOwnPropertyNames(
       this['__proto__']
-    ).filter((m) => m.startsWith('_fetch'));
+    ).filter((m) => m.startsWith('fetch') && !m.startsWith('fetchAndSave'));
 
     for (const key of allChildFetchMethods) {
-      const name = key.replace('_fetch', '').toLowerCase();
+      const entity = key.replace('fetch', '');
       const value = (await call(
         this[key].bind(this)
       )) as Partial<SitemapItem>[];
-      this.sitemaps.set(name, value);
+      this.sitemaps.set(entity, value);
+
+      // on create,update,delete
+      [CRUD.CREATE, CRUD.DELETE_ONE, CRUD.UPDATE_ONE].map((crud) =>
+        store.event.on(
+          getEntityEventName(entity, { post: true, type: crud }),
+          async (data) => {
+            try {
+              if (this[`update${entity}`])
+                await call(this[`update${entity}`].bind(this, data, crud));
+            } catch (err) {
+              this.conf.logger.error(
+                `[CoreSeo] error on update${entity} ${crud}`,
+                err
+              );
+            }
+          }
+        )
+      );
     }
   }
 
@@ -166,7 +192,7 @@ export class SeoCore implements Seo {
         const { modifyAt } = this.sitemaps.getWithTime(k);
         return {
           lastmod: modifyAt.toISOString(),
-          url: `${basePath}/${k}-sitemap.xml`,
+          url: `${basePath}/${k.toLowerCase()}-sitemap.xml`,
         } as IndexItem;
       });
 
@@ -174,8 +200,9 @@ export class SeoCore implements Seo {
       chunks = sitemapIndexes;
     } else if (childMatch) {
       // get child
-      const sm = this.sitemaps.get(childMatch);
-      if (!sm) throw new NotFound(`sitemap not found, target: ${childMatch}`);
+      const upper = capitalize(childMatch);
+      const sm = this.sitemaps.get(upper);
+      if (!sm) throw new NotFound(`sitemap not found, target: ${upper}`);
 
       stream = new SitemapStream({
         level: ErrorLevel.WARN,

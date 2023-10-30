@@ -15,6 +15,12 @@ import { CrudParamDto, MultiIDParam } from '../../dto/in/crud.dto';
 import _, { lowerFirst, orderBy } from 'lodash';
 import { ClassConstructor } from 'class-transformer';
 
+export function getEntityEventName(
+  name: string,
+  { pre, post, type }: { pre?: boolean; post?: boolean; type: CRUD }
+) {
+  return `${pre ? 'pre' : 'post'}-${type}-${name.toLocaleLowerCase()}`;
+}
 export class EntityCreator {
   constructor(private modelName: string) {}
   private get model() {
@@ -61,23 +67,24 @@ export class EntityCreator {
     next: NextFunction,
     {
       result,
-      saveToReq,
-      sendResponse,
       httpCode = 200,
+      ...opt
     }: {
       result: any;
-      saveToReq: CRUDCreatorOpt['saveToReq'];
-      sendResponse: CRUDCreatorOpt['sendResponse'];
       httpCode: number;
-    }
+    } & CRUDCreatorOpt
   ) {
     if (!result) throw new NotFound(`${this.modelName} not found`);
+    const { sendResponse, saveToReq } = opt;
 
     if (sendResponse && !saveToReq) {
       const data =
         typeof sendResponse === 'boolean'
           ? result
           : await call(sendResponse, result, req);
+
+      // call event
+      this.postEntity(data, opt, req);
       return res.status(httpCode).json({ data });
     }
 
@@ -114,8 +121,6 @@ export class EntityCreator {
       executeQuery,
       project,
       sort,
-      saveToReq,
-      sendResponse,
       paramFields,
       httpCode = 200,
       autoSetCount,
@@ -178,12 +183,32 @@ export class EntityCreator {
 
     // handle result and output
     await this.handleResult(req, res, next, {
+      ...arguments[4],
       result,
-      saveToReq,
-      sendResponse,
       httpCode,
     });
   }
+
+  preEntityCreator(opt: CRUDCreatorOpt): MiddleWare {
+    return (req, res, next) => {
+      store.event.emit(
+        getEntityEventName(this.modelName, { pre: true, type: opt.type }),
+        opt,
+        req
+      );
+      return next();
+    };
+  }
+
+  postEntity(data: any, opt: CRUDCreatorOpt, req: Req) {
+    store.event.emit(
+      getEntityEventName(this.modelName, { post: true, type: opt.type }),
+      data,
+      opt,
+      req
+    );
+  }
+
   createOneCreator({
     parseBody,
     executeQuery,
@@ -211,9 +236,8 @@ export class EntityCreator {
 
       // handle result and output
       this.handleResult(req, res, next, {
+        ...arguments[0],
         result: doc,
-        saveToReq,
-        sendResponse,
         httpCode: 201,
       });
     };
@@ -359,7 +383,7 @@ export function registerEntityCRUD(
     opt.controller = opt.controller ?? {};
 
     // set default values
-    opt.crud = _.merge({ ...defaultCrudOpt }, opt.crud ?? {});
+    opt.crud = _.merge({ ...defaultCrudOpt }, opt.crud ?? {}, { type: cName });
 
     const defValidator = detectDefaultParamValidation(cName, opt);
 
@@ -368,6 +392,7 @@ export function registerEntityCRUD(
       url: opt.controller.url ?? translateCRUD2Url(cName, opt.crud),
       access: opt.controller.access,
       service: [
+        creator.preEntityCreator(opt.crud),
         ...[opt.controller.beforeService ?? []].flat(),
         creator[translateCRUD2Creator(cName)](opt.crud),
         ...[opt.controller.service ?? []].flat(),
@@ -381,7 +406,9 @@ export function registerEntityCRUD(
   schemas.forEach((s) => controllerRegister(s, { ...registerOpt, base_url }));
 }
 
-function translateCRUD2Creator(name: CRUD): keyof EntityCreator {
+function translateCRUD2Creator(
+  name: CRUD
+): Exclude<keyof EntityCreator, 'postEntity'> {
   switch (name) {
     case CRUD.CREATE:
       return 'createOneCreator';
