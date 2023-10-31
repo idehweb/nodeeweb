@@ -61,6 +61,7 @@ const schema = new mongoose.Schema(
       default: () => Date.now() - 1000,
       select: false,
     },
+    data: { type: {}, default: {}, select: false },
     role: { type: String, default: 'admin' },
     type: { type: String, default: 'admin' },
     active: { type: Boolean, default: true },
@@ -72,11 +73,11 @@ schema.index({ _id: 1, active: 1 }, { name: 'auth' });
 
 schema.pre('save', async function (next) {
   const user = this;
-  if (!user.password) return next();
-
-  user.password = await bcrypt.hash(user.password, 12);
-  user.passwordChangeAt = new Date();
-  user.credentialChangeAt = user.passwordChangeAt;
+  if (user.password) {
+    user.password = await bcrypt.hash(user.password, 12);
+    user.passwordChangeAt = new Date();
+  }
+  user.credentialChangeAt = user.passwordChangeAt ?? new Date();
 
   return next();
 });

@@ -70,7 +70,7 @@ const schema = new mongoose.Schema(
     extra: { type: String },
     source: { type: String, enum: CustomerSource, default: CustomerSource.Web },
     bankData: {},
-    data: { type: {}, default: {} },
+    data: { type: {}, default: {}, select: false },
     type: {
       type: String,
       required: false,
@@ -125,11 +125,11 @@ schema.index({ _id: 1, active: 1 }, { name: 'auth' });
 
 schema.pre('save', async function (next) {
   const user = this;
-  if (!user.password) return next();
-
-  user.password = await bcrypt.hash(user.password, 12);
-  user.passwordChangeAt = new Date();
-  user.credentialChangeAt = user.passwordChangeAt;
+  if (user.password) {
+    user.password = await bcrypt.hash(user.password, 12);
+    user.passwordChangeAt = new Date();
+  }
+  user.credentialChangeAt = user.passwordChangeAt ?? new Date();
 
   return next();
 });
