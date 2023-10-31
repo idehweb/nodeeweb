@@ -72,5 +72,5 @@ export async function dbRegisterModels() {
 }
 
 export async function dbSyncIndex() {
-  await store.db.syncIndexes();
+  // await store.db.syncIndexes();
 }

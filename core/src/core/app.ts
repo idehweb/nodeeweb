@@ -14,6 +14,7 @@ import { registerDefaultEvent } from './event';
 import { initPlugins } from '../plugin';
 import { initRoutes } from './view';
 import initSupervisor from '../supervisor';
+import initSeo from '../seo';
 
 const app = express();
 
@@ -56,6 +57,9 @@ export default async function buildApp() {
 
   // auth controllers
   activeAuthControllers();
+
+  // seo
+  initSeo();
 
   // default controller
   registerDefaultControllers();

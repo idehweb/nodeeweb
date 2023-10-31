@@ -26,11 +26,13 @@ import {
 import { plainToInstance } from 'class-transformer';
 import { registerConfig } from '@nodeeweb/core/src/handlers/config.handler';
 import logger from '../../utils/log';
+import { getEnv } from '@nodeeweb/core/utils/helpers';
 
 export class ShopConfig extends Config<ShopConfigDto> {
   protected get _defaultSetting(): ShopConfigDto {
     return {
       app_name: store.env.APP_NAME ?? 'Nodeeweb Shop',
+      host: getEnv('server-host', { format: 'string' }) as string,
       auth: {},
       supervisor:
         store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
@@ -81,6 +83,7 @@ export class ShopConfig extends Config<ShopConfigDto> {
   public getPublic(): Partial<ShopConfigDto> {
     return {
       app_name: this._config.app_name,
+      host: this._config.host,
       currency: this._config.currency,
       shop_active: this._config.shop_active,
       shop_inactive_message: this._config.shop_inactive_message,

@@ -67,6 +67,7 @@ export type CRUDCreatorOpt = {
   forceDelete?: boolean;
   autoSetCount?: boolean;
   populate?: mongoose.PopulateOptions | mongoose.PopulateOptions[];
+  type?: CRUD;
 };
 
 export enum CRUD {
@@ -81,4 +82,14 @@ export enum CRUD {
 export interface SupervisorEmitter {
   id: string;
   emit(event: string, ...body: any[]): Promise<boolean>;
+}
+
+export interface Seo {
+  getSitemap: MiddleWare;
+  getPage: MiddleWare;
+  initial: () => Promise<void> | void;
+  clear: () => void;
+  log: (...args: any[]) => void;
+  error: (...args: any[]) => void;
+  warn: (...args: any[]) => void;
 }

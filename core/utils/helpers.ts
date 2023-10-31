@@ -5,6 +5,7 @@ import store from '../store';
 import { SimpleError } from '../types/error';
 import bfs from './bfs';
 import { StoreRoute } from '../types/route';
+import { Req } from '../types/global';
 
 export function page2Route(page: any): StoreRoute {
   return { path: page.path || page.slug };
@@ -183,4 +184,111 @@ export function getEnv(
     case 'string':
       return value;
   }
+}
+
+export function toMs(time: string) {
+  const milliseconds = time.match(/\d+\s?\w/g).reduce((acc, cur, i) => {
+    let multiplier = 1000;
+    switch (cur.slice(-1)) {
+      case 'd':
+        multiplier *= 24;
+      case 'h':
+        multiplier *= 60;
+      case 'm':
+        multiplier *= 60;
+      case 's':
+        return (parseInt(cur) ? parseInt(cur) : 0) * multiplier + acc;
+    }
+    return acc;
+  }, 0);
+  return milliseconds;
+}
+export function fromMs(duration: number) {
+  const portions: string[] = [];
+
+  const msInHour = 1000 * 60 * 60;
+  const hours = Math.trunc(duration / msInHour);
+  if (hours > 0) {
+    portions.push(hours + 'h');
+    duration = duration - hours * msInHour;
+  }
+
+  const msInMinute = 1000 * 60;
+  const minutes = Math.trunc(duration / msInMinute);
+  if (minutes > 0) {
+    portions.push(minutes + 'm');
+    duration = duration - minutes * msInMinute;
+  }
+
+  const seconds = Math.trunc(duration / 1000);
+  if (seconds > 0) {
+    portions.push(seconds + 's');
+    duration = duration - seconds * 1000;
+  }
+
+  if (duration > 0) {
+    portions.push(duration + 'ms');
+  }
+
+  return portions.join(' ');
+}
+
+export function combineUrl({
+  host,
+  url,
+  protocol,
+}: {
+  host: string;
+  url: string;
+  protocol?: string;
+}) {
+  const protocolRegex = /^(https?:\/\/)?(.+)$/;
+  const pathRegex = /\/+/g;
+  const [, proto, path] = protocolRegex.exec(`${host}/${url}`);
+  return `${protocol || proto.replace('://', '')}://${path.replace(
+    pathRegex,
+    '/'
+  )}`;
+}
+
+export function rawPath(req: Req) {
+  return `${req.protocol}://${req.get('host')}${req.path}`;
+}
+
+export function normalizeColName(col: string) {
+  // replace all "-" , " " with upper letter
+  let result = '',
+    act = 'none';
+  for (const char of col) {
+    if (char !== ' ' && char !== '-') {
+      switch (act) {
+        case 'upper':
+          result += char.toUpperCase();
+          break;
+        case 'none':
+        default:
+          result += char;
+          break;
+      }
+      act = 'none';
+    } else {
+      act = 'upper';
+    }
+  }
+  return result;
+}
+
+export function getAllPropertyNames(obj: object = {}, maxDepth = 5) {
+  const names: string[] = [];
+  const recorded = new Map();
+  names.push(...Object.getOwnPropertyNames(obj));
+  let depth = 0,
+    target = obj;
+  while (target['__proto__']) {
+    if (recorded.has(target['__proto__']) || ++depth > maxDepth) break;
+    names.push(...Object.getOwnPropertyNames(target['__proto__']));
+    recorded.set(target['__proto__'], true);
+    target = target['__proto__'];
+  }
+  return [...new Set(names)];
 }
