@@ -26,6 +26,7 @@ export interface IUser {
   passwordChangeAt?: Date;
   credentialChangeAt: Date;
   sex?: UserSex;
+  data: any;
 }
 
 export type UserModel = Model<IUser, {}, IUserMethods>;
