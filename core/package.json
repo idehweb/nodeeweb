@@ -29,6 +29,7 @@
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.1",
     "express-sitemap-xml": "^3.0.1",
+    "googleapis": "^128.0.0",
     "isbot": "^3.7.0",
     "js2xmlparser": "^5.0.0",
     "jsonwebtoken": "^9.0.0",
