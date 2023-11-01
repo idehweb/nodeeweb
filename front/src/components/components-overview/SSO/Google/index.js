@@ -1,9 +1,11 @@
 import { googleHandler } from '@/functions/auth';
+import { getGoogleClientId } from './utils';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { toast } from 'react-toastify';
 
 export default function Google({ setLoading, onSuccess }) {
   const handle = (d) => {
+    if (!d.credential) return;
     setLoading(true);
     googleHandler
       .detect({ credential: d.credential })
@@ -13,9 +15,12 @@ export default function Google({ setLoading, onSuccess }) {
   };
 
   return (
-    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider clientId={getGoogleClientId()}>
       <GoogleLogin
-        type="icon"
+        // type="icon"
+        text="continue_with"
+        size="large"
+        shape="rectangular"
         auto_select={false}
         onSuccess={handle}
         onError={() => {
