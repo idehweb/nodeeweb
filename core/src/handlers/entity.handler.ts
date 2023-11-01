@@ -1,4 +1,5 @@
 import mongoose, { PopulateOptions } from 'mongoose';
+import { isJSON } from 'class-validator';
 import store from '../../store';
 import { CRUD, CRUDCreatorOpt, MiddleWare, Req, Res } from '../../types/global';
 import { NextFunction, Response } from 'express';
@@ -7,17 +8,57 @@ import {
   ControllerRegisterOptions,
   controllerRegister,
 } from './controller.handler';
-import { BASE_API_URL, CRUD_DEFAULT_REQ_KEY } from '../constants/String';
-import { isAsyncFunction } from 'util/types';
+import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { BadRequestError, GeneralError, NotFound } from '../../types/error';
 import { call } from '../../utils/helpers';
-import { CrudParamDto } from '../../dto/in/crud.dto';
+import { CrudParamDto, MultiIDParam } from '../../dto/in/crud.dto';
 import _, { lowerFirst, orderBy } from 'lodash';
+import { ClassConstructor } from 'class-transformer';
 
+export function getEntityEventName(
+  name: string,
+  { pre, post, type }: { pre?: boolean; post?: boolean; type: CRUD }
+) {
+  return `${pre ? 'pre' : 'post'}-${type}-${name.toLocaleLowerCase()}`;
+}
 export class EntityCreator {
   constructor(private modelName: string) {}
   private get model() {
     return store.db.model(this.modelName);
+  }
+
+  private exportQueryParams(
+    reqQuery: Req['query'],
+    queryFields?: CRUDCreatorOpt['queryFields']
+  ) {
+    if (!queryFields) return {};
+
+    let mapper: (key: string) => string | undefined;
+    const defaultMapper = (key: string) =>
+      ['sort', 'limit', 'offset', 'filter'].includes(key) ? `_${key}` : key;
+
+    switch (typeof queryFields) {
+      case 'function':
+        mapper = queryFields;
+        break;
+      case 'object':
+        mapper = (key) => queryFields[key];
+        break;
+      case 'boolean':
+      default:
+        mapper = defaultMapper;
+        break;
+    }
+
+    const query: any = {};
+    Object.entries(reqQuery).forEach(([k, v]) => {
+      const newKey = mapper(k);
+      if (!newKey) return;
+      if (isJSON(v)) v = JSON.parse(v as any);
+      query[newKey] = v;
+    });
+
+    return query as { [k: string]: string | string[] | object };
   }
 
   private async handleResult(
@@ -26,23 +67,24 @@ export class EntityCreator {
     next: NextFunction,
     {
       result,
-      saveToReq,
-      sendResponse,
       httpCode = 200,
+      ...opt
     }: {
       result: any;
-      saveToReq: CRUDCreatorOpt['saveToReq'];
-      sendResponse: CRUDCreatorOpt['sendResponse'];
       httpCode: number;
-    }
+    } & CRUDCreatorOpt
   ) {
     if (!result) throw new NotFound(`${this.modelName} not found`);
+    const { sendResponse, saveToReq } = opt;
 
     if (sendResponse && !saveToReq) {
       const data =
         typeof sendResponse === 'boolean'
           ? result
           : await call(sendResponse, result, req);
+
+      // call event
+      this.postEntity(data, opt, req);
       return res.status(httpCode).json({ data });
     }
 
@@ -79,8 +121,6 @@ export class EntityCreator {
       executeQuery,
       project,
       sort,
-      saveToReq,
-      sendResponse,
       paramFields,
       httpCode = 200,
       autoSetCount,
@@ -89,51 +129,86 @@ export class EntityCreator {
     }: Partial<CRUDCreatorOpt>
   ) {
     let result: any = query;
-    let mySort: any =
-      sort ?? queryFields?.sort ? req.query[queryFields?.sort] : undefined;
-    if (mySort) query.sort(mySort);
+    const reqQuery = this.exportQueryParams(req.query, queryFields);
+    const mySort: any = reqQuery['_sort'] ?? sort;
+    if (mySort) query.sort(Array.isArray(mySort) ? mySort.pop() : mySort);
     if (project) query.projection(project);
-
-    const offset = +this.getFrom(
-      req,
-      [
-        { reqKey: 'query', objKey: queryFields },
-        { reqKey: 'params', objKey: paramFields },
-      ],
-      'offset',
-      0
+    const offset = +(
+      reqQuery['_offset'] ??
+      this.getFrom(
+        req,
+        [{ reqKey: 'params', objKey: paramFields }],
+        'offset',
+        0
+      )
     );
 
-    const limit = +this.getFrom(
-      req,
-      [
-        { reqKey: 'query', objKey: queryFields },
-        { reqKey: 'params', objKey: paramFields },
-      ],
-      'limit',
-      req.method === 'GET' ? 12 : 0
+    const limit = +(
+      reqQuery['_limit'] ??
+      this.getFrom(
+        req,
+        [
+          { reqKey: 'query', objKey: queryFields },
+          { reqKey: 'params', objKey: paramFields },
+        ],
+        'limit',
+        req.method === 'GET' ? 12 : 0
+      )
     );
     if (offset) query.skip(offset);
     if (limit) query.limit(limit);
+
+    // filter
+    const filterFromQuery = Object.fromEntries(
+      Object.entries(reqQuery).filter(([k, v]) => !k.startsWith('_'))
+    );
+    const directFilterQ: any = reqQuery._filter ?? {};
+    query.setQuery({
+      ...query.getQuery(),
+      ...filterFromQuery,
+      ...directFilterQ,
+    });
 
     // populate
     if (populate) {
       if (!Array.isArray(populate)) populate = [populate];
       populate.forEach((p) => query.populate(p));
     }
-
     if (executeQuery) result = await query.exec();
     if (autoSetCount)
-      res.setHeader('X-Total-Count', await query.clone().countDocuments());
+      res.setHeader(
+        'X-Total-Count',
+        await query.clone().countDocuments({}, { limit: null, skip: null })
+      );
 
     // handle result and output
     await this.handleResult(req, res, next, {
+      ...arguments[4],
       result,
-      saveToReq,
-      sendResponse,
       httpCode,
     });
   }
+
+  preEntityCreator(opt: CRUDCreatorOpt): MiddleWare {
+    return (req, res, next) => {
+      store.event.emit(
+        getEntityEventName(this.modelName, { pre: true, type: opt.type }),
+        opt,
+        req
+      );
+      return next();
+    };
+  }
+
+  postEntity(data: any, opt: CRUDCreatorOpt, req: Req) {
+    store.event.emit(
+      getEntityEventName(this.modelName, { post: true, type: opt.type }),
+      data,
+      opt,
+      req
+    );
+  }
+
   createOneCreator({
     parseBody,
     executeQuery,
@@ -161,9 +236,8 @@ export class EntityCreator {
 
       // handle result and output
       this.handleResult(req, res, next, {
+        ...arguments[0],
         result: doc,
-        saveToReq,
-        sendResponse,
         httpCode: 201,
       });
     };
@@ -178,15 +252,24 @@ export class EntityCreator {
   }
   getOneCreator({
     parseFilter,
-    paramFields = { id: 'id' },
+    paramFields: pf = { id: 'id', slug: 'slug' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = parseFilter
         ? await call(parseFilter, req)
         : {
-            _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+            _id:
+              pf.id &&
+              req.params[pf.id] &&
+              new mongoose.Types.ObjectId(req.params[pf.id]),
+            slug: req.params[pf.slug],
           };
+
+      for (const key in f) {
+        if (f[key] === undefined) delete f[key];
+      }
+
       const query = this.model.findOne(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
@@ -201,15 +284,24 @@ export class EntityCreator {
   updateOneCreator({
     parseFilter,
     parseUpdate,
-    paramFields = { id: 'id' },
+    paramFields: pf = { id: 'id', slug: 'slug' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = parseFilter
         ? await call(parseFilter, req)
         : {
-            _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+            _id:
+              pf.id &&
+              req.params[pf.id] &&
+              new mongoose.Types.ObjectId(req.params[pf.id]),
+            slug: req.params[pf.slug],
           };
+
+      for (const key in f) {
+        if (f[key] === undefined) delete f[key];
+      }
+
       const u = parseUpdate ? await call(parseUpdate, req) : req.body;
       const query = this.model.findOneAndUpdate(f, u, { new: true });
       return await this.baseCreator(query, req, res, next, opt);
@@ -219,15 +311,24 @@ export class EntityCreator {
     parseFilter,
     forceDelete,
     parseUpdate,
-    paramFields = { id: 'id' },
+    paramFields: pf = { id: 'id', slug: 'slug' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = parseFilter
         ? await call(parseFilter, req)
         : {
-            _id: new mongoose.Types.ObjectId(req.params[paramFields.id]),
+            _id:
+              pf.id &&
+              req.params[pf.id] &&
+              new mongoose.Types.ObjectId(req.params[pf.id]),
+            slug: req.params[pf.slug],
           };
+
+      for (const key in f) {
+        if (f[key] === undefined) delete f[key];
+      }
+
       const u = parseUpdate ? await call(parseUpdate, req) : { active: false };
       const query = forceDelete
         ? this.model.findOneAndDelete(f)
@@ -260,6 +361,7 @@ const defaultCrudOpt: Omit<CRUDCreatorOpt, 'httpCode'> = {
   sendResponse: true,
   saveToReq: false,
   autoSetCount: true,
+  queryFields: true,
 };
 
 export function registerEntityCRUD(
@@ -281,19 +383,22 @@ export function registerEntityCRUD(
     opt.controller = opt.controller ?? {};
 
     // set default values
-    opt.crud = _.merge({ ...defaultCrudOpt }, opt.crud ?? {});
+    opt.crud = _.merge({ ...defaultCrudOpt }, opt.crud ?? {}, { type: cName });
+
+    const defValidator = detectDefaultParamValidation(cName, opt);
 
     schemas.push({
       method: opt.controller.method ?? translateCRUD2Method(cName),
       url: opt.controller.url ?? translateCRUD2Url(cName, opt.crud),
       access: opt.controller.access,
       service: [
+        creator.preEntityCreator(opt.crud),
         ...[opt.controller.beforeService ?? []].flat(),
         creator[translateCRUD2Creator(cName)](opt.crud),
         ...[opt.controller.service ?? []].flat(),
       ],
-      validate: canUseDefaultParamValidation(cName, opt)
-        ? { reqPath: 'params', dto: CrudParamDto }
+      validate: defValidator
+        ? { reqPath: 'params', dto: defValidator }
         : opt.controller.validate,
     });
   }
@@ -301,7 +406,9 @@ export function registerEntityCRUD(
   schemas.forEach((s) => controllerRegister(s, { ...registerOpt, base_url }));
 }
 
-function translateCRUD2Creator(name: CRUD): keyof EntityCreator {
+function translateCRUD2Creator(
+  name: CRUD
+): Exclude<keyof EntityCreator, 'postEntity'> {
   switch (name) {
     case CRUD.CREATE:
       return 'createOneCreator';
@@ -354,18 +461,29 @@ function translateCRUD2Url(
     case CRUD.GET_ONE:
     case CRUD.UPDATE_ONE:
     case CRUD.DELETE_ONE:
-      return `/:${opt.paramFields?.id ?? 'id'}`;
+      const identifier = opt.paramFields?.id ?? opt.paramFields?.slug ?? 'id';
+      return `/:${identifier}`;
     default:
       throw new Error(`Invalid CRUD name : ${name}`);
   }
 }
 
-function canUseDefaultParamValidation(name: CRUD, opt: EntityCRUDOpt) {
-  return (
+function detectDefaultParamValidation(
+  name: CRUD,
+  opt: EntityCRUDOpt
+): ClassConstructor<unknown> | null {
+  const canUse =
     opt.controller.validate === undefined &&
     [CRUD.UPDATE_ONE, CRUD.DELETE_ONE, CRUD.GET_ONE].includes(name) &&
-    (!opt.crud.paramFields || ['id', 'slug'].includes(opt.crud.paramFields.id))
-  );
+    (!opt.crud?.paramFields ||
+      ['id', 'slug'].includes(opt.crud?.paramFields.id));
+
+  return !canUse
+    ? null
+    : !opt.crud?.paramFields ||
+      (opt.crud.paramFields.id && opt.crud.paramFields.slug)
+    ? MultiIDParam
+    : CrudParamDto;
 }
 
 function order(opts: EntityOpts): EntityOpts {

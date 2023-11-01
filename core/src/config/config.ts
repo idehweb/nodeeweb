@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { SingleJobProcess } from '../handlers/singleJob.handler';
-import { isExistsSync } from '../../utils/helpers';
+import { getEnv, isExistsSync } from '../../utils/helpers';
 import { getSharedPath } from '../../utils/path';
 import { CoreConfigDto } from '../../dto/config';
 import { plainToInstance } from 'class-transformer';
@@ -129,7 +129,18 @@ class CoreConfig extends Config<CoreConfigDto> {
   protected get _defaultSetting(): CoreConfigDto {
     return {
       app_name: store.env.APP_NAME ?? 'Nodeeweb Core',
+      host: getEnv('server-host', { format: 'string' }) as string,
       auth: {},
+      supervisor:
+        store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
+          ? {
+              url: store.env.SUPERVISOR_URL,
+              token: store.env.SUPERVISOR_TOKEN,
+              whitelist:
+                (getEnv('supervisor-whitelist', { format: 'array' }) as any) ??
+                [],
+            }
+          : undefined,
       limit: {
         request_limit: DEFAULT_REQ_LIMIT,
         request_limit_window_s: DEFAULT_REQ_WINDOW_LIMIT,
@@ -140,9 +151,29 @@ class CoreConfig extends Config<CoreConfigDto> {
     };
   }
 
+  protected _filterAuth() {
+    const auth = this._config.auth ?? {};
+    const fAuth = {};
+
+    // remove secret,pass,key
+    Object.keys(auth).forEach((provider) => {
+      fAuth[provider] = {};
+
+      Object.keys(auth[provider]).forEach((k) => {
+        if (k.includes('secret') || k.includes('pass') || k.includes('key'))
+          return;
+        fAuth[provider][k] = auth[provider][k];
+      });
+    });
+
+    return fAuth;
+  }
+
   public getPublic(): Partial<CoreConfigDto> {
     return {
       app_name: this._config.app_name,
+      host: this._config.host,
+      auth: this._filterAuth(),
     };
   }
 }

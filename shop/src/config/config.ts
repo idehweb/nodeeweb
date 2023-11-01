@@ -26,12 +26,21 @@ import {
 import { plainToInstance } from 'class-transformer';
 import { registerConfig } from '@nodeeweb/core/src/handlers/config.handler';
 import logger from '../../utils/log';
+import { getEnv } from '@nodeeweb/core/utils/helpers';
 
 export class ShopConfig extends Config<ShopConfigDto> {
   protected get _defaultSetting(): ShopConfigDto {
     return {
       app_name: store.env.APP_NAME ?? 'Nodeeweb Shop',
+      host: getEnv('server-host', { format: 'string' }) as string,
       auth: {},
+      supervisor:
+        store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
+          ? {
+              url: store.env.SUPERVISOR_URL,
+              token: store.env.SUPERVISOR_TOKEN,
+            }
+          : undefined,
       limit: {
         request_limit: DEFAULT_REQ_LIMIT,
         request_limit_window_s: DEFAULT_REQ_WINDOW_LIMIT,
@@ -71,8 +80,34 @@ export class ShopConfig extends Config<ShopConfigDto> {
       enableImplicitConversion: true,
     });
   }
+  protected _filterAuth() {
+    const auth = this._config.auth ?? {};
+    const fAuth = {};
+
+    // remove secret,pass,key
+    Object.keys(auth).forEach((provider) => {
+      fAuth[provider] = {};
+
+      Object.keys(auth[provider]).forEach((k) => {
+        if (k.includes('secret') || k.includes('pass') || k.includes('key'))
+          return;
+        fAuth[provider][k] = auth[provider][k];
+      });
+    });
+
+    return fAuth;
+  }
+
   public getPublic(): Partial<ShopConfigDto> {
-    return {};
+    return {
+      app_name: this._config.app_name,
+      host: this._config.host,
+      currency: this._config.currency,
+      shop_active: this._config.shop_active,
+      shop_inactive_message: this._config.shop_inactive_message,
+      tax: this._config.tax,
+      auth: this._filterAuth(),
+    };
   }
 }
 

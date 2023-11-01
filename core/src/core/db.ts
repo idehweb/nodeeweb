@@ -70,3 +70,7 @@ export async function dbRegisterModels() {
   //   logger.log(color("Green", `## Register ${_.startCase(name)} Model ##`));
   // }
 }
+
+export async function dbSyncIndex() {
+  // await store.db.syncIndexes();
+}

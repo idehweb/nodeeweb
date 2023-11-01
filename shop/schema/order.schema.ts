@@ -1,6 +1,8 @@
 import crypto from 'crypto';
 import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 import { MultiLang } from './_base.schema';
+import { Currency } from '../dto/config';
+import store from '../store';
 
 export enum OrderStatus {
   Cart = 'cart',
@@ -16,8 +18,23 @@ export enum TransactionProvider {
   Manual = 'manual',
 }
 
+export type AddressType = {
+  state: string;
+  city: string;
+  street: string;
+  postalCode: string;
+  receiver: {
+    firstName: string;
+    lastName: string;
+    username?: string;
+    phone?: string;
+    email?: string;
+  };
+};
+
 export interface IOrder {
   _id: string;
+  currency: Currency;
   customer: {
     _id: Types.ObjectId;
     firstName: string;
@@ -26,20 +43,9 @@ export interface IOrder {
     phone?: string;
     email?: string;
   };
-  address?: {
-    state: string;
-    city: string;
-    street: string;
-    postalCode: string;
-    receiver: {
-      firstName: string;
-      lastName: string;
-      username?: string;
-      phone?: string;
-      email?: string;
-    };
-  };
+  address?: AddressType;
   post?: {
+    id: string;
     provider?: string;
     description?: string;
     logo?: string;
@@ -48,6 +54,7 @@ export interface IOrder {
     tracking?: string;
     postedAt?: Date;
     deliveredAt?: Date;
+    title?: string;
   };
   products: {
     _id: Types.ObjectId;
@@ -76,6 +83,7 @@ export interface IOrder {
     createdAt: Date;
     expiredAt: Date;
   };
+  checkout?: boolean;
   status: OrderStatus;
   statusChangedAt: Date;
   active: boolean;
@@ -85,6 +93,24 @@ export interface IOrder {
 
 export type OrderModel = Model<IOrder>;
 export type OrderDocument = Document<unknown, {}, IOrder> & IOrder;
+
+export const AddressSchema = {
+  type: {
+    _id: false,
+    state: { type: String, required: true },
+    city: { type: String, required: true },
+    street: { type: String, required: true },
+    postalCode: { type: String, required: true },
+    receiver: {
+      firstName: String,
+      lastName: String,
+      username: String,
+      phone: String,
+      email: String,
+    },
+  },
+  required: false,
+};
 
 const schema = new mongoose.Schema(
   {
@@ -96,6 +122,7 @@ const schema = new mongoose.Schema(
           .map(() => crypto.randomInt(0, 10))
           .join(''),
     },
+    currency: { type: String, default: () => store.config.currency },
     customer: {
       type: {
         _id: Schema.Types.ObjectId,
@@ -107,26 +134,11 @@ const schema = new mongoose.Schema(
       },
       required: true,
     },
-    address: {
-      type: {
-        _id: false,
-        state: { type: String, required: true },
-        city: { type: String, required: true },
-        street: { type: String, required: true },
-        postalCode: { type: String, required: true },
-        receiver: {
-          firstName: String,
-          lastName: String,
-          username: String,
-          phone: String,
-          email: String,
-        },
-      },
-      required: false,
-    },
+    address: AddressSchema,
     post: {
       type: {
         _id: false,
+        id: { type: String, required: true },
         provider: String,
         description: String,
         logo: String,
@@ -135,6 +147,7 @@ const schema = new mongoose.Schema(
         tracking: String,
         postedAt: Date,
         deliveredAt: Date,
+        title: String,
       },
       required: false,
     },
@@ -142,7 +155,7 @@ const schema = new mongoose.Schema(
       {
         _id: { type: Schema.Types.ObjectId, required: true },
         title: { type: MultiLang, required: true },
-        miniTitle: { type: MultiLang, required: true },
+        miniTitle: { type: MultiLang, required: false },
         image: String,
         combinations: [
           {
@@ -178,6 +191,7 @@ const schema = new mongoose.Schema(
       type: String,
       default: OrderStatus.Cart,
     },
+    checkout: { type: Boolean, default: false },
     statusChangedAt: Date,
     active: { type: Boolean, default: true },
   },

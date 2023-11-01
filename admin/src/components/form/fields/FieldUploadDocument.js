@@ -1,14 +1,7 @@
 import React, { memo, useState } from 'react';
-import { Field } from 'react-final-form';
 import { Button, Col } from 'shards-react';
 
-import AddIcon from '@mui/icons-material/Add';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-
 import { useTranslate } from 'react-admin';
-
-import { getField } from '@/components/form/fields';
-import { MainUrl, uploadMedia } from '@/functions/index';
 
 function FieldUploadDocument({ field }) {
   const t = useTranslate();

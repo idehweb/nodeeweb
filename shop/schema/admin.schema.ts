@@ -1,23 +1,14 @@
 import mongoose, { Model, model } from 'mongoose';
 import bcrypt from 'bcrypt';
+import { IUser } from '@nodeeweb/core/types/user';
+import { AddressSchema, AddressType } from './order.schema';
 
 export interface IAdminMethods {
   passwordVerify: (password: string) => Promise<boolean>;
 }
 
-export interface IAdmin {
-  email?: string;
-  username?: string;
-  firstName?: string;
-  lastName?: string;
-  password?: string;
-  role: string;
-  type: string;
-  active: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  passwordChangeAt?: Date;
-  credentialChangeAt: Date;
+export interface IAdmin extends IUser {
+  address: AddressType[];
 }
 
 export type AdminModel = Model<IAdmin, {}, IAdminMethods>;
@@ -58,9 +49,11 @@ const schema = new mongoose.Schema(
     },
     credentialChangeAt: {
       type: Date,
-      default: Date.now,
+      default: () => Date.now() - 1000,
       select: false,
     },
+    address: [AddressSchema],
+    data: { type: {}, default: {}, select: false },
     role: { type: String, default: 'admin' },
     type: { type: String, default: 'admin' },
     active: { type: Boolean, default: true },
@@ -72,11 +65,11 @@ schema.index({ _id: 1, active: 1 }, { name: 'auth' });
 
 schema.pre('save', async function (next) {
   const user = this;
-  if (!user.password) return next();
-
-  user.password = await bcrypt.hash(user.password, 12);
-  user.passwordChangeAt = new Date();
-  user.credentialChangeAt = user.passwordChangeAt;
+  if (user.password) {
+    user.password = await bcrypt.hash(user.password, 12);
+    user.passwordChangeAt = new Date();
+  }
+  user.credentialChangeAt = user.passwordChangeAt ?? new Date();
 
   return next();
 });

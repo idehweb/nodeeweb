@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { Server } from 'http';
-import { ENV } from './types/global';
+import { ENV, Seo, SupervisorEmitter } from './types/global';
 import { Application } from 'express';
 import { ErrorPackageFn } from './types/error';
 import { AdminViewSchema } from './types/view';
@@ -11,11 +11,15 @@ import { RestartPolicy } from './types/restart';
 import { StoreEnv } from './types/store';
 import EventEmitter from 'events';
 import { PluginCore } from './src/plugin/plugin';
+import { StoreTemplate } from './types/template';
+import { StoreRoute } from './types/route';
 export class Store {
   env: StoreEnv;
   db: typeof mongoose;
   dirs: string[];
   app: Application;
+  seo: Seo;
+  supervisor?: SupervisorEmitter;
   globalMiddleware: {
     error: ErrorPackageFn;
     pipes: { [key: string]: Pipe<unknown> };
@@ -24,6 +28,8 @@ export class Store {
   systemLogger: any;
   adminViews: { [key: AdminViewSchema['name']]: AdminViewSchema['content'] } =
     {};
+  templates: { [key: string]: StoreTemplate } = {};
+  routes: { [k: string]: StoreRoute } = {};
   strategies = new Map<string, AuthStrategy>();
   plugins = new PluginCore();
   config: ConfigType;

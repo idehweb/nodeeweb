@@ -10,7 +10,7 @@
     "author": "Nodeeweb",
     "main":"index",
     "slug":"meli-payamak-service-line-sms",
-    "add": {
+    "config": {
         "inputs": [
             {
                 "key": "username",
@@ -40,8 +40,12 @@
                 "description": {}
             }
         ],
-        "dto":"dto/add",
-        "run":"add"
+        "dto":"dto/config",
+        "run":"config"
+    },
+    "active":{
+        "dto" :"dto/config",
+        "run":"active"
     },
     "edit":{
         "inputs": [

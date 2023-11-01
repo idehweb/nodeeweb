@@ -4,11 +4,14 @@ import axios from 'axios';
 import { isClient } from '#c/functions/index';
 
 export function getToken() {
-  return `Bearer ${
+  const base =
     store.getState().store.admin.admin_token ??
     store.getState().store.user.token ??
-    ''
-  }`;
+    store.getState().store.token;
+
+  if (!base) return null;
+
+  return base.startsWith('Bearer ') ? base : `Bearer ${base}`;
 }
 
 export const postData = (

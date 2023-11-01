@@ -30,8 +30,13 @@ export const userEdit = (props) => {
         />
         <TextInput
           fullWidth
-          source="nickname"
-          label={translate('resources.user.nickname')}
+          source="firstName"
+          label={translate('resources.user.firstName')}
+        />
+        <TextInput
+          fullWidth
+          source="lastName"
+          label={translate('resources.user.lastName')}
         />
         <TextInput
           fullWidth

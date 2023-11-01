@@ -4,7 +4,6 @@ import { Col } from 'shards-react';
 
 import { useTranslate } from 'react-admin';
 
-import { getEntities, MainUrl, uploadMedia } from '@/functions/index';
 // import { JsonEditor as Editor } from 'jsoneditor-react';
 
 // import 'jsoneditor-react/es/editor.min.css';

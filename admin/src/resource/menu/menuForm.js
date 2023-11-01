@@ -44,7 +44,6 @@ const Form = ({ children, ...props }) => {
 
   const save = (e) => {
     e.preventDefault();
-    console.clear();
     console.log('hi');
   };
   // console.log("record", record);

@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
-import { Field } from 'react-final-form';
-import { Col, Button } from 'shards-react';
+import { Delete } from '@mui/icons-material';
+import { styled, IconButton } from '@mui/material';
 
-import Switch from '@mui/material/Switch';
-import { useTranslate } from 'react-admin';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+const StyledButton = styled(IconButton)({
+  position: 'absolute',
+  right: 0,
+  top: 0,
+  fontSize: 16,
+  transition: '0.2s all ease-in-out',
+  color: 'rgb(244, 67, 54)',
+  padding: 4,
+});
 
-import { MainUrl, uploadMedia } from '@/functions/index';
-
-function EveryFields(props) {
-  // if(!props.onClick){
-  //   return <></>
-  // }
+export default function EveryFields({ onClick }) {
   return (
-    <Button className={'remove-button'} onClick={props.onClick}>
-      <DeleteForeverIcon />
-    </Button>
+    <StyledButton tabIndex={-1} className="remove-button" onClick={onClick}>
+      <Delete />
+    </StyledButton>
   );
 }
-
-export default EveryFields;

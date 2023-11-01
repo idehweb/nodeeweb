@@ -24,7 +24,8 @@ const exporter = (users) => {
     if (user) {
       allpros.push({
         _id: user._id,
-        nickname: user.nickname && user.nickname,
+        firstName: user.firstName && user.firstName,
+        lastName: user.lastName && user.lastName,
         username: user.username && user.username,
         type: user.type && user.type,
         email: user.email && user.email,
@@ -40,7 +41,8 @@ const exporter = (users) => {
     {
       headers: [
         '_id',
-        'nickname',
+        'firstName',
+        'lastName',
         'username',
         'type',
         'email',
@@ -67,8 +69,12 @@ export const userList = (props) => {
           label={translate('resources.user.username')}
         />
         <TextField
-          source="nickname"
-          label={translate('resources.user.nickname')}
+          source="firstName"
+          label={translate('resources.user.firstName')}
+        />
+        <TextField
+          source="lastName"
+          label={translate('resources.user.lastName')}
         />
         <DateField
           source="createdAt"

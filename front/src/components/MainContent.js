@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useParams} from 'react-router-dom';
 
 import store from '../functions/store';
-import { withTranslation } from 'react-i18next';
+import {withTranslation} from 'react-i18next';
 import {
   addBookmark,
   clearPost,
@@ -15,17 +15,17 @@ import {
   savePost,
   setStyles,
 } from '#c/functions/index';
-import { SnapChatIcon } from '#c/assets/index';
+import {SnapChatIcon} from '#c/assets/index';
 import Loading from '#c/components/Loading';
 import PageBuilder from '#c/components/page-builder/PageBuilder';
 
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 // import { Link, useNavigate, useParams } from "react-router-dom";
 // let obj = ;
 // let the_id='';
 
 const MainContent = (props) => {
-  let { match, location, history, t, url } = props;
+  let {match, location, history, t, url} = props;
 
   let page = useSelector((st) => {
     // console.log("st.store", st.store.productSliderData);
@@ -46,7 +46,12 @@ const MainContent = (props) => {
     return new Promise(function (resolve, reject) {
       // getBlogPost(_id).then((d = {}) => {
       getPage(_id).then((d = {}) => {
-        d = d.data;
+        console.log('d',d)
+        //
+        // d = d.data;
+        // console.log('d',d)
+        // if (d.data)
+        //   d = d.data;
         console.log('set _id to show *:', d);
         if (d._id) {
           savePost({
@@ -57,21 +62,21 @@ const MainContent = (props) => {
             elements: d.elements,
             mainCategory: d.mainCategory,
           });
-        resolve({
-          load: true,
-          title: d.title,
-          description: d.description,
-          photos: d.photos,
-          _id: d._id,
-          updatedAt: d.updatedAt,
-          kind: d.kind,
-          elements: d.elements,
-          thumbnail: d.thumbnail,
-          maxWidth: d.maxWidth,
-          excerpt: d.excerpt,
-          backgroundColor: d.backgroundColor,
-          views: d.views,
-        });
+          resolve({
+            load: true,
+            title: d.title,
+            description: d.description,
+            photos: d.photos,
+            _id: d._id,
+            updatedAt: d.updatedAt,
+            kind: d.kind,
+            elements: d.elements,
+            thumbnail: d.thumbnail,
+            maxWidth: d.maxWidth,
+            excerpt: d.excerpt,
+            backgroundColor: d.backgroundColor,
+            views: d.views,
+          });
         } else {
           reject({
             load: true,
@@ -84,7 +89,7 @@ const MainContent = (props) => {
   if (isClient)
     useEffect(() => {
       // let mounted = true;
-      let { _id, title } = params;
+      let {_id, title} = params;
 
       console.log('useEffect', _id, the_id, mainId);
       if (!elements)
@@ -100,8 +105,8 @@ const MainContent = (props) => {
             setState(e);
           });
       else {
-        let obj = { load: true };
-        setState({ ...obj });
+        let obj = {load: true};
+        setState({...obj});
       }
       // return () => mounted = false;
     }, [the_id]);
@@ -134,8 +139,8 @@ const MainContent = (props) => {
     views = null,
   } = state;
 
-  if (redirect && isClient) return <Navigate to={redirect} />;
-  if (!load && isClient) return <Loading />;
+  if (redirect && isClient) return <Navigate to={redirect}/>;
+  if (!load && isClient) return <Loading/>;
   if (load && notfound && isClient) return <div>not found</div>;
   let style = setStyles({
     backgroundColor: backgroundColor,

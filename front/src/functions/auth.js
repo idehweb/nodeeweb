@@ -1,43 +1,62 @@
-import axios from 'axios';
 import { ApiUrl } from '.';
+import API from './API';
 
+const defaultConfig = { login: true, signup: false };
 export class AuthHandler {
-  constructor(strategy) {
+  constructor(strategy, config) {
     this.strategy = strategy;
+    this.config = Object.assign({}, defaultConfig, config);
   }
-  detect = (phone, { login, signup } = { login: true, signup: false }) => {
-    return axios.post(`${ApiUrl}/auth/${this.strategy}`, {
-      userType: 'customer',
-      login,
-      signup,
-      user: { phone },
-    });
-  };
 
-  login = (phone, code) => {
-    return axios.post(`${ApiUrl}/auth/${this.strategy}/login`, {
-      userType: 'customer',
-      user: {
-        phone,
-        code,
+  async #query(config) {
+    const {
+      data: { data },
+    } = await API({
+      method: 'post',
+      baseURL: `${ApiUrl}/auth/${this.strategy}`,
+      ...config,
+    });
+    return data;
+  }
+
+  detect = (user, opt) => {
+    const login = opt?.login !== undefined ? opt.login : this.config.login;
+    const signup = opt?.signup !== undefined ? opt.signup : this.config.signup;
+    return this.#query({
+      url: '/',
+      data: {
+        userType: 'customer',
+        login,
+        signup,
+        user,
       },
     });
   };
 
-  signup = ({ firstName, lastName, phone, code, username }) => {
-    return axios.post(`${ApiUrl}/auth/${this.strategy}/signup`, {
-      userType: 'customer',
-      user: {
-        lastName,
-        firstName,
-        phone,
-        code,
-        username,
+  login = (user) => {
+    return this.#query({
+      url: `/login`,
+      data: {
+        userType: 'customer',
+        user,
+      },
+    });
+  };
+
+  signup = (user) => {
+    return this.#query({
+      url: `/signup`,
+      data: {
+        userType: 'customer',
+        user,
       },
     });
   };
 }
 
-const otpHandler = new AuthHandler('otp');
-
-export default otpHandler;
+export const otpHandler = new AuthHandler('otp');
+export const jwtHandler = new AuthHandler('jwt');
+export const googleHandler = new AuthHandler('google', {
+  signup: true,
+  login: true,
+});

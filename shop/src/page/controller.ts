@@ -8,7 +8,7 @@ import Service from './service';
 import { AdminAccess, OptUserAccess } from '@nodeeweb/core';
 
 export default function registerController() {
-  // create , update , getAll  ,getOne
+  // create , update , getAll  , getOne , deleteOne
   registerEntityCRUD(
     'page',
     {
@@ -40,6 +40,7 @@ export default function registerController() {
             }
           },
           autoSetCount: true,
+          queryFields: true,
           paramFields: {
             limit: 'limit',
             offset: 'offset',
@@ -51,11 +52,28 @@ export default function registerController() {
           access: AdminAccess,
           service: Service.createAfter,
         },
+        crud: {
+          saveToReq: true,
+        },
       },
       updateOne: {
         controller: {
           access: AdminAccess,
           service: Service.updateAfter,
+        },
+        crud: {
+          executeQuery: false,
+          saveToReq: true,
+        },
+      },
+      deleteOne: {
+        controller: {
+          access: AdminAccess,
+          service: Service.deleteAfter,
+        },
+        crud: {
+          executeQuery: true,
+          saveToReq: true,
         },
       },
     },

@@ -4,7 +4,6 @@ import { Col } from 'shards-react';
 
 import { useTranslate } from 'react-admin';
 
-import { MainUrl, uploadMedia } from '@/functions/index';
 import { EveryFields } from '@/components/form/fields';
 
 function FieldNumber(props) {

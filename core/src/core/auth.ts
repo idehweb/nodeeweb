@@ -1,6 +1,7 @@
 import { AuthStrategyBody } from '../../dto/in/auth/index.dto';
 import { ControllerSchema } from '../../types/controller';
 import AuthGatewayStrategy from '../auth/authGateway.strategy';
+import { GoogleStrategy } from '../auth/google.strategy';
 import { JwtStrategy } from '../auth/jwt.strategy';
 import { OtpStrategy } from '../auth/otp.strategy';
 import UserPassStrategy from '../auth/userPass.strategy';
@@ -13,6 +14,7 @@ export function activeAuthControllers() {
   registerAuthStrategy(new UserPassStrategy(), 'CoreAuth');
   registerAuthStrategy(new OtpStrategy(), 'CoreAuth');
   registerAuthStrategy(new JwtStrategy(), 'CoreAuth');
+  registerAuthStrategy(new GoogleStrategy(), 'CoreAuth');
 
   //   gateway
   const gateway = new AuthGatewayStrategy();

@@ -10,9 +10,17 @@ import CartService from './cart.service';
 import { AuthUserAccess } from '@nodeeweb/core';
 import transactionService from './transaction.service';
 import orderService from './order.service';
-import { AddToCartBody, UpdateCartBody } from '../../dto/in/order/cart';
+import {
+  AddToCartBody,
+  DeleteCombParam,
+  ModifyCombBody,
+  ModifyCombParam,
+  UpdateCartBody,
+} from '../../dto/in/order/cart';
 import { OrderIdParam, UpdateOrderBody } from '../../dto/in/order/order';
 import postService from './post.service';
+import { PostOptionQuery } from '../../dto/in/order/post';
+import { CreateTransactionBody } from '../../dto/in/order/transaction';
 
 export default function registerController() {
   // api
@@ -44,13 +52,42 @@ export default function registerController() {
       access: AuthUserAccess,
     },
     {
+      method: 'put',
+      url: '/cart/:productId/:combId',
+      service: CartService.modifyComb,
+      access: AuthUserAccess,
+      validate: [
+        { reqPath: 'params', dto: ModifyCombParam },
+        { reqPath: 'body', dto: ModifyCombBody },
+      ],
+    },
+    {
+      method: 'delete',
+      url: '/cart/:productId/:combId',
+      service: CartService.deleteComb,
+      access: AuthUserAccess,
+      validate: { reqPath: 'params', dto: DeleteCombParam },
+    },
+    {
+      method: 'put',
+      url: '/cart/checkout',
+      service: CartService.checkout,
+      access: AuthUserAccess,
+    },
+    {
       method: 'post',
       service: transactionService.createTransaction,
       url: '/transaction',
       access: AuthUserAccess,
+      validate: { reqPath: 'body', dto: CreateTransactionBody },
     },
     {
       method: 'get',
+      service: transactionService.paymentCallback,
+      url: '/payment_callback/:orderId',
+    },
+    {
+      method: 'post',
       service: transactionService.paymentCallback,
       url: '/payment_callback/:orderId',
     },
@@ -62,9 +99,10 @@ export default function registerController() {
     },
     {
       method: 'get',
-      service: postService.getAll,
+      service: postService.get,
       url: '/post',
       access: AuthUserAccess,
+      validate: { reqPath: 'query', dto: PostOptionQuery },
     },
   ];
 
@@ -95,6 +133,7 @@ export default function registerController() {
         crud: {
           parseFilter: orderService.getAllFilterParser,
           sort: { updatedAt: -1 },
+          queryFields: true,
           paramFields: {
             limit: 'limit',
             offset: 'offset',

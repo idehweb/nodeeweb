@@ -99,6 +99,12 @@ export default class Transform {
       productCategory: product.productCategory,
       access: 'public',
       requireWarranty: false,
+      id: product._id,
+      combinations: product.combinations.map((c) => ({
+        ...c,
+        id: c['_id'],
+        _id: c._id,
+      })),
     };
 
     if (product.price_type === 'normal') {
@@ -107,10 +113,7 @@ export default class Transform {
       out = {
         ...out,
         type: 'variable',
-        combinations: product.combinations.map((c) => ({
-          ...c,
-          id: c['_id'],
-        })),
+
         options: product.options.map((opt) => ({
           ...opt,
           isDisabled: false,
@@ -118,7 +121,6 @@ export default class Transform {
         })),
       };
     }
-
     return { ...product, ...out };
   }
   static getAllProduct(products) {

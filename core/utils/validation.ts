@@ -107,13 +107,14 @@ export type SlugOpt = {
 };
 
 const default_slug_options: SlugOpt = {
-  allow_underscore: false,
-  allow_uppercase: false,
+  allow_underscore: true,
+  allow_uppercase: true,
   allow_parenthesis: false,
 };
 
 export function isSlug(str: string, options: SlugOpt = {}) {
   if (typeof str !== 'string') return false;
+  return true;
 
   options = _.merge(options, default_slug_options);
 
@@ -130,8 +131,9 @@ export function isSlug(str: string, options: SlugOpt = {}) {
     charset += '\\(\\);';
   }
 
-  let regex_charset = new RegExp(`^[${charset}]+$`);
-  let regex_boundaries_consecutive = /[-_]{2,}/;
+  // let regex_charset = new RegExp(`^[${charset}]+$`);
+  let regex_charset = /^[^\s]+$/;
+  let regex_boundaries_consecutive = /[-_]{3,}/;
   let regex_boundaries_leading = /^[-_]/;
   let regex_boundaries_trailing = /[-_]$/;
 

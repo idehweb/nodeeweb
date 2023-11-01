@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "build": "tsc --build",
-    "build:post":"copyfiles -F -e 'node_modules/**' -e 'public/**' '**/*.sh' '**/*.json' dist",
+    "build:post": "copyfiles -F -e 'node_modules/**' -e 'public/**' '**/*.sh' '**/*.json' dist",
     "dev": "nodemon --config nodemon.json index.ts",
     "dev:start": "ts-node index.ts",
     "log": "nodemon src/core/log.ts",
@@ -16,14 +16,16 @@
   "dependencies": {
     "@nodeeweb/core": "link:../core",
     "axios": "^1.4.0",
-    "bcrypt": "link:./node_modules\\@nodeeweb\\core\\node_modules\\bcrypt",
+    "bcrypt": "^5.1.1",
     "class-transformer": "link:./node_modules\\@nodeeweb\\core\\node_modules\\class-transformer",
     "class-validator": "link:./node_modules\\@nodeeweb\\core\\node_modules\\class-validator",
     "lodash": "link:./node_modules\\@nodeeweb\\core\\node_modules\\lodash",
+    "mathjs": "^11.11.1",
     "moment": "^2.29.4",
     "mongoose": "link:./node_modules\\@nodeeweb\\core\\node_modules\\mongoose",
     "persianjs": "^0.4.0",
     "reflect-metadata": "link:./node_modules\\@nodeeweb\\core\\node_modules\\reflect-metadata",
+    "sitemap": "^7.1.1",
     "string-math": "^1.2.2"
   },
   "devDependencies": {

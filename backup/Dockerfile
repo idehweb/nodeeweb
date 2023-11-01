@@ -15,6 +15,7 @@ RUN wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add -
     && wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - \
     && echo "deb https://repo.mongodb.org/apt/debian/ bullseye/mongodb-org/6.0 main" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
 
+
 # Install requirements
 RUN apt update -y && \
     apt install -y --no-install-recommends \

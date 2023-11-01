@@ -133,6 +133,8 @@ const DefaultOptions = [
           { name: 'height', type: 'string' },
           { name: 'maxHeight', type: 'string' },
           { name: 'title', type: 'string' },
+          { name: 'border', type: 'string' },
+          { name: 'borderRadius', type: 'string' },
           ...rules,
         ],
       },
@@ -226,7 +228,15 @@ const DefaultOptions = [
     settings: {
       general: {
         fields: { height: '', ...fields },
-        rules: [{ name: 'height', type: 'string' }, ...rules],
+        rules: [
+          { name: 'height', type: 'string' },
+          { name: 'maxWidth', type: 'string' },
+          { name: 'border', type: 'string' },
+          { name: 'borderRadius', type: 'string' },
+          { name: 'boxShadow', type: 'string' },
+
+          ...rules,
+        ],
       },
       design: [{ name: 'padding', type: 'string' }],
     },
@@ -238,7 +248,13 @@ const DefaultOptions = [
     settings: {
       general: {
         fields: { width: '', ...fields },
-        rules: [{ name: 'width', type: 'string' }, ...rules],
+        rules: [
+          { name: 'width', type: 'string' },
+          { name: 'border', type: 'string' },
+          { name: 'borderRadius', type: 'string' },
+          { name: 'boxShadow', type: 'string' },
+          ...rules,
+        ],
       },
       design: [{ name: 'padding', type: 'string' }],
     },
@@ -329,8 +345,8 @@ const DefaultOptions = [
   {
     label: 'Navigation bar',
     name: 'navigation',
-    addable: true,
     settings: {
+      addable: true,
       general: {
         fields: { colCount: 1, type: 'simple', ...fields },
         rules: [

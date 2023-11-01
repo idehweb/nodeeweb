@@ -15,6 +15,7 @@ import { useWatch } from 'react-hook-form';
 import API, { BASE_URL, SERVER_URL } from '@/functions/API';
 import Api from '@/functions/API-v1';
 import { TheImages, showFiles } from '@/components';
+import { uploadMedia } from '@/functions';
 
 API.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 
@@ -29,7 +30,6 @@ export default (props) => {
   // let {values} = useFormState();
   let { field } = useInput(props);
   // console.log("input", field);
-
   const [gallery, setGallery] = useState(valuesphotos || []);
   const [counter, setCounter] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -55,13 +55,11 @@ export default (props) => {
     formData.append('file', file);
     formData.append('type', file.type);
     setLoading(true);
-    Api.post('/file', formData, {
-      onUploadProgress: (e) => {
-        let p = Math.floor((e.loaded * 100) / e.total);
-        setProgress(p);
-      },
+
+    uploadMedia(file, (percent, canceler) => {
+      setProgress(percent);
     })
-      .then(({ data: { data } }) => {
+      .then(({ data }) => {
         const { url, _id } = data;
         setProgress(0);
         GalleryTemp.push(url);
@@ -89,13 +87,14 @@ export default (props) => {
     });
     setGallery(cc);
     setProgress(0);
-    props.setPhotos(cc);
+    props.onRemove && props.onRemove(photo);
 
     // console.log('valuesphotos',valuesphotos);
   };
   const onImageClick = (photo) => {
     props.thep(photo);
     setV(photo);
+    props.changeThumbnail && props.changeThumbnail(photo);
   };
   const removeK = (g) => {
     // e.preventDefault();
@@ -107,8 +106,6 @@ export default (props) => {
     setGallery(c);
   };
 
-  // console.cle/sar();
-  //   console.log("gallery", props);
   return (
     <>
       <ImageInput

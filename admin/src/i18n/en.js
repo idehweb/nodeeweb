@@ -1,7 +1,5 @@
 import englishMessages from 'ra-language-english';
 
-console.log('running english language...');
-
 const customEnglishMessages = {
   ...englishMessages,
   websiteName: 'Gameboss',
@@ -223,8 +221,6 @@ const customEnglishMessages = {
       nickname: 'nickname',
       password: 'password',
       username: 'username',
-      firstName: 'firstname',
-      lastName: 'lastname',
     },
 
     attributes: {
@@ -245,6 +241,9 @@ const customEnglishMessages = {
       install: 'install',
       unistall: 'unistall',
       edit: 'edit',
+      configuration: 'config',
+      status: 'status',
+      activation: 'activation',
     },
     category: {
       menu_label: 'categories',
@@ -348,7 +347,7 @@ const customEnglishMessages = {
       labels: 'labels',
       story: 'story',
       miniTitle: 'Short title',
-      type: 'type',
+      type: 'Type of price calculation',
       photo: 'photo',
       extra_attr: 'extra attributes',
       sources: 'Robot Sources',

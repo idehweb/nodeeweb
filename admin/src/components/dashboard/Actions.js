@@ -52,7 +52,9 @@ const Actions = (props) => {
                 component={Link}
                 key={record.id}>
                 <ListItemText primary={record.title} />
-                {record.user && <ListItemText primary={record.user.nickname} />}
+                {record.user && (
+                  <ListItemText primary={record.user.firstName} />
+                )}
                 {record.customer && (
                   <ListItemText primary={record.customer.phoneNumber} />
                 )}

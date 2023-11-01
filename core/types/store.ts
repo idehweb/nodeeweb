@@ -27,4 +27,6 @@ export type StoreEnv = {
   RESTART_COUNT: string;
   RESTARTING: string;
   MAX_NUM_OF_PROXY?: number;
+  SUPERVISOR_URL?: string;
+  SUPERVISOR_TOKEN?: string;
 } & { [k: string]: string };

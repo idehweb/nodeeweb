@@ -12,7 +12,7 @@ import {
   NavLink,
   Row,
 } from 'shards-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import Gallery from '#c/components/single-post/Gallery';
 import {
   WarrantyIcon,
@@ -70,41 +70,23 @@ const Product = (props) => {
   let product = useSelector((st) => {
     return st.store.product || [];
   });
-
-  // window.scrollTo(0, 0);
   let params = useParams();
-  // return;
   let the_id = params._id || params._product_slug;
-  // let search = false;
-  // let history = useNavigate();
 
-  let st = store.getState().store;
   let fp = localStorage.getItem('username');
-  // return JSON.stringify(fp)
   let admin_token = null;
   if (fp) {
     admin_token = fp;
   }
-  const [mainId, setMainId] = useState(the_id);
   const [tab, setTab] = useState('attributes');
   const [state, setState] = useState(isClient ? [] : product || []);
   const [lan, setLan] = useState(store.getState().store.lan || 'fa');
   const [requiredWarranty, setRequiredWarranty] = useState(true);
-  // const [enableAdmin] = useState(store.getState().store.enableAdmin || false);
 
   const getThePost = (_id) => {
     return new Promise(function (resolve, reject) {
       getPost(_id).then((d = {}) => {
         d = Transform.getOneProduct(d.data);
-        // savePost({
-        //   mainList: d.mainList,
-        //   catChoosed: d.catChoosed,
-        //   countryChoosed: d.countryChoosed,
-        //   categories: d.categories,
-        //   mainCategory: d.mainCategory
-        // });
-
-        // **********WarrantyRequired*********************
 
         if (d.requireWarranty) {
           setRequiredWarranty(d.requireWarranty);
@@ -112,44 +94,9 @@ const Product = (props) => {
           setRequiredWarranty(false);
         }
 
-        // **************WarrantyRequired*****************
-
-        console.log('##$$', d);
-
         resolve({
           load: true,
-          title: d.title,
-          description: d.description,
-          lyrics: d.lyrics,
-          files: d.files,
-          photos: d.photos,
-          _id: d._id,
-          extra_button: d.extra_button,
-          customer: d.customer,
-          catChoosed: d.catChoosed,
-          countryChoosed: d.countryChoosed,
-          updatedAt: d.updatedAt,
-          nextPost: d.nextPost,
-          type: d.type,
-          price: d.price,
-          salePrice: d.salePrice,
-          allPostData: d.data,
-          questions: d.questions,
-          firstCategory: d.firstCategory,
-          secondCategory: d.secondCategory,
-          thirdCategory: d.thirdCategory,
-          sections: d.sections,
-          options: d.options,
-          in_stock: d.in_stock,
-          quantity: d.quantity,
-          thumbnail: d.thumbnail,
-          labels: d.labels,
-          excerpt: d.excerpt,
-          categories: d.categories,
-          extra_attr: d.extra_attr,
-          views: d.views,
-          like: d.like,
-          combinations: d.combinations,
+          ...d,
         });
       });
     });
@@ -157,24 +104,12 @@ const Product = (props) => {
 
   if (isClient)
     useEffect(() => {
-      // let mounted = true;
       let { _id, title } = params;
       getThePost(the_id).then((items) => {
         setState(items);
         if (isClient) window.scrollTo(0, 0);
-        // }
       });
-      // return () => mounted = false;
     }, [the_id]);
-
-  // useEffect(() => {
-  //   let { _id, title } = params;
-  //   // if (mainId != _id) {
-  //   getThePost(_id).then(res=>setState(state => ({ ...state, ...res })));
-  //   window.scrollTo(0, 0);
-  //   // }
-  //
-  // }, [the_id]);
 
   let {
     labels,
@@ -193,8 +128,6 @@ const Product = (props) => {
     firstCategory,
     secondCategory,
     thirdCategory,
-    sections,
-    categories,
     combinations,
     options,
     quantity,
@@ -263,7 +196,6 @@ const Product = (props) => {
             {views && (
               <Button>
                 <RemoveRedEyeIcon />
-                {/*<Badge theme="info">{views}</Badge>*/}
               </Button>
             )}
             <Button
@@ -436,6 +368,7 @@ const Product = (props) => {
                     </>
                   )}
                   <SidebarActions
+                    product={state}
                     className={'mobilenone '}
                     add={false}
                     edit={true}
@@ -466,6 +399,7 @@ const Product = (props) => {
             <Row>
               <Col lg="12" md="12" className={'single-product mb-3'}>
                 <SidebarActions
+                  product={state}
                   className={'mobilenone '}
                   add={false}
                   edit={true}

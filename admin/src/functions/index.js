@@ -8,13 +8,15 @@ import authProvider from './authProvider';
 import theme from './theme';
 import data from './dataProvider';
 
-// import {MainUrl, savePost} from "../../../main/src/client/functions";
+// import {SERVER_URL, savePost} from "../../../main/src/client/functions";
 import API from './API';
 import API_BASE_URL, { BASE_URL } from './API_BASE_URL';
+import { SERVER_URL as MainUrl } from '@/functions/API';
+
 // import { BASE_URL } from './API-v1';
 
 const ADMIN_ROUTE = window.BASE_URL;
-export const MainUrl = window.BASE_URL;
+export const SERVER_URL = MainUrl;
 
 const dataProvider = data(BASE_URL);
 
@@ -49,10 +51,9 @@ export const jToM = (date) => {
   return newDate;
 };
 export const dateFormat = (d, f = 'YYYY/MM/DD HH:mm') => {
-  // console.log('d', d);
-  if (d) var t = moment(d, 'YYYY-MM-DDTHH:mm:ss.SSSZ').locale('fa').format(f);
-  if (t) return t;
-  else return false;
+  if (!d) return '';
+
+  return moment(d, 'YYYY-MM-DDTHH:mm:ss.SSSZ').locale('fa').format(f);
 };
 export const dateFormatter = (date) => {
   return dateFormat(new Date(date), 'YYYY/MM/DD');
@@ -84,11 +85,9 @@ export const changeLocale = (locale) => {
     payload: locale,
   };
 };
-export const changeThemeDataFunc = () => {
-  console.log('changeThemeDataFunc');
-  return new Promise(function (resolve, reject) {
-    let c = [];
-    API_BASE_URL.get('/theme/')
+export const changeThemeDataFunc = () =>
+  new Promise(function (resolve, reject) {
+    API_BASE_URL.get('/theme')
       .then(({ data = {} }) => {
         resolve(data);
       })
@@ -96,7 +95,7 @@ export const changeThemeDataFunc = () => {
         reject(err);
       });
   });
-};
+
 export const restartSystem = () => {
   return new Promise(function (resolve, reject) {
     API.post(`/settings/restart`, {}, true)
@@ -144,30 +143,16 @@ export const SaveBuilder = (model, _id = null, data, headers) => {
       });
   });
 };
-export const GetBuilder = (model, _id) => {
-  console.log('GetBuilder()==>', _id);
-
-  return new Promise(function (resolve, reject) {
-    let c = [];
+export const GetBuilder = (model, _id) =>
+  new Promise((resolve, reject) => {
     API.get('/' + model + '/' + _id)
       .then(({ data = {} }) => {
-        // console.log('resolve GetBuilder')
-
-        //     let mainD = data["data"];
-        // console.log('mainD',data)
-
-        // if (mainD.success) {
-        //     // savePost({order_id: null, card: []});
-        // }
         resolve(data);
       })
       .catch((err) => {
-        // console.log('reject GetBuilder')
-
         reject(err);
       });
   });
-};
 
 export const getEntities = (
   entity,
@@ -220,7 +205,7 @@ export const getEntities = (
       });
   });
 };
-export const uploadMedia = (file = {}, onUploadProgress, id) => {
+export const uploadMedia = (file, onUploadProgress) => {
   return new Promise(function (resolve, reject) {
     const formData = new FormData();
     formData.append('file', file);
@@ -229,20 +214,15 @@ export const uploadMedia = (file = {}, onUploadProgress, id) => {
     let cancel;
 
     const config = {
-      headers: {
-        'content-type': 'multipart/form-data',
-        Authorization: localStorage.getItem('token'),
-      },
       cancelToken: new axios.CancelToken((c) => {
         cancel = c;
       }),
       onUploadProgress: (ev) => {
         const percent = (ev.loaded / ev.total) * 100;
-        onUploadProgress(percent, id, cancel);
+        if (onUploadProgress) onUploadProgress(percent, cancel);
       },
     };
-    return axios
-      .post(`${ADMIN_ROUTE}/media/fileUpload`, formData, config)
+    return API.post('/file', formData, config)
       .then((res) => {
         return resolve(res.data);
       })

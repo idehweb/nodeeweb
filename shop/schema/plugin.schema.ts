@@ -1,6 +1,11 @@
 import mongoose, { Document, Model, Schema, SchemaType, Types } from 'mongoose';
 import { MultiLang } from './_base.schema';
 
+export enum PluginStatus {
+  NeedToConfig = 'need-to-config',
+  Active = 'active',
+  Inactive = 'inactive',
+}
 export interface IPlugin {
   name: string;
   version: string;
@@ -11,7 +16,8 @@ export interface IPlugin {
   type: string;
   icon?: string;
   author: string;
-  arg: { [key: string]: string };
+  arg?: { [key: string]: string };
+  status: PluginStatus;
 }
 
 export type PluginModel = Model<IPlugin>;
@@ -27,9 +33,10 @@ const schema = new mongoose.Schema(
     type: { type: String, required: true },
     icon: { type: String },
     author: { type: String, required: true },
+    status: { type: String, default: PluginStatus.NeedToConfig },
     arg: {
       type: {},
-      required: true,
+      required: false,
       _id: false,
     },
   },

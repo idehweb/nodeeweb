@@ -50,12 +50,14 @@ export type CRUDCreatorOpt = {
     id?: string;
     offset?: string;
     limit?: string;
+    slug?: string;
   };
-  queryFields?: {
-    offset?: string;
-    limit?: string;
-    sort?: string;
-  };
+  queryFields?:
+    | {
+        [key: string]: string;
+      }
+    | ((key: string) => string | undefined)
+    | boolean;
   sort?: { [k: string]: mongoose.SortValues };
   project?: mongoose.ProjectionType<any>;
   executeQuery?: boolean;
@@ -65,6 +67,7 @@ export type CRUDCreatorOpt = {
   forceDelete?: boolean;
   autoSetCount?: boolean;
   populate?: mongoose.PopulateOptions | mongoose.PopulateOptions[];
+  type?: CRUD;
 };
 
 export enum CRUD {
@@ -74,4 +77,19 @@ export enum CRUD {
   CREATE = 'create',
   UPDATE_ONE = 'updateOne',
   DELETE_ONE = 'deleteOne',
+}
+
+export interface SupervisorEmitter {
+  id: string;
+  emit(event: string, ...body: any[]): Promise<boolean>;
+}
+
+export interface Seo {
+  getSitemap: MiddleWare;
+  getPage: MiddleWare;
+  initial: () => Promise<void> | void;
+  clear: () => void;
+  log: (...args: any[]) => void;
+  error: (...args: any[]) => void;
+  warn: (...args: any[]) => void;
 }
