@@ -34,6 +34,7 @@ import { fNum } from '#c/functions/utils';
 import CircularProgress from '@mui/material/CircularProgress';
 import { otpHandler } from '@/functions/auth';
 import { SaveData } from '@/functions';
+import SSO from './SSO';
 
 const globalTimerSet = 120;
 
@@ -576,6 +577,10 @@ class LoginForm extends React.Component {
             </Row>
           </ListGroupItem>
         )}
+        <SSO
+          setLoading={(v) => this.setState((p) => ({ ...p, loading: v }))}
+          onNext={(v) => (window.location.href = '/profile')}
+        />
       </ListGroup>
     );
   }

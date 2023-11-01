@@ -1,9 +1,11 @@
 import { ApiUrl } from '.';
 import API from './API';
 
+const defaultConfig = { login: true, signup: false };
 export class AuthHandler {
-  constructor(strategy) {
+  constructor(strategy, config) {
     this.strategy = strategy;
+    this.config = Object.assign({}, defaultConfig, config);
   }
 
   async #query(config) {
@@ -17,7 +19,9 @@ export class AuthHandler {
     return data;
   }
 
-  detect = (user, { login, signup } = { login: true, signup: false }) => {
+  detect = (user, opt) => {
+    const login = opt?.login !== undefined ? opt.login : this.config.login;
+    const signup = opt?.signup !== undefined ? opt.signup : this.config.signup;
     return this.#query({
       url: '/',
       data: {
@@ -52,3 +56,7 @@ export class AuthHandler {
 
 export const otpHandler = new AuthHandler('otp');
 export const jwtHandler = new AuthHandler('jwt');
+export const googleHandler = new AuthHandler('google', {
+  signup: true,
+  login: true,
+});
