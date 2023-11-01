@@ -161,7 +161,7 @@ export class GoogleStrategy extends AuthStrategy {
       email: info.email,
       data: { googleExtra: info.extra },
     });
-    const token = signToken(user);
+    const token = signToken(userDoc);
     setToCookie(res, token, 'authToken');
 
     // emit
