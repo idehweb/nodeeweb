@@ -35,6 +35,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { otpHandler } from '@/functions/auth';
 import { SaveData } from '@/functions';
 import SSO from './SSO';
+import Overlay from './Overlay';
+import Loading from '../Loading';
 
 const globalTimerSet = 120;
 
@@ -595,9 +597,11 @@ class LoginForm extends React.Component {
             onNext={this.afterSSO.bind(this)}
           />
         </ListGroup>
-        {/* <div>
-
-      </div> */}
+        {this.state.loading && (
+          <Overlay>
+            <Loading size={50} />
+          </Overlay>
+        )}
       </>
     );
   }
