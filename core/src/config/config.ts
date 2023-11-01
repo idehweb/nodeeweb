@@ -151,10 +151,29 @@ class CoreConfig extends Config<CoreConfigDto> {
     };
   }
 
+  protected _filterAuth() {
+    const auth = this._config.auth ?? {};
+    const fAuth = {};
+
+    // remove secret,pass,key
+    Object.keys(auth).forEach((provider) => {
+      fAuth[provider] = {};
+
+      Object.keys(auth[provider]).forEach((k) => {
+        if (k.includes('secret') || k.includes('pass') || k.includes('key'))
+          return;
+        fAuth[provider][k] = auth[provider][k];
+      });
+    });
+
+    return fAuth;
+  }
+
   public getPublic(): Partial<CoreConfigDto> {
     return {
       app_name: this._config.app_name,
       host: this._config.host,
+      auth: this._filterAuth(),
     };
   }
 }
