@@ -169,8 +169,7 @@ export class GoogleStrategy extends AuthStrategy {
 
     return res.status(201).json({
       data: {
-        ...userDoc.toObject(),
-        data: undefined,
+        user: { ...userDoc.toObject(), data: undefined },
         token,
       },
     });
