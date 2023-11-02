@@ -195,11 +195,9 @@ jobs:
           then 
             echo "IRAN_SERVICE_NAME=nwi-dev" >> $GITHUB_OUTPUT
             echo "GERMAN_SERVICE_NAME=nwi-dev2 nwi-dev-shop" >> $GITHUB_OUTPUT
-            else 
-            echo "IRAN_SERVICE_NAME=nwi-dev" >> $GITHUB_OUTPUT
-            echo "GERMAN_SERVICE_NAME=nwi-dev2 nwi-dev-shop" >> $GITHUB_OUTPUT
-            # echo "IRAN_SERVICE_NAME=nwi-fa" >> $GITHUB_OUTPUT
-            # echo "GERMAN_SERVICE_NAME=nodeeweb_nodeeweb-server nwi-shop" >> $GITHUB_OUTPUT
+          else 
+            echo "IRAN_SERVICE_NAME=nwi-fa" >> $GITHUB_OUTPUT
+            echo "GERMAN_SERVICE_NAME=nodeeweb_nodeeweb-server nwi-shop" >> $GITHUB_OUTPUT
           fi
         shell: bash
 
