@@ -129,6 +129,7 @@ class CoreConfig extends Config<CoreConfigDto> {
   protected get _defaultSetting(): CoreConfigDto {
     return {
       app_name: store.env.APP_NAME ?? 'Nodeeweb Core',
+      host: getEnv('server-host', { format: 'string' }) as string,
       auth: {},
       supervisor:
         store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
@@ -153,6 +154,7 @@ class CoreConfig extends Config<CoreConfigDto> {
   public getPublic(): Partial<CoreConfigDto> {
     return {
       app_name: this._config.app_name,
+      host: this._config.host,
     };
   }
 }

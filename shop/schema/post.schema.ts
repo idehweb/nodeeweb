@@ -1,4 +1,23 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model, Types } from 'mongoose';
+
+export interface IPost {
+  active: boolean;
+  category: Types.ObjectId[];
+  data: any;
+  description: any;
+  excerpt: any;
+  views: any[];
+  slug: string;
+  title: any;
+  elements: any;
+  kind: string;
+  status: string;
+  photos: any[];
+  thumbnail: string;
+}
+
+export type PostDocument = IPost & Document<Types.ObjectId, {}, IPost>;
+export type PostModel = Model<IPost>;
 
 const schema = new mongoose.Schema(
   {

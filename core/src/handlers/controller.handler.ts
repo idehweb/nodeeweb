@@ -45,14 +45,36 @@ function clearMatchHandler(urls: string[], method: string) {
   );
 }
 
-function popErrorHandlers() {
-  const errorLayers: any[] = [];
+function insertFirst(url: string, method: string, ...mws: MiddleWare[]) {
+  // add flag
+  mws.forEach((mw) => (mw['pop-flag'] = true));
+
+  // insert
+  store.app[method](url, ...mws);
+  // pop
+  popHandler((layer) => {
+    // diff path or diff method
+    if (url !== layer.route?.path || !layer.route?.methods?.[method]) {
+      return false;
+    }
+
+    // pop flag
+    if ((layer.route.stack ?? []).some(({ handle }) => handle['pop-flag'])) {
+      layer.route.stack?.forEach(({ handle: h }) => (h['pop-flag'] = false));
+      return false;
+    }
+    return true;
+  });
+}
+
+function popHandler(cond: (layer: any) => boolean) {
+  const popLayers: any[] = [];
 
   // filter layers
   store.app._router.stack = (store.app._router.stack as any[]).filter(
     (layer) => {
-      if (Object.values(store.globalMiddleware.error).includes(layer.handle)) {
-        errorLayers.push(layer);
+      if (cond(layer)) {
+        popLayers.push(layer);
         return false;
       }
       return true;
@@ -60,16 +82,24 @@ function popErrorHandlers() {
   );
 
   // push layers
-  store.app._router.stack.push(...errorLayers);
+  store.app._router.stack.push(...popLayers);
+}
+
+function popErrorHandlers() {
+  popHandler((layer) =>
+    Object.values(store.globalMiddleware.error).includes(layer.handle)
+  );
 }
 
 export type ControllerRegisterOptions = {
   base_url?: string | string[];
+  strategy?: 'replace' | 'insertAfter' | 'insertFirst';
 } & RegisterOptions;
 export function controllerRegister(
   schema: ControllerSchema,
   {
     base_url,
+    strategy = 'replace',
     from,
     logger = store.systemLogger,
   }: ControllerRegisterOptions = {}
@@ -98,12 +128,14 @@ export function controllerRegister(
 
   const method = schema.method.toLowerCase();
 
-  // clear match handler
-  clearMatchHandler(urls, method);
+  // clear match handler if want to replace
+  if (strategy === 'replace') clearMatchHandler(urls, method);
 
   // push
   for (const url of urls) {
-    store.app[method](url, ...mw);
+    if (strategy === 'insertFirst') insertFirst(url, method, ...mw);
+    else store.app[method](url, ...mw);
+
     logger.log(
       color(
         'Blue',

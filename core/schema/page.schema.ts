@@ -1,4 +1,5 @@
 import mongoose, { Document, Model, Types } from 'mongoose';
+import { MultiLang } from './_base.schema';
 
 export interface IPage {
   active: boolean;
@@ -20,6 +21,8 @@ export interface IPage {
   status: string;
   photos: any[];
   thumbnail?: string;
+  metatitle?: { [key: string]: string };
+  metadescription?: { [key: string]: string };
 }
 
 export type PageDocument = Document<Types.ObjectId, {}, IPage> & IPage;
@@ -47,6 +50,8 @@ const schema = new mongoose.Schema(
     status: { type: String, default: 'processing' },
     photos: [],
     thumbnail: String,
+    metatitle: MultiLang,
+    metadescription: MultiLang,
   },
   { timestamps: true }
 );

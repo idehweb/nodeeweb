@@ -1,4 +1,4 @@
-import { MiddleWare, Req } from '@nodeeweb/core/types/global';
+import { CRUD, MiddleWare, Req } from '@nodeeweb/core/types/global';
 import { submitAction, updateThemeConfig } from '../common/mustImplement';
 import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
 import store from '@nodeeweb/core/store';
@@ -9,6 +9,7 @@ import {
 import { PageDocument } from '../../schema/page.schema';
 import { page2Route } from '@nodeeweb/core/utils/helpers';
 import { Query } from 'mongoose';
+import { getEntityEventName } from '@nodeeweb/core/src/handlers/entity.handler';
 
 export default class Service {
   static createAfter: MiddleWare = async (req, res) => {
@@ -21,7 +22,12 @@ export default class Service {
       },
       { from: 'PageService' }
     );
-    console.log('after call register');
+
+    // emit event
+    store.event.emit(
+      getEntityEventName('page', { post: true, type: CRUD.CREATE }),
+      page
+    );
 
     return res.status(201).json({ data: page });
   };
@@ -31,13 +37,22 @@ export default class Service {
     pageQuery.setOptions({ ...pageQuery.getOptions(), new: false });
     const oldPage = await pageQuery;
     const newPage = { ...oldPage.toObject(), ...req.body };
-    unregisterRoute({ name: oldPage.slug }, { from: 'PageService' });
-    registerRoute(
-      {
-        name: newPage.slug,
-        route: page2Route(newPage),
-      },
-      { from: 'PageService' }
+
+    if (oldPage.slug !== newPage.slug || oldPage.path !== newPage.path) {
+      unregisterRoute({ name: oldPage.slug }, { from: 'PageService' });
+      registerRoute(
+        {
+          name: newPage.slug,
+          route: page2Route(newPage),
+        },
+        { from: 'PageService' }
+      );
+    }
+
+    // emit event
+    store.event.emit(
+      getEntityEventName('page', { post: true, type: CRUD.UPDATE_ONE }),
+      newPage
     );
 
     return res.status(200).json({ data: newPage });

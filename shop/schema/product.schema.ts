@@ -43,6 +43,8 @@ export interface IProduct {
   relatedProducts: Types.ObjectId[];
   photos: { _id: Types.ObjectId; url: string }[];
   active: boolean;
+  updatedAt: Date;
+  createdAt: Date;
 }
 
 export type ProductModel = Model<IProduct>;

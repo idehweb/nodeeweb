@@ -7,8 +7,8 @@ import { MiddleWare } from '../../types/global';
 import { PageModel } from '../../schema/page.schema';
 import { registerRoute } from '../handlers/view.handler';
 
+export const allPathExceptApi = '/:start(?!api)(?!*.[^/]+$):path(*)';
 export function getViewHandler(): [string, MiddleWare] {
-  const allPathExceptApi = '/:start(?!api):path(*)';
   return [
     allPathExceptApi,
     (_, res) => {

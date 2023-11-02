@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { Server } from 'http';
-import { ENV, SupervisorEmitter } from './types/global';
+import { ENV, Seo, SupervisorEmitter } from './types/global';
 import { Application } from 'express';
 import { ErrorPackageFn } from './types/error';
 import { AdminViewSchema } from './types/view';
@@ -18,6 +18,7 @@ export class Store {
   db: typeof mongoose;
   dirs: string[];
   app: Application;
+  seo: Seo;
   supervisor?: SupervisorEmitter;
   globalMiddleware: {
     error: ErrorPackageFn;
