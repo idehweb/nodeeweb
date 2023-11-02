@@ -77,19 +77,19 @@
   dependencies:
     sparse-bitfield "^3.0.3"
 
-"@nodeeweb/admin-build@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@nodeeweb/admin-build/-/admin-build-0.0.5.tgz#b7d03f5169fe753818569631d5a837d085775950"
-  integrity sha512-Pp0NfLcn9LBtVBiIPaA1ePDmMTP4LifLxuUsxOzam/yp4xx8DPKjbw/GUrkuqAI79Rm1aN6u5XoitrOouO5bzg==
+"@nodeeweb/admin-build@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@nodeeweb/admin-build/-/admin-build-0.1.0.tgz#259a6fef6431534b24e85b4f5e5f728acac37df4"
+  integrity sha512-G7ib7VgBqw4dHIOwbbNFyNPbnG3im5LGSleWO/4OUHmFdRHjphqFfI+ZUEG22V2rsMWOWHfhN15ia8lJ20wwDw==
 
 "@nodeeweb/core@link:../core":
   version "0.0.0"
   uid ""
 
-"@nodeeweb/front-build@^0.0.23":
-  version "0.0.23"
-  resolved "https://registry.yarnpkg.com/@nodeeweb/front-build/-/front-build-0.0.23.tgz#778e5a90fa303b59f7a21c31dbb2a3e97675b409"
-  integrity sha512-I/eyaG2g9rKheUTlcAf8xgWw3yFyVbEJYAnjy3TK14iWyN87ReGs84svmFYSrIolnE9/3Ph+UnFIP839BljGoA==
+"@nodeeweb/front-build@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@nodeeweb/front-build/-/front-build-0.1.0.tgz#9b18876e69eb85d318e8b532f2d4a648045cb62e"
+  integrity sha512-sdID6pX8NlVw/y92BIoGLQ9ywq2iaU7/uwLGAyuV1X+Zs3f7w17g9ojPHlxrX64Nd1ZUwRZfle/41Yx4C6jicw==
 
 "@sindresorhus/is@^0.7.0":
   version "0.7.0"
@@ -127,13 +127,6 @@
   version "4.14.197"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.197.tgz#e95c5ddcc814ec3e84c891910a01e0c8a378c54b"
   integrity sha512-BMVOiWs0uNxHVlHBgzTIqJYmj+PgCo4euloGF+5m4okL3rEYzM2EEv78mw8zWSMM57dM7kVIgJ2QDvwHSoCI5g==
-
-"@types/morgan@^1.9.4":
-  version "1.9.5"
-  resolved "https://registry.yarnpkg.com/@types/morgan/-/morgan-1.9.5.tgz#dda7388af1e67863f9fa4496d6d63f6f53334306"
-  integrity sha512-5TgfIWm0lcTGnbCZExwc19dCOMOMmAiiBZQj8Ko3NRxsVDgRxf+AEGRQTqNVA5Yh2xfdWp4clbAEMbYP+jkOqg==
-  dependencies:
-    "@types/node" "*"
 
 "@types/node@*":
   version "20.5.7"
@@ -388,6 +381,11 @@ bson@^5.4.0:
   version "5.4.0"
   resolved "https://registry.yarnpkg.com/bson/-/bson-5.4.0.tgz#0eea77276d490953ad8616b483298dbff07384c6"
   integrity sha512-WRZ5SQI5GfUuKnPTNmAYPiKIof3ORXAF4IRU5UcgmivNIon01rWQlw5RUH954dpu8yGL8T59YShVddIPaU/gFA==
+
+bson@^5.5.0:
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/bson/-/bson-5.5.1.tgz#f5849d405711a7f23acdda9a442375df858e6833"
+  integrity sha512-ix0EwukN2EpC0SRWIj/7B5+A6uQMQy6KMREI9qQqvgpkV2frH63T0UDVd1SYedL6dNCmDBYB3QtXi4ISk9YT+g==
 
 buffer-alloc-unsafe@^1.1.0:
   version "1.1.0"
@@ -1702,6 +1700,17 @@ mongodb@5.8.1:
   integrity sha512-wKyh4kZvm6NrCPH8AxyzXm3JBoEf4Xulo0aUWh3hCgwgYJxyQ1KLST86ZZaSWdj6/kxYUA3+YZuyADCE61CMSg==
   dependencies:
     bson "^5.4.0"
+    mongodb-connection-string-url "^2.6.0"
+    socks "^2.7.1"
+  optionalDependencies:
+    "@mongodb-js/saslprep" "^1.1.0"
+
+mongodb@5.9.0:
+  version "5.9.0"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-5.9.0.tgz#5a22065fa8cfaf1d58bf2e3c451cd2c4bfa983a2"
+  integrity sha512-g+GCMHN1CoRUA+wb1Agv0TI4YTSiWr42B5ulkiAfLLHitGK1R+PkSAf3Lr5rPZwi/3F04LiaZEW0Kxro9Fi2TA==
+  dependencies:
+    bson "^5.5.0"
     mongodb-connection-string-url "^2.6.0"
     socks "^2.7.1"
   optionalDependencies:
