@@ -92,7 +92,7 @@ export class CoreConfigDto {
 
   @Expose()
   @Allow()
-  auth: { [key: string]: object };
+  auth: { [key: string]: any };
 
   @Expose()
   @Type(() => CoreConfigLimit)

@@ -80,6 +80,24 @@ export class ShopConfig extends Config<ShopConfigDto> {
       enableImplicitConversion: true,
     });
   }
+  protected _filterAuth() {
+    const auth = this._config.auth ?? {};
+    const fAuth = {};
+
+    // remove secret,pass,key
+    Object.keys(auth).forEach((provider) => {
+      fAuth[provider] = {};
+
+      Object.keys(auth[provider]).forEach((k) => {
+        if (k.includes('secret') || k.includes('pass') || k.includes('key'))
+          return;
+        fAuth[provider][k] = auth[provider][k];
+      });
+    });
+
+    return fAuth;
+  }
+
   public getPublic(): Partial<ShopConfigDto> {
     return {
       app_name: this._config.app_name,
@@ -88,6 +106,7 @@ export class ShopConfig extends Config<ShopConfigDto> {
       shop_active: this._config.shop_active,
       shop_inactive_message: this._config.shop_inactive_message,
       tax: this._config.tax,
+      auth: this._filterAuth(),
     };
   }
 }

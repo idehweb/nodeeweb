@@ -9,6 +9,7 @@
     "@mui/material": "^5.14.11",
     "@mui/styles": "^5.14.11",
     "@mui/x-data-grid": "^5.16.0",
+    "@react-oauth/google": "^0.11.1",
     "@splidejs/react-splide": "^0.7.12",
     "axios": "^0.27.2",
     "bootstrap": "^5.1.3",

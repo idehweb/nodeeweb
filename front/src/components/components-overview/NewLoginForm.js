@@ -34,6 +34,9 @@ import { fNum } from '#c/functions/utils';
 import CircularProgress from '@mui/material/CircularProgress';
 import { otpHandler } from '@/functions/auth';
 import { SaveData } from '@/functions';
+import SSO from './SSO';
+import Overlay from './Overlay';
+import Loading from '../Loading';
 
 const globalTimerSet = 120;
 
@@ -73,6 +76,12 @@ class LoginForm extends React.Component {
     user.token = token;
     user.phoneNumber = user.phone;
     SaveData({ user, token });
+  }
+  afterSSO(res) {
+    console.log('after sso call', res);
+    const { user, token } = res;
+    this.afterAuth(user, token);
+    return this.setState((s) => ({ ...s, authStatus: 'success' }));
   }
 
   async detect(phone, signup = false) {
@@ -311,272 +320,289 @@ class LoginForm extends React.Component {
     const { firstName, lastName, username, timer, authStatus } = this.state;
     const { t } = this.props;
     if (authStatus === 'success') {
-      return <Navigate to={this.props.redirectTo} />;
+      console.log('here change nav', this.props.redirectTo);
+      return <Navigate to={this.props.redirectTo} replace />;
     }
     return (
-      <ListGroup flush>
-        {authStatus === 'detect' && (
-          <ListGroupItem className="p-3">
-            <Row>
-              <Col>
-                <Form onSubmit={this.handleDetect}>
-                  <Row form>
-                    <Col md="12" className="form-group ltr">
-                      <label htmlFor="thepho">{t('phone number')}</label>
+      <>
+        <ListGroup flush>
+          {authStatus === 'detect' && (
+            <ListGroupItem className="p-3">
+              <Row>
+                <Col>
+                  <Form onSubmit={this.handleDetect}>
+                    <Row form>
+                      <Col md="12" className="form-group ltr">
+                        <label htmlFor="thepho">{t('phone number')}</label>
 
-                      <InputGroup className="mb-3">
-                        <InputGroupAddon type="prepend">
-                          <FormSelect
-                            onChange={(e) =>
+                        <InputGroup className="mb-3">
+                          <InputGroupAddon type="prepend">
+                            <FormSelect
+                              onChange={(e) =>
+                                this.setState((state) => ({
+                                  ...state,
+                                  countryCode: e.target.value,
+                                }))
+                              }>
+                              <option value="98">+98</option>
+                            </FormSelect>
+                          </InputGroupAddon>
+                          <FormInput
+                            placeholder="**********"
+                            id="thepho"
+                            className={'iuygfghuji'}
+                            type="tel"
+                            dir="ltr"
+                            onChange={(e) => {
                               this.setState((state) => ({
                                 ...state,
-                                countryCode: e.target.value,
-                              }))
-                            }>
-                            <option value="98">+98</option>
-                          </FormSelect>
-                        </InputGroupAddon>
-                        <FormInput
-                          placeholder="**********"
-                          id="thepho"
-                          className={'iuygfghuji'}
-                          type="tel"
-                          dir="ltr"
-                          onChange={(e) => {
-                            this.setState((state) => ({
-                              ...state,
-                              phoneNumber: e.target.value,
-                            }));
-                          }}
-                        />
-                      </InputGroup>
-                      <Captcha onActionSubmit={this.captchaAction} />
-                    </Col>
-                  </Row>
-                  <Row form></Row>
-                  <Button
-                    block
-                    type="submit"
-                    className="center"
-                    onClick={this.handleDetect}>
-                    {t('get enter code')}
-                  </Button>
-                </Form>
-              </Col>
-            </Row>
-          </ListGroupItem>
-        )}
-        {(authStatus === 'login:active' || authStatus === 'signup:active') && (
-          <ListGroupItem className="p-3">
-            <Row>
-              <Col>
-                <Form onSubmit={this.handleCode}>
-                  <Row form>
-                    <Col md="12" className="form-group">
-                      <div
-                        className={
-                          'your-phone-number d-flex justify-content-sb'
-                        }>
-                        <div className={'flex-item '}>
-                          {t('your phone number') + ':'}
+                                phoneNumber: e.target.value,
+                              }));
+                            }}
+                          />
+                        </InputGroup>
+                        <Captcha onActionSubmit={this.captchaAction} />
+                      </Col>
+                    </Row>
+                    <Row form></Row>
+                    <Button
+                      block
+                      type="submit"
+                      className="center"
+                      onClick={this.handleDetect}>
+                      {t('get enter code')}
+                    </Button>
+                  </Form>
+                </Col>
+              </Row>
+            </ListGroupItem>
+          )}
+          {(authStatus === 'login:active' ||
+            authStatus === 'signup:active') && (
+            <ListGroupItem className="p-3">
+              <Row>
+                <Col>
+                  <Form onSubmit={this.handleCode}>
+                    <Row form>
+                      <Col md="12" className="form-group">
+                        <div
+                          className={
+                            'your-phone-number d-flex justify-content-sb'
+                          }>
+                          <div className={'flex-item '}>
+                            {t('your phone number') + ':'}
+                          </div>
+                          <div className={'flex-item ltr'}>
+                            {'+' + '98' + this.state.phoneNumber}
+                          </div>
                         </div>
-                        <div className={'flex-item ltr'}>
-                          {'+' + '98' + this.state.phoneNumber}
-                        </div>
-                      </div>
-                      <div className={'your-timer'}>
-                        <div className={'flex-item '}>
-                          {Boolean(timer) && (
-                            <div className={'flex-item-relative center '}>
-                              <CircularProgress
-                                className={'red-progress'}
-                                thickness={2}
-                                size={60}
-                                variant="determinate"
-                                value={parseInt((timer * 100) / globalTimerSet)}
-                              />
-                              <div className={'flex-item-absolute '}>
-                                {timer}
+                        <div className={'your-timer'}>
+                          <div className={'flex-item '}>
+                            {Boolean(timer) && (
+                              <div className={'flex-item-relative center '}>
+                                <CircularProgress
+                                  className={'red-progress'}
+                                  thickness={2}
+                                  size={60}
+                                  variant="determinate"
+                                  value={parseInt(
+                                    (timer * 100) / globalTimerSet
+                                  )}
+                                />
+                                <div className={'flex-item-absolute '}>
+                                  {timer}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'start',
-                        }}>
-                        <label
-                          style={{ fontSize: 12 }}
-                          htmlFor="feEmailAddress">
-                          {t('enter sent code')}
-                        </label>
-                      </div>
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'start',
+                          }}>
+                          <label
+                            style={{ fontSize: 12 }}
+                            htmlFor="feEmailAddress">
+                            {t('enter sent code')}
+                          </label>
+                        </div>
 
-                      <InputGroup className="mb-3">
-                        <FormInput
-                          placeholder="_ _ _ _ _ _"
-                          type="number"
-                          className={'iuygfghuji'}
-                          dir="ltr"
-                          onChange={(e) => {
-                            this.setState((state) => ({
-                              ...state,
-                              activationCode: e.target.value,
-                            }));
-                          }}
-                        />
-                      </InputGroup>
-                    </Col>
-                  </Row>
-                  <Button
-                    block={true}
-                    type="submit"
-                    className="center"
-                    onClick={this.handleCode}>
-                    {t('login')}
-                  </Button>
-                  {Boolean(!timer) && (
-                    <div className={'flex-item-relative center '}>
-                      <Button
-                        outline={true}
-                        type="button"
-                        className="center btn-block outline the-less-important the-no-border"
-                        onClick={(e) => {
-                          if (this.state.authStatus.includes('signup'))
-                            return this.handleSignup(e);
-                          if (this.state.authStatus.includes('login'))
-                            return this.handleDetect(e);
-                        }}>
-                        {t('Send code again?')}
-                      </Button>
-                    </div>
-                  )}
-                </Form>
-              </Col>
-            </Row>
-          </ListGroupItem>
-        )}
-        {authStatus === 'signup' && (
-          <ListGroupItem className="p-3">
-            <Row>
-              <Col>
-                <Form onSubmit={this.handleSignup}>
-                  <Row form>
-                    <Col md="12" className="form-group">
-                      <label htmlFor="olfirstname">
-                        {t('Your first name')}
-                      </label>
-
-                      <InputGroup className="mb-3">
-                        <FormInput
-                          placeholder={t('First name (persian)')}
-                          type="text"
-                          id="olfirstname"
-                          dir="rtl"
-                          value={firstName}
-                          onChange={(e) =>
-                            this.setState((s) => ({
-                              ...s,
-                              firstName: e.target.value,
-                            }))
-                          }
-                        />
-                      </InputGroup>
-                    </Col>
-
-                    <Col md="12" className="form-group">
-                      <label htmlFor="ollastname">{t('Your last name')}</label>
-
-                      <InputGroup className="mb-3">
-                        <FormInput
-                          placeholder={t('Last name (persian)')}
-                          type="text"
-                          value={lastName}
-                          id="ollastname"
-                          dir="rtl"
-                          onChange={(e) =>
-                            this.setState((s) => ({
-                              ...s,
-                              lastName: e.target.value,
-                            }))
-                          }
-                        />
-                      </InputGroup>
-                    </Col>
-
-                    <Col md="12" className="form-group">
-                      <label htmlFor="username">{t('Your username')}</label>
-
-                      <InputGroup className="mb-3">
-                        <FormInput
-                          placeholder={t('Username (persian)')}
-                          type="text"
-                          value={username}
-                          id="username"
-                          dir="rtl"
-                          onChange={(e) =>
-                            this.setState((s) => ({
-                              ...s,
-                              username: e.target.value,
-                            }))
-                          }
-                        />
-                      </InputGroup>
-                    </Col>
-
-                    <Col md="12" className="form-group ltr">
-                      <label htmlFor="thepho">{t('phone number')}</label>
-
-                      <InputGroup className="mb-3">
-                        <InputGroupAddon type="prepend">
-                          <FormSelect
-                            onChange={(e) =>
+                        <InputGroup className="mb-3">
+                          <FormInput
+                            placeholder="_ _ _ _ _ _"
+                            type="number"
+                            className={'iuygfghuji'}
+                            dir="ltr"
+                            onChange={(e) => {
                               this.setState((state) => ({
                                 ...state,
-                                countryCode: e.target.value,
+                                activationCode: e.target.value,
+                              }));
+                            }}
+                          />
+                        </InputGroup>
+                      </Col>
+                    </Row>
+                    <Button
+                      block={true}
+                      type="submit"
+                      className="center"
+                      onClick={this.handleCode}>
+                      {t('login')}
+                    </Button>
+                    {Boolean(!timer) && (
+                      <div className={'flex-item-relative center '}>
+                        <Button
+                          outline={true}
+                          type="button"
+                          className="center btn-block outline the-less-important the-no-border"
+                          onClick={(e) => {
+                            if (this.state.authStatus.includes('signup'))
+                              return this.handleSignup(e);
+                            if (this.state.authStatus.includes('login'))
+                              return this.handleDetect(e);
+                          }}>
+                          {t('Send code again?')}
+                        </Button>
+                      </div>
+                    )}
+                  </Form>
+                </Col>
+              </Row>
+            </ListGroupItem>
+          )}
+          {authStatus === 'signup' && (
+            <ListGroupItem className="p-3">
+              <Row>
+                <Col>
+                  <Form onSubmit={this.handleSignup}>
+                    <Row form>
+                      <Col md="12" className="form-group">
+                        <label htmlFor="olfirstname">
+                          {t('Your first name')}
+                        </label>
+
+                        <InputGroup className="mb-3">
+                          <FormInput
+                            placeholder={t('First name (persian)')}
+                            type="text"
+                            id="olfirstname"
+                            dir="rtl"
+                            value={firstName}
+                            onChange={(e) =>
+                              this.setState((s) => ({
+                                ...s,
+                                firstName: e.target.value,
                               }))
-                            }>
-                            <option value="98">+98</option>
-                          </FormSelect>
-                        </InputGroupAddon>
-                        <FormInput
-                          placeholder="**********"
-                          id="thepho"
-                          className={'iuygfghuji'}
-                          type="tel"
-                          dir="ltr"
-                          value={this.state.phoneNumber}
-                          onChange={(e) => {
-                            this.setState((state) => ({
-                              ...state,
-                              phoneNumber: e.target.value,
-                            }));
-                          }}
-                        />
-                      </InputGroup>
+                            }
+                          />
+                        </InputGroup>
+                      </Col>
 
-                      <Captcha onActionSubmit={this.captchaAction} />
-                    </Col>
-                  </Row>
+                      <Col md="12" className="form-group">
+                        <label htmlFor="ollastname">
+                          {t('Your last name')}
+                        </label>
 
-                  <Row form>
-                    <Col md="12" className="form-group"></Col>
-                  </Row>
-                  <Button
-                    type="submit"
-                    className="center btn-block"
-                    onClick={this.handleSignup}>
-                    {t('Register')}
-                  </Button>
-                </Form>
-              </Col>
-            </Row>
-          </ListGroupItem>
+                        <InputGroup className="mb-3">
+                          <FormInput
+                            placeholder={t('Last name (persian)')}
+                            type="text"
+                            value={lastName}
+                            id="ollastname"
+                            dir="rtl"
+                            onChange={(e) =>
+                              this.setState((s) => ({
+                                ...s,
+                                lastName: e.target.value,
+                              }))
+                            }
+                          />
+                        </InputGroup>
+                      </Col>
+
+                      <Col md="12" className="form-group">
+                        <label htmlFor="username">{t('Your username')}</label>
+
+                        <InputGroup className="mb-3">
+                          <FormInput
+                            placeholder={t('Username (persian)')}
+                            type="text"
+                            value={username}
+                            id="username"
+                            dir="rtl"
+                            onChange={(e) =>
+                              this.setState((s) => ({
+                                ...s,
+                                username: e.target.value,
+                              }))
+                            }
+                          />
+                        </InputGroup>
+                      </Col>
+
+                      <Col md="12" className="form-group ltr">
+                        <label htmlFor="thepho">{t('phone number')}</label>
+
+                        <InputGroup className="mb-3">
+                          <InputGroupAddon type="prepend">
+                            <FormSelect
+                              onChange={(e) =>
+                                this.setState((state) => ({
+                                  ...state,
+                                  countryCode: e.target.value,
+                                }))
+                              }>
+                              <option value="98">+98</option>
+                            </FormSelect>
+                          </InputGroupAddon>
+                          <FormInput
+                            placeholder="**********"
+                            id="thepho"
+                            className={'iuygfghuji'}
+                            type="tel"
+                            dir="ltr"
+                            value={this.state.phoneNumber}
+                            onChange={(e) => {
+                              this.setState((state) => ({
+                                ...state,
+                                phoneNumber: e.target.value,
+                              }));
+                            }}
+                          />
+                        </InputGroup>
+
+                        <Captcha onActionSubmit={this.captchaAction} />
+                      </Col>
+                    </Row>
+
+                    <Row form>
+                      <Col md="12" className="form-group"></Col>
+                    </Row>
+                    <Button
+                      type="submit"
+                      className="center btn-block"
+                      onClick={this.handleSignup}>
+                      {t('Register')}
+                    </Button>
+                  </Form>
+                </Col>
+              </Row>
+            </ListGroupItem>
+          )}
+          <SSO
+            setLoading={(v) => this.setState((p) => ({ ...p, loading: v }))}
+            onNext={this.afterSSO.bind(this)}
+          />
+        </ListGroup>
+        {this.state.loading && (
+          <Overlay>
+            <Loading size={50} />
+          </Overlay>
         )}
-      </ListGroup>
+      </>
     );
   }
 }
