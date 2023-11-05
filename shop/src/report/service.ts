@@ -116,7 +116,7 @@ class Service {
     const counts = await this.getCounts(period);
     return res.json({ data: { statistics: { counts } } });
   };
-  getOrder: MiddleWare = () => {};
+  getOrder: MiddleWare = async (req, res) => {};
 }
 
 export default new Service();

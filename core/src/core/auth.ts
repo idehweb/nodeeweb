@@ -42,8 +42,8 @@ export function activeAuthControllers() {
         service: [gateway.signup.bind(gateway)],
         url: '/auth/:strategyId/signup',
       },
-    ].map((s: ControllerSchema) => ({
-      ...s,
+    ].map((s) => ({
+      ...(s as ControllerSchema),
       validate: { dto: AuthStrategyBody, reqPath: 'body' },
     })),
     {
