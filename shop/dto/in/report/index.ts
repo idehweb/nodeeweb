@@ -3,7 +3,7 @@ import { toMs } from '@nodeeweb/core/utils/helpers';
 import { Expose, Transform } from 'class-transformer';
 import { Allow, IsOptional } from 'class-validator';
 
-export class ReportBaseQueryParam<F> {
+export class ReportBaseQueryParam<F = any> {
   @Expose()
   @IsOptional()
   @Transform(({ obj, key }) => {
