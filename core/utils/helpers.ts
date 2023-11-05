@@ -190,6 +190,11 @@ export function toMs(time: string) {
   const milliseconds = time.match(/\d+\s?\w/g).reduce((acc, cur, i) => {
     let multiplier = 1000;
     switch (cur.slice(-1)) {
+      case 'y':
+      case 'Y':
+        multiplier *= 12;
+      case 'M':
+        multiplier *= 30;
       case 'd':
         multiplier *= 24;
       case 'h':
