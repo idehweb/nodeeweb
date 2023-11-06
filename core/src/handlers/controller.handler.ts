@@ -15,8 +15,8 @@ import { OPTIONAL_LOGIN } from '../constants/String';
 import { catchMiddleware } from '../../utils/catchAsync';
 import { validateCreator } from '../core/validate';
 
-export function getUrlFromBaseUrl(url: string, base_url?: string) {
-  return join(base_url ?? '', url).replace(/\\/g, '/');
+export function getUrlFromBaseUrl(url?: string, base_url?: string) {
+  return join(base_url ?? '', url ?? '').replace(/\\/g, '/');
 }
 
 function clearMatchHandler(urls: string[], method: string) {

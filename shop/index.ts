@@ -25,6 +25,7 @@ import registerCustomerGroup from './src/customerGroup';
 import { registerShopConfig } from './src/config/config';
 import registerTemplate from './src/template';
 import initSeo from './src/seo';
+import registerReport from './src/report';
 
 async function deployShop() {
   await deployCore();
@@ -56,6 +57,7 @@ async function deployShop() {
   registerProduct();
   registerProductCategory();
   registerSettings();
+  registerReport();
   await registerTemplate();
 
   // register plugins
