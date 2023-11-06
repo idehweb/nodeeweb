@@ -18,11 +18,11 @@ export function convertToString(a: any, pretty = true) {
   const cache = [];
 
   const replacer = (key, value) => {
-    if (typeof value === 'object' && value !== null) {
-      if (cache.includes(value)) return;
+    // if (typeof value === 'object' && value !== null) {
+    //   if (cache.includes(value)) return;
 
-      cache.push(value);
-    }
+    //   cache.push(value);
+    // }
     return value;
   };
 
@@ -190,6 +190,11 @@ export function toMs(time: string) {
   const milliseconds = time.match(/\d+\s?\w/g).reduce((acc, cur, i) => {
     let multiplier = 1000;
     switch (cur.slice(-1)) {
+      case 'y':
+      case 'Y':
+        multiplier *= 12;
+      case 'M':
+        multiplier *= 30;
       case 'd':
         multiplier *= 24;
       case 'h':
