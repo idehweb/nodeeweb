@@ -18,11 +18,11 @@ export function convertToString(a: any, pretty = true) {
   const cache = [];
 
   const replacer = (key, value) => {
-    if (typeof value === 'object' && value !== null) {
-      if (cache.includes(value)) return;
+    // if (typeof value === 'object' && value !== null) {
+    //   if (cache.includes(value)) return;
 
-      cache.push(value);
-    }
+    //   cache.push(value);
+    // }
     return value;
   };
 

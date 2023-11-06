@@ -21,7 +21,7 @@
     "class-validator": "link:./node_modules\\@nodeeweb\\core\\node_modules\\class-validator",
     "lodash": "link:./node_modules\\@nodeeweb\\core\\node_modules\\lodash",
     "mathjs": "^11.11.1",
-    "moment": "^2.29.4",
+    "moment-jalaali": "^0.10.0",
     "mongoose": "link:./node_modules\\@nodeeweb\\core\\node_modules\\mongoose",
     "persianjs": "^0.4.0",
     "reflect-metadata": "link:./node_modules\\@nodeeweb\\core\\node_modules\\reflect-metadata",
@@ -31,6 +31,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/lodash": "^4.14.197",
+    "@types/moment-jalaali": "^0.7.8",
     "@types/multer": "^1.4.9",
     "@types/string-math": "^1.0.0",
     "copyfiles": "^2.4.1",
