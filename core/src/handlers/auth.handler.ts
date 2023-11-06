@@ -78,7 +78,7 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
     },
     catchFn(
       async (req: Req, { id, iat, _id }, done) => {
-        iat = iat * 1000;
+        iat = (iat + 1) * 1000;
         const models = Array.isArray(opt.model) ? opt.model : [opt.model];
         const query = (model: string) =>
           store.db.model(model).findOne({
