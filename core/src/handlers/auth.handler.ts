@@ -72,7 +72,8 @@ function jwtStrategyBuilder(opt: JwtStrategyOpt) {
 
   strategy = new JwtStrategy(
     {
-      jwtFromRequest: (req) => extractToken(req as Req, opt.cookieName),
+      jwtFromRequest: (req) =>
+        extractToken(req as Req, opt.cookieName ?? 'authToken'),
       secretOrKey: store.env.AUTH_SECRET,
       passReqToCallback: true,
     },
