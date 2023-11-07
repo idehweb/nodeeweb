@@ -33,6 +33,7 @@ export class ShopConfig extends Config<ShopConfigDto> {
     return {
       app_name: store.env.APP_NAME ?? 'Nodeeweb Shop',
       host: getEnv('server-host', { format: 'string' }) as string,
+      favicons: [],
       auth: {},
       supervisor:
         store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
@@ -54,7 +55,6 @@ export class ShopConfig extends Config<ShopConfigDto> {
       tax: 0,
       shop_active: true,
       shop_inactive_message: DEFAULT_SHOP_INACTIVE_MSG,
-      favicon: '/favicon.icon',
       consumer_status: [],
       factor: {
         name: store.env.APP_NAME ?? 'Nodeeweb Shop',
@@ -76,6 +76,9 @@ export class ShopConfig extends Config<ShopConfigDto> {
   }
 
   protected _transform(value: any): ShopConfigDto {
+    // rewrite favicon base on first dist in favicons
+    if (Array.isArray(value.favicons)) value.favicon = value.favicons[0]?.dist;
+
     return plainToInstance(ShopConfigDto, value, {
       enableImplicitConversion: true,
     });
@@ -102,6 +105,7 @@ export class ShopConfig extends Config<ShopConfigDto> {
     return {
       app_name: this._config.app_name,
       host: this._config.host,
+      favicon: this._config.favicons[0]?.dist,
       currency: this._config.currency,
       shop_active: this._config.shop_active,
       shop_inactive_message: this._config.shop_inactive_message,

@@ -122,6 +122,9 @@ export abstract class Config<C extends CoreConfigDto> {
 
 class CoreConfig extends Config<CoreConfigDto> {
   protected _transform(value: any): CoreConfigDto {
+    // rewrite favicon base on first dist in favicons
+    if (Array.isArray(value.favicons)) value.favicon = value.favicons[0]?.dist;
+
     return plainToInstance(CoreConfigDto, value, {
       enableImplicitConversion: true,
     });
@@ -174,6 +177,7 @@ class CoreConfig extends Config<CoreConfigDto> {
       app_name: this._config.app_name,
       host: this._config.host,
       auth: this._filterAuth(),
+      favicon: this._config.favicons[0]?.dist,
     };
   }
 }
