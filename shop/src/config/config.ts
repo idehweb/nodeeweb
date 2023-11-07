@@ -54,7 +54,7 @@ export class ShopConfig extends Config<ShopConfigDto> {
       tax: 0,
       shop_active: true,
       shop_inactive_message: DEFAULT_SHOP_INACTIVE_MSG,
-      favicon: '/favicon.icon',
+      favicon: '/favicon.ico',
       consumer_status: [],
       factor: {
         name: store.env.APP_NAME ?? 'Nodeeweb Shop',
@@ -102,6 +102,7 @@ export class ShopConfig extends Config<ShopConfigDto> {
     return {
       app_name: this._config.app_name,
       host: this._config.host,
+      favicon: this._config.favicon,
       currency: this._config.currency,
       shop_active: this._config.shop_active,
       shop_inactive_message: this._config.shop_inactive_message,

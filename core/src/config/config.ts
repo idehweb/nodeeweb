@@ -130,6 +130,7 @@ class CoreConfig extends Config<CoreConfigDto> {
     return {
       app_name: store.env.APP_NAME ?? 'Nodeeweb Core',
       host: getEnv('server-host', { format: 'string' }) as string,
+      favicon: '/favicon.ico',
       auth: {},
       supervisor:
         store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
@@ -174,6 +175,7 @@ class CoreConfig extends Config<CoreConfigDto> {
       app_name: this._config.app_name,
       host: this._config.host,
       auth: this._filterAuth(),
+      favicon: this._config.favicon,
     };
   }
 }
