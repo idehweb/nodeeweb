@@ -6,6 +6,7 @@ import { SimpleError } from '../types/error';
 import bfs from './bfs';
 import { StoreRoute } from '../types/route';
 import { Req } from '../types/global';
+import { networkInterfaces } from 'os';
 
 export function page2Route(page: any): StoreRoute {
   return { path: page.path || page.slug };
@@ -296,4 +297,28 @@ export function getAllPropertyNames(obj: object = {}, maxDepth = 5) {
     target = target['__proto__'];
   }
   return [...new Set(names)];
+}
+
+export function getMyIp(canInternal = false) {
+  const nets = networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4;
+      if (net.family === familyV4Value && (canInternal || !net.internal)) {
+        return net.address;
+      }
+    }
+  }
+
+  return null;
+}
+
+export function addForwarded(req: Req, ip: string) {
+  const forwarded =
+    (req.get('x-forwarded-for') ?? '').split(',').map((ip) => ip.trim()) ?? [];
+
+  // push
+  if (ip) forwarded.push(ip);
+
+  return forwarded.join(',');
 }
