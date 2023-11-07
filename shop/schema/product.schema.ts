@@ -137,4 +137,13 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
+schema.index(
+  { slug: 1 },
+  {
+    name: 'slug',
+    unique: true,
+    partialFilterExpression: { active: true },
+  }
+);
+
 export default schema;
