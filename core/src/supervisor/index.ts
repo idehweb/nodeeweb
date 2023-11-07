@@ -13,7 +13,7 @@ import Supervisor from './Supervisor';
 
 export default function initSupervisor() {
   updateSupervisor();
-  store.event.on('config-update', (changes) => {
+  store.event.on('config-update', ({ config: changes }) => {
     if (changes?.supervisor !== undefined) updateSupervisor();
     store.supervisor?.emit('config-update', changes);
   });

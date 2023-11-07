@@ -4,8 +4,10 @@ import {
   CoreConfigLimit,
   CoreConfigLimitBody,
   CoreConfigSmsOn,
+  Favicon,
 } from '@nodeeweb/core';
-import { Expose, Type } from 'class-transformer';
+import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
+import { Exclude, Expose, Type } from 'class-transformer';
 import {
   Allow,
   IsArray,
@@ -19,6 +21,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { Types } from 'mongoose';
 
 export enum Currency {
   Toman = 'Toman',
@@ -290,6 +293,18 @@ export class ShopConfConfBody extends ShopConfigDto {
   @IsOptional()
   @Type(() => ShopConfigSmsOnBody)
   sms_message_on: ShopConfigSmsOnBody;
+
+  @Exclude()
+  favicon?: string;
+
+  @Exclude()
+  favicons?: Favicon[];
+
+  @Expose()
+  @IsOptional()
+  @IsMongoID()
+  @ToMongoID()
+  favicon_id?: Types.ObjectId;
 }
 
 export class ShopConfigBody extends CoreConfigBody {
