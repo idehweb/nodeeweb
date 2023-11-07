@@ -30,11 +30,23 @@ import { getEnv } from '@nodeeweb/core/utils/helpers';
 
 export class ShopConfig extends Config<ShopConfigDto> {
   protected get _defaultSetting(): ShopConfigDto {
+    const nodeewebApiUrl = getEnv('nodeewebhub_api_base_url', {
+      format: 'string',
+    }) as string;
+
     return {
       app_name: store.env.APP_NAME ?? 'Nodeeweb Shop',
       host: getEnv('server-host', { format: 'string' }) as string,
       favicons: [],
-      auth: {},
+      auth: {
+        ...(nodeewebApiUrl
+          ? {
+              nodeeweb: {
+                api_url: nodeewebApiUrl,
+              },
+            }
+          : {}),
+      },
       supervisor:
         store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
           ? {

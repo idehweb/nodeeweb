@@ -130,10 +130,21 @@ class CoreConfig extends Config<CoreConfigDto> {
     });
   }
   protected get _defaultSetting(): CoreConfigDto {
+    const nodeewebApiUrl = getEnv('nodeewebhub_api_base_url', {
+      format: 'string',
+    }) as string;
     return {
       app_name: store.env.APP_NAME ?? 'Nodeeweb Core',
       host: getEnv('server-host', { format: 'string' }) as string,
-      auth: {},
+      auth: {
+        ...(nodeewebApiUrl
+          ? {
+              nodeeweb: {
+                api_url: nodeewebApiUrl,
+              },
+            }
+          : {}),
+      },
       supervisor:
         store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
           ? {

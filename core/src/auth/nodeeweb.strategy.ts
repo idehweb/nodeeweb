@@ -28,9 +28,7 @@ class NodeewebApi {
   api: Axios;
 
   constructor() {
-    const baseURL = getEnv('nodeewebhub_api_base_url', {
-      format: 'string',
-    }) as string;
+    const baseURL = store.config.auth.nodeeweb?.api_url;
     if (!baseURL) throw new Error('nodeewebhub api url not set!');
     this.api = axios.create({
       baseURL,
