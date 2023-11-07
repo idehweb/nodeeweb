@@ -140,6 +140,9 @@ export class NodeewebStrategy extends AuthStrategy {
 
     if (user) throw new DuplicateError('user exists, please login');
 
+    if (req.modelName === 'admin')
+      throw new ForbiddenError('can not create admin with sso');
+
     const userDoc = await this.getUserModel(req).create(info);
     const token = signToken(userDoc);
     setToCookie(res, token, 'authToken');
