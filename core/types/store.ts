@@ -29,4 +29,5 @@ export type StoreEnv = {
   MAX_NUM_OF_PROXY?: number;
   SUPERVISOR_URL?: string;
   SUPERVISOR_TOKEN?: string;
+  NODEEWEBHUB_API_BASE_URL?: string;
 } & { [k: string]: string };

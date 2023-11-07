@@ -3,6 +3,7 @@ import { ControllerSchema } from '../../types/controller';
 import AuthGatewayStrategy from '../auth/authGateway.strategy';
 import { GoogleStrategy } from '../auth/google.strategy';
 import { JwtStrategy } from '../auth/jwt.strategy';
+import { NodeewebStrategy } from '../auth/nodeeweb.strategy';
 import { OtpStrategy } from '../auth/otp.strategy';
 import UserPassStrategy from '../auth/userPass.strategy';
 import { registerAuthStrategy } from '../handlers/auth.handler';
@@ -15,6 +16,7 @@ export function activeAuthControllers() {
   registerAuthStrategy(new OtpStrategy(), 'CoreAuth');
   registerAuthStrategy(new JwtStrategy(), 'CoreAuth');
   registerAuthStrategy(new GoogleStrategy(), 'CoreAuth');
+  registerAuthStrategy(new NodeewebStrategy(), 'CoreAuth');
 
   //   gateway
   const gateway = new AuthGatewayStrategy();
