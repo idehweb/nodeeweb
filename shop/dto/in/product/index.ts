@@ -1,4 +1,4 @@
-import { Expose, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { IsMultiLang } from '../../../utils/validation';
 import {
   Allow,
@@ -108,8 +108,9 @@ class CombinationProduct {
 
 export class CreateProductBody {
   @Expose()
+  @IsOptional()
   @IsMultiLang()
-  title: { [key: string]: string };
+  title?: { [key: string]: string };
 
   @Expose()
   @IsMultiLang()
@@ -141,32 +142,40 @@ export class CreateProductBody {
   description?: { [key: string]: string };
 
   @Expose()
+  @IsOptional()
+  @Transform(({ value }) => value ?? [])
   @IsArray()
-  @ArrayMinSize(1)
+  // @ArrayMinSize(1)
   @Type(() => CombinationProduct)
   @ValidateNested({ each: true })
-  combinations: CombinationProduct[];
+  combinations?: CombinationProduct[];
 
   @Expose()
+  @Transform(({ value }) => value ?? [])
+  @IsOptional()
   @Type(() => OptionProduct)
   @ValidateNested({ each: true })
-  options: OptionProduct[];
+  options?: OptionProduct[];
 
   @Expose()
+  @Transform(({ value }) => value ?? [])
   @IsOptional()
   @ToMongoID()
   @IsMongoID({ each: true })
   productCategory?: Types.ObjectId[];
 
   @Expose()
+  @IsOptional()
+  @Transform(({ value }) => value ?? [])
   @Type(() => Attributes)
   @ValidateNested({ each: true })
-  attributes: Attributes[];
+  attributes?: Attributes[];
 
   @Expose()
+  @IsOptional()
   @Type(() => Labels)
   @ValidateNested({ each: true })
-  labels: Labels[];
+  labels?: Labels[];
 
   @Expose()
   @IsOptional()
@@ -174,17 +183,20 @@ export class CreateProductBody {
   data?: any;
 
   @Expose()
+  @IsOptional()
   @Type(() => ExtraAtr)
   @ValidateNested({ each: true })
-  extra_attr: ExtraAtr[];
+  extra_attr?: ExtraAtr[];
 
   @Expose()
+  @IsOptional()
   @IsEnum(PriceType)
-  price_type: PriceType;
+  price_type?: PriceType;
 
   @Expose()
+  @IsOptional()
   @IsEnum(PublishStatus)
-  status: PublishStatus;
+  status?: PublishStatus;
 
   @Expose()
   @ToMongoID()
