@@ -165,7 +165,7 @@ export function slugify(str: string) {
   return _.kebabCase(str);
 }
 
-export function getEnv(
+export function getEnv<T = string | string[]>(
   key: string,
   { format }: { format: 'array' | 'string' | 'auto' } = { format: 'auto' }
 ) {
@@ -176,15 +176,21 @@ export function getEnv(
     .map((v) => v.trim())
     .filter((v) => v);
 
+  let response;
   switch (format) {
     case 'auto':
-      if (newValue.length <= 1) return value;
-      else return newValue;
+      if (newValue.length <= 1) response = value;
+      else response = newValue;
+      break;
     case 'array':
-      return newValue;
+      response = newValue;
+      break;
     case 'string':
-      return value;
+      response = value;
+      break;
   }
+
+  return response as T | undefined;
 }
 
 export function toMs(time: string) {

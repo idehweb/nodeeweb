@@ -130,12 +130,24 @@ class CoreConfig extends Config<CoreConfigDto> {
     });
   }
   protected get _defaultSetting(): CoreConfigDto {
-    const nodeewebApiUrl = getEnv('nodeewebhub_api_base_url', {
+    const app_name = getEnv<string>('app-name', { format: 'string' });
+    const nodeewebApiUrl = getEnv<string>('nodeewebhub_api_base_url', {
       format: 'string',
-    }) as string;
+    });
+    const host = getEnv<string>('server-host', { format: 'string' });
+    const supervisor_url = getEnv<string>('supervisor-url', {
+      format: 'string',
+    });
+    const supervisor_token = getEnv<string>('supervisor-token', {
+      format: 'string',
+    });
+    const supervisor_whitelist = getEnv<string[]>('supervisor-whitelist', {
+      format: 'array',
+    });
+
     return {
-      app_name: store.env.APP_NAME ?? 'Nodeeweb Core',
-      host: getEnv('server-host', { format: 'string' }) as string,
+      app_name: app_name ?? 'Nodeeweb Core',
+      host,
       auth: {
         ...(nodeewebApiUrl
           ? {
@@ -146,13 +158,11 @@ class CoreConfig extends Config<CoreConfigDto> {
           : {}),
       },
       supervisor:
-        store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
+        supervisor_token && supervisor_url
           ? {
-              url: store.env.SUPERVISOR_URL,
-              token: store.env.SUPERVISOR_TOKEN,
-              whitelist:
-                (getEnv('supervisor-whitelist', { format: 'array' }) as any) ??
-                [],
+              url: supervisor_url,
+              token: supervisor_token,
+              whitelist: supervisor_whitelist ?? [],
             }
           : undefined,
       limit: {
