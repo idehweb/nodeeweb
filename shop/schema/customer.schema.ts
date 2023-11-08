@@ -2,6 +2,8 @@ import mongoose, { Document, Model, Types } from 'mongoose';
 import bcrypt from 'bcrypt';
 import { IUser } from '@nodeeweb/core/types/user';
 import { AddressSchema, AddressType } from './order.schema';
+import { normalizePhone } from '@nodeeweb/core/utils/helpers';
+import bfs from '@nodeeweb/core/utils/bfs';
 
 export enum CustomerSource {
   Web = 'WEBSITE',

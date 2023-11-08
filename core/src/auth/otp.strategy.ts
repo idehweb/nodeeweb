@@ -28,7 +28,7 @@ import {
   OtpUserSignup,
 } from '../../dto/in/auth/index.dto';
 import { IUser, UserDocument, UserModel, UserStatus } from '../../types/user';
-import { replaceValue } from '../../utils/helpers';
+import { normalizePhone, replaceValue } from '../../utils/helpers';
 import { AuthEvents } from './authGateway.strategy';
 import { SmsSubType } from '../../types/config';
 
@@ -56,11 +56,13 @@ export class OtpStrategy extends AuthStrategy {
 
     const { phone } = req.body.user as OtpUserDetect;
 
+    const normalPhone = normalizePhone(phone);
+
     const model = store.db.model(req.modelName);
-    const user: UserDocument = await model.findOne({ phone });
+    const user: UserDocument = await model.findOne({ phone: normalPhone });
     if (!user && throwOnNotfound)
       throw new NotFound(
-        `did'nt find any user with ${phone} number, please signup`
+        `did'nt find any user with ${normalPhone} number, please signup`
       );
     if (user && !user.active) throw new ForbiddenError('inactive user');
 
@@ -71,6 +73,8 @@ export class OtpStrategy extends AuthStrategy {
   private async verify(user: IUser, code: string, userType: string) {
     let outUser = user;
     const otpModel = store.db.model('otp');
+
+    user.phone = normalizePhone(user.phone);
 
     const codeDoc = await otpModel.findOneAndUpdate(
       {
@@ -103,7 +107,7 @@ export class OtpStrategy extends AuthStrategy {
   private async sendCode(req: Req, res: Res) {
     // generate and send code
 
-    const phone = req.user?.phone ?? req.body.user?.phone,
+    const phone = normalizePhone(req.user?.phone ?? req.body.user?.phone),
       userExists = Boolean(req.user);
 
     // send code
@@ -204,7 +208,7 @@ export class OtpStrategy extends AuthStrategy {
         throw new ForbiddenError('can not register admin');
 
       req.user = await this.createUser(req.modelName, {
-        phone: req.body.user.phone,
+        phone: normalizePhone(req.body.user.phone),
         status: [{ status: UserStatus.NeedVerify }],
       });
     }
