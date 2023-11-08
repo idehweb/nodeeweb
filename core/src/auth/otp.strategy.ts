@@ -165,13 +165,23 @@ export class OtpStrategy extends AuthStrategy {
     });
   }
 
+  private async createUser(modelName: string, phone: string) {
+    const userModel = store.db.model(modelName) as UserModel;
+    const user = await userModel.create({ phone });
+    return user;
+  }
+
   async detect(req: Req, res: Res, next: NextFunction) {
     req.body.user = await this.transformDetect(req.body.user);
 
     const { login, signup } = req.body;
 
     // export user
-    await this.exportUser(req, !signup && login);
+    req.user = await this.exportUser(req, !signup && login);
+
+    // create user
+    if (signup && !req.user)
+      req.user = await this.createUser(req.modelName, req.body.phone);
 
     if (login || signup) {
       // progress
