@@ -30,13 +30,24 @@ import { getEnv } from '@nodeeweb/core/utils/helpers';
 
 export class ShopConfig extends Config<ShopConfigDto> {
   protected get _defaultSetting(): ShopConfigDto {
-    const nodeewebApiUrl = getEnv('nodeewebhub_api_base_url', {
+    const app_name = getEnv<string>('app-name', { format: 'string' });
+    const nodeewebApiUrl = getEnv<string>('nodeewebhub_api_base_url', {
       format: 'string',
-    }) as string;
+    });
+    const host = getEnv<string>('server-host', { format: 'string' });
+    const supervisor_url = getEnv<string>('supervisor-url', {
+      format: 'string',
+    });
+    const supervisor_token = getEnv<string>('supervisor-token', {
+      format: 'string',
+    });
+    const supervisor_whitelist = getEnv<string[]>('supervisor-whitelist', {
+      format: 'array',
+    });
 
     return {
-      app_name: store.env.APP_NAME ?? 'Nodeeweb Shop',
-      host: getEnv('server-host', { format: 'string' }) as string,
+      app_name: app_name ?? 'Nodeeweb Shop',
+      host,
       favicons: [],
       auth: {
         ...(nodeewebApiUrl
@@ -48,10 +59,11 @@ export class ShopConfig extends Config<ShopConfigDto> {
           : {}),
       },
       supervisor:
-        store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
+        supervisor_token && supervisor_url
           ? {
-              url: store.env.SUPERVISOR_URL,
-              token: store.env.SUPERVISOR_TOKEN,
+              url: supervisor_url,
+              token: supervisor_token,
+              whitelist: supervisor_whitelist ?? [],
             }
           : undefined,
       limit: {
@@ -69,8 +81,8 @@ export class ShopConfig extends Config<ShopConfigDto> {
       shop_inactive_message: DEFAULT_SHOP_INACTIVE_MSG,
       consumer_status: [],
       factor: {
-        name: store.env.APP_NAME ?? 'Nodeeweb Shop',
-        url: store.env.BASE_URL,
+        name: app_name ?? 'Nodeeweb Shop',
+        url: host,
       },
       manual_post: [],
       entry_submit_message: DEFAULT_ENTRY_SUBMIT_MSG,
