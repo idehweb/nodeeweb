@@ -1,6 +1,7 @@
 import mongoose, { Document, Model, Types } from 'mongoose';
 
 export interface IFile {
+  _id?: Types.ObjectId;
   title?: string;
   url: string;
   type: string;

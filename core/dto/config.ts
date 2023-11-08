@@ -166,7 +166,7 @@ export class CoreConfigBody {
   @Type(() => CoreConfConfBody)
   @IsObject()
   @ValidateNested()
-  config: CoreConfConfBody;
+  config: Partial<CoreConfConfBody>;
 
   @Expose()
   @IsOptional()

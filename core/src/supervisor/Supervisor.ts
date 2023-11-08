@@ -3,6 +3,7 @@ import axios from 'axios';
 import store from '../../store';
 import logger from '../handlers/log.handler';
 import { axiosError2String } from '../../utils/helpers';
+import { color } from '../../utils/color';
 
 export default class Supervisor {
   url: string;
@@ -24,6 +25,7 @@ export default class Supervisor {
         { event, body, id: this.id },
         { headers: { Authorization: this.token } }
       );
+      logger.log(color('Green', `[Supervisor] successfully emit ${event}!`));
       return true;
     } catch (err) {
       logger.error(

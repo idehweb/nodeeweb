@@ -34,7 +34,7 @@ class ConfigService {
     } as Favicon;
   }
 
-  async updateConf(body: CoreConfigBody) {
+  async updateConf(body: CoreConfigBody, emit = true) {
     if (!store.config) throw new GeneralError('config not resister yet!', 500);
 
     if (body.config.favicon_id) {
@@ -48,18 +48,20 @@ class ConfigService {
 
     await store.config.change(body.config, {
       merge: true,
-      restart: body.restart ?? true,
+      restart: body.restart ?? false,
       external_wait: true,
       internal_wait: false,
     });
+
+    if (emit) {
+      store.event.emit('config-update', body);
+    }
   }
 
   update: MiddleWare = async (req, res) => {
     const body: CoreConfigBody = req.body;
 
     await this.updateConf(body);
-
-    store.event.emit('config-update', body);
 
     return res.status(200).json({ data: store.config });
   };

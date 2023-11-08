@@ -54,6 +54,8 @@ export default function registerController() {
         },
         crud: {
           parseUpdate: service.updateBodyParser,
+          saveToReq: true,
+          executeQuery: false,
         },
       },
       deleteOne: {
