@@ -23,6 +23,7 @@ export class Service {
       title: req.body.title,
       type: req.file?.mimetype?.split('/')?.[0] ?? 'unknown',
       url: path.replace(/\\/g, '/'),
+      alt: req.body.alt,
     };
 
     return file;
@@ -36,6 +37,7 @@ export class Service {
       url,
       title: req.body.title,
       type: req.file?.mimetype?.split('/')?.[0] ?? undefined,
+      alt: req.body.alt,
     };
   }
   updateAfter: MiddleWare = async (req, res) => {

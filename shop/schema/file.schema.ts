@@ -4,6 +4,7 @@ export interface IFile {
   title?: string;
   url: string;
   type: string;
+  alt?: string;
 }
 
 export type FileModel = Model<IFile, {}, unknown>;
@@ -20,6 +21,7 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    alt: String,
   },
   { timestamps: true }
 );
