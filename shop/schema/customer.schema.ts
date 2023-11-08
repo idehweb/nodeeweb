@@ -107,6 +107,7 @@ const schema = new mongoose.Schema(
         description: String,
         status: String,
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'admin' },
+        _id: false,
       },
     ],
     photos: [
