@@ -26,7 +26,7 @@ import {
   OtpUserLogin,
   OtpUserSignup,
 } from '../../dto/in/auth/index.dto';
-import { UserDocument, UserModel } from '../../types/user';
+import { IUser, UserDocument, UserModel, UserStatus } from '../../types/user';
 import { replaceValue } from '../../utils/helpers';
 import { AuthEvents } from './authGateway.strategy';
 import { SmsSubType } from '../../types/config';
@@ -165,9 +165,9 @@ export class OtpStrategy extends AuthStrategy {
     });
   }
 
-  private async createUser(modelName: string, phone: string) {
+  private async createUser(modelName: string, iuser: Partial<IUser>) {
     const userModel = store.db.model(modelName) as UserModel;
-    const user = await userModel.create({ phone });
+    const user = await userModel.create(iuser);
     return user;
   }
 
@@ -180,8 +180,15 @@ export class OtpStrategy extends AuthStrategy {
     req.user = await this.exportUser(req, !signup && login);
 
     // create user
-    if (signup && !req.user)
-      req.user = await this.createUser(req.modelName, req.body.phone);
+    if (signup && !req.user) {
+      if (req.modelName === 'admin')
+        throw new ForbiddenError('can not register admin');
+
+      req.user = await this.createUser(req.modelName, {
+        phone: req.body.phone,
+        // status: [{ status: UserStatus.NeedVerify }],
+      });
+    }
 
     if (login || signup) {
       // progress
@@ -211,6 +218,9 @@ export class OtpStrategy extends AuthStrategy {
   }
 
   async signup(req: Req, res: Res, next: NextFunction) {
+    if (req.modelName === 'admin')
+      throw new ForbiddenError('can not register admin');
+
     req.body.user = await this.transformSignup(req.body.user);
 
     const codeDoc = await this.verify(req.body.user.phone, req.body.user.code);
