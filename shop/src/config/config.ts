@@ -30,15 +30,40 @@ import { getEnv } from '@nodeeweb/core/utils/helpers';
 
 export class ShopConfig extends Config<ShopConfigDto> {
   protected get _defaultSetting(): ShopConfigDto {
+    const app_name = getEnv<string>('app-name', { format: 'string' });
+    const nodeewebApiUrl = getEnv<string>('nodeewebhub_api_base_url', {
+      format: 'string',
+    });
+    const host = getEnv<string>('server-host', { format: 'string' });
+    const supervisor_url = getEnv<string>('supervisor-url', {
+      format: 'string',
+    });
+    const supervisor_token = getEnv<string>('supervisor-token', {
+      format: 'string',
+    });
+    const supervisor_whitelist = getEnv<string[]>('supervisor-whitelist', {
+      format: 'array',
+    });
+
     return {
-      app_name: store.env.APP_NAME ?? 'Nodeeweb Shop',
-      host: getEnv('server-host', { format: 'string' }) as string,
-      auth: {},
-      supervisor:
-        store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
+      app_name: app_name ?? 'Nodeeweb Shop',
+      host,
+      favicons: [],
+      auth: {
+        ...(nodeewebApiUrl
           ? {
-              url: store.env.SUPERVISOR_URL,
-              token: store.env.SUPERVISOR_TOKEN,
+              nodeeweb: {
+                api_url: nodeewebApiUrl,
+              },
+            }
+          : {}),
+      },
+      supervisor:
+        supervisor_token && supervisor_url
+          ? {
+              url: supervisor_url,
+              token: supervisor_token,
+              whitelist: supervisor_whitelist ?? [],
             }
           : undefined,
       limit: {
@@ -54,11 +79,10 @@ export class ShopConfig extends Config<ShopConfigDto> {
       tax: 0,
       shop_active: true,
       shop_inactive_message: DEFAULT_SHOP_INACTIVE_MSG,
-      favicon: '/favicon.icon',
       consumer_status: [],
       factor: {
-        name: store.env.APP_NAME ?? 'Nodeeweb Shop',
-        url: store.env.BASE_URL,
+        name: app_name ?? 'Nodeeweb Shop',
+        url: host,
       },
       manual_post: [],
       entry_submit_message: DEFAULT_ENTRY_SUBMIT_MSG,
@@ -76,6 +100,9 @@ export class ShopConfig extends Config<ShopConfigDto> {
   }
 
   protected _transform(value: any): ShopConfigDto {
+    // rewrite favicon base on first dist in favicons
+    if (Array.isArray(value.favicons)) value.favicon = value.favicons[0]?.dist;
+
     return plainToInstance(ShopConfigDto, value, {
       enableImplicitConversion: true,
     });
@@ -102,6 +129,7 @@ export class ShopConfig extends Config<ShopConfigDto> {
     return {
       app_name: this._config.app_name,
       host: this._config.host,
+      favicon: this._config.favicons[0]?.dist,
       currency: this._config.currency,
       shop_active: this._config.shop_active,
       shop_inactive_message: this._config.shop_inactive_message,

@@ -155,6 +155,9 @@ export class GoogleStrategy extends AuthStrategy {
 
     if (user) throw new DuplicateError('user exists, please login');
 
+    if (req.modelName === 'admin')
+      throw new ForbiddenError('can not create admin with sso');
+
     const userDoc = await this.getUserModel(req).create({
       firstName: info.firstName,
       lastName: info.lastName,

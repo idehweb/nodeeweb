@@ -18,7 +18,9 @@ export function IsMultiLang(validationOptions?: ValidationOptions) {
       },
       validator: {
         validate(value: any) {
-          return Object.entries(value).every(([, v]) => typeof v === 'string');
+          return Object.entries(value ?? {}).every(
+            ([, v]) => typeof v === 'string'
+          );
         },
       },
     });

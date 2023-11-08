@@ -31,6 +31,7 @@ export default function registerController() {
               quality: 80,
               format: 'webp',
             },
+            not_reduce: '$notReduce',
           }),
         },
         crud: {
@@ -47,6 +48,7 @@ export default function registerController() {
               quality: 80,
               format: 'webp',
             },
+            not_reduce: '$notReduce',
           }),
           service: service.updateAfter,
         },

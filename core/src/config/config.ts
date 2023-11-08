@@ -122,23 +122,47 @@ export abstract class Config<C extends CoreConfigDto> {
 
 class CoreConfig extends Config<CoreConfigDto> {
   protected _transform(value: any): CoreConfigDto {
+    // rewrite favicon base on first dist in favicons
+    if (Array.isArray(value.favicons)) value.favicon = value.favicons[0]?.dist;
+
     return plainToInstance(CoreConfigDto, value, {
       enableImplicitConversion: true,
     });
   }
   protected get _defaultSetting(): CoreConfigDto {
+    const app_name = getEnv<string>('app-name', { format: 'string' });
+    const nodeewebApiUrl = getEnv<string>('nodeewebhub_api_base_url', {
+      format: 'string',
+    });
+    const host = getEnv<string>('server-host', { format: 'string' });
+    const supervisor_url = getEnv<string>('supervisor-url', {
+      format: 'string',
+    });
+    const supervisor_token = getEnv<string>('supervisor-token', {
+      format: 'string',
+    });
+    const supervisor_whitelist = getEnv<string[]>('supervisor-whitelist', {
+      format: 'array',
+    });
+
     return {
-      app_name: store.env.APP_NAME ?? 'Nodeeweb Core',
-      host: getEnv('server-host', { format: 'string' }) as string,
-      auth: {},
-      supervisor:
-        store.env.SUPERVISOR_URL && store.env.SUPERVISOR_TOKEN
+      app_name: app_name ?? 'Nodeeweb Core',
+      host,
+      auth: {
+        ...(nodeewebApiUrl
           ? {
-              url: store.env.SUPERVISOR_URL,
-              token: store.env.SUPERVISOR_TOKEN,
-              whitelist:
-                (getEnv('supervisor-whitelist', { format: 'array' }) as any) ??
-                [],
+              nodeeweb: {
+                api_url: nodeewebApiUrl,
+              },
+            }
+          : {}),
+      },
+      supervisor:
+        supervisor_token && supervisor_url
+          ? {
+              url: supervisor_url,
+              token: supervisor_token,
+              whitelist: supervisor_whitelist ?? [],
             }
           : undefined,
       limit: {
@@ -174,6 +198,7 @@ class CoreConfig extends Config<CoreConfigDto> {
       app_name: this._config.app_name,
       host: this._config.host,
       auth: this._filterAuth(),
+      favicon: this._config.favicons[0]?.dist,
     };
   }
 }

@@ -78,7 +78,6 @@ class LoginForm extends React.Component {
     SaveData({ user, token });
   }
   afterSSO(res) {
-    console.log('after sso call', res);
     const { user, token } = res;
     this.afterAuth(user, token);
     return this.setState((s) => ({ ...s, authStatus: 'success' }));
@@ -320,7 +319,6 @@ class LoginForm extends React.Component {
     const { firstName, lastName, username, timer, authStatus } = this.state;
     const { t } = this.props;
     if (authStatus === 'success') {
-      console.log('here change nav', this.props.redirectTo);
       return <Navigate to={this.props.redirectTo} replace />;
     }
     return (

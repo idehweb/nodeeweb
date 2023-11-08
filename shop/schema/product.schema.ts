@@ -64,18 +64,21 @@ const schema = new mongoose.Schema(
       },
     ],
     labels: [{ title: String, _id: false }],
-    combinations: [
-      {
-        _id: { type: String, default: crypto.randomUUID },
-        options: {},
-        price: { type: Number, required: false },
-        weight: { type: Number, default: 0 },
-        quantity: { type: Number, default: 1 },
-        salePrice: { type: Number, required: false },
-        sku: String,
-        in_stock: { type: Boolean, default: true },
-      },
-    ],
+    combinations: {
+      type: [
+        {
+          _id: { type: String, default: crypto.randomUUID },
+          options: {},
+          price: { type: Number, required: false },
+          weight: { type: Number, default: 0 },
+          quantity: { type: Number, default: 1 },
+          salePrice: { type: Number, required: false },
+          sku: String,
+          in_stock: { type: Boolean, default: true },
+        },
+      ],
+      required: false,
+    },
     data: {},
     miniTitle: MultiLang,
     excerpt: MultiLang,
@@ -127,11 +130,20 @@ const schema = new mongoose.Schema(
           _id: { type: mongoose.Schema.Types.ObjectId, ref: 'file' },
           url: { type: String, required: true },
         },
-        required: true,
+        required: false,
       },
     ],
   },
   { timestamps: true }
+);
+
+schema.index(
+  { slug: 1 },
+  {
+    name: 'slug',
+    unique: true,
+    partialFilterExpression: { active: true },
+  }
 );
 
 export default schema;

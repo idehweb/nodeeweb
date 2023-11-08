@@ -4,7 +4,7 @@ import fs from 'fs';
 import sharp from 'sharp';
 import { getPublicDir } from '../../utils/path';
 import { MiddleWare, Req } from '../../types/global';
-import { isExist } from '../../utils/helpers';
+import { call, isExist } from '../../utils/helpers';
 import { BadRequestError } from '../../types/error';
 
 export type UploadOptions = {
@@ -15,6 +15,7 @@ export type UploadOptions = {
     format?: keyof sharp.FormatEnum;
     quality?: number;
   };
+  not_reduce?: string | boolean;
   type: 'image' | 'video' | 'audio' | 'other' | 'all';
   max_size_mb?: number;
   dir_path?: string;
@@ -54,6 +55,18 @@ function getDir(opt: UploadOptions) {
   return opt.dir_path ?? join(getPublicDir('files', true)[0], 'customer');
 }
 
+export function exportAllowReduce(
+  req: Req,
+  not_reduce: string | boolean,
+  allowRecursive = true
+) {
+  if (!not_reduce) return true;
+  if (typeof not_reduce === 'boolean') return !not_reduce;
+  if (allowRecursive && not_reduce?.startsWith('$'))
+    return exportAllowReduce(req, req.body[not_reduce.slice(1)], false);
+  return not_reduce?.toLowerCase() === 'true' ? false : true;
+}
+
 export function uploadSingle(opt: UploadOptions) {
   const dir_path = getDir(opt);
   const saveToMemory = opt.reduce && opt.type === 'image';
@@ -91,7 +104,18 @@ export function uploadSingle(opt: UploadOptions) {
         }),
   });
   const mw: MiddleWare[] = [upload.single(opt.file_key ?? 'file')];
-  if (opt.reduce) mw.push(reduceSingle(opt));
+  if (opt.reduce) {
+    if (opt.not_reduce === undefined)
+      // reduce allow
+      mw.push(reduceSingle(opt));
+    else {
+      mw.push(async (req, res, next) => {
+        const canReduce = exportAllowReduce(req, opt.not_reduce);
+        if (!canReduce) return next();
+        return await call(reduceSingle(opt), req, res, next);
+      });
+    }
+  }
 
   return mw;
 }

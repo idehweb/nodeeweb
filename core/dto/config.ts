@@ -1,4 +1,4 @@
-import { Expose, Type } from 'class-transformer';
+import { Expose, Exclude, Type } from 'class-transformer';
 import {
   Allow,
   IsBoolean,
@@ -12,6 +12,22 @@ import {
   IsUrl,
   IsArray,
 } from 'class-validator';
+import { IsMongoID, ToMongoID } from '../utils/validation';
+import { Types } from 'mongoose';
+
+export class Favicon {
+  @Expose()
+  @IsString()
+  source: string;
+
+  @Expose()
+  @IsMongoID()
+  id: string;
+
+  @Expose()
+  @IsString()
+  dist: string;
+}
 
 class ConfigSupervisor {
   @Expose()
@@ -91,6 +107,13 @@ export class CoreConfigDto {
   favicon?: string;
 
   @Expose()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @IsArray()
+  @Type(() => Favicon)
+  favicons?: Favicon[];
+
+  @Expose()
   @Allow()
   auth: { [key: string]: any };
 
@@ -124,6 +147,18 @@ class CoreConfConfBody extends CoreConfigDto {
   @IsOptional()
   @Type(() => CoreConfigSmsOnBody)
   sms_message_on: CoreConfigSmsOnBody;
+
+  @Exclude()
+  favicon?: string;
+
+  @Exclude()
+  favicons?: Favicon[];
+
+  @Expose()
+  @IsOptional()
+  @IsMongoID()
+  @ToMongoID()
+  favicon_id?: Types.ObjectId;
 }
 
 export class CoreConfigBody {
