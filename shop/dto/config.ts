@@ -309,5 +309,5 @@ export class ShopConfConfBody extends ShopConfigDto {
 
 export class ShopConfigBody extends CoreConfigBody {
   @Type(() => ShopConfConfBody)
-  config: ShopConfConfBody;
+  config: Partial<ShopConfConfBody>;
 }

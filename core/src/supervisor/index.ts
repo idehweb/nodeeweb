@@ -18,9 +18,8 @@ export default function initSupervisor() {
     store.supervisor?.emit('config-update', changes);
   });
 
-  registerFuncSupervisor(
-    'config-update',
-    configService.updateConf.bind(configService)
+  registerFuncSupervisor('config-update', (body) =>
+    configService.updateConf.bind(configService)(body, false)
   );
   registerFuncSupervisor('register-template', registerTemplate);
   registerFuncSupervisor('unregister-template', unregisterTemplate);

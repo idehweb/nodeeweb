@@ -1,9 +1,11 @@
 import mongoose, { Document, Model, Types } from 'mongoose';
 
 export interface IFile {
+  _id?: Types.ObjectId;
   title?: string;
   url: string;
   type: string;
+  alt?: string;
 }
 
 export type FileModel = Model<IFile, {}, unknown>;
@@ -20,6 +22,7 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    alt: String,
   },
   { timestamps: true }
 );

@@ -1,3 +1,4 @@
+import { Photo } from '@nodeeweb/core';
 import mongoose, { Document, Model, Types } from 'mongoose';
 
 export interface IPost {
@@ -12,7 +13,7 @@ export interface IPost {
   elements: any;
   kind: string;
   status: string;
-  photos: any[];
+  photos: Photo[];
   thumbnail: string;
 }
 
@@ -37,7 +38,16 @@ const schema = new mongoose.Schema(
     elements: {},
     kind: { type: String, default: 'post' },
     status: { type: String, default: 'processing' },
-    photos: [],
+    photos: [
+      {
+        type: {
+          _id: { type: mongoose.Schema.Types.ObjectId, ref: 'file' },
+          url: { type: String, required: true },
+          alt: { type: String },
+        },
+        required: false,
+      },
+    ],
     thumbnail: String,
   },
   { timestamps: true }
