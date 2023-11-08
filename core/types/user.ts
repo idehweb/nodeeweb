@@ -1,4 +1,5 @@
 import mongoose, { Model, Types, Document } from 'mongoose';
+import { Photo } from './global';
 
 export interface IUserMethods {
   passwordVerify: (password: string) => Promise<boolean>;
@@ -27,6 +28,7 @@ export interface IUser {
   credentialChangeAt: Date;
   sex?: UserSex;
   data: any;
+  photo?: Photo[];
 }
 
 export type UserModel = Model<IUser, {}, IUserMethods>;

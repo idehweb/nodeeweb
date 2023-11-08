@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import mongoose, { Document, Model } from 'mongoose';
 import { Types } from 'mongoose';
 import { MultiLang, PublishStatus } from './_base.schema';
+import { Photo } from '@nodeeweb/core';
 
 export enum PriceType {
   Normal = 'normal',
@@ -41,7 +42,7 @@ export interface IProduct {
   price_type: PriceType;
   status: PublishStatus;
   relatedProducts: Types.ObjectId[];
-  photos: { _id: Types.ObjectId; url: string }[];
+  photos: Photo[];
   active: boolean;
   updatedAt: Date;
   createdAt: Date;
@@ -129,6 +130,7 @@ const schema = new mongoose.Schema(
         type: {
           _id: { type: mongoose.Schema.Types.ObjectId, ref: 'file' },
           url: { type: String, required: true },
+          alt: { type: String },
         },
         required: false,
       },

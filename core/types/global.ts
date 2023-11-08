@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import mongoose, { Document, Model, ObjectId } from 'mongoose';
+import mongoose, { Document, Model, ObjectId, Types } from 'mongoose';
 import { CRUD_DEFAULT_REQ_KEY } from '../src/constants/String';
 import { UserDocument } from './user';
 
@@ -93,3 +93,9 @@ export interface Seo {
   error: (...args: any[]) => void;
   warn: (...args: any[]) => void;
 }
+
+export type Photo = {
+  url: string;
+  _id: Types.ObjectId;
+  alt?: string;
+};

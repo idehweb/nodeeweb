@@ -1,5 +1,6 @@
 import mongoose, { Document, Model, Types } from 'mongoose';
 import { MultiLang } from './_base.schema';
+import { Photo } from '@nodeeweb/core';
 
 export interface IPage {
   active: boolean;
@@ -19,7 +20,7 @@ export interface IPage {
   path?: string;
   maxWidth: string;
   status: string;
-  photos: any[];
+  photos: Photo[];
   thumbnail?: string;
   metatitle?: { [key: string]: string };
   metadescription?: { [key: string]: string };
@@ -48,7 +49,16 @@ const schema = new mongoose.Schema(
     path: String,
     maxWidth: { type: String, default: '100%' },
     status: { type: String, default: 'processing' },
-    photos: [],
+    photos: [
+      {
+        type: {
+          _id: { type: mongoose.Schema.Types.ObjectId, ref: 'file' },
+          url: { type: String, required: true },
+          alt: { type: String },
+        },
+        required: false,
+      },
+    ],
     thumbnail: String,
     metatitle: MultiLang,
     metadescription: MultiLang,

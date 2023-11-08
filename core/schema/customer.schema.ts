@@ -109,8 +109,12 @@ const schema = new mongoose.Schema(
     ],
     photos: [
       {
-        name: String,
-        url: String,
+        type: {
+          _id: { type: mongoose.Schema.Types.ObjectId, ref: 'file' },
+          url: { type: String, required: true },
+          alt: { type: String },
+        },
+        required: false,
       },
     ],
     role: { type: String, default: 'customer' },
