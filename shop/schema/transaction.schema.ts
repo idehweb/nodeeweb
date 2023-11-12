@@ -31,6 +31,7 @@ export interface ITransaction {
   createdAt: Date;
   updatedAt: Date;
   expiredAt: Date;
+  active: boolean;
 }
 export interface ITransactionGrid {
   _id: Types.ObjectId;
@@ -61,6 +62,7 @@ const schema = new mongoose.Schema(
     payment_link: String,
     authority: { type: String, unique: true, sparse: true },
     status: { type: String, default: TransactionStatus.NeedToPay },
+    active: { type: Boolean, default: true },
     //   15min expr by default
     expiredAt: { type: Date, default: () => Date.now() + 15 * 60 * 1_000 },
   },
