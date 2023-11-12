@@ -3,6 +3,7 @@ import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 import { MultiLang } from './_base.schema';
 import { Currency } from '../dto/config';
 import store from '../store';
+import { ITransactionGrid, TransactionGridSchema } from './transaction.schema';
 
 export enum OrderStatus {
   Cart = 'cart',
@@ -12,10 +13,6 @@ export enum OrderStatus {
   Completed = 'completed',
   Canceled = 'canceled',
   Expired = 'expired',
-}
-
-export enum TransactionProvider {
-  Manual = 'manual',
 }
 
 export type AddressType = {
@@ -76,13 +73,7 @@ export interface IOrder {
   };
   tax?: number;
   totalPrice: number;
-  transaction?: {
-    provider: string;
-    payment_link: string;
-    authority: string;
-    createdAt: Date;
-    expiredAt: Date;
-  };
+  transaction?: ITransactionGrid;
   checkout?: boolean;
   status: OrderStatus;
   statusChangedAt: Date;
@@ -179,14 +170,7 @@ const schema = new mongoose.Schema(
     },
     tax: { type: Number, default: 0 },
     totalPrice: Number,
-    transaction: {
-      _id: false,
-      provider: String,
-      payment_link: String,
-      authority: { type: String, unique: true, sparse: true },
-      createdAt: Date,
-      expiredAt: Date,
-    },
+    transaction: TransactionGridSchema,
     status: {
       type: String,
       default: OrderStatus.Cart,
