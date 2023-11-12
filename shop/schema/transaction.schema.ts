@@ -1,4 +1,5 @@
 import mongoose, { Document, Model, Types } from 'mongoose';
+import { Currency } from '../dto/config';
 
 export enum TransactionStatus {
   NeedToPay = 'need-to-pay',
@@ -21,16 +22,17 @@ export interface ITransaction {
   provider: string | TransactionProvider;
   creator_category: TransactionCreator;
   creator?: Types.ObjectId;
-  consumer?: Types.ObjectId;
+  consumer?: { _id: Types.ObjectId; type: 'admin' | 'customer' };
   order?: Types.ObjectId;
   payment_link?: string;
   authority: string;
   amount: number;
   status: TransactionStatus;
-  currency: string;
+  currency: Currency;
   createdAt: Date;
   updatedAt: Date;
   expiredAt: Date;
+  message?: string;
   active: boolean;
 }
 export interface ITransactionGrid {
@@ -54,7 +56,13 @@ const schema = new mongoose.Schema(
   {
     creator_category: { type: String, required: true },
     creator: { type: mongoose.Schema.Types.ObjectId },
-    consumer: { type: mongoose.Schema.Types.ObjectId },
+    consumer: {
+      type: {
+        _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+        type: { type: String, required: true },
+      },
+      required: false,
+    },
     order: { type: mongoose.Schema.Types.ObjectId },
     amount: { type: Number, required: true },
     currency: { type: String, required: true },
@@ -65,6 +73,7 @@ const schema = new mongoose.Schema(
     active: { type: Boolean, default: true },
     //   15min expr by default
     expiredAt: { type: Date, default: () => Date.now() + 15 * 60 * 1_000 },
+    message: String,
   },
   { timestamps: true }
 );

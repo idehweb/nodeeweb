@@ -17,9 +17,11 @@ export default function registerTransactionController() {
         controller: {
           access: AdminAccess,
           validate: { reqPath: 'body', dto: TransactionCreateBody },
+          beforeService: service.beforeCreate,
+          service: service.afterCreate,
         },
         crud: {
-          parseBody: service.parseCreateBody,
+          saveToReq: true,
         },
       },
       getAll: {

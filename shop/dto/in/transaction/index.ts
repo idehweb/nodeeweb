@@ -1,21 +1,35 @@
 import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   IsDate,
   IsEnum,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { Types } from 'mongoose';
 import { TransactionStatus } from '../../../schema/transaction.schema';
+import { Currency } from '../../config';
+
+export class TransactionConsumer {
+  @Expose()
+  @ToMongoID()
+  @IsMongoID()
+  _id: Types.ObjectId;
+
+  @Expose()
+  @IsIn(['admin', 'customer'])
+  type: 'admin' | 'customer';
+}
 
 export class TransactionCreateBody {
   @Expose()
   @IsOptional()
-  @ToMongoID()
-  @IsMongoID()
-  consumer?: Types.ObjectId;
+  @ValidateNested()
+  @Type(() => TransactionConsumer)
+  consumer?: TransactionConsumer;
 
   @Expose()
   @IsOptional()
@@ -29,8 +43,8 @@ export class TransactionCreateBody {
 
   @Expose()
   @IsOptional()
-  @IsString()
-  currency?: string;
+  @IsEnum(Currency)
+  currency?: Currency;
 
   @Expose()
   @IsOptional()
