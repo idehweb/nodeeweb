@@ -45,9 +45,12 @@ export default function registerTransactionController() {
         controller: {
           access: AdminAccess,
           validate: { dto: TransactionUpdateBody, reqPath: 'body' },
+          service: service.afterUpdate,
         },
         crud: {
+          parseUpdate: service.parseUpdateFilter,
           parseBody: service.parseUpdateBody,
+          saveToReq: true,
         },
       },
       deleteOne: {

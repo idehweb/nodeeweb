@@ -74,9 +74,9 @@ export class TransactionCreateBody {
 export class TransactionUpdateBody {
   @Expose()
   @IsOptional()
-  @ToMongoID()
-  @IsMongoID()
-  consumer?: Types.ObjectId;
+  @ValidateNested()
+  @Type(() => TransactionConsumer)
+  consumer?: TransactionConsumer;
 
   @Expose()
   @IsOptional()
@@ -91,8 +91,8 @@ export class TransactionUpdateBody {
 
   @Expose()
   @IsOptional()
-  @IsString()
-  currency?: string;
+  @IsEnum(Currency)
+  currency?: Currency;
 
   @Expose()
   @IsOptional()
