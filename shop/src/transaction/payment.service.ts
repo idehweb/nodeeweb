@@ -30,6 +30,7 @@ import {
 import { UserDocument } from '@nodeeweb/core/types/user';
 import orderUtils from '../order/utils.service';
 import utilsService from './utils.service';
+import { HandlePaymentArgs } from '../../types/transaction';
 
 class PaymentService {
   transactionSupervisors = new Map<string, NodeJS.Timer>();
@@ -195,21 +196,15 @@ class PaymentService {
 
   async handlePayment({
     transaction,
+    forceFailedAction,
+    forceSuccessAction,
     successAction,
     failedAction,
     extraFields,
     statusWithoutVerify,
     statusWithVerify,
     sendSuccessSMS = true,
-  }: {
-    transaction: TransactionDocument | null;
-    successAction: boolean;
-    failedAction: boolean;
-    extraFields?: any;
-    statusWithoutVerify?: PaymentVerifyStatus | TransactionStatus;
-    sendSuccessSMS?: boolean;
-    statusWithVerify?: PaymentVerifyStatus | TransactionStatus;
-  }) {
+  }: HandlePaymentArgs) {
     const _clearTimer = (authority: string) => {
       const expiredTimer = this.transactionSupervisors.get(authority + '-1');
       const notifTimer = this.transactionSupervisors.get(authority + '-2');
@@ -254,16 +249,26 @@ class PaymentService {
     };
 
     const _core = async () => {
-      if (transaction.status === TransactionStatus.Paid)
+      if (transaction.status === TransactionStatus.Paid) {
+        if (forceSuccessAction) await _success();
         return { status: PaymentVerifyStatus.CheckBefore, transaction };
-      else if (
+      } else if (
         [
           TransactionStatus.Canceled,
           TransactionStatus.Failed,
           TransactionStatus.Expired,
         ].includes(transaction.status)
-      )
+      ) {
+        if (forceFailedAction)
+          await _failed(
+            utilsService.combineStatuses(
+              transaction.status,
+              statusWithVerify,
+              statusWithoutVerify
+            )
+          );
         return { status: PaymentVerifyStatus.Failed, transaction };
+      }
 
       if (transaction.status !== TransactionStatus.NeedToPay)
         throw new BadRequestError(
@@ -288,20 +293,23 @@ class PaymentService {
 
       switch (transactionStatus) {
         case TransactionStatus.Paid:
-          if (successAction) await _success();
+          if (successAction || forceSuccessAction) await _success();
           break;
         case TransactionStatus.Failed:
         case TransactionStatus.Expired:
         case TransactionStatus.Canceled:
-          if (failedAction) await _failed(transactionStatus);
+          if (failedAction || forceFailedAction)
+            await _failed(transactionStatus);
           break;
       }
 
       return { status, transaction };
     };
 
-    // not found
-    if (!transaction) return { status: PaymentVerifyStatus.Failed };
+    // not exists
+    if (!transaction) {
+      return { status: PaymentVerifyStatus.Failed };
+    }
 
     // clear timer
     _clearTimer(transaction.authority);

@@ -14,6 +14,7 @@ import store from '../../store';
 import { SmsSubType } from '../../types/sms';
 import {
   TransactionDocument,
+  TransactionModel,
   TransactionStatus,
 } from '../../schema/transaction.schema';
 import { PostGatewayPluginContent, ShopPluginType } from '../../types/plugin';
@@ -27,6 +28,7 @@ export type UpdateOrderOpt = {
   sendSuccessSMS?: boolean;
   pushTransaction?: boolean;
   updateStatus?: boolean;
+  exec?: boolean;
 };
 export class Utils {
   get smsPlugin() {
@@ -42,6 +44,9 @@ export class Utils {
 
   get orderModel() {
     return store.db.model('order') as OrderModel;
+  }
+  get transactionModel() {
+    return store.db.model('transaction') as TransactionModel;
   }
   get productModel() {
     return store.db.model('product') as ProductModel;
@@ -145,9 +150,12 @@ export class Utils {
 
   private async updateOrderStatus(
     order: OrderDocument,
-    transaction: TransactionDocument,
+    trsSts: TransactionDocument | TransactionStatus,
     update: UpdateQuery<OrderDocument>
   ) {
+    const transaction = typeof trsSts === 'string' ? null : trsSts;
+    const status = typeof trsSts === 'string' ? trsSts : transaction.status;
+
     let isOrderPaid = false;
     const _rollback = async () => {
       // rollback
@@ -182,14 +190,18 @@ export class Utils {
       }
     };
     if (order.status === OrderStatus.NeedToPay && order.active) {
-      switch (transaction.status) {
+      switch (status) {
         case TransactionStatus.Paid:
           // paid
-          const left =
-            order.totalPrice -
-            order.transactions.reduce((acc, t) => acc + t.amount, 0);
-          if (left - transaction.amount <= 0) {
-            update.$set.status = OrderStatus.Paid;
+          if (transaction) {
+            const left =
+              order.totalPrice -
+              order.transactions.reduce((acc, t) => acc + t.amount, 0);
+            if (left - transaction.amount <= 0) {
+              update.$set.status = OrderStatus.Paid;
+              isOrderPaid = true;
+            }
+          } else {
             isOrderPaid = true;
           }
           break;
@@ -212,42 +224,86 @@ export class Utils {
     }
     return { isOrderPaid, update };
   }
-
   async updateOrder(
     transaction: TransactionDocument,
+    opt?: UpdateOrderOpt
+  ): Promise<UpdateQuery<OrderDocument>>;
+  async updateOrder(
+    order: OrderDocument,
+    newStatus: TransactionStatus,
+    opt?: UpdateOrderOpt
+  ): Promise<UpdateQuery<OrderDocument>>;
+  async updateOrder(
+    trsOrd: TransactionDocument | OrderDocument,
+    stsOpt: TransactionStatus | UpdateOrderOpt = {},
     opt: UpdateOrderOpt = {}
   ) {
+    // initialize
+    const order = trsOrd instanceof this.orderModel ? trsOrd : null;
+    const transaction = trsOrd instanceof this.transactionModel ? trsOrd : null;
+    const newStatus = typeof stsOpt === 'string' ? stsOpt : null;
     const options = merge<UpdateOrderOpt, UpdateOrderOpt, UpdateOrderOpt>(
       {},
-      { pushTransaction: false, sendSuccessSMS: false, updateStatus: false },
-      opt
+      {
+        pushTransaction: false,
+        sendSuccessSMS: false,
+        updateStatus: false,
+        exec: true,
+      },
+      typeof stsOpt !== 'string' ? stsOpt : opt
     );
     let isOrderPaid = false;
-
-    const order = await this.orderModel.findById(transaction.order);
-    if (!order) return;
-
     const update: UpdateQuery<OrderDocument> = { $set: {}, $push: {} };
 
-    // push transaction
-    if (options.pushTransaction) {
-      update.$push.transactions =
-        transactionUtils.convertTransaction2Grid(transaction);
-    }
+    const _updateWithTransaction = async () => {
+      const order = await this.orderModel.findById(transaction.order);
+      if (!order) return;
 
-    // update status
-    if (options.updateStatus) {
-      const result = await this.updateOrderStatus(order, transaction, update);
-      isOrderPaid = result.isOrderPaid;
-    }
+      // push transaction
+      if (options.pushTransaction) {
+        update.$push.transactions =
+          transactionUtils.convertTransaction2Grid(transaction);
+      }
 
-    // send sms
-    if (options.sendSuccessSMS && isOrderPaid) {
-      utils.sendOnStateChange(order)?.then();
-    }
+      // update status
+      if (options.updateStatus) {
+        const result = await this.updateOrderStatus(order, transaction, update);
+        isOrderPaid = result.isOrderPaid;
+      }
 
-    // execute
-    await this.orderModel.updateOne({ _id: order._id }, update);
+      // send sms
+      if (options.sendSuccessSMS && isOrderPaid) {
+        utils.sendOnStateChange(order)?.then();
+      }
+
+      // execute
+      if (options.exec)
+        await this.orderModel.updateOne({ _id: order._id }, update);
+
+      return update;
+    };
+
+    const _updateWithNewStatus = async () => {
+      // update status
+      if (options.updateStatus) {
+        const result = await this.updateOrderStatus(order, newStatus, update);
+        isOrderPaid = result.isOrderPaid;
+      }
+
+      // send sms
+      if (options.sendSuccessSMS && isOrderPaid) {
+        utils.sendOnStateChange(order)?.then();
+      }
+
+      // execute
+      if (options.exec)
+        await this.orderModel.updateOne({ _id: order._id }, update);
+
+      return update;
+    };
+
+    if (transaction) return await _updateWithTransaction();
+    if (order && newStatus) return await _updateWithNewStatus();
   }
 }
 
