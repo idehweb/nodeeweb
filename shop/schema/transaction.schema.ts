@@ -68,7 +68,7 @@ const schema = new mongoose.Schema(
         _id: { type: mongoose.Schema.Types.ObjectId, required: true },
         type: { type: String, required: true },
       },
-      required: false,
+      // required: false,
     },
     order: { type: mongoose.Schema.Types.ObjectId },
     amount: { type: Number, required: true },
