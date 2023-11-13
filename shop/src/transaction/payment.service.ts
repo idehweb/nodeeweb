@@ -29,6 +29,7 @@ import {
 } from '../../schema/transaction.schema';
 import { UserDocument } from '@nodeeweb/core/types/user';
 import orderUtils from '../order/utils.service';
+import utilsService from './utils.service';
 
 class PaymentService {
   transactionSupervisors = new Map<string, NodeJS.Timer>();
@@ -125,12 +126,12 @@ class PaymentService {
       active: true,
     });
 
-    const { status } = await this.handlePayment(
+    const { status } = await this.handlePayment({
       transaction,
-      true,
-      true,
-      req.query
-    );
+      failedAction: true,
+      successAction: true,
+      extraFields: req.query,
+    });
 
     // redirect
     return res.redirect(
@@ -192,14 +193,23 @@ class PaymentService {
     };
   }
 
-  async handlePayment(
-    transaction: TransactionDocument | null,
-    successAction: boolean,
-    failedAction: boolean,
-    extraFields?: any,
-    statusWithoutVerify?: PaymentVerifyStatus,
-    sendSuccessSMS = true
-  ) {
+  async handlePayment({
+    transaction,
+    successAction,
+    failedAction,
+    extraFields,
+    statusWithoutVerify,
+    statusWithVerify,
+    sendSuccessSMS = true,
+  }: {
+    transaction: TransactionDocument | null;
+    successAction: boolean;
+    failedAction: boolean;
+    extraFields?: any;
+    statusWithoutVerify?: PaymentVerifyStatus | TransactionStatus;
+    sendSuccessSMS?: boolean;
+    statusWithVerify?: PaymentVerifyStatus | TransactionStatus;
+  }) {
     const _clearTimer = (authority: string) => {
       const expiredTimer = this.transactionSupervisors.get(authority + '-1');
       const notifTimer = this.transactionSupervisors.get(authority + '-2');
@@ -228,27 +238,30 @@ class PaymentService {
       );
       await orderUtils.updateOrder(newT, {
         sendSuccessSMS,
+        updateStatus: true,
       });
       return;
     };
 
-    const _failed = async () => {
+    const _failed = async (status: TransactionStatus) => {
       const newT = await this.transactionModel.findOneAndUpdate(
         { _id: transaction._id },
-        { status: TransactionStatus.Failed },
+        { status },
         { new: true }
       );
 
-      await orderUtils.updateOrder(newT);
+      await orderUtils.updateOrder(newT, { updateStatus: true });
     };
 
     const _core = async () => {
       if (transaction.status === TransactionStatus.Paid)
         return { status: PaymentVerifyStatus.CheckBefore, transaction };
       else if (
-        [TransactionStatus.Canceled, TransactionStatus.Failed].includes(
-          transaction.status
-        )
+        [
+          TransactionStatus.Canceled,
+          TransactionStatus.Failed,
+          TransactionStatus.Expired,
+        ].includes(transaction.status)
       )
         return { status: PaymentVerifyStatus.Failed, transaction };
 
@@ -267,12 +280,20 @@ class PaymentService {
           })
         ).status;
 
-      switch (status) {
-        case PaymentVerifyStatus.Failed:
-          if (failedAction) await _failed();
-          break;
-        case PaymentVerifyStatus.Paid:
+      // convert status
+      const transactionStatus = utilsService.combineStatuses(
+        status,
+        statusWithVerify
+      );
+
+      switch (transactionStatus) {
+        case TransactionStatus.Paid:
           if (successAction) await _success();
+          break;
+        case TransactionStatus.Failed:
+        case TransactionStatus.Expired:
+        case TransactionStatus.Canceled:
+          if (failedAction) await _failed(transactionStatus);
           break;
       }
 
@@ -334,7 +355,12 @@ class PaymentService {
             status: TransactionStatus.NeedToPay,
           });
           if (!td) return;
-          await this.handlePayment(td, true, true);
+          await this.handlePayment({
+            transaction: td,
+            successAction: true,
+            failedAction: true,
+            statusWithVerify: TransactionStatus.Expired,
+          });
         } catch (err) {}
       }, watchers_timeout * 1000);
       this.transactionSupervisors.set(
@@ -398,7 +424,12 @@ class PaymentService {
             false
           );
           if (!transaction) return;
-          return await this.handlePayment(transaction, true, false, props);
+          return await this.handlePayment({
+            transaction,
+            successAction: true,
+            failedAction: false,
+            extraFields: props,
+          });
         });
       };
       const _expired_transactions = async () => {
@@ -411,7 +442,12 @@ class PaymentService {
         return expiredTransactions.map((transaction) => {
           if (taskId.includes(transaction.authority)) return;
           taskId.push(transaction.authority);
-          return this.handlePayment(transaction, true, true);
+          return this.handlePayment({
+            transaction,
+            successAction: true,
+            failedAction: true,
+            statusWithVerify: TransactionStatus.Expired,
+          });
         });
       };
       const _watcher_transactions = async () => {

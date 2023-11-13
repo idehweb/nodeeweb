@@ -1,6 +1,7 @@
 import {
   AdminAccess,
   AuthUserAccess,
+  controllerRegister,
   controllersBatchRegister,
   registerEntityCRUD,
 } from '@nodeeweb/core';
@@ -9,6 +10,7 @@ import {
   TransactionCreateBody,
   TransactionUpdateBody,
 } from '../../dto/in/transaction';
+import paymentService from './payment.service';
 export default function registerTransactionController() {
   registerEntityCRUD(
     'transaction',
@@ -57,6 +59,22 @@ export default function registerTransactionController() {
         controller: { access: AdminAccess },
       },
     },
+    { base_url: '/api/v1/transaction', from: 'ShopEntity' }
+  );
+
+  controllersBatchRegister(
+    [
+      {
+        method: 'get',
+        service: paymentService.paymentCallback,
+        url: '/payment_callback/:transactionId',
+      },
+      {
+        method: 'post',
+        service: paymentService.paymentCallback,
+        url: '/payment_callback/:transactionId',
+      },
+    ],
     { base_url: '/api/v1/transaction', from: 'ShopEntity' }
   );
 }

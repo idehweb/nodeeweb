@@ -129,6 +129,12 @@ export class ShopConfigLimit extends CoreConfigLimit {
   @IsNumber()
   @IsInt()
   max_need_to_pay_transaction: number;
+
+  @Expose()
+  @IsOptional()
+  @IsNumber()
+  @IsInt()
+  max_need_to_pay_order: number;
 }
 
 class ShopConfigLimitBody extends ShopConfigLimit {

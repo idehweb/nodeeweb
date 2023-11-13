@@ -5,6 +5,7 @@ export enum TransactionStatus {
   NeedToPay = 'need-to-pay',
   Canceled = 'canceled',
   Failed = 'failed',
+  Expired = 'expired',
   Paid = 'paid',
 }
 
@@ -40,6 +41,7 @@ export interface ITransactionGrid {
   _id: Types.ObjectId;
   provider: string | TransactionProvider;
   payment_link?: string;
+  status: TransactionStatus;
   amount: number;
   createdAt: Date;
   expiredAt: Date;
@@ -52,6 +54,7 @@ export const TransactionGridSchema = new mongoose.Schema({
   _id: { type: mongoose.Schema.Types.ObjectId, required: true, unique: true },
   provider: { type: String, default: TransactionProvider.Manual },
   payment_link: String,
+  status: { type: String, required: true },
   amount: { type: Number, required: true },
   expiredAt: { type: Date },
 });

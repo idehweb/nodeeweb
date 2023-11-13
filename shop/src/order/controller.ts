@@ -83,16 +83,6 @@ export default function registerController() {
     },
     {
       method: 'get',
-      service: transactionService.paymentCallback,
-      url: '/payment_callback/:orderId',
-    },
-    {
-      method: 'post',
-      service: transactionService.paymentCallback,
-      url: '/payment_callback/:orderId',
-    },
-    {
-      method: 'get',
       service: transactionService.getPrice,
       url: '/price',
       access: AuthUserAccess,

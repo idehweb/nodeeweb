@@ -5,7 +5,6 @@ import {
   LimitError,
   MiddleWare,
   NotFound,
-  NotImplement,
 } from '@nodeeweb/core';
 import {
   IOrder,
@@ -14,27 +13,17 @@ import {
   OrderStatus,
 } from '../../schema/order.schema';
 import { ProductDocument, ProductModel } from '../../schema/product.schema';
-import { FilterQuery, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { DiscountDocument, DiscountModel } from '../../schema/discount.schema';
 import { roundPrice } from '../../utils/helpers';
 import utils from './utils.service';
-import { PaymentVerifyStatus } from '../../types/order';
-import {
-  BankGatewayPluginContent,
-  BankGatewayVerifyArgs,
-  PostGatewayPluginContent,
-  ShopPluginType,
-} from '../../types/plugin';
+import { PostGatewayPluginContent, ShopPluginType } from '../../types/plugin';
 import discountService from '../discount/service';
-import logger from '../../utils/log';
-import { axiosError2String, replaceValue } from '@nodeeweb/core/utils/helpers';
 import store from '../../store';
 import postService from './post.service';
 import { CreateTransactionBody } from '../../dto/in/order/transaction';
-import {
-  TransactionDocument,
-  TransactionProvider,
-} from '../../schema/transaction.schema';
+import paymentService from '../transaction/payment.service';
+import transactionUtils from '../transaction/utils.service';
 
 class TransactionService {
   transactionSupervisors = new Map<string, NodeJS.Timer>();
@@ -47,22 +36,6 @@ class TransactionService {
   }
   get discountModel() {
     return store.db.model('discount') as DiscountModel;
-  }
-  async updateOrderAfterTransaction(
-    transaction: TransactionDocument,
-    opt = {}
-  ) {}
-  private async getNeedToPayOrder(
-    filter: FilterQuery<IOrder>,
-    throwOnError = true
-  ) {
-    const order = await this.orderModel.findOne({
-      ...filter,
-      active: true,
-      status: OrderStatus.NeedToPay,
-    });
-    if (!order && throwOnError) throw new NotFound('order not found');
-    return order;
   }
 
   createTransaction: MiddleWare = async (req, res) => {
@@ -85,9 +58,9 @@ class TransactionService {
       })
       .count();
 
-    if (needToPayOrders > store.config.limit.max_need_to_pay_transaction)
+    if (needToPayOrders > store.config.limit.max_need_to_pay_order)
       throw new LimitError(
-        'Maximum need to pay transaction , please paid them first'
+        'Maximum need to pay order , please paid them first'
       );
 
     // 2. find order
@@ -126,13 +99,12 @@ class TransactionService {
       total: true,
     });
 
-    // 6. create payment link
-    const transaction = await this.createPaymentLink(
-      order._id,
-      totalPrice,
-      products,
-      req.user.phone
-    );
+    // 6. create transaction
+    const transaction = await paymentService.createTransaction({
+      amount: totalPrice,
+      order,
+      user: req.user,
+    });
 
     // 7. fill post, post if not payment issue
     let post: IOrder['post'] = await postService.getPostProvider(
@@ -161,20 +133,13 @@ class TransactionService {
           status: totalPrice ? OrderStatus.NeedToPay : OrderStatus.Posting,
           tax: taxesPrice,
           totalPrice,
-          transaction,
+          transactions: [transactionUtils.convertTransaction2Grid(transaction)],
         },
       },
       { new: true }
     );
 
-    // 9. active supervisor
-    await this.transactionSupervisor(newOrder, {
-      clear: true,
-      expired_watcher: totalPrice ? true : false,
-      notif_watcher: totalPrice ? true : false,
-    });
-
-    // 10. send sms if payment completed by discount
+    // 9. send sms if payment completed by discount
     if (!totalPrice) {
       // send change state sms
       utils.sendOnStateChange(newOrder)?.then();
@@ -204,24 +169,6 @@ class TransactionService {
     return res.json({
       data: await this.calculatePrice(order, { ...req.query, ...extraOpt }),
     });
-  };
-
-  paymentCallback: MiddleWare = async (req, res) => {
-    // handle payment
-    const order = await this.orderModel.findOne({
-      _id: req.params.orderId,
-      active: true,
-    });
-
-    const { status } = await this.handlePayment(order, true, true, req.query);
-
-    // redirect
-    return res.redirect(
-      `${store.config.payment_redirect}?${[
-        `order_id=${order._id}`,
-        `status=${status}`,
-      ].join('&')}`
-    );
   };
 
   private productCheck(order: OrderDocument, products: ProductDocument[]) {
@@ -407,332 +354,6 @@ class TransactionService {
       discount,
       totalPrice,
     };
-  }
-
-  private async createPaymentLink(
-    orderId: string,
-    amount: number,
-    products: ProductDocument[],
-    userPhone: string
-  ): Promise<Partial<OrderDocument['transaction']>> {
-    const bankPlugin = store.plugins.get(
-      ShopPluginType.BANK_GATEWAY
-    ) as BankGatewayPluginContent;
-
-    if (!bankPlugin)
-      return {
-        authority: new Date().toISOString(),
-        provider: TransactionProvider.Manual,
-      };
-
-    // env
-    // if (envAllowed([Environment.Local])) {
-    //   return ['https://example.com', '' + Date.now()];
-    // }
-
-    const description = `برای خرید محصولات ${products
-      .map(({ title }) => title.fa ?? title.en ?? Object.values(title)[0])
-      .join(' ، ')} از فروشگاه ${store.config.app_name}`;
-
-    const response = await bankPlugin.stack[0]({
-      amount,
-      callback_url: `${store.env.BASE_URL}/api/v1/order/payment_callback/${orderId}?amount=${amount}`,
-      currency: store.config.currency,
-      description,
-      userPhone,
-    });
-
-    if (!response.isOk) throw new Error(response.message);
-
-    return {
-      authority: response.authority,
-      expiredAt: response.expiredAt,
-      payment_link: response.payment_link,
-      provider: bankPlugin.slug,
-    };
-  }
-
-  async handlePayment(
-    order: OrderDocument | null,
-    successAction: boolean,
-    failedAction: boolean,
-    extraFields?: any,
-    statusWithoutVerify?: PaymentVerifyStatus,
-    sendSuccessSMS = true
-  ) {
-    const _clearTimer = (authority: string) => {
-      const expiredTimer = this.transactionSupervisors.get(authority + '-1');
-      const notifTimer = this.transactionSupervisors.get(authority + '-2');
-
-      [expiredTimer, notifTimer]
-        .filter((t) => t)
-        .forEach((timer, index) => {
-          clearTimeout(timer as any);
-          this.transactionSupervisors.delete(`${authority}-${index + 1}`);
-        });
-    };
-
-    const _success = async () => {
-      const update = {
-        $set: {
-          status: OrderStatus.Paid,
-          post: {
-            ...order.toObject().post,
-            ...(await this.submitPostReq(order)),
-          },
-        },
-        $unset: { 'transaction.expiredAt': '' },
-      };
-      order = await this.orderModel.findOneAndUpdate(
-        { _id: order._id },
-        update,
-        { new: true }
-      );
-
-      // send sms
-      sendSuccessSMS && utils.sendOnStateChange(order)?.then();
-    };
-
-    const _failed = async () => {
-      // rollback
-      // disabled order
-      order = await this.orderModel.findOneAndUpdate(
-        { _id: order._id },
-        {
-          $set: { active: false, status: OrderStatus.Canceled },
-        },
-        { new: true }
-      );
-
-      // rollback products
-      await this.productModel.bulkWrite(
-        order.products.flatMap((p) =>
-          p.combinations.map((d) => ({
-            updateOne: {
-              filter: { _id: p._id, 'combinations._id': d._id },
-              update: { $inc: { 'combinations.$.quantity': d.quantity } },
-            },
-          }))
-        ),
-        { ordered: false }
-      );
-
-      // pull discount consumer
-      if (order.discount) {
-        await this.discountModel.updateOne(
-          { code: order.discount.code },
-          { $pull: { consumers: order.customer._id }, $inc: { usageLimit: 1 } }
-        );
-      }
-    };
-
-    const _core = async () => {
-      if (
-        [OrderStatus.Paid, OrderStatus.Posting, OrderStatus.Completed].includes(
-          order.status
-        )
-      )
-        return { status: PaymentVerifyStatus.CheckBefore, order };
-      else if (
-        [OrderStatus.Cart, OrderStatus.Canceled, OrderStatus.Expired].includes(
-          order.status
-        )
-      )
-        return { status: PaymentVerifyStatus.Failed, order };
-
-      if (order.status !== OrderStatus.NeedToPay)
-        throw new BadRequestError(
-          `order status invalid, current status: ${order.status}`
-        );
-
-      let status = statusWithoutVerify;
-      if (!statusWithoutVerify)
-        status = (
-          await this.verifyPayment({
-            ...extraFields,
-            authority: order.transaction.authority,
-            amount: order.totalPrice,
-          })
-        ).status;
-
-      switch (status) {
-        case PaymentVerifyStatus.Failed:
-          if (failedAction) await _failed();
-          break;
-        case PaymentVerifyStatus.Paid:
-          if (successAction) await _success();
-          break;
-      }
-
-      return { status, order };
-    };
-
-    // not found
-    if (!order) return { status: PaymentVerifyStatus.Failed };
-
-    // clear timer
-    _clearTimer(order.transaction.authority);
-
-    // core
-    return await _core();
-  }
-
-  private async transactionSupervisor(
-    order: OrderDocument,
-    {
-      clear,
-      expired_watcher,
-      notif_watcher,
-      watchers_timeout = store.config.limit.transaction_expiration_s,
-    }: {
-      clear?: boolean;
-      expired_watcher?: boolean;
-      notif_watcher?: boolean;
-      watchers_timeout?: number;
-    }
-  ) {
-    const limit = store.config.limit;
-    // clear
-    if (clear) {
-      // inactive products
-      await this.productModel.bulkWrite(
-        order.products.flatMap((p) =>
-          p.combinations.map((d) => ({
-            updateOne: {
-              filter: { _id: p._id, 'combinations._id': d._id },
-              update: { $inc: { 'combinations.$.quantity': -d.quantity } },
-            },
-          }))
-        ),
-        { ordered: false }
-      );
-    }
-
-    // watchers
-    if (expired_watcher && watchers_timeout !== -1) {
-      // create watcher
-      // 1. Expire
-      const expiredTimer = setTimeout(async () => {
-        try {
-          this.transactionSupervisors.delete(
-            order.transaction.authority + '-1'
-          );
-          const td = await this.orderModel.findOne({
-            _id: order._id,
-            status: OrderStatus.NeedToPay,
-          });
-          if (!td) return;
-          await this.handlePayment(td, true, true);
-        } catch (err) {}
-      }, watchers_timeout * 1000);
-      this.transactionSupervisors.set(
-        order.transaction.authority + '-1',
-        expiredTimer
-      );
-    }
-
-    if (
-      notif_watcher &&
-      watchers_timeout !== -1 &&
-      limit.approach_transaction_expiration !== -1
-    ) {
-      //2. Notification Before Expired
-      const notifTimer = setTimeout(async () => {
-        try {
-          this.transactionSupervisors.delete(
-            order.transaction.authority + '-2'
-          );
-          const td = await this.orderModel.findOne({
-            _id: order._id,
-            status: OrderStatus.NeedToPay,
-            active: true,
-          });
-          if (!td) return;
-          utils.sendOnExpire(order)?.then();
-        } catch (err) {}
-      }, watchers_timeout * 1000 * limit.approach_transaction_expiration);
-      this.transactionSupervisors.set(
-        order.transaction.authority + '-2',
-        notifTimer
-      );
-    }
-  }
-
-  private verifyPayment(query: BankGatewayVerifyArgs) {
-    const bankPlugin = store.plugins.get(
-      ShopPluginType.BANK_GATEWAY
-    ) as BankGatewayPluginContent;
-    if (!bankPlugin) throw new NotImplement('bank gateway plugin not exist');
-
-    return bankPlugin.stack[1](query);
-  }
-
-  private async unverifiedPayments() {
-    const bankPlugin = store.plugins.get(
-      ShopPluginType.BANK_GATEWAY
-    ) as BankGatewayPluginContent;
-    if (!bankPlugin) return [];
-    return await bankPlugin.stack[2]();
-  }
-
-  async synchronize() {
-    try {
-      const taskId = [];
-      const _unverified_authorities = async () => {
-        const unverified = await this.unverifiedPayments();
-        // unverified authorities
-        return unverified.map(async ({ authority, ...props }) => {
-          if (taskId.includes(authority)) return;
-          taskId.push(authority);
-          const order = await this.getNeedToPayOrder(
-            {
-              'transaction.authority': authority,
-            },
-            false
-          );
-          if (!order) return;
-          return await this.handlePayment(order, true, false, props);
-        });
-      };
-      const _expired_transactions = async () => {
-        const expiredTransactions = await this.orderModel.find({
-          'transaction.expiredAt': { $lt: new Date() },
-          status: OrderStatus.NeedToPay,
-          active: true,
-        });
-        // expired transactions
-        return expiredTransactions.map((order) => {
-          if (taskId.includes(order.transaction.authority)) return;
-          taskId.push(order.transaction.authority);
-          return this.handlePayment(order, true, true);
-        });
-      };
-      const _watcher_transactions = async () => {
-        const openTransactions = await this.orderModel.find({
-          active: true,
-          status: OrderStatus.NeedToPay,
-          'transaction.expiredAt': { $gt: new Date() },
-        });
-        return openTransactions.map((order) => {
-          if (taskId.includes(order.transaction.authority)) return;
-          taskId.push(order.transaction.authority);
-          return this.transactionSupervisor(order, {
-            expired_watcher: true,
-            watchers_timeout:
-              order.transaction.expiredAt.getTime() - Date.now(),
-          });
-        });
-      };
-      const promises = [
-        ...(await _unverified_authorities()),
-        ...(await _expired_transactions()),
-        ...(await _watcher_transactions()),
-      ];
-      // execute parallel
-      await Promise.all(promises);
-    } catch (err) {
-      logger.error('order sync job error\n', axiosError2String(err));
-    }
   }
 }
 
