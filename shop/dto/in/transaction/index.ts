@@ -10,10 +10,13 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Types } from 'mongoose';
-import { TransactionStatus } from '../../../schema/transaction.schema';
+import {
+  TransactionCreator,
+  TransactionStatus,
+} from '../../../schema/transaction.schema';
 import { Currency } from '../../config';
 
-export class TransactionConsumer {
+export class TransactionPayer {
   @Expose()
   @ToMongoID()
   @IsMongoID()
@@ -28,8 +31,8 @@ export class TransactionCreateBody {
   @Expose()
   @IsOptional()
   @ValidateNested()
-  @Type(() => TransactionConsumer)
-  consumer?: TransactionConsumer;
+  @Type(() => TransactionPayer)
+  payer?: TransactionPayer;
 
   @Expose()
   @IsOptional()
@@ -70,13 +73,15 @@ export class TransactionCreateBody {
   @IsOptional()
   @IsDate()
   expiredAt?: Date;
+
+  creator_category: TransactionCreator;
 }
 export class TransactionUpdateBody {
   @Expose()
   @IsOptional()
   @ValidateNested()
-  @Type(() => TransactionConsumer)
-  consumer?: TransactionConsumer;
+  @Type(() => TransactionPayer)
+  payer?: TransactionPayer;
 
   @Expose()
   @IsOptional()

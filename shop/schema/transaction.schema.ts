@@ -23,7 +23,7 @@ export interface ITransaction {
   provider: string | TransactionProvider;
   creator_category: TransactionCreator;
   creator?: Types.ObjectId;
-  consumer?: { _id: Types.ObjectId; type: 'admin' | 'customer' };
+  payer?: { _id: Types.ObjectId; type: 'admin' | 'customer' };
   order?: Types.ObjectId;
   payment_link?: string;
   authority: string;
@@ -63,12 +63,12 @@ const schema = new mongoose.Schema(
   {
     creator_category: { type: String, required: true },
     creator: { type: mongoose.Schema.Types.ObjectId },
-    consumer: {
-      type: {
+    payer: {
+      type: new mongoose.Schema({
         _id: { type: mongoose.Schema.Types.ObjectId, required: true },
         type: { type: String, required: true },
-      },
-      // required: false,
+      }),
+      required: false,
     },
     order: { type: mongoose.Schema.Types.ObjectId },
     amount: { type: Number, required: true },

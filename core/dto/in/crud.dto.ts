@@ -54,3 +54,10 @@ export class MultiIDParam {
   @Allow()
   slug?: string;
 }
+
+export class IDParam {
+  @Expose()
+  @ToMongoID()
+  @IsMongoID()
+  id?: Types.ObjectId;
+}

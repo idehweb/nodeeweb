@@ -2,6 +2,7 @@ import { MiddleWare, Req, ValidationError } from '@nodeeweb/core';
 import { FilterQuery, Query, UpdateQuery } from 'mongoose';
 import {
   ITransaction,
+  TransactionCreator,
   TransactionDocument,
   TransactionStatus,
 } from '../../schema/transaction.schema';
@@ -23,27 +24,27 @@ class Service {
   }
 
   private async validate(body: TransactionCreateBody | TransactionUpdateBody) {
-    // consumer
-    if (body.consumer) {
-      const user = await this.getUserModel(body.consumer.type).findOne({
-        _id: body.consumer._id,
+    // payer
+    if (body.payer) {
+      const user = await this.getUserModel(body.payer.type).findOne({
+        _id: body.payer._id,
         active: true,
       });
-      if (!user) throw new ValidationError('invalid consumer');
+      if (!user) throw new ValidationError('invalid payer');
     }
 
     // order
     if (body.order) {
       const order = await this.orderModel.findOne({
         _id: body.order,
-        ...(body.consumer ? { customer: body.consumer._id } : {}),
+        ...(body.payer ? { customer: body.payer._id } : {}),
         active: true,
         status: OrderStatus.NeedToPay,
       });
 
       if (!order)
         throw new ValidationError(
-          'not found any need to pay order that match with sent consumer'
+          'not found any need to pay order that match with sent payer'
         );
     }
   }
@@ -51,7 +52,7 @@ class Service {
   private parseFilter(req: Req): FilterQuery<ITransaction> {
     const userType = req.user.type;
     if (userType === 'admin') return { active: true };
-    return { active: true, 'consumer._id': req.user._id };
+    return { active: true, 'payer._id': req.user._id };
   }
 
   parseCountFilter = (req: Req) => {
@@ -69,6 +70,9 @@ class Service {
 
     // currency
     if (!body.currency) body.currency = store.config.currency;
+
+    // creator category
+    body['creator_category'] = TransactionCreator.Admin;
 
     // validate
     await this.validate(body);
@@ -93,7 +97,6 @@ class Service {
 
   parseUpdateBody = async (req: Req) => {
     const body: TransactionUpdateBody = req.body;
-
     // base validate
     await this.validate(body);
 

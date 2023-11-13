@@ -79,7 +79,7 @@ class PaymentService {
     // 1. check user maximum need paid transaction
     const needToPayOrders = await this.transactionModel
       .find({
-        'consumer._id': user._id,
+        'payer._id': user._id,
         status: TransactionStatus.NeedToPay,
         active: true,
       })
@@ -104,7 +104,7 @@ class PaymentService {
       ...payment,
       _id: transactionId,
       amount,
-      consumer: { _id: user._id, type: user.type },
+      payer: { _id: user._id, type: user.type },
       currency: store.config.currency,
       order: order._id,
       creator_category: TransactionCreator.Customer_Order,

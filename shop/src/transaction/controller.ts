@@ -11,6 +11,7 @@ import {
   TransactionUpdateBody,
 } from '../../dto/in/transaction';
 import paymentService from './payment.service';
+import { IDParam, MultiIDParam } from '@nodeeweb/core/dto/in/crud.dto';
 export default function registerTransactionController() {
   registerEntityCRUD(
     'transaction',
@@ -40,7 +41,10 @@ export default function registerTransactionController() {
         },
       },
       getOne: {
-        controller: { access: AuthUserAccess },
+        controller: {
+          access: AuthUserAccess,
+          validate: { dto: IDParam, reqPath: 'params' },
+        },
         crud: { parseFilter: service.parseGetOneFilter },
       },
       updateOne: {
@@ -50,8 +54,8 @@ export default function registerTransactionController() {
           service: service.afterUpdate,
         },
         crud: {
-          parseUpdate: service.parseUpdateFilter,
-          parseBody: service.parseUpdateBody,
+          parseFilter: service.parseUpdateFilter,
+          parseUpdate: service.parseUpdateBody,
           saveToReq: true,
         },
       },
