@@ -12,7 +12,6 @@ import {
   OrderDocument,
   OrderModel,
   OrderStatus,
-  TransactionProvider,
 } from '../../schema/order.schema';
 import { ProductDocument, ProductModel } from '../../schema/product.schema';
 import { FilterQuery, Types } from 'mongoose';
@@ -32,6 +31,10 @@ import { axiosError2String, replaceValue } from '@nodeeweb/core/utils/helpers';
 import store from '../../store';
 import postService from './post.service';
 import { CreateTransactionBody } from '../../dto/in/order/transaction';
+import {
+  TransactionDocument,
+  TransactionProvider,
+} from '../../schema/transaction.schema';
 
 class TransactionService {
   transactionSupervisors = new Map<string, NodeJS.Timer>();
@@ -45,7 +48,10 @@ class TransactionService {
   get discountModel() {
     return store.db.model('discount') as DiscountModel;
   }
-
+  async updateOrderAfterTransaction(
+    transaction: TransactionDocument,
+    opt = {}
+  ) {}
   private async getNeedToPayOrder(
     filter: FilterQuery<IOrder>,
     throwOnError = true

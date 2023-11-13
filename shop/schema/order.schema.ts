@@ -73,7 +73,7 @@ export interface IOrder {
   };
   tax?: number;
   totalPrice: number;
-  transaction?: ITransactionGrid;
+  transactions: ITransactionGrid[];
   checkout?: boolean;
   status: OrderStatus;
   statusChangedAt: Date;
@@ -170,7 +170,7 @@ const schema = new mongoose.Schema(
     },
     tax: { type: Number, default: 0 },
     totalPrice: Number,
-    transaction: TransactionGridSchema,
+    transactions: { type: [TransactionGridSchema] },
     status: {
       type: String,
       default: OrderStatus.Cart,

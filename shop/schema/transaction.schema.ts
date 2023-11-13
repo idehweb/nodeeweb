@@ -32,6 +32,7 @@ export interface ITransaction {
   createdAt: Date;
   updatedAt: Date;
   expiredAt: Date;
+  paidAt: Date;
   message?: string;
   active: boolean;
 }
@@ -39,6 +40,7 @@ export interface ITransactionGrid {
   _id: Types.ObjectId;
   provider: string | TransactionProvider;
   payment_link?: string;
+  amount: number;
   createdAt: Date;
   expiredAt: Date;
 }
@@ -47,8 +49,10 @@ export type TransactionDocument = Document<Types.ObjectId, {}, ITransaction> &
 export type TransactionModel = Model<ITransaction>;
 
 export const TransactionGridSchema = new mongoose.Schema({
+  _id: { type: mongoose.Schema.Types.ObjectId, required: true, unique: true },
   provider: { type: String, default: TransactionProvider.Manual },
   payment_link: String,
+  amount: { type: Number, required: true },
   expiredAt: { type: Date },
 });
 
@@ -73,6 +77,7 @@ const schema = new mongoose.Schema(
     active: { type: Boolean, default: true },
     //   15min expr by default
     expiredAt: { type: Date, default: () => Date.now() + 15 * 60 * 1_000 },
+    paidAt: { type: Date },
     message: String,
   },
   { timestamps: true }

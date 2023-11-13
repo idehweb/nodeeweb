@@ -1,7 +1,8 @@
 import { MiddleWare, Req, ValidationError } from '@nodeeweb/core';
-import { FilterQuery, Query } from 'mongoose';
+import { FilterQuery, Query, UpdateQuery } from 'mongoose';
 import {
   ITransaction,
+  ITransactionGrid,
   TransactionDocument,
   TransactionStatus,
 } from '../../schema/transaction.schema';
@@ -11,7 +12,11 @@ import {
 } from '../../dto/in/transaction';
 import { UserModel } from '@nodeeweb/core/types/user';
 import store from '../../store';
-import { OrderModel, OrderStatus } from '../../schema/order.schema';
+import {
+  OrderDocument,
+  OrderModel,
+  OrderStatus,
+} from '../../schema/order.schema';
 
 class Service {
   private get orderModel(): OrderModel {
@@ -19,6 +24,42 @@ class Service {
   }
   private getUserModel(type: 'admin' | 'customer'): UserModel {
     return store.db.model(type);
+  }
+
+  private async updateOrder(transaction: TransactionDocument) {
+    const order = await this.orderModel.findOne({
+      _id: transaction.order,
+    });
+    if (!order) return;
+
+    const update: UpdateQuery<OrderDocument> = {};
+
+    // push transaction
+    const transactionGrid = (
+      [
+        '_id',
+        'createdAt',
+        'expiredAt',
+        'payment_link',
+        'provider',
+        'amount',
+      ] as (keyof ITransactionGrid)[]
+    ).reduce<ITransactionGrid>(
+      (prev, curr) => ({ ...prev, [curr]: transaction[curr] }),
+      {} as any
+    );
+    update.$push = { transactions: transactionGrid };
+
+    // update status
+    if (order.status === OrderStatus.NeedToPay && order.active) {
+      const left =
+        order.totalPrice -
+        order.transactions.reduce((acc, t) => acc + t.amount, 0);
+      if (left - transaction.amount <= 0)
+        update.$set = { status: OrderStatus.Paid };
+    }
+
+    await this.orderModel.updateOne({ _id: order._id }, update);
   }
 
   private async validate(body: TransactionCreateBody | TransactionUpdateBody) {
@@ -81,7 +122,7 @@ class Service {
 
     // return
     if (needUpdateOrder) {
-      // TODO update order
+      await this.updateOrder(transaction);
     }
 
     return res.status(201).json({ data: transaction });
@@ -124,7 +165,7 @@ class Service {
 
     // return
     if (needUpdateOrder) {
-      // TODO update order
+      await this.updateOrder(transaction);
     }
 
     return res.status(200).json({ data: transaction });

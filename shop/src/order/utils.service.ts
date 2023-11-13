@@ -7,6 +7,7 @@ import {
 import { replaceValue } from '@nodeeweb/core/utils/helpers';
 import store from '../../store';
 import { SmsSubType } from '../../types/sms';
+import { TransactionDocument } from '../../schema/transaction.schema';
 
 export class Utils {
   get smsPlugin() {
@@ -96,6 +97,8 @@ export class Utils {
       text: message,
     });
   }
+
+  async updateOrder(transaction: TransactionDocument, opt = {}) {}
 }
 
 const utils = new Utils();
