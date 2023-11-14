@@ -25,8 +25,11 @@ export type Req = Request & {
   user?: UserDocument;
   modelName?: string;
   data?: any;
-  [CRUD_DEFAULT_REQ_KEY]: any;
-  [ACTIVITY_TARGET_BEFORE_REQ_KEY]: any;
+  [CRUD_DEFAULT_REQ_KEY]?: any;
+  [ACTIVITY_TARGET_BEFORE_REQ_KEY]?: any;
+  filter_query?: mongoose.FilterQuery<any>;
+  update_query?: mongoose.UpdateQuery<any>;
+  create_query?: any;
 };
 
 export type Res = Response;

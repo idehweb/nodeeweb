@@ -28,6 +28,7 @@ export interface IActivity {
   depend_on?: any;
   filter_query: mongoose.FilterQuery<any>;
   update_query?: mongoose.UpdateQuery<any>;
+  create_query?: any;
   target_before: any | null;
   target_after: any;
   createdAt: Date;
@@ -63,6 +64,7 @@ const schema = new mongoose.Schema(
     status: { type: String, required: true },
     filter_query: { type: {}, required: true },
     update_query: { type: {}, required: false },
+    create_query: { type: {}, required: false },
     target_before: { type: {}, required: true },
     target_after: { type: {}, required: true },
   },

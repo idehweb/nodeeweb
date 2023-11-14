@@ -62,6 +62,8 @@ export class EntityCreator {
   }
 
   async parseFilterQuery(opt: CRUDCreatorOpt, req: Req) {
+    if (req.filter_query) return req.filter_query;
+
     const pf = opt.paramFields || { id: 'id', slug: 'slug' };
 
     const f = opt.parseFilter
@@ -78,7 +80,28 @@ export class EntityCreator {
       if (f[key] === undefined) delete f[key];
     }
 
+    req.filter_query = f;
     return f;
+  }
+
+  async parseUpdateQuery(opt: CRUDCreatorOpt, req: Req) {
+    if (req.update_query) return req.update_query;
+    const def =
+      opt.type === CRUD.DELETE_ONE
+        ? opt.forceDelete
+          ? {}
+          : { active: false }
+        : req.body;
+    const u = opt.parseUpdate ? await call(opt.parseUpdate, req) : def;
+    req.update_query = u;
+    return u;
+  }
+
+  async parseCreateQuery(opt: CRUDCreatorOpt, req: Req) {
+    if (req.create_query) return req.create_query;
+    const c = opt.parseBody ? await call(opt.parseBody, req) : req.body;
+    req.create_query = c;
+    return c;
   }
 
   private async handleResult(
@@ -229,15 +252,9 @@ export class EntityCreator {
     );
   }
 
-  createOneCreator({
-    parseBody,
-    executeQuery,
-    saveToReq,
-    sendResponse,
-    project,
-  }: CRUDCreatorOpt) {
+  createOneCreator({ executeQuery, project }: CRUDCreatorOpt) {
     return async (req: Req, res: Response, next: NextFunction) => {
-      const body = parseBody ? await call(parseBody, req) : req.body;
+      const body = this.parseCreateQuery(arguments[0], req);
       if (!body)
         return EntityCreator.onError(
           new BadRequestError('body must exist'),
@@ -270,38 +287,33 @@ export class EntityCreator {
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
-  getOneCreator({ ...opt }: CRUDCreatorOpt): MiddleWare {
+  getOneCreator(opt: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = this.parseFilterQuery(opt, req);
       const query = this.model.findOne(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
-  getCountCreator({ ...opt }: CRUDCreatorOpt): MiddleWare {
+  getCountCreator(opt: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = this.parseFilterQuery(opt, req);
       const query = this.model.countDocuments(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
-  updateOneCreator({ parseUpdate, ...opt }: CRUDCreatorOpt): MiddleWare {
+  updateOneCreator(opt: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = this.parseFilterQuery(opt, req);
-      const u = parseUpdate ? await call(parseUpdate, req) : req.body;
+      const u = this.parseUpdateQuery(opt, req);
       const query = this.model.findOneAndUpdate(f, u, { new: true });
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
-  deleteOneCreator({
-    forceDelete,
-    parseUpdate,
-    ...opt
-  }: CRUDCreatorOpt): MiddleWare {
+  deleteOneCreator(opt: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
       const f = this.parseFilterQuery(opt, req);
-
-      const u = parseUpdate ? await call(parseUpdate, req) : { active: false };
-      const query = forceDelete
+      const u = this.parseUpdateQuery(opt, req);
+      const query = opt.forceDelete
         ? this.model.findOneAndDelete(f)
         : this.model.findOneAndUpdate(f, u);
       return await this.baseCreator(query, req, res, next, {
@@ -361,6 +373,9 @@ export function registerEntityCRUD(
 
     const defValidator = detectDefaultParamValidation(cName, opt);
 
+    // freeze options
+    Object.freeze(opt);
+
     schemas.push({
       method: opt.controller.method ?? translateCRUD2Method(cName),
       url: opt.controller.url ?? translateCRUD2Url(cName, opt.crud),
@@ -382,7 +397,13 @@ export function registerEntityCRUD(
 
 function translateCRUD2Creator(
   name: CRUD
-): Exclude<Exclude<keyof EntityCreator, 'postEntity'>, 'parseFilterQuery'> {
+):
+  | 'createOneCreator'
+  | 'getAllCreator'
+  | 'getOneCreator'
+  | 'updateOneCreator'
+  | 'deleteOneCreator'
+  | 'getCountCreator' {
   switch (name) {
     case CRUD.CREATE:
       return 'createOneCreator';
