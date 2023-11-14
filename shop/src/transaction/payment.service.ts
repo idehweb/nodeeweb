@@ -115,6 +115,8 @@ class PaymentService {
       clear: true,
       expired_watcher: amount ? true : false,
       notif_watcher: amount ? true : false,
+      watchers_timeout:
+        payment.expiredAt && payment.expiredAt.getTime() - Date.now(),
     });
 
     return transaction;
@@ -241,7 +243,7 @@ class PaymentService {
     const _failed = async (status: TransactionStatus) => {
       const newT = await this.transactionModel.findOneAndUpdate(
         { _id: transaction._id },
-        { status },
+        { status, active: false, $unset: { expiredAt: '' } },
         { new: true }
       );
 
@@ -325,7 +327,8 @@ class PaymentService {
       clear,
       expired_watcher,
       notif_watcher,
-      watchers_timeout = store.config.limit.transaction_expiration_s,
+      watchers_timeout = (store.config.limit.transaction_expiration_s ?? -1) *
+        1_000,
     }: {
       clear?: boolean;
       expired_watcher?: boolean;
@@ -352,7 +355,7 @@ class PaymentService {
     }
 
     // watchers
-    if (expired_watcher && watchers_timeout !== -1) {
+    if (expired_watcher && watchers_timeout > 0) {
       // create watcher
       // 1. Expire
       const expiredTimer = setTimeout(async () => {
@@ -370,7 +373,7 @@ class PaymentService {
             statusWithVerify: TransactionStatus.Expired,
           });
         } catch (err) {}
-      }, watchers_timeout * 1000);
+      }, watchers_timeout);
       this.transactionSupervisors.set(
         transaction.authority + '-1',
         expiredTimer
@@ -379,8 +382,8 @@ class PaymentService {
 
     if (
       notif_watcher &&
-      watchers_timeout !== -1 &&
-      limit.approach_transaction_expiration !== -1
+      watchers_timeout > 0 &&
+      limit.approach_transaction_expiration > 0
     ) {
       //2. Notification Before Expired
       const notifTimer = setTimeout(async () => {
@@ -394,7 +397,7 @@ class PaymentService {
           if (!td) return;
           orderUtils.sendOnExpire(order)?.then();
         } catch (err) {}
-      }, watchers_timeout * 1000 * limit.approach_transaction_expiration);
+      }, watchers_timeout * limit.approach_transaction_expiration);
       this.transactionSupervisors.set(transaction.authority + '-2', notifTimer);
     }
   }

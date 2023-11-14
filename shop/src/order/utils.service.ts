@@ -72,7 +72,7 @@ export class Utils {
     }
   }
 
-  private replaceValues(order: OrderDocument, msg: string) {
+  private replaceValues(order: OrderDocument | IOrder, msg: string) {
     let orderStatus: string;
     switch (order.status) {
       case OrderStatus.Cart:
@@ -108,7 +108,7 @@ export class Utils {
     });
   }
 
-  async sendOnStateChange(order: OrderDocument) {
+  async sendOnStateChange(order: OrderDocument | IOrder) {
     const message = this.replaceValues(
       order,
       this.orderStatus2Msg(order.status)
@@ -196,7 +196,9 @@ export class Utils {
           if (transaction) {
             const left =
               order.totalPrice -
-              order.transactions.reduce((acc, t) => acc + t.amount, 0);
+              order.transactions
+                .filter((t) => t.status === TransactionStatus.Paid)
+                .reduce((acc, t) => acc + t.amount, 0);
             if (left - transaction.amount <= 0) {
               update.$set.status = OrderStatus.Paid;
               isOrderPaid = true;
@@ -224,6 +226,9 @@ export class Utils {
     }
     return { isOrderPaid, update };
   }
+  private isInstanceOf(a: any, b: any) {
+    return a instanceof b || b?.modelName === a.modelName;
+  }
   async updateOrder(
     transaction: TransactionDocument,
     opt?: UpdateOrderOpt
@@ -239,8 +244,12 @@ export class Utils {
     opt: UpdateOrderOpt = {}
   ) {
     // initialize
-    const order = trsOrd instanceof this.orderModel ? trsOrd : null;
-    const transaction = trsOrd instanceof this.transactionModel ? trsOrd : null;
+    const order = this.isInstanceOf(trsOrd, this.orderModel)
+      ? (trsOrd as OrderDocument)
+      : null;
+    const transaction = this.isInstanceOf(trsOrd, this.transactionModel)
+      ? (trsOrd as TransactionDocument)
+      : null;
     const newStatus = typeof stsOpt === 'string' ? stsOpt : null;
     const options = merge<UpdateOrderOpt, UpdateOrderOpt, UpdateOrderOpt>(
       {},
@@ -254,7 +263,6 @@ export class Utils {
     );
     let isOrderPaid = false;
     const update: UpdateQuery<OrderDocument> = { $set: {}, $push: {} };
-
     const _updateWithTransaction = async () => {
       const order = await this.orderModel.findById(transaction.order);
       if (!order) return;
@@ -269,16 +277,30 @@ export class Utils {
       if (options.updateStatus) {
         const result = await this.updateOrderStatus(order, transaction, update);
         isOrderPaid = result.isOrderPaid;
+
+        if (!options.pushTransaction) {
+          const trIndex = order.transactions.findIndex((t) =>
+            t._id.equals(transaction._id)
+          );
+          // update transaction
+          if (trIndex !== -1) {
+            update.$set[`transactions.${trIndex}`] =
+              transactionUtils.convertTransaction2Grid(transaction);
+          }
+        }
       }
 
       // send sms
       if (options.sendSuccessSMS && isOrderPaid) {
-        utils.sendOnStateChange(order)?.then();
+        utils
+          .sendOnStateChange({ ...order.toObject(), status: OrderStatus.Paid })
+          ?.then();
       }
 
       // execute
-      if (options.exec)
+      if (options.exec) {
         await this.orderModel.updateOne({ _id: order._id }, update);
+      }
 
       return update;
     };

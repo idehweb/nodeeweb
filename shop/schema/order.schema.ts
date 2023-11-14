@@ -12,7 +12,7 @@ export enum OrderStatus {
   Posting = 'posting',
   Completed = 'completed',
   Canceled = 'canceled',
-  Failed = 'Failed',
+  Failed = 'failed',
   Expired = 'expired',
 }
 

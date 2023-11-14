@@ -174,12 +174,12 @@ export class EntityCreator {
       if (!Array.isArray(populate)) populate = [populate];
       populate.forEach((p) => query.populate(p));
     }
-    if (executeQuery) result = await query.exec();
     if (autoSetCount)
       res.setHeader(
         'X-Total-Count',
         await query.clone().countDocuments({}, { limit: null, skip: null })
       );
+    if (executeQuery) result = await query.exec();
 
     // handle result and output
     await this.handleResult(req, res, next, {

@@ -37,7 +37,7 @@ class Service {
     if (body.order) {
       const order = await this.orderModel.findOne({
         _id: body.order,
-        ...(body.payer ? { customer: body.payer._id } : {}),
+        ...(body.payer ? { 'customer._id': body.payer._id } : {}),
         active: true,
         status: OrderStatus.NeedToPay,
       });
@@ -80,16 +80,19 @@ class Service {
     return next();
   };
   afterCreate: MiddleWare = async (req, res, next) => {
-    const transaction: TransactionDocument = req.crud;
+    const transaction: ITransaction = req.crud;
     const needUpdateOrder = Boolean(transaction.order);
 
     // return
     if (needUpdateOrder) {
-      await orderUtils.updateOrder(transaction, {
-        pushTransaction: true,
-        sendSuccessSMS: true,
-        updateStatus: true,
-      });
+      await orderUtils.updateOrder(
+        { ...transaction, modelName: 'transaction' } as any,
+        {
+          pushTransaction: true,
+          sendSuccessSMS: true,
+          updateStatus: true,
+        }
+      );
     }
 
     return res.status(201).json({ data: transaction });

@@ -7,7 +7,6 @@ import { classCatchBuilder } from '../../../utils/catchAsync';
 export class SiteMapService {
   static async post(req: any, res: Response) {
     const records = await getRecordsFromDataSource('Post');
-    console.log('records', records.length);
     const collection = [];
 
     //add recipes urls

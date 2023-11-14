@@ -78,8 +78,7 @@ const schema = new mongoose.Schema(
     authority: { type: String, unique: true, sparse: true },
     status: { type: String, default: TransactionStatus.NeedToPay },
     active: { type: Boolean, default: true },
-    //   15min expr by default
-    expiredAt: { type: Date, default: () => Date.now() + 15 * 60 * 1_000 },
+    expiredAt: { type: Date },
     paidAt: { type: Date },
     message: String,
   },

@@ -12,7 +12,7 @@ class TransactionUtils {
     transaction: TransactionDocument | any
   ): ITransactionGrid {
     return {
-      _id: transaction,
+      _id: transaction._id,
       amount: transaction.amount,
       status: transaction.status,
       provider: transaction.provider,
