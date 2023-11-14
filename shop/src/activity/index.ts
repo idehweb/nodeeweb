@@ -1,8 +1,7 @@
-import { ControllerSchema } from '@nodeeweb/core/types/controller';
 import registerController from './controller';
 import registerView from './view';
 
-export default function registerCategory() {
+export default function registerActivity() {
   registerController();
   registerView();
 }
