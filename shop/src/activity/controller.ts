@@ -4,44 +4,51 @@ import {
 } from '@nodeeweb/core/src/constants/String';
 import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
+import { AdminAccess, controllersBatchRegister } from '@nodeeweb/core';
+import { IDParam } from '@nodeeweb/core/dto/in/crud.dto';
+import service from './service';
+import { ActivityUpdateBody } from '../../dto/in/activity';
 
 export default function registerController() {
-  const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
   registerEntityCRUD(
     'activity',
     {
       getAll: {
         controller: {
-          access,
+          access: AdminAccess,
         },
         crud: {
-          parseFilter(req) {
-            return { user: req.query.user, product: req.query.product };
-          },
           autoSetCount: true,
-          project:
-            '_id user product order page title action createdAt updatedAt',
-          populate: [
-            {
-              path: 'customer',
-              select: 'phone firstName lastName _id',
-            },
-            {
-              path: 'product',
-              select: 'title _id',
-            },
-            {
-              path: 'user',
-              select: 'username _id nickname',
-            },
-          ],
           paramFields: {
             limit: 'limit',
             offset: 'offset',
           },
         },
       },
+      getCount: {
+        controller: { access: AdminAccess },
+      },
+      getOne: {
+        controller: {
+          access: AdminAccess,
+          validate: { dto: IDParam, reqPath: 'params' },
+        },
+      },
     },
     { from: 'ShopEntity' }
+  );
+
+  // update
+  controllersBatchRegister(
+    [
+      {
+        method: 'put',
+        access: AdminAccess,
+        validate: { reqPath: 'body', dto: ActivityUpdateBody },
+        service: service.update,
+        url: '/:id',
+      },
+    ],
+    { base_url: '/api/v1/activity', from: 'ShopEntity' }
   );
 }
