@@ -7,7 +7,11 @@ import {
   NotFound,
   NotImplement,
 } from '@nodeeweb/core';
-import { OrderDocument, OrderModel } from '../../schema/order.schema';
+import {
+  OrderDocument,
+  OrderModel,
+  OrderStatus,
+} from '../../schema/order.schema';
 import { ProductDocument, ProductModel } from '../../schema/product.schema';
 import mongoose, { FilterQuery, Types, UpdateQuery } from 'mongoose';
 import { PaymentVerifyStatus } from '../../types/order';
@@ -395,7 +399,11 @@ class PaymentService {
             active: true,
           });
           if (!td) return;
-          orderUtils.sendOnExpire(order)?.then();
+          const order = await this.orderModel.findOne({
+            _id: transaction.order,
+            status: OrderStatus.NeedToPay,
+          });
+          order && orderUtils.sendOnExpire(order)?.then();
         } catch (err) {}
       }, watchers_timeout * limit.approach_transaction_expiration);
       this.transactionSupervisors.set(transaction.authority + '-2', notifTimer);
