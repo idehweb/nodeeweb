@@ -36,9 +36,8 @@ export class TransactionCreateBody {
 
   @Expose()
   @IsOptional()
-  @ToMongoID()
-  @IsMongoID()
-  order?: Types.ObjectId;
+  @IsString()
+  order?: string;
 
   @Expose()
   @IsNumber()
@@ -85,9 +84,8 @@ export class TransactionUpdateBody {
 
   @Expose()
   @IsOptional()
-  @ToMongoID()
-  @IsMongoID()
-  order?: Types.ObjectId;
+  @IsString()
+  order?: string;
 
   @Expose()
   @IsOptional()

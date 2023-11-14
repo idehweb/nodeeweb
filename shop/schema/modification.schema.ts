@@ -13,7 +13,7 @@ const schema = {
   comment: { type: mongoose.Schema.Types.ObjectId, ref: 'comment' },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'admin' },
   product: { type: mongoose.Schema.Types.ObjectId, ref: 'product' },
-  order: { type: mongoose.Schema.Types.ObjectId, ref: 'order' },
+  order: { type: String, ref: 'order' },
   transaction: { type: mongoose.Schema.Types.ObjectId, ref: 'transaction' },
   settings: { type: mongoose.Schema.Types.ObjectId, ref: 'settings' },
   page: { type: mongoose.Schema.Types.ObjectId, ref: 'page' },

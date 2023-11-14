@@ -24,7 +24,7 @@ export interface ITransaction {
   creator_category: TransactionCreator;
   creator?: Types.ObjectId;
   payer?: { _id: Types.ObjectId; type: 'admin' | 'customer' };
-  order?: Types.ObjectId;
+  order?: string;
   payment_link?: string;
   authority: string;
   amount: number;
@@ -62,7 +62,7 @@ export const TransactionGridSchema = new mongoose.Schema({
 const schema = new mongoose.Schema(
   {
     creator_category: { type: String, required: true },
-    creator: { type: mongoose.Schema.Types.ObjectId },
+    creator: { type: mongoose.Schema.Types.ObjectId, ref: 'admin' },
     payer: {
       type: new mongoose.Schema({
         _id: { type: mongoose.Schema.Types.ObjectId, required: true },
@@ -70,7 +70,7 @@ const schema = new mongoose.Schema(
       }),
       required: false,
     },
-    order: { type: mongoose.Schema.Types.ObjectId },
+    order: { type: String, ref: 'order' },
     amount: { type: Number, required: true },
     currency: { type: String, required: true },
     provider: { type: String, default: TransactionProvider.Manual },
