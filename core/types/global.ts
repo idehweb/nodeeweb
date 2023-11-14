@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose, { Document, Model, ObjectId, Types } from 'mongoose';
-import { CRUD_DEFAULT_REQ_KEY } from '../src/constants/String';
+import {
+  ACTIVITY_TARGET_BEFORE_REQ_KEY,
+  CRUD_DEFAULT_REQ_KEY,
+} from '../src/constants/String';
 import { UserDocument } from './user';
 
 export enum ENV {
@@ -23,6 +26,7 @@ export type Req = Request & {
   modelName?: string;
   data?: any;
   [CRUD_DEFAULT_REQ_KEY]: any;
+  [ACTIVITY_TARGET_BEFORE_REQ_KEY]: any;
 };
 
 export type Res = Response;
@@ -68,6 +72,7 @@ export type CRUDCreatorOpt = {
   autoSetCount?: boolean;
   populate?: mongoose.PopulateOptions | mongoose.PopulateOptions[];
   type?: CRUD;
+  model?: string;
 };
 
 export enum CRUD {

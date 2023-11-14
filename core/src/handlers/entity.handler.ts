@@ -61,6 +61,26 @@ export class EntityCreator {
     return query as { [k: string]: string | string[] | object };
   }
 
+  async parseFilterQuery(opt: CRUDCreatorOpt, req: Req) {
+    const pf = opt.paramFields || { id: 'id', slug: 'slug' };
+
+    const f = opt.parseFilter
+      ? await call(opt.parseFilter, req)
+      : {
+          _id:
+            pf?.id &&
+            req.params[pf.id] &&
+            new mongoose.Types.ObjectId(req.params[pf.id]),
+          slug: req.params[pf?.slug],
+        };
+
+    for (const key in f) {
+      if (f[key] === undefined) delete f[key];
+    }
+
+    return f;
+  }
+
   private async handleResult(
     req: Req,
     res: Response,
@@ -242,92 +262,43 @@ export class EntityCreator {
       });
     };
   }
-  getAllCreator({ parseFilter, ...opt }: CRUDCreatorOpt): MiddleWare {
+  getAllCreator({ ...opt }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = parseFilter ? await call(parseFilter, req) : {};
+      const f = this.parseFilterQuery(opt, req);
       if (!opt.sort) opt.sort = { createdAt: -1 };
       const query = this.model.find(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
-  getOneCreator({
-    parseFilter,
-    paramFields: pf = { id: 'id', slug: 'slug' },
-    ...opt
-  }: CRUDCreatorOpt): MiddleWare {
+  getOneCreator({ ...opt }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = parseFilter
-        ? await call(parseFilter, req)
-        : {
-            _id:
-              pf.id &&
-              req.params[pf.id] &&
-              new mongoose.Types.ObjectId(req.params[pf.id]),
-            slug: req.params[pf.slug],
-          };
-
-      for (const key in f) {
-        if (f[key] === undefined) delete f[key];
-      }
-
+      const f = this.parseFilterQuery(opt, req);
       const query = this.model.findOne(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
-  getCountCreator({ parseFilter, ...opt }: CRUDCreatorOpt): MiddleWare {
+  getCountCreator({ ...opt }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = parseFilter ? await call(parseFilter, req) : {};
+      const f = this.parseFilterQuery(opt, req);
       const query = this.model.countDocuments(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
-  updateOneCreator({
-    parseFilter,
-    parseUpdate,
-    paramFields: pf = { id: 'id', slug: 'slug' },
-    ...opt
-  }: CRUDCreatorOpt): MiddleWare {
+  updateOneCreator({ parseUpdate, ...opt }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = parseFilter
-        ? await call(parseFilter, req)
-        : {
-            _id:
-              pf.id &&
-              req.params[pf.id] &&
-              new mongoose.Types.ObjectId(req.params[pf.id]),
-            slug: req.params[pf.slug],
-          };
-
-      for (const key in f) {
-        if (f[key] === undefined) delete f[key];
-      }
-
+      const f = this.parseFilterQuery(opt, req);
       const u = parseUpdate ? await call(parseUpdate, req) : req.body;
       const query = this.model.findOneAndUpdate(f, u, { new: true });
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
   deleteOneCreator({
-    parseFilter,
     forceDelete,
     parseUpdate,
-    paramFields: pf = { id: 'id', slug: 'slug' },
     ...opt
   }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = parseFilter
-        ? await call(parseFilter, req)
-        : {
-            _id:
-              pf.id &&
-              req.params[pf.id] &&
-              new mongoose.Types.ObjectId(req.params[pf.id]),
-            slug: req.params[pf.slug],
-          };
-
-      for (const key in f) {
-        if (f[key] === undefined) delete f[key];
-      }
+      const f = this.parseFilterQuery(opt, req);
 
       const u = parseUpdate ? await call(parseUpdate, req) : { active: false };
       const query = forceDelete
@@ -383,7 +354,10 @@ export function registerEntityCRUD(
     opt.controller = opt.controller ?? {};
 
     // set default values
-    opt.crud = _.merge({ ...defaultCrudOpt }, opt.crud ?? {}, { type: cName });
+    opt.crud = _.merge({ ...defaultCrudOpt }, opt.crud ?? {}, {
+      type: cName,
+      model: modelName,
+    });
 
     const defValidator = detectDefaultParamValidation(cName, opt);
 
@@ -408,7 +382,7 @@ export function registerEntityCRUD(
 
 function translateCRUD2Creator(
   name: CRUD
-): Exclude<keyof EntityCreator, 'postEntity'> {
+): Exclude<Exclude<keyof EntityCreator, 'postEntity'>, 'parseFilterQuery'> {
   switch (name) {
     case CRUD.CREATE:
       return 'createOneCreator';
