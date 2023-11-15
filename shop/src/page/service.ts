@@ -26,7 +26,9 @@ export default class Service {
     // emit event
     store.event.emit(
       getEntityEventName('page', { post: true, type: CRUD.CREATE }),
-      page
+      page,
+      { type: CRUD.CREATE, model: 'page' },
+      req
     );
 
     return res.status(201).json({ data: page });
@@ -52,7 +54,9 @@ export default class Service {
     // emit event
     store.event.emit(
       getEntityEventName('page', { post: true, type: CRUD.UPDATE_ONE }),
-      newPage
+      newPage,
+      { type: CRUD.UPDATE_ONE, model: 'page' },
+      req
     );
 
     return res.status(200).json({ data: newPage });
@@ -87,6 +91,15 @@ export default class Service {
   static deleteAfter: MiddleWare = (req, res) => {
     const page = req.crud;
     unregisterRoute({ name: page.slug }, { from: 'PageService' });
+
+    // emit event
+    store.event.emit(
+      getEntityEventName('page', { post: true, type: CRUD.DELETE_ONE }),
+      page,
+      { type: CRUD.DELETE_ONE, model: 'page' },
+      req
+    );
+
     return res.status(204).send();
   };
 }
