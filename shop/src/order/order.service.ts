@@ -1,3 +1,4 @@
+import { merge } from 'lodash';
 import {
   BadRequestError,
   CRUD_DEFAULT_REQ_KEY,
@@ -7,14 +8,14 @@ import {
   Res,
 } from '@nodeeweb/core';
 import {
+  OrderDocument,
   OrderModel,
   OrderStatus,
-  TransactionProvider,
 } from '../../schema/order.schema';
 import utils from './utils.service';
 import store from '../../store';
-import transactionService from './transaction.service';
-import { PaymentVerifyStatus } from '../../types/order';
+import transactionUtils from '../transaction/utils.service';
+import { UpdateQuery } from 'mongoose';
 import { isIn } from 'class-validator';
 
 class OrderService {
@@ -52,46 +53,37 @@ class OrderService {
     });
 
     if (!order) throw new NotFound('order not found');
-    if (!order.transaction && body.status)
-      throw new BadRequestError('order transaction not initiate yet');
+    let extraUpdate: UpdateQuery<OrderDocument> = {};
 
     // update status
     if (body.status) {
-      if (order.status === OrderStatus.NeedToPay) {
-        if (order.transaction.provider !== TransactionProvider.Manual)
+      // payment issue
+      if (
+        order.status === OrderStatus.NeedToPay &&
+        !isIn(body.status, [OrderStatus.Cart, OrderStatus.NeedToPay])
+      ) {
+        //  need update transaction
+        if (order.transactions.length) {
           throw new BadRequestError(
-            `can not update ${order.status} order until transaction provider not equal to ${TransactionProvider.Manual}`
+            `can not update need-to-pay order status until its transactions exists, try update transactions`
           );
-        if (
-          isIn(body.status, [
-            OrderStatus.Paid,
-            OrderStatus.Posting,
-            OrderStatus.Completed,
-          ])
-        )
-          await transactionService.handlePayment(
-            order,
-            true,
-            true,
-            undefined,
-            PaymentVerifyStatus.Paid,
-            false
-          );
-        else if (body.status === OrderStatus.Canceled)
-          await transactionService.handlePayment(
-            order,
-            false,
-            true,
-            undefined,
-            PaymentVerifyStatus.Failed,
-            false
-          );
+        }
+
+        // update order without transaction
+        extraUpdate = await utils.updateOrder(
+          order,
+          transactionUtils.convertStatus(body.status),
+          {
+            exec: false,
+            updateStatus: true,
+          }
+        );
       }
     }
 
     const newOrder = await this.orderModel.findOneAndUpdate(
       { _id: order._id },
-      { $set: body }
+      merge({}, { $set: body }, extraUpdate)
     );
 
     // sms

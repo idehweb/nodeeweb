@@ -9,6 +9,7 @@ import { DEFAULT_SMS_ON_OTP } from '@nodeeweb/core';
 import {
   DEFAULT_APPROACH_TRANSACTION_EXP,
   DEFAULT_TRANSACTION_EXP_S,
+  MAXIMUM_NEED_TO_PAY_ORDER,
   MAXIMUM_NEED_TO_PAY_TRANSACTION,
   MAX_PRODUCTS_IN_CART,
   MAX_PRODUCT_QUANTITY_IN_CART,
@@ -74,6 +75,7 @@ export class ShopConfig extends Config<ShopConfigDto> {
         max_products_in_cart: MAX_PRODUCTS_IN_CART,
         transaction_expiration_s: DEFAULT_TRANSACTION_EXP_S,
         max_need_to_pay_transaction: MAXIMUM_NEED_TO_PAY_TRANSACTION,
+        max_need_to_pay_order: MAXIMUM_NEED_TO_PAY_ORDER,
       },
       currency: Currency.Toman,
       tax: 0,

@@ -26,6 +26,7 @@ import { registerShopConfig } from './src/config/config';
 import registerTemplate from './src/template';
 import initSeo from './src/seo';
 import registerReport from './src/report';
+import registerTransaction from './src/transaction';
 
 async function deployShop() {
   await deployCore();
@@ -51,6 +52,7 @@ async function deployShop() {
   registerFile();
   registerNotification();
   registerOrder();
+  registerTransaction();
   registerModification();
   registerPage();
   registerPost();
@@ -59,7 +61,6 @@ async function deployShop() {
   registerSettings();
   registerReport();
   await registerTemplate();
-
   // register plugins
   handlePlugins();
 }
