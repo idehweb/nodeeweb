@@ -27,13 +27,15 @@ class Service {
       case CRUD.DELETE_ONE:
         const target_before = await store.db
           .model(opt.model)
-          .findOne(new EntityCreator(opt.model).parseFilterQuery(opt, req));
+          .findOne(
+            await new EntityCreator(opt.model).parseFilterQuery(opt, req)
+          );
         req.target_before = target_before;
         return;
     }
   };
   post = async (data: any, opt: CRUDCreatorOpt, req: Req) => {
-    const depend_on = req.target_before?._id ?? req.data._id;
+    const depend_on = req.target_before?._id ?? data?._id;
     const entity = new EntityCreator(opt.model);
     const activity: Partial<IActivity> = {
       doer: {
@@ -45,12 +47,23 @@ class Service {
       status: ActivityStatus.Do,
       depend_on,
       type: crudType2ActivityType(opt.type),
-      target_after: data,
-      target_before: req.target_before,
-      filter_query: entity.parseFilterQuery(opt, req),
-      update_query: entity.parseUpdateQuery(opt, req),
-      create_query: entity.parseCreateQuery(opt, req),
+      target: {
+        after: data,
+        before: req.target_before,
+      },
+      query: {},
     };
+
+    switch (opt.type) {
+      case CRUD.CREATE:
+        activity.query.create = await entity.parseCreateQuery(opt, req);
+        break;
+      case CRUD.UPDATE_ONE:
+      case CRUD.DELETE_ONE:
+        activity.query.filter = await entity.parseFilterQuery(opt, req);
+        activity.query.update = await entity.parseUpdateQuery(opt, req);
+        break;
+    }
 
     await this.activityModel.create(activity);
   };

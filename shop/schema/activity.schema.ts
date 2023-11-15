@@ -26,11 +26,15 @@ export interface IActivity {
   status: ActivityStatus;
   model: string;
   depend_on?: any;
-  filter_query: mongoose.FilterQuery<any>;
-  update_query?: mongoose.UpdateQuery<any>;
-  create_query?: any;
-  target_before: any | null;
-  target_after: any;
+  query: {
+    filter?: mongoose.FilterQuery<any>;
+    update?: mongoose.UpdateQuery<any>;
+    create?: any;
+  };
+  target: {
+    before?: any;
+    after: any;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -62,11 +66,15 @@ const schema = new mongoose.Schema(
     depend_on: { type: mongoose.Schema.Types.Mixed },
     model: { type: String, required: true },
     status: { type: String, required: true },
-    filter_query: { type: {}, required: true },
-    update_query: { type: {}, required: false },
-    create_query: { type: {}, required: false },
-    target_before: { type: {}, required: true },
-    target_after: { type: {}, required: true },
+    query: {
+      filter: { type: {} },
+      update: { type: {} },
+      create: { type: {} },
+    },
+    target: {
+      before: { type: {} },
+      after: { type: {}, required: true },
+    },
   },
   { timestamps: true }
 );

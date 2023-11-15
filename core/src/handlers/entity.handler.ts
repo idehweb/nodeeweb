@@ -12,7 +12,7 @@ import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { BadRequestError, GeneralError, NotFound } from '../../types/error';
 import { call } from '../../utils/helpers';
 import { CrudParamDto, MultiIDParam } from '../../dto/in/crud.dto';
-import _, { lowerFirst, orderBy } from 'lodash';
+import _, { isNil, lowerFirst, orderBy } from 'lodash';
 import { ClassConstructor } from 'class-transformer';
 
 export function getEntityEventName(
@@ -117,7 +117,7 @@ export class EntityCreator {
       httpCode: number;
     } & CRUDCreatorOpt
   ) {
-    if (!result) throw new NotFound(`${this.modelName} not found`);
+    if (isNil(result)) throw new NotFound(`${this.modelName} not found`);
     const { sendResponse, saveToReq } = opt;
 
     if (sendResponse && !saveToReq) {
@@ -254,7 +254,7 @@ export class EntityCreator {
 
   createOneCreator({ executeQuery, project }: CRUDCreatorOpt) {
     return async (req: Req, res: Response, next: NextFunction) => {
-      const body = this.parseCreateQuery(arguments[0], req);
+      const body = await this.parseCreateQuery(arguments[0], req);
       if (!body)
         return EntityCreator.onError(
           new BadRequestError('body must exist'),
@@ -281,7 +281,7 @@ export class EntityCreator {
   }
   getAllCreator({ ...opt }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = this.parseFilterQuery(opt, req);
+      const f = await this.parseFilterQuery(opt, req);
       if (!opt.sort) opt.sort = { createdAt: -1 };
       const query = this.model.find(f);
       return await this.baseCreator(query, req, res, next, opt);
@@ -289,30 +289,30 @@ export class EntityCreator {
   }
   getOneCreator(opt: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = this.parseFilterQuery(opt, req);
+      const f = await this.parseFilterQuery(opt, req);
       const query = this.model.findOne(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
   getCountCreator(opt: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = this.parseFilterQuery(opt, req);
+      const f = await this.parseFilterQuery(opt, req);
       const query = this.model.countDocuments(f);
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
   updateOneCreator(opt: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = this.parseFilterQuery(opt, req);
-      const u = this.parseUpdateQuery(opt, req);
+      const f = await this.parseFilterQuery(opt, req);
+      const u = await this.parseUpdateQuery(opt, req);
       const query = this.model.findOneAndUpdate(f, u, { new: true });
       return await this.baseCreator(query, req, res, next, opt);
     };
   }
   deleteOneCreator(opt: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
-      const f = this.parseFilterQuery(opt, req);
-      const u = this.parseUpdateQuery(opt, req);
+      const f = await this.parseFilterQuery(opt, req);
+      const u = await this.parseUpdateQuery(opt, req);
       const query = opt.forceDelete
         ? this.model.findOneAndDelete(f)
         : this.model.findOneAndUpdate(f, u);
