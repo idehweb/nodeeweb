@@ -33,9 +33,6 @@ export default function registerController() {
     'product',
     {
       getAll: {
-        // controller: {
-        //   access: AdminAccess,
-        // },
         crud: {
           parseFilter: Service.getAllFilterParser,
           autoSetCount: true,
@@ -45,14 +42,9 @@ export default function registerController() {
           },
         },
       },
-      getCount: {
-        // controller: {
-        //   access: AdminAccess,
-        // },
-      },
+      getCount: {},
       getOne: {
         controller: {
-          // access: AuthUserAccess,
           service: Service.getOneAfter,
         },
       },
@@ -63,7 +55,6 @@ export default function registerController() {
             dto: CreateProductBody,
             reqPath: 'body',
           },
-          service: Service.createAfter,
         },
         crud: {
           parseBody: Service.createBodyParser,
@@ -72,7 +63,6 @@ export default function registerController() {
       updateOne: {
         controller: {
           access,
-          service: Service.updateAfter,
           validate: {
             reqPath: 'body',
             dto: UpdateProductBody,
@@ -85,10 +75,9 @@ export default function registerController() {
       deleteOne: {
         controller: {
           access,
-          service: Service.deleteAfter,
         },
         crud: {
-          parseUpdate: () => ({ status: 'trash' }),
+          parseUpdate: () => ({ status: 'trash', active: false }),
         },
       },
     },

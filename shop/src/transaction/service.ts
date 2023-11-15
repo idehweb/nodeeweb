@@ -1,4 +1,4 @@
-import { MiddleWare, Req, ValidationError } from '@nodeeweb/core';
+import { CRUD, MiddleWare, Req, ValidationError } from '@nodeeweb/core';
 import { FilterQuery, Query, UpdateQuery } from 'mongoose';
 import {
   ITransaction,
@@ -14,6 +14,7 @@ import { UserModel } from '@nodeeweb/core/types/user';
 import store from '../../store';
 import { OrderModel, OrderStatus } from '../../schema/order.schema';
 import orderUtils from '../order/utils.service';
+import { getEntityEventName } from '@nodeeweb/core/src/handlers/entity.handler';
 
 class Service {
   private get orderModel(): OrderModel {
@@ -83,7 +84,7 @@ class Service {
     const transaction: ITransaction = req.crud;
     const needUpdateOrder = Boolean(transaction.order);
 
-    // return
+    // update order
     if (needUpdateOrder) {
       await orderUtils.updateOrder(
         { ...transaction, modelName: 'transaction' } as any,
@@ -94,6 +95,14 @@ class Service {
         }
       );
     }
+
+    // emit event
+    store.event.emit(
+      getEntityEventName('transaction', { post: true, type: CRUD.CREATE }),
+      transaction,
+      { type: CRUD.CREATE, model: 'transaction' },
+      req
+    );
 
     return res.status(201).json({ data: transaction });
   };
@@ -131,7 +140,7 @@ class Service {
     const transaction: TransactionDocument = req.crud;
     const needUpdateOrder = Boolean(transaction.order);
 
-    // return
+    // update order
     if (needUpdateOrder) {
       await orderUtils.updateOrder(transaction, {
         pushTransaction: true,
@@ -139,6 +148,14 @@ class Service {
         updateStatus: true,
       });
     }
+
+    // emit event
+    store.event.emit(
+      getEntityEventName('transaction', { post: true, type: CRUD.UPDATE_ONE }),
+      transaction,
+      { type: CRUD.UPDATE_ONE, model: 'transaction' },
+      req
+    );
 
     return res.status(200).json({ data: transaction });
   };

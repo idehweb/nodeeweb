@@ -12,7 +12,7 @@ import registerGateway from './src/gateways';
 import registerFile from './src/file';
 import registerNotification from './src/notification';
 import registerOrder from './src/order';
-import registerModification from './src/modification';
+import registerActivity from './src/activity';
 import registerPage from './src/page';
 import registerPost from './src/post';
 import registerProduct from './src/product';
@@ -53,7 +53,7 @@ async function deployShop() {
   registerNotification();
   registerOrder();
   registerTransaction();
-  registerModification();
+  registerActivity();
   registerPage();
   registerPost();
   registerProduct();

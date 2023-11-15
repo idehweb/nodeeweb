@@ -10,7 +10,9 @@ export interface IPage {
   views: any[];
   slug?: string;
   title: any;
-  elements: any;
+  elements: any[];
+  mobileElements: any[];
+  desktopElements: any[];
   access: string;
   kind: string;
   classes: string;
@@ -39,7 +41,9 @@ const schema = new mongoose.Schema(
     views: [],
     slug: { type: String, require: true },
     title: {},
-    elements: {},
+    elements: { type: [] },
+    mobileElements: { type: [] },
+    desktopElements: { type: [] },
     access: { type: String, default: 'public' },
     kind: { type: String, default: 'page' },
     classes: { type: String, default: '' },

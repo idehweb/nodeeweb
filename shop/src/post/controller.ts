@@ -19,13 +19,6 @@ export default function registerController() {
       getOne: {},
       getAll: {
         crud: {
-          // parseFilter(req) {
-          //   if (req.query.filter && typeof req.query.filter === 'string') {
-          //     return JSON.parse(req.query.filter);
-          //   }
-          // },
-          autoSetCount: true,
-          queryFields: true,
           paramFields: {
             limit: 'limit',
             offset: 'offset',

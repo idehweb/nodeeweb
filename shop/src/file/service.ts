@@ -1,6 +1,7 @@
 import fs from 'fs';
 import {
   BadRequestError,
+  CRUD,
   CRUD_DEFAULT_REQ_KEY,
   MiddleWare,
   NotFound,
@@ -17,6 +18,7 @@ import { PageModel } from '../../schema/page.schema';
 import { CustomerModel } from '../../schema/customer.schema';
 import { AdminModel } from '../../schema/admin.schema';
 import { configService } from '@nodeeweb/core/src/config/service';
+import { getEntityEventName } from '@nodeeweb/core/src/handlers/entity.handler';
 
 export class Service {
   get postModel(): PostModel {
@@ -122,6 +124,14 @@ export class Service {
     // update embedded
     this.updateEmbedded(newDoc);
 
+    // call event
+    store.event.emit(
+      getEntityEventName('file', { post: true, type: CRUD.UPDATE_ONE }),
+      newDoc,
+      { type: CRUD.UPDATE_ONE, model: 'file' },
+      req
+    );
+
     return res.status(200).json({ data: newDoc });
   };
 
@@ -133,6 +143,14 @@ export class Service {
     try {
       await fs.promises.rm(oldPath);
     } catch (err) {}
+
+    // call event
+    store.event.emit(
+      getEntityEventName('file', { post: true, type: CRUD.DELETE_ONE }),
+      req.crud,
+      { type: CRUD.DELETE_ONE, model: 'file' },
+      req
+    );
 
     return res.status(204).send();
   };
