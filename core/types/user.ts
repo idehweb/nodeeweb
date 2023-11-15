@@ -4,6 +4,9 @@ import { Photo } from './global';
 export interface IUserMethods {
   passwordVerify: (password: string) => Promise<boolean>;
 }
+export enum UserStatus {
+  NeedVerify = 'need-verify',
+}
 
 export enum UserSex {
   Male = 'male',
@@ -29,6 +32,11 @@ export interface IUser {
   sex?: UserSex;
   data: any;
   photo?: Photo[];
+  status: {
+    status?: UserStatus | string;
+    user?: Types.ObjectId;
+    createdAt?: Date;
+  }[];
 }
 
 export type UserModel = Model<IUser, {}, IUserMethods>;

@@ -74,6 +74,9 @@ export default class UserPassStrategy extends AuthStrategy {
     });
   }
   async signup(req: Req, res: Res, next: NextFunction) {
+    if (req.modelName === 'admin')
+      throw new ForbiddenError('can not register admin');
+
     const userModel = store.db.model<IUser, UserModel>(req.modelName);
 
     const userBody = await this.transformSignup(req.body.user);
