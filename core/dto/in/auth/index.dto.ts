@@ -97,14 +97,17 @@ export class OtpUserSignup {
   code: string;
 
   @Expose()
+  @IsOptional()
   @IsString()
-  username: string;
+  username?: string;
 
   @Expose()
+  @IsOptional()
   @IsString()
-  firstName: string;
+  firstName?: string;
 
   @Expose()
+  @IsOptional()
   @IsString()
-  lastName: string;
+  lastName?: string;
 }

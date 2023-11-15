@@ -328,3 +328,8 @@ export function addForwarded(req: Req, ip: string) {
 
   return forwarded.join(',');
 }
+
+export function normalizePhone(phone: string) {
+  const [, digits] = /(?!^0)(?!^98)(\d{10})$/.exec(phone);
+  return `98${digits}`;
+}

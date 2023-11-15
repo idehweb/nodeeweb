@@ -3,6 +3,7 @@ import { AuthStrategy } from '../../types/auth';
 import { Req, Res } from '../../types/global';
 import store from '../../store';
 import {
+  BadRequestError,
   ErrorType,
   ForbiddenError,
   GeneralError,
@@ -26,8 +27,8 @@ import {
   OtpUserLogin,
   OtpUserSignup,
 } from '../../dto/in/auth/index.dto';
-import { UserDocument, UserModel } from '../../types/user';
-import { replaceValue } from '../../utils/helpers';
+import { IUser, UserDocument, UserModel, UserStatus } from '../../types/user';
+import { normalizePhone, replaceValue } from '../../utils/helpers';
 import { AuthEvents } from './authGateway.strategy';
 import { SmsSubType } from '../../types/config';
 
@@ -55,11 +56,13 @@ export class OtpStrategy extends AuthStrategy {
 
     const { phone } = req.body.user as OtpUserDetect;
 
+    const normalPhone = normalizePhone(phone);
+
     const model = store.db.model(req.modelName);
-    const user: UserDocument = await model.findOne({ phone });
+    const user: UserDocument = await model.findOne({ phone: normalPhone });
     if (!user && throwOnNotfound)
       throw new NotFound(
-        `did'nt find any user with ${phone} number, please signup`
+        `did'nt find any user with ${normalPhone} number, please signup`
       );
     if (user && !user.active) throw new ForbiddenError('inactive user');
 
@@ -67,12 +70,16 @@ export class OtpStrategy extends AuthStrategy {
     return user;
   }
 
-  private async verify(phone: string, code: string) {
+  private async verify(user: IUser, code: string, userType: string) {
+    let outUser = user;
     const otpModel = store.db.model('otp');
+
+    user.phone = normalizePhone(user.phone);
 
     const codeDoc = await otpModel.findOneAndUpdate(
       {
-        phone,
+        phone: user.phone,
+        type: userType,
         code,
         updatedAt: { $gt: new Date(Date.now() - 120 * 1000) },
       },
@@ -80,7 +87,18 @@ export class OtpStrategy extends AuthStrategy {
     );
 
     if (!codeDoc) throw new UnauthorizedError();
-    return codeDoc;
+
+    if (user.status.find(({ status }) => status == UserStatus.NeedVerify)) {
+      outUser = await store.db
+        .model(userType)
+        .findOneAndUpdate(
+          { _id: user._id },
+          { $pull: { status: { status: UserStatus.NeedVerify } } },
+          { new: true }
+        );
+    }
+
+    return [codeDoc, user];
   }
   private async codeRevert(codeDoc: Document) {
     await codeDoc.updateOne({ ...codeDoc.toObject() }, { timestamps: false });
@@ -89,7 +107,7 @@ export class OtpStrategy extends AuthStrategy {
   private async sendCode(req: Req, res: Res) {
     // generate and send code
 
-    const phone = req.user?.phone ?? req.body.user?.phone,
+    const phone = normalizePhone(req.user?.phone ?? req.body.user?.phone),
       userExists = Boolean(req.user);
 
     // send code
@@ -101,6 +119,7 @@ export class OtpStrategy extends AuthStrategy {
     //check if sms send before :
     const prevCode = await otpModel.findOne({
       phone,
+      type: req.modelName,
       updatedAt: { $gt: new Date(Date.now() - 120 * 1000) },
     });
     if (prevCode) {
@@ -124,7 +143,7 @@ export class OtpStrategy extends AuthStrategy {
 
     // create
     await otpModel.findOneAndUpdate(
-      { phone },
+      { phone, type: req.modelName },
       { code },
       { new: true, upsert: true }
     );
@@ -148,7 +167,7 @@ export class OtpStrategy extends AuthStrategy {
 
     if (codeResult !== true) {
       // revert changes
-      await otpModel.findOneAndDelete({ phone });
+      await otpModel.findOneAndDelete({ phone, type: req.modelName });
       throw new SendSMSError(codeResult);
     }
 
@@ -165,13 +184,34 @@ export class OtpStrategy extends AuthStrategy {
     });
   }
 
+  private async createUser(modelName: string, iuser: Partial<IUser>) {
+    const userModel = store.db.model(modelName) as UserModel;
+    const user = await userModel.create(iuser);
+    return user;
+  }
+
   async detect(req: Req, res: Res, next: NextFunction) {
     req.body.user = await this.transformDetect(req.body.user);
 
     const { login, signup } = req.body;
 
     // export user
-    await this.exportUser(req, !signup && login);
+    req.user = await this.exportUser(req, !signup && login);
+
+    // create user
+
+    if (req.user && !login) throw new BadRequestError('user exists');
+    if (!req.user && !signup) throw new BadRequestError('user not exists');
+
+    if (signup && !req.user) {
+      if (req.modelName === 'admin')
+        throw new ForbiddenError('can not register admin');
+
+      req.user = await this.createUser(req.modelName, {
+        phone: normalizePhone(req.body.user.phone),
+        status: [{ status: UserStatus.NeedVerify }],
+      });
+    }
 
     if (login || signup) {
       // progress
@@ -186,24 +226,35 @@ export class OtpStrategy extends AuthStrategy {
     const user = await this.exportUser(req);
 
     // verify code
-    await this.verify(user.phone, req.body.user.code);
+    const [, newUser] = await this.verify(
+      user,
+      req.body.user.code,
+      req.modelName
+    );
 
     // token
-    const token = signToken(user);
+    const token = signToken(newUser);
     setToCookie(res, token, 'authToken');
 
     return res.json({
       data: {
-        user,
+        user: newUser,
         token,
       },
     });
   }
 
   async signup(req: Req, res: Res, next: NextFunction) {
+    if (req.modelName === 'admin')
+      throw new ForbiddenError('can not register admin');
+
     req.body.user = await this.transformSignup(req.body.user);
 
-    const codeDoc = await this.verify(req.body.user.phone, req.body.user.code);
+    const [codeDoc] = await this.verify(
+      req.body.user.phone,
+      req.body.user.code,
+      req.modelName
+    );
 
     delete req.body.user.code;
 
