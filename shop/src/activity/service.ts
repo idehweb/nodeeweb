@@ -15,7 +15,7 @@ import {
   ActivityType,
   IActivity,
 } from '../../schema/activity.schema';
-import { crudType2ActivityType } from './utils';
+import { convertUser, crudType2ActivityType } from './utils';
 import { ActivityUpdateBody } from '../../dto/in/activity';
 import mongoose from 'mongoose';
 
@@ -159,9 +159,11 @@ class Service {
     }
 
     // save
-    // undoer
+    // undoer or doer
     const update: mongoose.UpdateQuery<ActivityDocument> = {};
-    isDo ? (update.doer = req.user) : (update.undoer = req.user);
+    const key = isDo ? 'doers' : 'undoers';
+    update.$push = { [key]: convertUser(req.user) };
+
     // status
     update.status = body.status;
     const newActivity = await this.activityModel.findOneAndUpdate(
@@ -192,11 +194,7 @@ class Service {
     const depend_on = req.target_before?._id ?? data?._id;
     const entity = new EntityCreator(opt.model);
     const activity: Partial<IActivity> = {
-      doer: {
-        _id: req.user._id,
-        firstName: req.user.firstName,
-        lastName: req.user.lastName,
-      },
+      doers: [convertUser(req.user)],
       status: ActivityStatus.Do,
       depend_on,
       type: crudType2ActivityType(opt.type),

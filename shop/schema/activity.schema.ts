@@ -11,17 +11,16 @@ export enum ActivityStatus {
   Undo = 'undo',
 }
 
+export type ActivityUser = {
+  _id: Types.ObjectId;
+  firstName?: string;
+  lastName?: string;
+  at: Date;
+};
+
 export interface IActivity {
-  doer: {
-    _id: Types.ObjectId;
-    firstName?: string;
-    lastName?: string;
-  };
-  undoer?: {
-    _id: Types.ObjectId;
-    firstName?: string;
-    lastName?: string;
-  };
+  doers: ActivityUser[];
+  undoers: ActivityUser[];
   type: ActivityType;
   status: ActivityStatus;
   depend_on?: any;
@@ -46,20 +45,26 @@ export type ActivityModel = Model<IActivity>;
 
 const schema = new mongoose.Schema(
   {
-    doer: {
-      type: {
-        _id: { type: mongoose.Schema.Types.ObjectId, required: true },
-        firstName: String,
-        lastName: String,
-      },
+    doers: {
+      type: [
+        {
+          _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+          firstName: String,
+          lastName: String,
+          at: Date,
+        },
+      ],
       required: true,
     },
-    undoer: {
-      type: {
-        _id: { type: mongoose.Schema.Types.ObjectId, required: true },
-        firstName: String,
-        lastName: String,
-      },
+    undoers: {
+      type: [
+        {
+          _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+          firstName: String,
+          lastName: String,
+          at: Date,
+        },
+      ],
       required: false,
     },
     type: { type: String, required: true },

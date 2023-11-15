@@ -1,5 +1,6 @@
 import { CRUD } from '@nodeeweb/core';
-import { ActivityType } from '../../schema/activity.schema';
+import { ActivityType, ActivityUser } from '../../schema/activity.schema';
+import { UserDocument } from '@nodeeweb/core/types/user';
 
 export function crudType2ActivityType(status: CRUD) {
   switch (status) {
@@ -13,4 +14,13 @@ export function crudType2ActivityType(status: CRUD) {
     default:
       throw new Error(`invalid crud status: ${status}`);
   }
+}
+
+export function convertUser(user: UserDocument): ActivityUser {
+  return {
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    at: new Date(),
+  };
 }
