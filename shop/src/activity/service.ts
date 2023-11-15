@@ -22,9 +22,10 @@ import {
 } from './utils';
 import { ActivityUpdateBody } from '../../dto/in/activity';
 import mongoose from 'mongoose';
+import { normalizeColName } from '@nodeeweb/core/utils/helpers';
 
 class Service {
-  forbiddenModels = ['order', 'transaction'];
+  forbiddenModels = ['order', 'transaction', 'file'];
   get activityModel(): ActivityModel {
     return store.db.model('activity');
   }
@@ -34,7 +35,7 @@ class Service {
     if (activity.status === newStatus)
       return { can: false, message: 'new status must be deferent' };
 
-    if (this.forbiddenModels.includes(activity.target.model))
+    if (this.forbiddenModels.includes(normalizeColName(activity.target.model)))
       return {
         can: false,
         message: `can not update status for ${activity.target.model} model`,
