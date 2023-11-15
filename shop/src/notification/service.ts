@@ -1,4 +1,4 @@
-import { MiddleWare } from '@nodeeweb/core/types/global';
+import { CRUD, MiddleWare } from '@nodeeweb/core/types/global';
 import store from '../../store';
 import {
   INotification,
@@ -22,6 +22,7 @@ import { UserDocument } from '@nodeeweb/core/types/user';
 import { catchFn } from '@nodeeweb/core/utils/catchAsync';
 import { sendSms } from './sms.service';
 import { SmsSubType } from '@nodeeweb/core/types/config';
+import { getEntityEventName } from '@nodeeweb/core/src/handlers/entity.handler';
 export default class Service {
   constructor() {
     this.init();
@@ -84,7 +85,7 @@ export default class Service {
     });
 
     // save notif
-    await this.notificationModel.updateOne(
+    const newNotif = await this.notificationModel.findOneAndUpdate(
       { _id: notif._id },
       {
         $set: {
@@ -95,7 +96,16 @@ export default class Service {
           },
           status: response.status,
         },
-      }
+      },
+      { new: true }
+    );
+
+    // call event
+    store.event.emit(
+      getEntityEventName('notification', { post: true, type: CRUD.CREATE }),
+      newNotif,
+      { type: CRUD.CREATE, model: 'notification' },
+      req
     );
   };
   private createNotif = async (body: INotification) => {
