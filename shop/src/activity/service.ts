@@ -24,14 +24,29 @@ import { ActivityUpdateBody } from '../../dto/in/activity';
 import mongoose from 'mongoose';
 
 class Service {
+  forbiddenModels = ['order', 'transaction'];
   get activityModel(): ActivityModel {
     return store.db.model('activity');
   }
 
-  private async canUndo(activity: ActivityDocument) {
+  private generalCan(activity: ActivityDocument, newStatus: ActivityStatus) {
     // same status
-    if (activity.status === ActivityStatus.Undo)
+    if (activity.status === newStatus)
       return { can: false, message: 'new status must be deferent' };
+
+    if (this.forbiddenModels.includes(activity.target.model))
+      return {
+        can: false,
+        message: `can not update status for ${activity.target.model} model`,
+      };
+
+    return { can: true };
+  }
+
+  private async canUndo(activity: ActivityDocument) {
+    //  general
+    const gen = this.generalCan(activity, ActivityStatus.Undo);
+    if (!gen.can) return gen;
 
     // not depend to any things
     if (!activity.depend_on) return { can: true };
@@ -57,9 +72,9 @@ class Service {
   }
 
   private async canDo(activity: ActivityDocument) {
-    // same status
-    if (activity.status === ActivityStatus.Do)
-      return { can: false, message: 'new status must be deferent' };
+    //  general
+    const gen = this.generalCan(activity, ActivityStatus.Do);
+    if (!gen.can) return gen;
 
     // not depend to any things
     if (!activity.depend_on) return { can: true };
