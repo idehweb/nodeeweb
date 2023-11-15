@@ -1,11 +1,11 @@
 import { MiddleWare, Req } from '@nodeeweb/core/types/global';
 import store from '@nodeeweb/core/store';
-import { show, submitAction } from '../common/mustImplement';
+import { show } from '../common/mustImplement';
 import { SortValues, isObjectIdOrHexString } from 'mongoose';
 import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
 import { CreateProductBody } from '../../dto/in/product';
 import { BadRequestError, NotFound } from '@nodeeweb/core';
-import { FileDocument, FileModel } from '../../schema/file.schema';
+import { FileModel } from '../../schema/file.schema';
 
 export default class Service {
   static get fileModel(): FileModel {
@@ -365,21 +365,6 @@ export default class Service {
     return body;
   };
 
-  static createAfter: MiddleWare = async (req, res) => {
-    const product = req[CRUD_DEFAULT_REQ_KEY];
-    delete req.body.views;
-    const action = {
-      user: req.user._id,
-      title: 'create product ' + product._id,
-      action: 'create-product',
-      data: product,
-      history: req.body,
-      product: product._id,
-    };
-    submitAction(action);
-    res.status(201).json({ data: product });
-  };
-
   static updateBodyParser = async (req: Req) => {
     let body = req.body;
     if (req.body.slug) {
@@ -430,33 +415,6 @@ export default class Service {
       } else if (!body.thumbnail) body['thumbnail'] = files[0].url;
     }
     return body;
-  };
-
-  static updateAfter: MiddleWare = async (req, res) => {
-    const product = req[CRUD_DEFAULT_REQ_KEY];
-    delete req.body.views;
-    const action = {
-      user: req.user._id,
-      title: 'edit product ' + product._id,
-      action: 'edit-product',
-      data: product,
-      history: req.body,
-      product: product._id,
-    };
-    submitAction(action);
-    res.status(200).json({ data: product });
-  };
-  static deleteAfter: MiddleWare = async (req, res) => {
-    const product = req[CRUD_DEFAULT_REQ_KEY];
-    const action = {
-      user: req.user._id,
-      title: 'delete product ' + product._id,
-      action: 'delete-product',
-      history: product,
-      product: product._id,
-    };
-    submitAction(action);
-    return res.status(204).send();
   };
 
   static rewriteProducts: MiddleWare = async (req, res) => {
