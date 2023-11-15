@@ -15,7 +15,11 @@ import {
   ActivityType,
   IActivity,
 } from '../../schema/activity.schema';
-import { convertUser, crudType2ActivityType } from './utils';
+import {
+  convertUser,
+  crudType2ActivityType,
+  getActivityEventName,
+} from './utils';
 import { ActivityUpdateBody } from '../../dto/in/activity';
 import mongoose from 'mongoose';
 
@@ -163,7 +167,6 @@ class Service {
     const update: mongoose.UpdateQuery<ActivityDocument> = {};
     const key = isDo ? 'doers' : 'undoers';
     update.$push = { [key]: convertUser(req.user) };
-
     // status
     update.status = body.status;
     const newActivity = await this.activityModel.findOneAndUpdate(
@@ -171,6 +174,20 @@ class Service {
       update,
       { new: true }
     );
+
+    // event
+    const events = [
+      getActivityEventName({
+        type: newActivity.type,
+        status: newActivity.status,
+        model: activity.target.model,
+      }),
+      getActivityEventName({
+        type: newActivity.type,
+        status: newActivity.status,
+      }),
+    ];
+    events.forEach((ev) => store.event.emit(ev, newActivity, activity, req));
 
     // present
     return res.status(200).json({ data: newActivity });
