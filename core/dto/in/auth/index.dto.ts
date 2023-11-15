@@ -12,6 +12,7 @@ import {
   Length,
   ValidateNested,
 } from 'class-validator';
+import { normalizePhone } from '../../../utils/helpers';
 
 export enum AuthUserType {
   Customer = 'customer',
@@ -76,11 +77,13 @@ export class UserPassUserSignup {
 export class OtpUserDetect {
   @Expose()
   @IsMobilePhone('fa-IR')
+  @Transform(({ value }) => normalizePhone(value))
   phone: string;
 }
 export class OtpUserLogin {
   @Expose()
   @IsMobilePhone('fa-IR')
+  @Transform(({ value }) => normalizePhone(value))
   phone: string;
 
   @Expose()
@@ -89,6 +92,7 @@ export class OtpUserLogin {
 }
 export class OtpUserSignup {
   @Expose()
+  @Transform(({ value }) => normalizePhone(value))
   @IsMobilePhone('fa-IR')
   phone: string;
 
