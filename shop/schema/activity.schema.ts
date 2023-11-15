@@ -24,7 +24,6 @@ export interface IActivity {
   };
   type: ActivityType;
   status: ActivityStatus;
-  model: string;
   depend_on?: any;
   query: {
     filter?: mongoose.FilterQuery<any>;
@@ -32,8 +31,9 @@ export interface IActivity {
     create?: any;
   };
   target: {
+    model: string;
     before?: any;
-    after: any;
+    after?: any;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -64,7 +64,6 @@ const schema = new mongoose.Schema(
     },
     type: { type: String, required: true },
     depend_on: { type: mongoose.Schema.Types.Mixed },
-    model: { type: String, required: true },
     status: { type: String, required: true },
     query: {
       filter: { type: {} },
@@ -72,8 +71,9 @@ const schema = new mongoose.Schema(
       create: { type: {} },
     },
     target: {
+      model: { type: String, required: true },
       before: { type: {} },
-      after: { type: {}, required: true },
+      after: { type: {} },
     },
   },
   { timestamps: true }
