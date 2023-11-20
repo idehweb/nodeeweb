@@ -11,7 +11,7 @@ import _ from 'lodash';
 import { USE_ENV } from '../../types/global';
 import store from '../../store';
 import logger from '../handlers/log.handler';
-import { isExistsSync } from '../../utils/helpers';
+import { isExist, isExistsSync } from '../../utils/helpers';
 import exec from '../../utils/exec';
 import { color } from '../../utils/color';
 import { APP_INFO, CORE_NODE_MODULE_PATH_RELATIVE } from '../../utils/package';
@@ -23,7 +23,7 @@ export default async function prepare() {
   // create directories
   createSharedDir();
   createPublicDir();
-  createPublicMediaFolder();
+  createStaticFilesDir();
 
   // copy public files
   await copyPublicFiles('admin');
@@ -31,6 +31,9 @@ export default async function prepare() {
 
   // copy static dirs
   await copyStaticFiles('schema');
+
+  // link
+  await linkIndex();
 }
 
 async function installRequirements() {
@@ -66,7 +69,7 @@ function createPublicDir() {
     fs.mkdirSync(getPublicDir('.', true)[0]);
 }
 
-function createPublicMediaFolder() {
+function createStaticFilesDir() {
   const [filesPath] = getPublicDir('files', true);
   const files_customerPath = path.join(filesPath, 'customer');
   const files_siteSettingPath = path.join(filesPath, 'site_setting');
@@ -99,6 +102,15 @@ function createPublicMediaFolder() {
       });
     });
   }
+}
+
+async function linkIndex() {
+  const source = getPublicDir('front/index.html', true)[0];
+  const target = getPublicDir('files/index.html', true)[0];
+
+  if (await isExist(target)) return;
+
+  await fs.promises.symlink(source, target, 'file');
 }
 
 async function copyStaticFiles(name: string) {
