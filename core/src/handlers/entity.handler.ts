@@ -437,9 +437,9 @@ function translateCRUD2Method(name: CRUD): ControllerSchema['method'] {
       throw new Error(`Invalid CRUD name : ${name}`);
   }
 }
-function translateCRUD2Url(
+export function translateCRUD2Url(
   name: CRUD,
-  opt: CRUDCreatorOpt
+  opt: Pick<CRUDCreatorOpt, 'paramFields'>
 ): ControllerSchema['url'] {
   switch (name) {
     case CRUD.GET_COUNT:
