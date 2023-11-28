@@ -21,10 +21,11 @@ import {
   crudType2ActivityType,
   getActivityEventName,
 } from './utils';
-import { ActivityUpdateBody } from '../../dto/in/activity';
+import { ActivityBody } from '../../dto/in/activity';
 import mongoose from 'mongoose';
 import { normalizeColName } from '@nodeeweb/core/utils/helpers';
 
+type DoResponse = { targetAfter?: any; query: IActivity['query'] };
 class Service {
   forbiddenModels = ['order', 'transaction', 'file'];
   get activityModel(): ActivityModel {
@@ -101,61 +102,68 @@ class Service {
     };
   }
 
-  private async undoCreate(activity: ActivityDocument) {
+  private async undoCreate(activity: ActivityDocument): Promise<DoResponse> {
     const model = store.db.model(activity.target.model);
-    await model.deleteOne({ _id: activity.target.after._id });
-    return;
+    const filter = { _id: activity.target.after._id };
+    await model.deleteOne(filter);
+    return { query: { filter } };
   }
-  private async doCreate(activity: ActivityDocument) {
+  private async doCreate(activity: ActivityDocument): Promise<DoResponse> {
     const model = store.db.model(activity.target.model);
-    await model.create(activity.target.after);
-    return;
-  }
-
-  private async undoUpdate(activity: ActivityDocument) {
-    const model = store.db.model(activity.target.model);
-    await model.updateOne(
-      { _id: activity.target.after._id },
-      activity.target.before ?? {}
-    );
-    return;
-  }
-  private async doUpdate(activity: ActivityDocument) {
-    const model = store.db.model(activity.target.model);
-    await model.updateOne(
-      { _id: activity.target.after._id },
-      activity.target.after
-    );
-    return;
+    const targetAfter = await model.create(activity.target.after);
+    return { targetAfter, query: { create: activity.target.after } };
   }
 
-  private async undoDelete(activity: ActivityDocument) {
+  private async undoUpdate(activity: ActivityDocument): Promise<DoResponse> {
     const model = store.db.model(activity.target.model);
-
-    // update
-    if (activity.target.after) await this.undoUpdate(activity);
-    // delete
-    else if (activity.target.before) await model.create(activity.target.before);
-
-    return;
+    const filter = { _id: activity.target.after._id };
+    const update = activity.target.before ?? {};
+    const targetAfter = await model.findOneAndUpdate(filter, update, {
+      new: true,
+    });
+    return { targetAfter, query: { filter, update } };
   }
-  private async doDelete(activity: ActivityDocument) {
+  private async doUpdate(activity: ActivityDocument): Promise<DoResponse> {
+    const model = store.db.model(activity.target.model);
+    const filter = { _id: activity.target.after._id };
+    const update = activity.target.after ?? {};
+    const targetAfter = await model.findOneAndUpdate(filter, update, {
+      new: true,
+    });
+    return { targetAfter, query: { filter, update } };
+  }
+
+  private async undoDelete(activity: ActivityDocument): Promise<DoResponse> {
     const model = store.db.model(activity.target.model);
 
     // update
-    if (activity.target.after) await this.doUpdate(activity);
+    if (activity.target.after) return await this.undoUpdate(activity);
     // delete
     else if (activity.target.before)
-      await model.deleteOne({ _id: activity.target.before._id });
+      return await model.create(activity.target.before);
 
     return;
   }
+  private async doDelete(activity: ActivityDocument): Promise<DoResponse> {
+    const model = store.db.model(activity.target.model);
 
-  update: MiddleWare = async (req, res, next) => {
-    const body: ActivityUpdateBody = req.body;
+    // update
+    if (activity.target.after) return await this.doUpdate(activity);
+    // delete
+    else if (activity.target.before) {
+      const filter = { _id: activity.target.before._id };
+      await model.deleteOne(filter);
+      return { query: { filter } };
+    }
+
+    throw new Error('can not do delete because there is not exist any target');
+  }
+
+  act: MiddleWare = async (req, res, next) => {
+    const body: ActivityBody = req.body;
 
     // find
-    const activity = await this.activityModel.findById(req.params.id);
+    const activity = await this.activityModel.findById(body.id);
     if (!activity) throw new NotFound('not found activity');
     const isDo = body.status === ActivityStatus.Do;
 
@@ -166,48 +174,60 @@ class Service {
     if (!can) throw new BadRequestError(message);
 
     // action
+    let response: DoResponse;
+
     switch (activity.type) {
       case ActivityType.Create:
-        isDo ? await this.doCreate(activity) : await this.undoCreate(activity);
+        response = isDo
+          ? await this.doCreate(activity)
+          : await this.undoCreate(activity);
         break;
       case ActivityType.Update:
-        isDo ? await this.doUpdate(activity) : await this.undoUpdate(activity);
+        response = isDo
+          ? await this.doUpdate(activity)
+          : await this.undoUpdate(activity);
 
         break;
       case ActivityType.Delete:
-        isDo ? await this.doDelete(activity) : await this.undoDelete(activity);
+        response = isDo
+          ? await this.doDelete(activity)
+          : await this.undoDelete(activity);
         break;
     }
 
     // save
-    // undoer or doer
-    const update: mongoose.UpdateQuery<ActivityDocument> = {};
-    const key = isDo ? 'doers' : 'undoers';
-    update.$push = { [key]: convertUser(req.user) };
-    // status
-    update.status = body.status;
-    const newActivity = await this.activityModel.findOneAndUpdate(
-      { _id: activity._id },
-      update,
-      { new: true }
-    );
+    const doer = convertUser(req.user);
+    const newActivity: Partial<IActivity> = {
+      doer,
+      status: body.status,
+      depend_on: activity.depend_on,
+      type: activity.type,
+      target: {
+        model: activity.target.model,
+        after: response.targetAfter,
+        before: activity.target.after,
+      },
+      query: response.query,
+      from: ActivityFrom.Activity,
+    };
+    const newActDoc = await this.activityModel.create(newActivity);
 
     // event
     const events = [
       getActivityEventName({
-        type: newActivity.type,
-        status: newActivity.status,
+        type: newActDoc.type,
+        status: newActDoc.status,
         model: activity.target.model,
       }),
       getActivityEventName({
-        type: newActivity.type,
-        status: newActivity.status,
+        type: newActDoc.type,
+        status: newActDoc.status,
       }),
     ];
-    events.forEach((ev) => store.event.emit(ev, newActivity, activity, req));
+    events.forEach((ev) => store.event.emit(ev, newActDoc, activity, req));
 
     // present
-    return res.status(200).json({ data: newActivity });
+    return res.status(200).json({ data: newActDoc });
   };
   pre = async (opt: CRUDCreatorOpt, req: Req) => {
     switch (opt.type) {
@@ -228,7 +248,7 @@ class Service {
     const depend_on = req.target_before?._id ?? data?._id;
     const entity = new EntityCreator(opt.model);
     const activity: Partial<IActivity> = {
-      doers: [convertUser(req.user)],
+      doer: convertUser(req.user),
       status: ActivityStatus.Do,
       depend_on,
       type: crudType2ActivityType(opt.type),

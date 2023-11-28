@@ -20,12 +20,10 @@ export type ActivityUser = {
   _id: Types.ObjectId;
   firstName?: string;
   lastName?: string;
-  at: Date;
 };
 
 export interface IActivity {
-  doers: ActivityUser[];
-  undoers: ActivityUser[];
+  doer: ActivityUser;
   type: ActivityType;
   status: ActivityStatus;
   depend_on?: any;
@@ -51,27 +49,13 @@ export type ActivityModel = Model<IActivity>;
 
 const schema = new mongoose.Schema(
   {
-    doers: {
-      type: [
-        {
-          _id: { type: mongoose.Schema.Types.ObjectId, required: true },
-          firstName: String,
-          lastName: String,
-          at: Date,
-        },
-      ],
+    doer: {
+      type: {
+        _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+        firstName: String,
+        lastName: String,
+      },
       required: true,
-    },
-    undoers: {
-      type: [
-        {
-          _id: { type: mongoose.Schema.Types.ObjectId, required: true },
-          firstName: String,
-          lastName: String,
-          at: Date,
-        },
-      ],
-      required: false,
     },
     type: { type: String, required: true },
     depend_on: { type: mongoose.Schema.Types.Mixed },
