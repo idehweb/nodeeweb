@@ -10,6 +10,7 @@ import {
 import store from '../../store';
 import {
   ActivityDocument,
+  ActivityFrom,
   ActivityModel,
   ActivityStatus,
   ActivityType,
@@ -237,6 +238,7 @@ class Service {
         before: req.target_before,
       },
       query: {},
+      from: ActivityFrom.EntityCrud,
     };
 
     if (opt.type === CRUD.DELETE_ONE && opt.forceDelete)

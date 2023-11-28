@@ -1,5 +1,10 @@
 import mongoose, { Document, Model, Types } from 'mongoose';
 
+export enum ActivityFrom {
+  EntityCrud = 'entity-crud',
+  Activity = 'activity',
+}
+
 export enum ActivityType {
   Update = 'update',
   Create = 'create',
@@ -34,6 +39,7 @@ export interface IActivity {
     before?: any;
     after?: any;
   };
+  from: ActivityFrom;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -80,6 +86,7 @@ const schema = new mongoose.Schema(
       before: { type: {} },
       after: { type: {} },
     },
+    from: { type: String, required: true },
   },
   { timestamps: true }
 );
