@@ -20,13 +20,9 @@ export default function registerController() {
       getOne: {
         controller: {
           access: OptUserAccess,
-          service: Service.getOneAfter,
         },
         crud: {
-          parseFilter: Service.getOneFilterParser,
-          paramFields: {
-            id: 'page',
-          },
+          parseFilter: Service.getOneFilter,
         },
       },
       getAll: {
