@@ -38,6 +38,7 @@ export interface IActivity {
     after?: any;
   };
   from: ActivityFrom;
+  ref?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -71,6 +72,7 @@ const schema = new mongoose.Schema(
       after: { type: {} },
     },
     from: { type: String, required: true },
+    ref: { type: mongoose.Schema.Types.ObjectId },
   },
   { timestamps: true }
 );
