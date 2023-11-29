@@ -1,5 +1,10 @@
 import mongoose, { Document, Model, Types } from 'mongoose';
 
+export enum ActivityFrom {
+  EntityCrud = 'entity-crud',
+  Activity = 'activity',
+}
+
 export enum ActivityType {
   Update = 'update',
   Create = 'create',
@@ -15,12 +20,10 @@ export type ActivityUser = {
   _id: Types.ObjectId;
   firstName?: string;
   lastName?: string;
-  at: Date;
 };
 
 export interface IActivity {
-  doers: ActivityUser[];
-  undoers: ActivityUser[];
+  doer: ActivityUser;
   type: ActivityType;
   status: ActivityStatus;
   depend_on?: any;
@@ -34,6 +37,8 @@ export interface IActivity {
     before?: any;
     after?: any;
   };
+  from: ActivityFrom;
+  ref?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,27 +50,13 @@ export type ActivityModel = Model<IActivity>;
 
 const schema = new mongoose.Schema(
   {
-    doers: {
-      type: [
-        {
-          _id: { type: mongoose.Schema.Types.ObjectId, required: true },
-          firstName: String,
-          lastName: String,
-          at: Date,
-        },
-      ],
+    doer: {
+      type: {
+        _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+        firstName: String,
+        lastName: String,
+      },
       required: true,
-    },
-    undoers: {
-      type: [
-        {
-          _id: { type: mongoose.Schema.Types.ObjectId, required: true },
-          firstName: String,
-          lastName: String,
-          at: Date,
-        },
-      ],
-      required: false,
     },
     type: { type: String, required: true },
     depend_on: { type: mongoose.Schema.Types.Mixed },
@@ -80,6 +71,8 @@ const schema = new mongoose.Schema(
       before: { type: {} },
       after: { type: {} },
     },
+    from: { type: String, required: true },
+    ref: { type: mongoose.Schema.Types.ObjectId },
   },
   { timestamps: true }
 );
