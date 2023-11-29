@@ -18,10 +18,15 @@ class MarketService {
   }
 
   getAll: MiddleWare = async (req, res) => {
+    let { limit = 10, offset = 0 } = req.params;
+    limit = +limit;
+    offset = +offset;
+
     // path
-    const pluginsConfigPath = (
-      await fs.promises.readdir(getPluginMarketPath())
-    ).map((slug) => getPluginMarketPath(slug, 'config.json'));
+    const pluginsConfigPath = (await fs.promises.readdir(getPluginMarketPath()))
+      .sort()
+      .slice(offset, offset + limit)
+      .map((slug) => getPluginMarketPath(slug, 'config.json'));
 
     // resolve
     const configs = await Promise.all(
@@ -40,6 +45,13 @@ class MarketService {
         type: conf.type,
       })),
     });
+  };
+  getCount: MiddleWare = async (req, res) => {
+    // path
+    const pluginsConfigPath = await fs.promises.readdir(getPluginMarketPath());
+
+    // serve
+    return res.status(200).json({ data: pluginsConfigPath.length });
   };
   getOne: MiddleWare = async (req, res) => {
     // resolve
