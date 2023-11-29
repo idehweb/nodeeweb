@@ -230,6 +230,25 @@ jobs:
             tag=(`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`)
             sudo /update-service.sh $tag "$SERVICE_NAME"
 
+      - name: 'Update Instance Manager And German nwi'
+        if: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
+        uses: appleboy/ssh-action@v1.0.0
+        env:
+          IM_TOKEN: ${{secrets.IM_TOKEN}}
+          USER_PASS: ${{secrets.GERMAN_FTP_PASS}}
+        with:
+          host: ${{secrets.GERMAN_HOST}}
+          username: ${{secrets.GERMAN_FTP_USER}}
+          password: ${{secrets.GERMAN_FTP_PASS}}
+          envs: IM_TOKEN,USER_PASS
+          script_stop: true
+          script: |
+            echo $USER_PASS | sudo -S chmod 755 /tmp/img/nodeeweb-image.tar
+            out=`sudo docker image load -i /tmp/img/nodeeweb-image.tar -q`
+            tag=(`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`)
+            sudo /update-im.sh $tag $tag
+            sudo /update-nwi.sh $tag
+
       - name: 'Upload Image on Iran server'
         if: ${{steps.metadata.outputs.IRAN_SERVICE_NAME}}
         uses: appleboy/ssh-action@v1.0.0
@@ -266,6 +285,23 @@ jobs:
             out=`sudo docker image load -i /tmp/img/nodeeweb-image.tar -q`
             tag=(`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`)
             sudo /update-service.sh $tag "$SERVICE_NAME"
+
+      - name: 'Update Iran nwi'
+        if: ${{steps.metadata.outputs.IRAN_SERVICE_NAME}}
+        uses: appleboy/ssh-action@v1.0.0
+        env:
+          USER_PASS: ${{secrets.IRAN_FTP_PASS}}
+        with:
+          host: ${{secrets.IRAN_HOST}}
+          username: ${{secrets.IRAN_FTP_USER}}
+          password: ${{secrets.IRAN_FTP_PASS}}
+          envs: USER_PASS
+          script_stop: true
+          script: |
+            echo $USER_PASS | sudo -S chmod 755 /tmp/img/nodeeweb-image.tar
+            out=`sudo docker image load -i /tmp/img/nodeeweb-image.tar -q`
+            tag=(`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`)
+            sudo /update-nwi.sh $tag
 
   cleanup:
     name: Cleanup actions

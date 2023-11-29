@@ -18,23 +18,20 @@ curl -fk --location 'http://127.0.0.1:2760/api/v1/image' \
     \"name\" : \"${image_name}\",
     \"image\" : \"${image_tag}\"
 }" || exit 1
-
 echo "update api"
 
 # Update Env
 env_path="/deploy/instance-manager/.env.local"
-envs=$(cat $env_path)
-env_arr=(${envs//$'\n'/ })
+env_arr=$(cat $env_path)
 echo "" > $env_path
 for kv in ${env_arr[@]}
 do
-replaced_kv=$(echo $kv | sed -r "s/INSTANCE_DEFAULT_IMAGE=.+/INSTANCE_DEFAULT_IMAGE=\"$image_tag\"/g")
-echo "$replaced_kv" >> $env_path
+    replaced_kv=$(echo $kv | sed -r "s/INSTANCE_DEFAULT_IMAGE=.+/INSTANCE_DEFAULT_IMAGE=\"$image_tag\"/g")
+    echo "$replaced_kv" >> $env_path
 done;
 echo "update env file"
 
 
 # Update compose
 cd /deploy/instance-manager && ./compose.sh -d
-
 echo "update compose file"
