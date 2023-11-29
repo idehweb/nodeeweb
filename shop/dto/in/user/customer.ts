@@ -69,7 +69,7 @@ export class CreateCustomerBody {
   @Expose()
   @IsOptional()
   @IsString()
-  @Length(11, 11)
+  @Length(10, 10)
   internationalCode?: string;
 
   @Expose()
@@ -152,7 +152,7 @@ export class UpdateCustomerBody {
   @Expose()
   @IsOptional()
   @IsString()
-  @Length(11, 11)
+  @Length(10, 10)
   internationalCode?: string;
 
   @Expose()
