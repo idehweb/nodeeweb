@@ -24,6 +24,7 @@ on:
         default: dev.shop
         type: choice
         options:
+          - instance-manager
           - shop
           - dev.shop
           - nodeeweb.com
@@ -191,13 +192,22 @@ jobs:
             exit 0
           fi
 
+          if [ $input == 'instance-manager' ]
+          then
+            echo "GERMAN_IM=true" >> $GITHUB_OUTPUT
+            echo "IRAN_IM=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           if [[ $GITHUB_REF_NAME == *dev ]]
           then 
             echo "IRAN_SERVICE_NAME=nwi-dev" >> $GITHUB_OUTPUT
             echo "GERMAN_SERVICE_NAME=nwi-dev2 nwi-dev-shop" >> $GITHUB_OUTPUT
-          else 
+            else 
             echo "IRAN_SERVICE_NAME=nwi-fa" >> $GITHUB_OUTPUT
             echo "GERMAN_SERVICE_NAME=nodeeweb_nodeeweb-server nwi-shop" >> $GITHUB_OUTPUT
+            echo "GERMAN_IM=true" >> $GITHUB_OUTPUT
+            echo "IRAN_IM=true" >> $GITHUB_OUTPUT
           fi
         shell: bash
 
@@ -231,7 +241,7 @@ jobs:
             sudo /update-service.sh $tag "$SERVICE_NAME"
 
       - name: 'Update Instance Manager And German nwi'
-        if: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
+        if: ${{steps.metadata.outputs.GERMAN_IM}}
         uses: appleboy/ssh-action@v1.0.0
         env:
           IM_TOKEN: ${{secrets.IM_TOKEN}}
@@ -287,7 +297,7 @@ jobs:
             sudo /update-service.sh $tag "$SERVICE_NAME"
 
       - name: 'Update Iran nwi'
-        if: ${{steps.metadata.outputs.IRAN_SERVICE_NAME}}
+        if: ${{steps.metadata.outputs.IRAN_IM}}
         uses: appleboy/ssh-action@v1.0.0
         env:
           USER_PASS: ${{secrets.IRAN_FTP_PASS}}
