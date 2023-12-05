@@ -6,7 +6,7 @@ set -e
 
 image_name=${1:-$IMAGE_TAG}
 image_tag=${2:-$IMAGE_TAG}
-im_token=${IM_TOKEN}
+im_token=${3:-$IM_TOKEN}
 
 echo "received $image_tag"
 
