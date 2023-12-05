@@ -256,7 +256,7 @@ jobs:
             echo $USER_PASS | sudo -S chmod 755 /tmp/img/nodeeweb-image.tar
             out=`sudo docker image load -i /tmp/img/nodeeweb-image.tar -q`
             tag=(`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`)
-            sudo /update-im.sh $tag $tag
+            sudo /update-im.sh $tag $tag $IM_TOKEN
             sudo /update-nwi.sh $tag
 
       - name: 'Upload Image on Iran server'
