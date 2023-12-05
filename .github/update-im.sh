@@ -2,7 +2,7 @@
 
 set -e
 
-# ./update-im.sh {name} {tag}
+# ./update-im.sh {name} {tag} {im token}
 
 image_name=${1:-$IMAGE_TAG}
 image_tag=${2:-$IMAGE_TAG}
