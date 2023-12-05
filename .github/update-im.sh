@@ -22,13 +22,7 @@ echo "update api"
 
 # Update Env
 env_path="/deploy/instance-manager/.env.local"
-env_arr=$(cat $env_path)
-echo "" > $env_path
-for kv in ${env_arr[@]}
-do
-    replaced_kv=$(echo $kv | sed -r "s/INSTANCE_DEFAULT_IMAGE=.+/INSTANCE_DEFAULT_IMAGE=\"$image_tag\"/g")
-    echo "$replaced_kv" >> $env_path
-done;
+node /update-env.js $env_path INSTANCE_DEFAULT_IMAGE $image_tag 
 echo "update env file"
 
 
