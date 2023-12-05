@@ -1,5 +1,5 @@
+import crypto from 'crypto';
 import mongoose, { Document, Model, Types } from 'mongoose';
-
 export interface ISystemNotif {
   message: string;
   type: string;
@@ -8,11 +8,12 @@ export interface ISystemNotif {
   createdAt: Date;
 }
 export type SystemNotifModel = Model<ISystemNotif>;
-export type SystemNotifDocument = Document<Types.ObjectId, {}, ISystemNotif> &
+export type SystemNotifDocument = Document<string, {}, ISystemNotif> &
   ISystemNotif;
 
 const schema = new mongoose.Schema(
   {
+    _id: { type: String, default: crypto.randomUUID },
     message: { type: String, required: true },
     type: {
       type: String,

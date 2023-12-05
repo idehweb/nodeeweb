@@ -7,7 +7,7 @@ export const catchFn = <F extends Function>(
   fn: F,
   {
     self,
-    onError,
+    onError = self?.onError,
   }: {
     self?: any;
     onError?: Function;
