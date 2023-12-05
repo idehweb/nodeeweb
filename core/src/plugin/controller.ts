@@ -22,19 +22,6 @@ export function registerPluginControllers() {
   controllersBatchRegister(
     [
       {
-        method: 'get',
-        service: marketService.getAll,
-        url: '/market',
-        access: AdminAccess,
-      },
-      {
-        method: 'get',
-        service: marketService.getOne,
-        url: '/market/:slug',
-        access: AdminAccess,
-        validate: { dto: CrudParamDto, reqPath: 'params' },
-      },
-      {
         method: 'post',
         service: localService.install,
         url: '/local/install/:slug',
@@ -69,7 +56,54 @@ export function registerPluginControllers() {
     opt
   );
 
-  //   plugin crud
+  // plugin market crud
+  registerEntityCRUD(
+    'plugin',
+    {
+      getAll: {
+        controller: {
+          access: AdminAccess,
+          service: marketService.getAll,
+        },
+        crud: {
+          executeQuery: false,
+          saveToReq: true,
+          autoSetCount: false,
+          paramFields: {
+            offset: 'offset',
+            limit: 'limit',
+          },
+        },
+      },
+      getCount: {
+        controller: {
+          access: AdminAccess,
+          service: marketService.getCount,
+        },
+        crud: {
+          executeQuery: false,
+          saveToReq: true,
+        },
+      },
+      getOne: {
+        controller: {
+          service: marketService.getOne,
+          access: AdminAccess,
+          validate: { dto: CrudParamDto, reqPath: 'params' },
+        },
+        crud: {
+          executeQuery: false,
+          saveToReq: true,
+          paramFields: {
+            slug: 'slug',
+          },
+        },
+      },
+    },
+    { base_url: `${opt.base_url}/market` }
+  );
+
+  //   plugin local crud
   registerEntityCRUD(
     'plugin',
     {
@@ -84,6 +118,13 @@ export function registerPluginControllers() {
             limit: 'limit',
             offset: 'offset',
           },
+        },
+      },
+
+      // get count
+      getCount: {
+        controller: {
+          access: AdminAccess,
         },
       },
 

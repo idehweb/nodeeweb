@@ -74,7 +74,7 @@ const schema = new mongoose.Schema(
     extra: { type: String },
     source: { type: String, enum: CustomerSource, default: CustomerSource.Web },
     bankData: {},
-    data: { type: {}, default: {}, select: false },
+    data: { type: {}, default: {} },
     type: {
       type: String,
       required: false,
