@@ -39,7 +39,7 @@ const schema = new mongoose.Schema(
     description: {},
     excerpt: {},
     views: [],
-    slug: { type: String, require: true },
+    slug: { type: String, required: true },
     title: {},
     elements: { type: [] },
     mobileElements: { type: [] },
