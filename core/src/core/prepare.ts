@@ -11,7 +11,12 @@ import _ from 'lodash';
 import { USE_ENV } from '../../types/global';
 import store from '../../store';
 import logger from '../handlers/log.handler';
-import { isExist, isExistsSync } from '../../utils/helpers';
+import {
+  isExist,
+  isExistsSync,
+  satisfyExistence,
+  satisfyExistenceSync,
+} from '../../utils/helpers';
 import exec from '../../utils/exec';
 import { color } from '../../utils/color';
 import { APP_INFO, CORE_NODE_MODULE_PATH_RELATIVE } from '../../utils/package';
@@ -26,8 +31,8 @@ export default async function prepare() {
   createStaticFilesDir();
 
   // copy public files
-  await copyPublicFiles('admin');
-  await copyPublicFiles('front');
+  await copyPublicFiles('admin', ['asset-manifest.json']);
+  await copyPublicFiles('front', ['asset-manifest.json']);
 
   // copy static dirs
   await copyStaticFiles('schema');
@@ -146,12 +151,12 @@ async function copyStaticFiles(name: string) {
   logger.log(name, 'folder:', dirLocalPath);
 }
 
-async function copyPublicFiles(name: string) {
+async function copyPublicFiles(name: string, condFiles: string[] = []) {
   const [dirLocalPath] = getPublicDir(name, true);
   const dirModulePath = getBuildDir(name);
 
   // check if directory exist before
-  if (isExistsSync(dirLocalPath)) {
+  if (satisfyExistenceSync(dirLocalPath, ['.', ...condFiles])) {
     logger.log(name, 'folder:', dirLocalPath, ', existed');
     return;
   }
