@@ -74,6 +74,12 @@ export class EntityCreator {
             req.params[pf.id] &&
             new mongoose.Types.ObjectId(req.params[pf.id]),
           slug: req.params[pf?.slug],
+          $expr: {
+            $or: [
+              { $eq: ['$active', true] },
+              { $eq: ['missing', { $type: '$active' }] },
+            ],
+          },
         };
 
     for (const key in f) {
