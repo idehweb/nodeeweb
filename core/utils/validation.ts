@@ -174,3 +174,26 @@ export function IsSlug(opt?: SlugOpt, validationOptions?: ValidationOptions) {
     });
   };
 }
+
+export function Custom(
+  validation: (value: any) => boolean,
+  validationOptions?: ValidationOptions & { name: string }
+) {
+  return function (object: Object, propertyName: string) {
+    registerDecorator({
+      name: validationOptions.name,
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any) {
+          return validationOptions?.each
+            ? Array.isArray(value)
+              ? value.every(validation)
+              : false
+            : validation(value);
+        },
+      },
+    });
+  };
+}

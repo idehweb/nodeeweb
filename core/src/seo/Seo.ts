@@ -272,15 +272,19 @@ export class SeoCore implements Seo {
     //   return next();
     // }
 
-    const [, slug] = /^\/([^/]+)$/.exec(req.path) ?? [];
-    console.log({ slug });
+    let slug: string;
+
+    console.log(req.path);
+    if (req.path === '/') slug = 'home';
+    else [, slug] = /^\/([^/]+)$/.exec(req.path) ?? [];
+
     if (!slug) {
       // not cover
       return next();
     }
     const page = await this.pageModel.findOne(
       {
-        [isMongoId(slug) ? '_id' : 'slug']: slug,
+        slug,
         active: true,
         status: PublishStatus.Published,
       },

@@ -83,7 +83,7 @@ schema.index(
   {
     name: 'path',
     unique: true,
-    partialFilterExpression: { active: true },
+    partialFilterExpression: { active: true, path: { $exists: true } },
   }
 );
 
