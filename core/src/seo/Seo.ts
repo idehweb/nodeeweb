@@ -273,6 +273,7 @@ export class SeoCore implements Seo {
     // }
 
     const [, slug] = /^\/([^/]+)$/.exec(req.path) ?? [];
+    console.log({ slug });
     if (!slug) {
       // not cover
       return next();

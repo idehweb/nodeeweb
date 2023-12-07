@@ -11,7 +11,8 @@ export const allPathExceptApi = '/:start(?!api)(?!*.[^/]+$):path(*)';
 export function getViewHandler(): [string, MiddleWare] {
   return [
     allPathExceptApi,
-    (_, res) => {
+    (req, res) => {
+      console.log('here', req.path);
       res.sendFile(join(getPublicDir('front', true)[0], 'index.html'));
     },
   ];
