@@ -274,7 +274,8 @@ export class SeoCore implements Seo {
 
     let slug: string;
 
-    console.log(req.path);
+    if (req.path === '/home') throw new NotFound('page not found');
+
     if (req.path === '/') slug = 'home';
     else [, slug] = /^\/([^/]+)$/.exec(req.path) ?? [];
 
