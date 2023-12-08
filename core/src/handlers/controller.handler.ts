@@ -47,47 +47,55 @@ function clearMatchHandler(urls: string[], method: string) {
 
 function insertFirst(url: string, method: string, ...mws: MiddleWare[]) {
   // add flag
-  mws.forEach((mw) => (mw['pop-flag'] = true));
+  mws.forEach((mw) => (mw['hot-flag'] = true));
 
   // insert
   store.app[method](url, ...mws);
-  // pop
-  popHandler((layer) => {
+  // hot handler
+  hotHandler((layer) => {
     // diff path or diff method
     if (url !== layer.route?.path || !layer.route?.methods?.[method]) {
       return false;
     }
 
-    // pop flag
-    if ((layer.route.stack ?? []).some(({ handle }) => handle['pop-flag'])) {
-      layer.route.stack?.forEach(({ handle: h }) => (h['pop-flag'] = false));
-      return false;
+    // hot flag
+    if ((layer.route.stack ?? []).some(({ handle }) => handle['hot-flag'])) {
+      layer.route.stack?.forEach(({ handle: h }) => (h['hot-flag'] = false));
+      return true;
     }
-    return true;
+    return false;
   });
 }
 
-function popHandler(cond: (layer: any) => boolean) {
-  const popLayers: any[] = [];
+function hotHandler(cond: (layer: any) => boolean) {
+  const floatLayers: any[] = [];
 
-  // filter layers
+  // fixed layers
   store.app._router.stack = (store.app._router.stack as any[]).filter(
     (layer) => {
-      if (cond(layer)) {
-        popLayers.push(layer);
+      // always fixed handlers
+      if (layer.handle && store.fixedHandlers.includes(layer.handle)) {
+        return true;
+      }
+
+      // must float
+      if (!cond(layer)) {
+        floatLayers.push(layer);
         return false;
       }
+
       return true;
     }
   );
 
   // push layers
-  store.app._router.stack.push(...popLayers);
+  store.app._router.stack.push(...floatLayers);
 }
 
-function popErrorHandlers() {
-  popHandler((layer) =>
-    Object.values(store.globalMiddleware.error).includes(layer.handle)
+function heavyErrorHandlers() {
+  hotHandler(
+    (layer) =>
+      !Object.values(store.globalMiddleware.error).includes(layer.handle)
   );
 }
 
@@ -144,8 +152,8 @@ export function controllerRegister(
     );
   }
 
-  // pop error handlers
-  popErrorHandlers();
+  // heavy error handlers
+  heavyErrorHandlers();
 }
 
 export function controllersBatchRegister(

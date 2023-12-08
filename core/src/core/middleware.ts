@@ -12,16 +12,16 @@ import { color } from '../../utils/color';
 import { getName } from '../../utils/helpers';
 import { join } from 'path';
 
-export function commonMiddleware(): (
-  | MiddleWare
-  | MiddleWareError
-  | [string, MiddleWare | MiddleWareError]
-)[] {
+export function commonMiddleware(): {
+  mw: (MiddleWare | MiddleWareError | [string, MiddleWare | MiddleWareError])[];
+  fixedHandlers: any[];
+} {
   const mw: (
     | MiddleWare
     | MiddleWareError
     | [string, MiddleWare | MiddleWareError]
   )[] = [];
+  const fixedHandlers = [];
 
   // cors
   mw.push(
@@ -53,6 +53,9 @@ export function commonMiddleware(): (
 
   mw.push(cookieParser());
 
+  // set fixed handlers
+  mw.forEach((mw) => fixedHandlers.push(mw));
+
   if (
     store.env.isLoc ||
     (store.env.STATIC_SERVER && store.env.STATIC_SERVER !== 'false')
@@ -62,6 +65,7 @@ export function commonMiddleware(): (
     const frontFolder = getPublicDir('front', true)[0];
 
     const filesStatic = express.static(filesFolder, { maxAge: '1y' });
+
     filesStatic['shadowName'] = `Server-Static / => ${filesFolder}`;
 
     const frontSettingStatic: [string, MiddleWare] = [
@@ -97,15 +101,29 @@ export function commonMiddleware(): (
     mw.push(store.globalMiddleware.error.general);
   }
 
-  return mw;
+  return { mw, fixedHandlers };
 }
 
 export function registerCommonHandlers() {
-  const mw = commonMiddleware();
+  const { mw, fixedHandlers } = commonMiddleware();
   mw.forEach((w) => {
     if (Array.isArray(w)) {
       store.app.use(w[0], w[1]);
-    } else store.app.use(w);
+    } else {
+      store.app.use(w);
+    }
     logger.log(color('Cyan', `## CoreMiddleware Register ${getName(w)} ##`));
   });
+
+  // set fixed handlers
+  setFixedHandlers(fixedHandlers);
+}
+
+function setFixedHandlers(fixedHandlers: any[]) {
+  const expressFixed = (store.app._router.stack.slice(0, 2) as any[]).map(
+    (l) => l.handle
+  );
+  [...expressFixed, ...fixedHandlers].forEach((handle) =>
+    store.fixedHandlers.push(handle)
+  );
 }

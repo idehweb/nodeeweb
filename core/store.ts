@@ -34,6 +34,7 @@ export class Store {
   plugins = new PluginCore();
   config: ConfigType;
   event: EventEmitter;
+  fixedHandlers: any[] = [];
 
   constructor() {
     this.env = { ...process.env } as any;

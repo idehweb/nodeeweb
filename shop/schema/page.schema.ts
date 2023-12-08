@@ -78,6 +78,14 @@ schema.index(
     partialFilterExpression: { active: true },
   }
 );
+schema.index(
+  { path: 1 },
+  {
+    name: 'path',
+    unique: true,
+    partialFilterExpression: { active: true, path: { $exists: true } },
+  }
+);
 
 schema.pre('save', function (next) {
   this.slug = this.slug?.replace(/\s+/g, '-').toLowerCase();
