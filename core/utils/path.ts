@@ -4,6 +4,7 @@ import os from 'os';
 import store from '../store';
 import { USE_ENV } from '../types/global';
 import info, { CORE_NODE_MODULE_PATH, NODE_MODULE_PATH } from './package';
+import { SimpleError } from '../types/error';
 
 export function getPluginTemp(...path: string[]) {
   return getPluginPath('temp', ...path);
@@ -54,8 +55,12 @@ export function getBuildDir(name: string) {
     k.endsWith(`${name}-build`)
   );
   if (!buildName)
-    throw new Error(
-      `not found any build package with name: ${name}-build in dependencies:\n${info.dependencies}`
+    throw new SimpleError(
+      `not found any build package with name: ${name}-build in dependencies:\n${JSON.stringify(
+        info.dependencies,
+        null,
+        ' '
+      )}`
     );
-  return join(CORE_NODE_MODULE_PATH, buildName);
+  return join(NODE_MODULE_PATH, buildName);
 }

@@ -12,6 +12,7 @@ import { USE_ENV } from '../../types/global';
 import store from '../../store';
 import logger from '../handlers/log.handler';
 import {
+  getEnv,
   isExist,
   isExistsSync,
   satisfyExistence,
@@ -19,7 +20,11 @@ import {
 } from '../../utils/helpers';
 import exec from '../../utils/exec';
 import { color } from '../../utils/color';
-import { APP_INFO, CORE_NODE_MODULE_PATH_RELATIVE } from '../../utils/package';
+import packageInfo, {
+  APP_INFO,
+  CORE_NODE_MODULE_PATH_RELATIVE,
+  dispatchPackageInfo,
+} from '../../utils/package';
 
 export default async function prepare() {
   // install requirements
@@ -42,10 +47,13 @@ export default async function prepare() {
 }
 
 async function installRequirements() {
+  await installStatics();
+  await installDeps();
+}
+
+async function installDeps() {
   if (store.env.NOT_INSTALL_REQUIREMENTS || store.env.USE_ENV !== USE_ENV.NPM)
     return;
-
-  const packageInfo = await import(APP_INFO);
 
   const requirements = [
     'mongoose',
@@ -64,6 +72,32 @@ async function installRequirements() {
       .join(' ')}`,
     { logger }
   );
+
+  // dispatch package info
+  dispatchPackageInfo();
+}
+async function installStatics() {
+  const adminVersion = getEnv<string>('admin-version');
+  const frontVersion = getEnv<string>('front-version');
+
+  const packages = [
+    ['@nodeeweb/admin-build', adminVersion],
+    ['@nodeeweb/front-build', frontVersion],
+  ]
+    .filter(([p]) => !packageInfo.dependencies[p])
+    .map(([p, v]) => `${p}${v ? `@${v}` : ''}`);
+
+  // not things to install
+  if (!packages.length) return;
+
+  logger.log(color('Green', `## Install ${packages.join(' , ')} with yarn ##`));
+
+  const cmd = exec(`yarn add ${packages.join(' ')}`, { logger });
+
+  await cmd;
+
+  // dispatch package info
+  dispatchPackageInfo();
 }
 
 function createSharedDir() {

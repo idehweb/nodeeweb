@@ -1,8 +1,17 @@
 import fs from 'fs';
 import { join } from 'path';
 import info from '../package.json';
-export default info;
+
 export const APP_INFO = getRealPath('package.json');
+
+const packageInfo = JSON.parse(fs.readFileSync(APP_INFO, 'utf8'));
+
+export function dispatchPackageInfo() {
+  const newPackage = JSON.parse(fs.readFileSync(APP_INFO, 'utf8'));
+  Object.assign(packageInfo, newPackage);
+}
+
+export default packageInfo;
 export const NODE_MODULE_PATH = getRealPath('node_modules');
 export const CORE_NODE_MODULE_PATH: string = fs.existsSync(
   join(NODE_MODULE_PATH, info.name, 'node_modules')
