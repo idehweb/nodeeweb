@@ -56,6 +56,9 @@ export class Store {
       this.env.MAX_NUM_OF_PROXY === undefined ? 0 : +this.env.MAX_NUM_OF_PROXY;
 
     this.globalMiddleware = { pipes: {}, error: {} };
+
+    if (this.env.ADMIN_VERSION === 'null') delete this.env.ADMIN_VERSION;
+    if (this.env.FRONT_VERSION === 'null') delete this.env.FRONT_VERSION;
   }
 }
 
