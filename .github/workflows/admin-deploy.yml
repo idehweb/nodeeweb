@@ -7,12 +7,11 @@ name: Publish & Deploy admin on npm
 on:
   push:
     branches:
-      # - main
-      # - 'releases/**'
-      # - dev
-      - workflow-static
-    # paths:
-    #   - 'admin/**'
+      - main
+      - 'releases/**'
+      - dev
+    paths:
+      - 'admin/**'
   workflow_dispatch:
     inputs:
       target:
@@ -165,8 +164,6 @@ jobs:
         continue-on-error: false
         run: |
           input=${INPUT_MAN:-'null'}
-          echo "GERMAN_IM=true" >> $GITHUB_OUTPUT  
-          echo "IRAN_IM=true" >> $GITHUB_OUTPUT
           if [ $input == 'shop' ]
           then
             echo "TARGET_PATH=/var/instances/nwi-shop/public/admin/" >> $GITHUB_OUTPUT
