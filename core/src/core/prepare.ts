@@ -84,7 +84,13 @@ async function installStatics() {
     ['@nodeeweb/admin-build', adminVersion],
     ['@nodeeweb/front-build', frontVersion],
   ]
-    .filter(([p]) => !packageInfo.dependencies[p])
+    .filter(
+      ([p, v]) =>
+        // not install yet
+        !packageInfo.dependencies[p] ||
+        // force install and not install exact version
+        (store.env.FORCE_STATIC_MATCH && packageInfo.dependencies[p] !== v)
+    )
     .map(([p, v]) => `${p}${v ? `@${v}` : ''}`);
 
   // not things to install
