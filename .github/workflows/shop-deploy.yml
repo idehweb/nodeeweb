@@ -222,25 +222,7 @@ jobs:
           server-dir: '/tmp/img/'
           timeout: 600000
 
-      - name: 'Update Image and Service on German'
-        if: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
-        uses: appleboy/ssh-action@v1.0.0
-        env:
-          SERVICE_NAME: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
-          USER_PASS: ${{secrets.GERMAN_FTP_PASS}}
-        with:
-          host: ${{secrets.GERMAN_HOST}}
-          username: ${{secrets.GERMAN_FTP_USER}}
-          password: ${{secrets.GERMAN_FTP_PASS}}
-          envs: SERVICE_NAME,USER_PASS
-          script_stop: true
-          script: |
-            echo $USER_PASS | sudo -S chmod 755 /tmp/img/nodeeweb-image.tar
-            out=`sudo docker image load -i /tmp/img/nodeeweb-image.tar -q`
-            tag=(`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`)
-            sudo /update-service.sh $tag "$SERVICE_NAME"
-
-      - name: 'Update Instance Manager And German nwi'
+      - name: 'Update Instances Manager And German nwi'
         if: ${{steps.metadata.outputs.GERMAN_IM}}
         uses: appleboy/ssh-action@v1.0.0
         env:
@@ -258,6 +240,24 @@ jobs:
             tag=(`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`)
             sudo /update-im.sh $tag $tag $IM_TOKEN
             sudo /update-nwi.sh $tag
+
+      - name: 'Update Image and Service on German'
+        if: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
+        uses: appleboy/ssh-action@v1.0.0
+        env:
+          SERVICE_NAME: ${{steps.metadata.outputs.GERMAN_SERVICE_NAME}}
+          USER_PASS: ${{secrets.GERMAN_FTP_PASS}}
+        with:
+          host: ${{secrets.GERMAN_HOST}}
+          username: ${{secrets.GERMAN_FTP_USER}}
+          password: ${{secrets.GERMAN_FTP_PASS}}
+          envs: SERVICE_NAME,USER_PASS
+          script_stop: true
+          script: |
+            echo $USER_PASS | sudo -S chmod 755 /tmp/img/nodeeweb-image.tar
+            out=`sudo docker image load -i /tmp/img/nodeeweb-image.tar -q`
+            tag=(`echo $out | sed -E 's/Loaded image: //ig' | sed -E 's/[,\n].+//ig'`)
+            sudo /update-service.sh $tag "$SERVICE_NAME"
 
       - name: 'Upload Image on Iran server'
         if: ${{steps.metadata.outputs.IRAN_SERVICE_NAME}}
