@@ -85,6 +85,7 @@ export async function validatePlain<C>(
 ) {
   const instance: any = plainToInstance(dto, plain, {
     enableImplicitConversion: true,
+    excludeExtraneousValues: !strict,
   });
 
   const errors = await validate(instance, {

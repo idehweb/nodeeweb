@@ -27,6 +27,7 @@ import registerTemplate from './src/template';
 import initSeo from './src/seo';
 import registerReport from './src/report';
 import registerTransaction from './src/transaction';
+import registerValidation from './src/validation';
 
 async function deployShop() {
   await deployCore();
@@ -34,6 +35,9 @@ async function deployShop() {
 
   // register config
   registerShopConfig();
+
+  // validation
+  registerValidation();
 
   // seo
   initSeo();
