@@ -59,6 +59,14 @@ export class Store {
 
     if (this.env.ADMIN_VERSION === 'null') delete this.env.ADMIN_VERSION;
     if (this.env.FRONT_VERSION === 'null') delete this.env.FRONT_VERSION;
+
+    if (
+      ['null', 'false', undefined, null].includes(
+        this.env.FORCE_STATIC_MATCH as string
+      )
+    )
+      this.env.FORCE_STATIC_MATCH = false;
+    else this.env.FORCE_STATIC_MATCH = true;
   }
 }
 
