@@ -274,7 +274,7 @@ jobs:
           envs: USER_PASS,TARGET_PATH
           script_stop: true
           script: |
-            echo $USER_PASS | sudo /update-nwi-static.sh "front" $TARGET_PATH
+            echo $USER_PASS | sudo -S /update-nwi-static.sh "front" $TARGET_PATH
 
       - name: 'SSH on iran server'
         uses: appleboy/ssh-action@v1.0.0
@@ -306,7 +306,7 @@ jobs:
           envs: USER_PASS,TARGET_PATH
           script_stop: true
           script: |
-            echo $USER_PASS | sudo /update-nwi-static.sh "front" $TARGET_PATH
+            echo $USER_PASS | sudo -S /update-nwi-static.sh "front" $TARGET_PATH
 
   cleanup:
     name: Cleanup actions
