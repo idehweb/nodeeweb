@@ -227,7 +227,7 @@ jobs:
             echo "GERMAN_IM=true" >> $GITHUB_OUTPUT  
             echo "IRAN_IM=true" >> $GITHUB_OUTPUT
             echo "IN_GERMAN=true" >> $GITHUB_OUTPUT  
-            echo "IN_IRAN=false" >> $GITHUB_OUTPUT
+            echo "IN_IRAN=true" >> $GITHUB_OUTPUT
           else 
             echo "TARGET_PATH=/var/instances/nwi-dev-shop/public/front/" >> $GITHUB_OUTPUT
             echo "IN_GERMAN=true" >> $GITHUB_OUTPUT  
