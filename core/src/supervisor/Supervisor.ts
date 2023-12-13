@@ -11,8 +11,14 @@ export default class Supervisor {
   isInitiate: boolean;
   id: string;
   constructor() {
-    this.url = store.config.supervisor?.url || store.env.SUPERVISOR_URL;
-    this.token = store.config.supervisor?.token || store.env.SUPERVISOR_TOKEN;
+    this.url =
+      store.config.supervisor !== null
+        ? store.config.supervisor?.url || store.env.SUPERVISOR_URL
+        : null;
+    this.token =
+      store.config.supervisor !== null
+        ? store.config.supervisor?.token || store.env.SUPERVISOR_TOKEN
+        : null;
     this.isInitiate = this.url && this.token && true;
     this.id = crypto.randomUUID();
   }
