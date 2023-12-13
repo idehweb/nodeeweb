@@ -7,6 +7,7 @@ import bfs from './bfs';
 import { StoreRoute } from '../types/route';
 import { Req } from '../types/global';
 import { networkInterfaces } from 'os';
+import { join } from 'path';
 
 export function page2Route(page: any): StoreRoute {
   return { path: page.path || page.slug };
@@ -87,6 +88,12 @@ export async function isExist(path: string) {
 
 export function isExistsSync(path: string) {
   return fs.existsSync(path);
+}
+
+export async function safeRm(path: string) {
+  try {
+    await fs.promises.rm(path, { recursive: true, force: true });
+  } catch (err) {}
 }
 
 export function isAsync(fn: Function) {
@@ -332,4 +339,24 @@ export function addForwarded(req: Req, ip: string) {
 export function normalizePhone(phone: string) {
   const [, digits] = /(?!^0)(?!^98)(\d{10})$/.exec(phone);
   return `98${digits}`;
+}
+
+export function satisfyExistenceSync(rootPath: string, condFiles: string[]) {
+  const allPaths = condFiles.map((file) => join(rootPath, file));
+
+  for (const path of allPaths) {
+    if (!isExistsSync(path)) return false;
+  }
+
+  return true;
+}
+
+export async function satisfyExistence(rootPath: string, condFiles: string[]) {
+  const allPaths = new Set(condFiles.map((file) => join(rootPath, file)));
+
+  for (const path of allPaths) {
+    if (!(await isExist(path))) return false;
+  }
+
+  return true;
 }

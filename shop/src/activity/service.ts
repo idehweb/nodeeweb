@@ -10,6 +10,7 @@ import {
 import store from '../../store';
 import {
   ActivityDocument,
+  ActivityFrom,
   ActivityModel,
   ActivityStatus,
   ActivityType,
@@ -20,14 +21,67 @@ import {
   crudType2ActivityType,
   getActivityEventName,
 } from './utils';
-import { ActivityUpdateBody } from '../../dto/in/activity';
-import mongoose from 'mongoose';
+import { ActivityBody } from '../../dto/in/activity';
+import mongoose, { Types } from 'mongoose';
 import { normalizeColName } from '@nodeeweb/core/utils/helpers';
+import { UserDocument } from '@nodeeweb/core/types/user';
+
+type DoResponse = { targetAfter?: any; query: IActivity['query'] };
+type FilterAction = {
+  status: ActivityStatus;
+  ref: Types.ObjectId;
+  _id: Types.ObjectId;
+};
 
 class Service {
   forbiddenModels = ['order', 'transaction', 'file'];
   get activityModel(): ActivityModel {
     return store.db.model('activity');
+  }
+
+  private async getHistory({
+    createdAt,
+    depend,
+  }: {
+    depend: any;
+    createdAt: Date;
+  }) {
+    const actions = await this.activityModel
+      .find(
+        {
+          depend_on: depend,
+          createdAt: { $gte: createdAt },
+        },
+        { status: 1, ref: 1 }
+      )
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // reduce
+    const table: { [k: string]: FilterAction } = {};
+    for (const action of actions) {
+      const refId = action.ref?.toString();
+      const myId = action._id.toString();
+
+      // has ref
+      if (refId) {
+        // has original before
+        if (table[refId]) {
+          delete table[refId];
+          continue;
+        }
+        table[refId] = myId as any;
+      }
+      // init before
+      if (table[myId]) {
+        delete table[table[myId] as any];
+        continue;
+      }
+
+      table[myId] = action as any;
+    }
+
+    return Object.values(table).filter((v) => typeof v === 'object');
   }
 
   private generalCan(activity: ActivityDocument, newStatus: ActivityStatus) {
@@ -49,18 +103,33 @@ class Service {
     const gen = this.generalCan(activity, ActivityStatus.Undo);
     if (!gen.can) return gen;
 
+    // get real history
+    const realHistory = await this.getHistory({
+      createdAt: activity.createdAt,
+      depend: activity.depend_on,
+    });
+
+    // split
+    const [myAct, others]: [null | FilterAction, FilterAction[]] =
+      realHistory.reduce(
+        (prev, curr) => {
+          if (curr._id.equals(activity._id)) prev[0] = curr;
+          else prev[1].push(curr);
+          return prev;
+        },
+        [null, []]
+      );
+
+    // exists
+    if (!myAct) return { can: false, message: 'this activity was undo before' };
+
     // not depend to any things
     if (!activity.depend_on) return { can: true };
 
     // list of forward do acts
-    const listOfForwardDos = await this.activityModel
-      .find({
-        _id: { $ne: activity._id },
-        depend_on: activity.depend_on,
-        status: ActivityStatus.Do,
-        createdAt: { $gte: activity.createdAt },
-      })
-      .sort({ createdAt: -1 });
+    const listOfForwardDos = others.filter(
+      ({ status }) => status === ActivityStatus.Do
+    );
 
     if (!listOfForwardDos.length) return { can: true };
     return {
@@ -77,18 +146,33 @@ class Service {
     const gen = this.generalCan(activity, ActivityStatus.Do);
     if (!gen.can) return gen;
 
+    // get real history
+    const realHistory = await this.getHistory({
+      createdAt: activity.createdAt,
+      depend: activity.depend_on,
+    });
+
+    // split
+    const [myAct, others]: [null | FilterAction, FilterAction[]] =
+      realHistory.reduce(
+        (prev, curr) => {
+          if (curr._id.equals(activity._id)) prev[0] = curr;
+          else prev[1].push(curr);
+          return prev;
+        },
+        [null, []]
+      );
+
+    // exists
+    if (!myAct) return { can: false, message: 'this activity was do before' };
+
     // not depend to any things
     if (!activity.depend_on) return { can: true };
 
     // list of backward undo acts
-    const listOfBackwardDos = await this.activityModel
-      .find({
-        _id: { $ne: activity._id },
-        depend_on: activity.depend_on,
-        status: ActivityStatus.Undo,
-        createdAt: { $lte: activity.createdAt },
-      })
-      .sort({ createdAt: 1 });
+    const listOfBackwardDos = others.filter(
+      ({ status }) => status === ActivityStatus.Undo
+    );
 
     if (!listOfBackwardDos.length) return { can: true };
     return {
@@ -100,63 +184,61 @@ class Service {
     };
   }
 
-  private async undoCreate(activity: ActivityDocument) {
+  private async undoCreate(activity: ActivityDocument): Promise<DoResponse> {
     const model = store.db.model(activity.target.model);
-    await model.deleteOne({ _id: activity.target.after._id });
-    return;
+    const filter = { _id: activity.target.after._id };
+    await model.deleteOne(filter);
+    return { query: { filter } };
   }
-  private async doCreate(activity: ActivityDocument) {
+  private async doCreate(activity: ActivityDocument): Promise<DoResponse> {
     const model = store.db.model(activity.target.model);
-    await model.create(activity.target.after);
-    return;
-  }
-
-  private async undoUpdate(activity: ActivityDocument) {
-    const model = store.db.model(activity.target.model);
-    await model.updateOne(
-      { _id: activity.target.after._id },
-      activity.target.before ?? {}
-    );
-    return;
-  }
-  private async doUpdate(activity: ActivityDocument) {
-    const model = store.db.model(activity.target.model);
-    await model.updateOne(
-      { _id: activity.target.after._id },
-      activity.target.after
-    );
-    return;
+    const targetAfter = await model.create(activity.target.after);
+    return { targetAfter, query: { create: activity.target.after } };
   }
 
-  private async undoDelete(activity: ActivityDocument) {
+  private async revertUpdate(activity: ActivityDocument): Promise<DoResponse> {
+    const model = store.db.model(activity.target.model);
+    const filter = { _id: activity.target.after._id };
+    const update = activity.target.before ?? {};
+    const targetAfter = await model.findOneAndUpdate(filter, update, {
+      new: true,
+    });
+    return { targetAfter, query: { filter, update } };
+  }
+
+  private async undoDelete(activity: ActivityDocument): Promise<DoResponse> {
     const model = store.db.model(activity.target.model);
 
     // update
-    if (activity.target.after) await this.undoUpdate(activity);
-    // delete
-    else if (activity.target.before) await model.create(activity.target.before);
-
-    return;
-  }
-  private async doDelete(activity: ActivityDocument) {
-    const model = store.db.model(activity.target.model);
-
-    // update
-    if (activity.target.after) await this.doUpdate(activity);
+    if (activity.target.after) return await this.revertUpdate(activity);
     // delete
     else if (activity.target.before)
-      await model.deleteOne({ _id: activity.target.before._id });
+      return await model.create(activity.target.before);
 
     return;
   }
+  private async doDelete(activity: ActivityDocument): Promise<DoResponse> {
+    const model = store.db.model(activity.target.model);
 
-  update: MiddleWare = async (req, res, next) => {
-    const body: ActivityUpdateBody = req.body;
+    // update
+    if (activity.target.after) return await this.revertUpdate(activity);
+    // delete
+    else if (activity.target.before) {
+      const filter = { _id: activity.target.before._id };
+      await model.deleteOne(filter);
+      return { query: { filter } };
+    }
 
-    // find
-    const activity = await this.activityModel.findById(req.params.id);
-    if (!activity) throw new NotFound('not found activity');
-    const isDo = body.status === ActivityStatus.Do;
+    throw new Error('can not do delete because there is not exist any target');
+  }
+
+  private async doAction(
+    req: Req,
+    activity: ActivityDocument,
+    user: UserDocument,
+    status: ActivityStatus
+  ) {
+    const isDo = status === ActivityStatus.Do;
 
     // can
     const { can, message } = isDo
@@ -165,45 +247,73 @@ class Service {
     if (!can) throw new BadRequestError(message);
 
     // action
+    let response: DoResponse;
     switch (activity.type) {
       case ActivityType.Create:
-        isDo ? await this.doCreate(activity) : await this.undoCreate(activity);
+        response = isDo
+          ? await this.doCreate(activity)
+          : await this.undoCreate(activity);
         break;
       case ActivityType.Update:
-        isDo ? await this.doUpdate(activity) : await this.undoUpdate(activity);
-
+        response = await this.revertUpdate(activity);
         break;
       case ActivityType.Delete:
-        isDo ? await this.doDelete(activity) : await this.undoDelete(activity);
+        response = isDo
+          ? await this.doDelete(activity)
+          : await this.undoDelete(activity);
         break;
     }
 
     // save
-    // undoer or doer
-    const update: mongoose.UpdateQuery<ActivityDocument> = {};
-    const key = isDo ? 'doers' : 'undoers';
-    update.$push = { [key]: convertUser(req.user) };
-    // status
-    update.status = body.status;
-    const newActivity = await this.activityModel.findOneAndUpdate(
-      { _id: activity._id },
-      update,
-      { new: true }
-    );
+    const doer = convertUser(user);
+    const newActivity: Partial<IActivity> = {
+      doer,
+      status,
+      depend_on: activity.depend_on,
+      type: activity.type,
+      target: {
+        model: activity.target.model,
+        after: response.targetAfter,
+        before: activity.target.after,
+      },
+      query: response.query,
+      from: ActivityFrom.Activity,
+      ref: activity._id,
+    };
+    const newActDoc = await this.activityModel.create(newActivity);
 
     // event
     const events = [
       getActivityEventName({
-        type: newActivity.type,
-        status: newActivity.status,
+        type: newActDoc.type,
+        status: newActDoc.status,
         model: activity.target.model,
       }),
       getActivityEventName({
-        type: newActivity.type,
-        status: newActivity.status,
+        type: newActDoc.type,
+        status: newActDoc.status,
       }),
     ];
-    events.forEach((ev) => store.event.emit(ev, newActivity, activity, req));
+    events.forEach((ev) => store.event.emit(ev, newActDoc, activity, req));
+
+    // present
+    return newActDoc;
+  }
+
+  act: MiddleWare = async (req, res, next) => {
+    const body: ActivityBody = req.body;
+
+    // find
+    const activity = await this.activityModel.findById(body.id);
+    if (!activity) throw new NotFound('not found activity');
+
+    // action
+    const newActivity = await this.doAction(
+      req,
+      activity,
+      req.user,
+      body.status
+    );
 
     // present
     return res.status(200).json({ data: newActivity });
@@ -227,7 +337,7 @@ class Service {
     const depend_on = req.target_before?._id ?? data?._id;
     const entity = new EntityCreator(opt.model);
     const activity: Partial<IActivity> = {
-      doers: [convertUser(req.user)],
+      doer: convertUser(req.user),
       status: ActivityStatus.Do,
       depend_on,
       type: crudType2ActivityType(opt.type),
@@ -237,6 +347,7 @@ class Service {
         before: req.target_before,
       },
       query: {},
+      from: ActivityFrom.EntityCrud,
     };
 
     if (opt.type === CRUD.DELETE_ONE && opt.forceDelete)

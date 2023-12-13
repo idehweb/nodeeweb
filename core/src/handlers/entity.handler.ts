@@ -74,6 +74,12 @@ export class EntityCreator {
             req.params[pf.id] &&
             new mongoose.Types.ObjectId(req.params[pf.id]),
           slug: req.params[pf?.slug],
+          $expr: {
+            $or: [
+              { $eq: ['$active', true] },
+              { $eq: ['missing', { $type: '$active' }] },
+            ],
+          },
         };
 
     for (const key in f) {
@@ -437,9 +443,9 @@ function translateCRUD2Method(name: CRUD): ControllerSchema['method'] {
       throw new Error(`Invalid CRUD name : ${name}`);
   }
 }
-function translateCRUD2Url(
+export function translateCRUD2Url(
   name: CRUD,
-  opt: CRUDCreatorOpt
+  opt: Pick<CRUDCreatorOpt, 'paramFields'>
 ): ControllerSchema['url'] {
   switch (name) {
     case CRUD.GET_COUNT:

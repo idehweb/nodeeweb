@@ -6,6 +6,7 @@ import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
 import Service from './service';
 import { AdminAccess, OptUserAccess } from '@nodeeweb/core';
+import { PageBody, PageUpdate } from '../../dto/in/page';
 
 export default function registerController() {
   // create , update , getAll  , getOne , deleteOne
@@ -20,13 +21,9 @@ export default function registerController() {
       getOne: {
         controller: {
           access: OptUserAccess,
-          service: Service.getOneAfter,
         },
         crud: {
-          parseFilter: Service.getOneFilterParser,
-          paramFields: {
-            id: 'page',
-          },
+          parseFilter: Service.getOneFilter,
         },
       },
       getAll: {
@@ -34,11 +31,6 @@ export default function registerController() {
           access: AdminAccess,
         },
         crud: {
-          parseFilter(req) {
-            if (req.query.filter && typeof req.query.filter === 'string') {
-              return JSON.parse(req.query.filter);
-            }
-          },
           autoSetCount: true,
           queryFields: true,
           paramFields: {
@@ -51,6 +43,7 @@ export default function registerController() {
         controller: {
           access: AdminAccess,
           service: Service.createAfter,
+          validate: { reqPath: 'body', dto: PageBody },
         },
         crud: {
           saveToReq: true,
@@ -60,6 +53,7 @@ export default function registerController() {
         controller: {
           access: AdminAccess,
           service: Service.updateAfter,
+          validate: { dto: PageUpdate, reqPath: 'body' },
         },
         crud: {
           executeQuery: false,

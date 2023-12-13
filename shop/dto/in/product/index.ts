@@ -19,6 +19,7 @@ import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
 import { Types } from 'mongoose';
 import { PriceType } from '../../../schema/product.schema';
 import { PublishStatus } from '../../../schema/_base.schema';
+import { ToObject } from '@nodeeweb/core/utils/transform';
 
 class ExtraAtr {
   @Expose()
@@ -69,6 +70,7 @@ class CombinationProduct {
   @Expose()
   @IsOptional()
   @IsMultiLang()
+  @ToObject()
   options?: { [key: string]: string };
 
   @Expose()
@@ -110,21 +112,25 @@ export class CreateProductBody {
   @Expose()
   @IsOptional()
   @IsMultiLang()
+  @ToObject()
   title?: { [key: string]: string };
 
   @Expose()
   @IsMultiLang()
   @IsOptional()
+  @ToObject()
   miniTitle?: { [key: string]: string };
 
   @Expose()
   @IsOptional()
   @IsMultiLang()
+  @ToObject()
   metatitle?: { [key: string]: string };
 
   @Expose()
   @IsOptional()
   @IsMultiLang()
+  @ToObject()
   metadescription?: { [key: string]: string };
 
   @Expose()
@@ -134,11 +140,13 @@ export class CreateProductBody {
   @Expose()
   @IsOptional()
   @IsMultiLang()
+  @ToObject()
   excerpt?: { [key: string]: string };
 
   @Expose()
   @IsOptional()
   @IsMultiLang()
+  @ToObject()
   description?: { [key: string]: string };
 
   @Expose()
@@ -179,6 +187,7 @@ export class CreateProductBody {
 
   @Expose()
   @IsOptional()
+  @ToObject()
   @IsObject()
   data?: any;
 
@@ -226,21 +235,25 @@ export class UpdateProductBody {
   @Expose()
   @IsMultiLang()
   @IsOptional()
+  @ToObject()
   title?: { [key: string]: string };
 
   @Expose()
   @IsMultiLang()
+  @ToObject()
   @IsOptional()
   miniTitle?: { [key: string]: string };
 
   @Expose()
   @IsOptional()
   @IsMultiLang()
+  @ToObject()
   metatitle?: { [key: string]: string };
 
   @Expose()
   @IsOptional()
   @IsMultiLang()
+  @ToObject()
   metadescription?: { [key: string]: string };
 
   @Expose()
@@ -251,11 +264,13 @@ export class UpdateProductBody {
   @Expose()
   @IsOptional()
   @IsMultiLang()
+  @ToObject()
   excerpt?: { [key: string]: string };
 
   @Expose()
   @IsOptional()
   @IsMultiLang()
+  @ToObject()
   description?: { [key: string]: string };
 
   @Expose()
@@ -292,6 +307,7 @@ export class UpdateProductBody {
 
   @Expose()
   @IsOptional()
+  @ToObject()
   @IsObject()
   data?: any;
 

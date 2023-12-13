@@ -11,10 +11,21 @@ import _ from 'lodash';
 import { USE_ENV } from '../../types/global';
 import store from '../../store';
 import logger from '../handlers/log.handler';
-import { isExistsSync } from '../../utils/helpers';
+import {
+  getEnv,
+  isExist,
+  isExistsSync,
+  safeRm,
+  satisfyExistence,
+  satisfyExistenceSync,
+} from '../../utils/helpers';
 import exec from '../../utils/exec';
 import { color } from '../../utils/color';
-import { APP_INFO, CORE_NODE_MODULE_PATH_RELATIVE } from '../../utils/package';
+import packageInfo, {
+  APP_INFO,
+  CORE_NODE_MODULE_PATH_RELATIVE,
+  dispatchPackageInfo,
+} from '../../utils/package';
 
 export default async function prepare() {
   // install requirements
@@ -23,21 +34,27 @@ export default async function prepare() {
   // create directories
   createSharedDir();
   createPublicDir();
-  createPublicMediaFolder();
+  createStaticFilesDir();
 
   // copy public files
-  await copyPublicFiles('admin');
-  await copyPublicFiles('front');
+  await copyPublicFiles('admin', ['asset-manifest.json']);
+  await copyPublicFiles('front', ['asset-manifest.json']);
 
   // copy static dirs
   await copyStaticFiles('schema');
+
+  // link
+  await linkIndex();
 }
 
 async function installRequirements() {
+  await installStatics();
+  await installDeps();
+}
+
+async function installDeps() {
   if (store.env.NOT_INSTALL_REQUIREMENTS || store.env.USE_ENV !== USE_ENV.NPM)
     return;
-
-  const packageInfo = await import(APP_INFO);
 
   const requirements = [
     'mongoose',
@@ -56,6 +73,38 @@ async function installRequirements() {
       .join(' ')}`,
     { logger }
   );
+
+  // dispatch package info
+  dispatchPackageInfo();
+}
+async function installStatics() {
+  const adminVersion = getEnv<string>('admin-version');
+  const frontVersion = getEnv<string>('front-version');
+
+  const packages = [
+    ['@nodeeweb/admin-build', adminVersion],
+    ['@nodeeweb/front-build', frontVersion],
+  ]
+    .filter(
+      ([p, v]) =>
+        // not install yet
+        !packageInfo.dependencies[p] ||
+        // force install and not install exact version
+        (store.env.FORCE_STATIC_MATCH && packageInfo.dependencies[p] !== v)
+    )
+    .map(([p, v]) => `${p}${v ? `@${v}` : ''}`);
+
+  // not things to install
+  if (!packages.length) return;
+
+  logger.log(color('Green', `## Install ${packages.join(' , ')} with yarn ##`));
+
+  const cmd = exec(`yarn add ${packages.join(' ')}`, { logger });
+
+  await cmd;
+
+  // dispatch package info
+  dispatchPackageInfo();
 }
 
 function createSharedDir() {
@@ -66,7 +115,7 @@ function createPublicDir() {
     fs.mkdirSync(getPublicDir('.', true)[0]);
 }
 
-function createPublicMediaFolder() {
+function createStaticFilesDir() {
   const [filesPath] = getPublicDir('files', true);
   const files_customerPath = path.join(filesPath, 'customer');
   const files_siteSettingPath = path.join(filesPath, 'site_setting');
@@ -99,6 +148,19 @@ function createPublicMediaFolder() {
       });
     });
   }
+}
+
+async function linkIndex() {
+  const source = getPublicDir('front/index.html', true)[0];
+  const target = getPublicDir('files/index.html', true)[0];
+
+  if (await isExist(target)) return;
+
+  // remove before link
+  await safeRm(target);
+
+  // link
+  await fs.promises.symlink(source, target, 'file');
 }
 
 async function copyStaticFiles(name: string) {
@@ -134,12 +196,12 @@ async function copyStaticFiles(name: string) {
   logger.log(name, 'folder:', dirLocalPath);
 }
 
-async function copyPublicFiles(name: string) {
+async function copyPublicFiles(name: string, condFiles: string[] = []) {
   const [dirLocalPath] = getPublicDir(name, true);
   const dirModulePath = getBuildDir(name);
 
   // check if directory exist before
-  if (isExistsSync(dirLocalPath)) {
+  if (satisfyExistenceSync(dirLocalPath, ['.', ...condFiles])) {
     logger.log(name, 'folder:', dirLocalPath, ', existed');
     return;
   }

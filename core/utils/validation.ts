@@ -85,6 +85,7 @@ export async function validatePlain<C>(
 ) {
   const instance: any = plainToInstance(dto, plain, {
     enableImplicitConversion: true,
+    excludeExtraneousValues: !strict,
   });
 
   const errors = await validate(instance, {
@@ -169,6 +170,29 @@ export function IsSlug(opt?: SlugOpt, validationOptions?: ValidationOptions) {
           function core(value: any) {
             return isSlug(value, opt);
           }
+        },
+      },
+    });
+  };
+}
+
+export function Custom(
+  validation: (value: any) => boolean,
+  validationOptions?: ValidationOptions & { name: string }
+) {
+  return function (object: Object, propertyName: string) {
+    registerDecorator({
+      name: validationOptions.name,
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any) {
+          return validationOptions?.each
+            ? Array.isArray(value)
+              ? value.every(validation)
+              : false
+            : validation(value);
         },
       },
     });

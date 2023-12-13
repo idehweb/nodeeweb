@@ -19,7 +19,7 @@ export const postData = (
   data = {},
   f = false,
   headers = {},
-  rewriteHeader = false,
+  rewriteHeader = false
 ) => {
   return new Promise(function (resolve, reject) {
     let option = {
@@ -79,7 +79,7 @@ export const postAdminData = (
   data = {},
   f = false,
   headers = {},
-  rewriteHeader = false,
+  rewriteHeader = false
 ) => {
   console.log('...postAdminData');
   return new Promise(function (resolve, reject) {
@@ -311,7 +311,7 @@ export const deleteData = (url = '', f = false) => {
 export const getData = (
   url = '',
   option = { headers: { token: '' }, params: {} },
-  f = false,
+  f = false
 ) => {
   console.log('...getData', option);
 
@@ -354,7 +354,7 @@ export const getData = (
 export const getAdminData = (
   url = '',
   option = { headers: { token: '' }, params: {} },
-  f = false,
+  f = false
 ) => {
   console.log('...getAdminData', option);
 
@@ -497,3 +497,12 @@ export const dateFormat = (d) => {
       .locale('fa')
       .format('YYYY/MM/DD HH:mm');
 };
+
+export function combineUrl(...urls) {
+  return urls
+    .map((url) => (typeof url === 'object' ? url.url : url))
+    .join('/')
+    .replace('://', '$PROTOCOL_END%')
+    .replace(/\/\/+/g, '/')
+    .replace('$PROTOCOL_END%', '://');
+}

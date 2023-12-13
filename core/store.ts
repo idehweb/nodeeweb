@@ -35,6 +35,7 @@ export class Store {
   plugins = new PluginCore();
   config: ConfigType;
   event: EventEmitter;
+  fixedHandlers: any[] = [];
   sysNotifs: SystemNotif[] = [];
 
   constructor() {
@@ -57,6 +58,17 @@ export class Store {
       this.env.MAX_NUM_OF_PROXY === undefined ? 0 : +this.env.MAX_NUM_OF_PROXY;
 
     this.globalMiddleware = { pipes: {}, error: {} };
+
+    if (this.env.ADMIN_VERSION === 'null') delete this.env.ADMIN_VERSION;
+    if (this.env.FRONT_VERSION === 'null') delete this.env.FRONT_VERSION;
+
+    if (
+      ['null', 'false', undefined, null].includes(
+        this.env.FORCE_STATIC_MATCH as string
+      )
+    )
+      this.env.FORCE_STATIC_MATCH = false;
+    else this.env.FORCE_STATIC_MATCH = true;
   }
 }
 

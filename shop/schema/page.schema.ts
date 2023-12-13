@@ -39,7 +39,7 @@ const schema = new mongoose.Schema(
     description: {},
     excerpt: {},
     views: [],
-    slug: { type: String, require: true },
+    slug: { type: String, required: true },
     title: {},
     elements: { type: [] },
     mobileElements: { type: [] },
@@ -76,6 +76,14 @@ schema.index(
     name: 'slug',
     unique: true,
     partialFilterExpression: { active: true },
+  }
+);
+schema.index(
+  { path: 1 },
+  {
+    name: 'path',
+    unique: true,
+    partialFilterExpression: { active: true, path: { $exists: true } },
   }
 );
 

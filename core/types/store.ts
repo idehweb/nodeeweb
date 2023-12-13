@@ -30,4 +30,7 @@ export type StoreEnv = {
   SUPERVISOR_URL?: string;
   SUPERVISOR_TOKEN?: string;
   NODEEWEBHUB_API_BASE_URL?: string;
+  ADMIN_VERSION?: string;
+  FRONT_VERSION?: string;
+  FORCE_STATIC_MATCH?: string | boolean;
 } & { [k: string]: string };

@@ -268,24 +268,28 @@ export class SeoCore implements Seo {
     });
   }
   getPage: MiddleWare = async (req, res, next) => {
-    if (!isbot(req.get('user-agent'))) {
-      return next();
-    }
+    // if (!isbot(req.get('user-agent'))) {
+    //   return next();
+    // }
 
-    // is bot
-    const [, slug] = /^\/([^/]+)$/.exec(req.path) ?? [];
+    let slug: string;
+
+    if (req.path === '/home') throw new NotFound('page not found');
+
+    if (req.path === '/') slug = 'home';
+    else [, slug] = /^\/([^/]+)$/.exec(req.path) ?? [];
+
     if (!slug) {
       // not cover
       return next();
     }
-
     const page = await this.pageModel.findOne(
       {
-        [isMongoId(slug) ? '_id' : 'slug']: slug,
+        slug,
         active: true,
         status: PublishStatus.Published,
       },
-      { metadescription: 1, metatitle: 1 }
+      { metadescription: 1, metatitle: 1, title: 1 }
     );
 
     if (!page) {
@@ -294,7 +298,9 @@ export class SeoCore implements Seo {
     }
 
     const des = Object.values(page.metadescription ?? {}).filter((d) => d)[0];
-    const title = Object.values(page.title ?? {}).filter((d) => d)[0];
+    const title =
+      Object.values({ ...page.title, ...page.metatitle }).filter((d) => d)[0] ||
+      store.config.app_name;
 
     const htmlStr = await fs.promises.readFile(
       join(getPublicDir('front', true)[0], 'index.html'),
@@ -302,9 +308,7 @@ export class SeoCore implements Seo {
     );
     const html = parse(htmlStr, { comment: false });
     if (title)
-      html
-        .querySelector('head')
-        .appendChild(parse(`<title>${title}</title>">`));
+      html.querySelector('head').appendChild(parse(`<title>${title}</title>`));
     if (des)
       html
         .querySelector('head')

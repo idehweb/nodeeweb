@@ -25,7 +25,6 @@ export function convertUser(user: UserDocument): ActivityUser {
     _id: user._id,
     firstName: user.firstName,
     lastName: user.lastName,
-    at: new Date(),
   };
 }
 

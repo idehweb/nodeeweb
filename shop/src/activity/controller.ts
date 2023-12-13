@@ -7,7 +7,7 @@ import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
 import { AdminAccess, controllersBatchRegister } from '@nodeeweb/core';
 import { IDParam } from '@nodeeweb/core/dto/in/crud.dto';
 import service from './service';
-import { ActivityUpdateBody } from '../../dto/in/activity';
+import { ActivityBody } from '../../dto/in/activity';
 
 export default function registerController() {
   registerEntityCRUD(
@@ -42,11 +42,11 @@ export default function registerController() {
   controllersBatchRegister(
     [
       {
-        method: 'put',
+        method: 'post',
         access: AdminAccess,
-        validate: { reqPath: 'body', dto: ActivityUpdateBody },
-        service: service.update,
-        url: '/:id',
+        validate: { reqPath: 'body', dto: ActivityBody },
+        service: service.act,
+        url: '/',
       },
     ],
     { base_url: '/api/v1/activity', from: 'ShopEntity' }
