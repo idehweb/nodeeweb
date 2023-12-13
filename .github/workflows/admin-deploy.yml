@@ -223,7 +223,7 @@ jobs:
           then 
             echo "TARGET_PATH=/var/instances/nwi-shop/public/admin/" >> $GITHUB_OUTPUT
             echo "IN_GERMAN=true" >> $GITHUB_OUTPUT  
-            echo "IN_IRAN=false" >> $GITHUB_OUTPUT
+            echo "IN_IRAN=true" >> $GITHUB_OUTPUT
             echo "GERMAN_IM=true" >> $GITHUB_OUTPUT  
             echo "IRAN_IM=true" >> $GITHUB_OUTPUT
           else 
