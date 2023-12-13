@@ -82,7 +82,7 @@ export default class Service {
   static getOneFilter(req: Req) {
     const isAdmin = req.modelName === 'admin';
     const { slug, id } = req.params;
-    const filter: FilterQuery<PageDocument> = {};
+    const filter: FilterQuery<PageDocument> = { active: true };
 
     if (slug) filter.slug = slug;
     if (id) filter._id = id;
