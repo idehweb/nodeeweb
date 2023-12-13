@@ -24,9 +24,9 @@ do
       cp -r ${source_path}* $dist_path
       echo "copy static $type for $service"
 
+    fi
       # chmod
       chgrp -R public $dist_path
       chmod g+rw -R $dist_path
       echo "set permissions"
-    fi
 done
