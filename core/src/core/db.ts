@@ -24,17 +24,26 @@ export async function dbInit() {
   await SingleJobProcess.builderAsync('initial-db', async () => {
     // check admin
     const adminModel = store.db.model('admin');
-    const admin = await adminModel.findOne({ role: 'owner', active: true });
+    const targetAdmin = {
+      _id: store.env.ADMIN_ID,
+      email: store.env.ADMIN_EMAIL,
+      username: store.env.ADMIN_USERNAME ?? 'admin',
+      firstName: store.env.ADMIN_USERNAME ?? 'admin',
+      password: store.env.ADMIN_PASSWORD ?? 'admin',
+      role: 'owner',
+    };
+    const admin = await adminModel.findOne({
+      username: targetAdmin.username,
+      role: 'owner',
+      active: true,
+    });
     if (!admin) {
       logger.log("there is not any owner admin, let's insert some...");
-      await adminModel.create({
-        _id: store.env.ADMIN_ID,
-        email: store.env.ADMIN_EMAIL,
-        username: store.env.ADMIN_USERNAME ?? 'admin',
-        firstName: store.env.ADMIN_USERNAME ?? 'admin',
-        password: store.env.ADMIN_PASSWORD ?? 'admin',
-        role: 'owner',
-      });
+      try {
+        await adminModel.create(targetAdmin);
+      } catch (err) {
+        logger.error('[DB]', 'can not insert user with role owner', err);
+      }
     }
 
     // check setting
