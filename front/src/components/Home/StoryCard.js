@@ -4,7 +4,7 @@ import _truncate from 'lodash/truncate';
 import { Link } from 'react-router-dom';
 import Theprice from '#c/components/single-post/Theprice';
 
-import { dFormat, PriceFormat } from '#c/functions/utils';
+import { combineUrl, dFormat, PriceFormat } from '#c/functions/utils';
 import { addItem, MainUrl, removeItem } from '#c/functions/index';
 import { defaultImg } from '#c/assets/index';
 import { store } from '#c/functions/store';
@@ -20,8 +20,9 @@ function PostCard({ onClick, item, t }) {
   if (item.price) price = PriceFormat(item.price);
   if (item.salePrice) salePrice = PriceFormat(item.salePrice);
   let backgroundImage = defaultImg;
-  if (item.photos && item.photos[0]) backgroundImage = MainUrl + item.photos[0];
-  if (item.thumbnail) backgroundImage = MainUrl + item.thumbnail;
+  if (item.photos && item.photos[0])
+    backgroundImage = combineUrl(MainUrl, item.photos[0]);
+  if (item.thumbnail) backgroundImage = combineUrl(MainUrl, item.thumbnail);
 
   let slug = item.slug;
   let cat_inLink = item.firstCategory.slug;
