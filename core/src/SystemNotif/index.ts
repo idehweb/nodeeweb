@@ -1,11 +1,20 @@
+import { SystemNotif } from '../../types/systemNotif';
 import logger from '../handlers/log.handler';
 import { registerSystemNotif } from '../handlers/systemNotif.handler';
+import { LogNotif } from './LogNotif';
 import { UserRegisterNotif } from './UserRegisterNotif';
 
 export async function registerCoreSystemNotifs() {
-  // user-register
-  const userRegister = new UserRegisterNotif();
+  const notifObservers: SystemNotif[] = [
+    // user-register
+    new UserRegisterNotif(),
+
+    // log
+    // new LogNotif(),
+  ];
 
   // register
-  await registerSystemNotif(userRegister, { logger, from: 'CoreSystemNotifs' });
+  for (const observer of notifObservers) {
+    await registerSystemNotif(observer, { logger, from: 'CoreSystemNotifs' });
+  }
 }

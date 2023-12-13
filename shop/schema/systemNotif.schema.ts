@@ -1,18 +1,20 @@
+import crypto from 'crypto';
 import mongoose, { Document, Model, Types } from 'mongoose';
-
 export interface ISystemNotif {
   message: string;
   type: string;
   from: string;
   viewers: { _id: Types.ObjectId; at: Date }[];
   createdAt: Date;
+  provider_id: string;
 }
 export type SystemNotifModel = Model<ISystemNotif>;
-export type SystemNotifDocument = Document<Types.ObjectId, {}, ISystemNotif> &
+export type SystemNotifDocument = Document<string, {}, ISystemNotif> &
   ISystemNotif;
 
 const schema = new mongoose.Schema(
   {
+    provider_id: { type: String, required: true },
     message: { type: String, required: true },
     type: {
       type: String,

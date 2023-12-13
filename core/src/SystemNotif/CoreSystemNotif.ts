@@ -12,7 +12,7 @@ export abstract class CoreSystemNotif extends SystemNotif {
 
   async save(notif: Partial<ISystemNotif> & { message: string }) {
     return await this.model.create({
-      _id: this.id,
+      provider_id: this.id,
       type: this.type,
       from: this['constructor'].name,
       ...notif,

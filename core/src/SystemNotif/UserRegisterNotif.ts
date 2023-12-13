@@ -5,9 +5,12 @@ import { AuthEvents } from '../auth/authGateway.strategy';
 import logger from '../handlers/log.handler';
 import { CoreSystemNotif } from './CoreSystemNotif';
 
+export const USER_REGISTER_NOTIF_ID = 'user-register-core';
+export const USER_REGISTER_NOTIF_TYPE = 'user-register';
+
 export class UserRegisterNotif extends CoreSystemNotif {
-  id = 'user-register-core';
-  type = 'user-register';
+  id = USER_REGISTER_NOTIF_ID;
+  type = USER_REGISTER_NOTIF_TYPE;
 
   onRegister = catchFn(async (user: UserDocument) => {
     await this.save({ message: 'user register' });

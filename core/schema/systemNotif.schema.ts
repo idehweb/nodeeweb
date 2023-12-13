@@ -6,6 +6,7 @@ export interface ISystemNotif {
   from: string;
   viewers: { _id: Types.ObjectId; at: Date }[];
   createdAt: Date;
+  provider_id: string;
 }
 export type SystemNotifModel = Model<ISystemNotif>;
 export type SystemNotifDocument = Document<string, {}, ISystemNotif> &
@@ -13,7 +14,7 @@ export type SystemNotifDocument = Document<string, {}, ISystemNotif> &
 
 const schema = new mongoose.Schema(
   {
-    _id: { type: String, default: crypto.randomUUID },
+    provider_id: { type: String, required: true },
     message: { type: String, required: true },
     type: {
       type: String,
