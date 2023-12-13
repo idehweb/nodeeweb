@@ -163,16 +163,16 @@ export class PageUpdate {
 
   @Expose()
   @Allow()
-  @ToArray()
+  @Transform(({ obj, key }) => obj[key])
   elements?: any;
 
   @Expose()
   @Allow()
-  @ToArray()
+  @Transform(({ obj, key }) => obj[key])
   mobileElements?: any;
 
   @Expose()
-  @ToArray()
+  @Transform(({ obj, key }) => obj[key])
   @Allow()
   desktopElements?: any;
 
