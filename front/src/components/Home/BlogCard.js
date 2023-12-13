@@ -18,9 +18,9 @@ function BlogCard({ onClick, item, method, t }) {
   if (item.salePrice) salePrice = PriceFormat(item.salePrice);
   let backgroundImage = defaultImg;
   if (item.photos && item.photos[0])
-    backgroundImage = MainUrl + "/" + item.photos[0];
+    backgroundImage = MainUrl + item.photos[0];
   if (item.thumbnail)
-    backgroundImage = MainUrl + "/" + item.thumbnail;
+    backgroundImage = MainUrl + item.thumbnail;
   let url = (item && item.slug) ? encodeURIComponent(item.slug.replace(/\\|\//g, "")) : (item && typeof item.slug==='string') ? item.slug : "";
   let title = (item && item.title && item.title.fa) ? (item.title.fa) : (item && item.title && !item.title.fa) ? item.title : "";
   // console.log('item.labels', item.labels);
