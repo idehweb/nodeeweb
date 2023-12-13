@@ -2,21 +2,39 @@ import { Custom, IsSlug } from '@nodeeweb/core/utils/validation';
 import { Expose, Transform } from 'class-transformer';
 import { Allow, IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
 import { PublishStatus, MultiLang } from '../../../schema/_base.schema';
-
+import { ToArray, ToObject } from '@nodeeweb/core/utils/transform';
 export class PageBody {
   @Expose()
   @IsOptional()
   @IsObject()
+  @ToObject()
   data?: any;
+
+  @Expose()
+  @Allow()
+  @ToArray()
+  elements?: any;
+
+  @Expose()
+  @Allow()
+  @ToArray()
+  mobileElements?: any;
+
+  @Expose()
+  @ToArray()
+  @Allow()
+  desktopElements?: any;
 
   @Expose()
   @IsOptional()
   @IsObject()
+  @ToObject()
   description?: any;
 
   @Expose()
   @IsOptional()
   @IsObject()
+  @ToObject()
   excerpt?: any;
 
   @Expose()
@@ -30,6 +48,7 @@ export class PageBody {
 
   @Expose()
   @IsObject()
+  @ToObject()
   title: any;
 
   @Expose()
@@ -81,11 +100,13 @@ export class PageBody {
   @Expose()
   @IsOptional()
   @IsObject()
+  @ToObject()
   metatitle: any;
 
   @Expose()
   @IsOptional()
   @IsObject()
+  @ToObject()
   metadescription: any;
 }
 
@@ -93,16 +114,19 @@ export class PageUpdate {
   @Expose()
   @IsOptional()
   @IsObject()
+  @ToObject()
   data?: any;
 
   @Expose()
   @IsOptional()
   @IsObject()
+  @ToObject()
   description?: any;
 
   @Expose()
   @IsOptional()
   @IsObject()
+  @ToObject()
   excerpt?: any;
 
   @Expose()
@@ -118,7 +142,8 @@ export class PageUpdate {
   @Expose()
   @IsOptional()
   @IsObject()
-  title: any;
+  @ToObject()
+  title?: any;
 
   @Expose()
   @Allow()
@@ -138,16 +163,16 @@ export class PageUpdate {
 
   @Expose()
   @Allow()
-  @Transform(({ obj, key }) => obj[key])
+  @ToArray()
   elements?: any;
 
   @Expose()
   @Allow()
-  @Transform(({ obj, key }) => obj[key])
+  @ToArray()
   mobileElements?: any;
 
   @Expose()
-  @Transform(({ obj, key }) => obj[key])
+  @ToArray()
   @Allow()
   desktopElements?: any;
 
@@ -184,10 +209,12 @@ export class PageUpdate {
   @Expose()
   @IsOptional()
   @IsObject()
+  @ToObject()
   metatitle: any;
 
   @Expose()
   @IsOptional()
   @IsObject()
+  @ToObject()
   metadescription: any;
 }
