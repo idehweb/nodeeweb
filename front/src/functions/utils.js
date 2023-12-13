@@ -499,5 +499,10 @@ export const dateFormat = (d) => {
 };
 
 export function combineUrl(...urls) {
-  return urls.join('/').replace(/[^:]\/\//g, '$1/');
+  return urls
+    .map((url) => (typeof url === 'object' ? url.url : url))
+    .join('/')
+    .replace('://', '$PROTOCOL_END%')
+    .replace(/\/\/+/g, '/')
+    .replace('$PROTOCOL_END%', '://');
 }

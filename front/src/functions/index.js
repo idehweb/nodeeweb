@@ -9,6 +9,7 @@ import store, {
 import { createContext } from 'react';
 import {
   clearState,
+  combineUrl,
   deleteAdminData,
   deleteData,
   getAdminData,
@@ -231,10 +232,10 @@ export const SearchIt = (_id) => {
         res.data.map((ir, i) => {
           let ph = '';
           if (ir.photos && ir.photos[0]) {
-            ph = MainUrl + '/' + ir.photos[0];
+            ph = combineUrl(MainUrl, ir.photos[0]);
           }
           if (ir.thumbnail) {
-            ph = MainUrl + '/' + ir.thumbnail;
+            ph = combineUrl(MainUrl, ir.thumbnail);
           }
           let title = encodeURIComponent(ir.title.fa.replace(/\\|\//g, ''));
           let slug = encodeURIComponent(ir.slug.replace(/\\|\//g, ''));
@@ -1239,7 +1240,7 @@ export const editRecord = (model, _id, obj) => {
 
 export const contactBoy = (d, obj) => {
   return new Promise(function (resolve, reject) {
-    getData(`${MainUrl}/${d}`, obj, false)
+    getData(combineUrl(MainUrl,d), obj, false)
       .then((data) => {
         let mainD = data['data'];
 

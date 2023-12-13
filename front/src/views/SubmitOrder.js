@@ -1,16 +1,34 @@
-import React from "react";
-import {Button, Card, CardBody, CardHeader, Col, Container, ListGroup, ListGroupItem, Row} from "shards-react";
-import {toast} from "react-toastify";
+import React from 'react';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Container,
+  ListGroup,
+  ListGroupItem,
+  Row,
+} from 'shards-react';
+import { toast } from 'react-toastify';
 
-import store from "../functions/store";
+import store from '../functions/store';
 
-import PageTitle from "../components/common/PageTitle";
-import CreateForm from "../components/form/CreateForm";
-import pageData from "./../functions/pageData"
+import PageTitle from '../components/common/PageTitle';
+import CreateForm from '../components/form/CreateForm';
+import pageData from './../functions/pageData';
 // import UserDetails from "../components/profile/UserDetails";
-import {withTranslation} from 'react-i18next';
-import {addToCard, buy, createOrder, goToProduct, MainUrl, updateCard} from "../functions/index"
-import {Navigate} from "react-router-dom";
+import { withTranslation } from 'react-i18next';
+import {
+  addToCard,
+  buy,
+  createOrder,
+  goToProduct,
+  MainUrl,
+  updateCard,
+} from '../functions/index';
+import { Navigate } from 'react-router-dom';
+import { combineUrl } from '@/functions/utils';
 
 class SubmitOrder extends React.Component {
   constructor(props) {
@@ -26,10 +44,10 @@ class SubmitOrder extends React.Component {
       submitOrder: {
         add: {
           data: {
-            firstName:store.getState().store.firstName || '',
-            lastName:store.getState().store.lastName || '',
-            email:store.getState().store.email || '',
-            phoneNumber:store.getState().store.phoneNumber || '',
+            firstName: store.getState().store.firstName || '',
+            lastName: store.getState().store.lastName || '',
+            email: store.getState().store.email || '',
+            phoneNumber: store.getState().store.phoneNumber || '',
           },
           fields: [
             {
@@ -123,12 +141,8 @@ class SubmitOrder extends React.Component {
               },
               onClick: async (e) => {
                 console.log('this.data', this.state.submitOrder.add.data);
-                let {
-                  firstName,
-                  lastName,
-                  phoneNumber,
-                  email,
-                } = this.state.submitOrder.add.data;
+                let { firstName, lastName, phoneNumber, email } =
+                  this.state.submitOrder.add.data;
                 let { card, agent, link } = store.getState().store;
                 let err = '';
                 if (!firstName) err = 'Enter your first name';
@@ -165,21 +179,18 @@ class SubmitOrder extends React.Component {
           ],
         },
       },
-
     };
   }
 
   async removeItem(idx) {
-    console.log('removeItem', idx)
-    const {t} = await this.props;
-    let {card, sum} = await this.state;
+    console.log('removeItem', idx);
+    const { t } = await this.props;
+    let { card, sum } = await this.state;
     let arr = [];
     await card.map(async (c, i) => {
-
       if (idx !== i) {
         console.log(i, idx);
-        await arr.push(c)
-
+        await arr.push(c);
       } else if (idx === i) {
         if (c.salePrice) {
           sum -= c.count * c.salePrice;
@@ -188,7 +199,7 @@ class SubmitOrder extends React.Component {
         }
       }
       return;
-    })
+    });
     console.log('cardddd', arr);
     if (sum < 0) {
       sum = 0;
@@ -196,105 +207,97 @@ class SubmitOrder extends React.Component {
     await updateCard(arr, sum).then(() => {
       this.setState({
         card: arr,
-        sum: sum
-      })
+        sum: sum,
+      });
       console.log('toasts,,', arr);
 
       toast(t('Item deleted!'), {
-        type: 'warning'
-      })
+        type: 'warning',
+      });
     });
-
-
   }
 
   async addItem(idx) {
-    let {card, sum} = await this.state;
-    sum = 0;
-    console.log('sum is',sum);
-    let arr = [];
-    await card.map(async (c, i) => {
-      if (c.salePrice) {
-        sum += c.salePrice;
-
-      } else if (c.price)
-        sum += c.price;
-      if (idx === i) {
-        console.log(i, idx);
-        c.count = c.count + 1;
-        if (c.salePrice) {
-          sum += c.salePrice;
-
-        } else if (c.price)
-          sum += c.price;
-      }
-      await arr.push(c)
-
-      return;
-    })
-    console.log('cardddd', arr);
-
-    await updateCard(arr, sum).then(() => {
-      this.setState({
-        card: arr,
-        sum: sum
-      })
-
-    });
-
-  }
-
-  async minusItem(idx) {
-    let {card, sum} = await this.state;
+    let { card, sum } = await this.state;
     sum = 0;
     console.log('sum is', sum);
     let arr = [];
     await card.map(async (c, i) => {
       if (c.salePrice) {
         sum += c.salePrice;
-
-      } else if (c.price)
-        sum += c.price;
+      } else if (c.price) sum += c.price;
       if (idx === i) {
         console.log(i, idx);
-        c.count = c.count - 1;
+        c.count = c.count + 1;
         if (c.salePrice) {
-          sum -= c.salePrice;
-
-        } else if (c.price)
-          sum -= c.price;
-        if (c.count === 0) {
-          this.removeItem(idx);
-          return;
-        }
+          sum += c.salePrice;
+        } else if (c.price) sum += c.price;
       }
-      await arr.push(c)
+      await arr.push(c);
 
       return;
-    })
+    });
     console.log('cardddd', arr);
 
     await updateCard(arr, sum).then(() => {
       this.setState({
         card: arr,
-        sum: sum
-      })
+        sum: sum,
+      });
+    });
+  }
 
+  async minusItem(idx) {
+    let { card, sum } = await this.state;
+    sum = 0;
+    console.log('sum is', sum);
+    let arr = [];
+    await card.map(async (c, i) => {
+      if (c.salePrice) {
+        sum += c.salePrice;
+      } else if (c.price) sum += c.price;
+      if (idx === i) {
+        console.log(i, idx);
+        c.count = c.count - 1;
+        if (c.salePrice) {
+          sum -= c.salePrice;
+        } else if (c.price) sum -= c.price;
+        if (c.count === 0) {
+          this.removeItem(idx);
+          return;
+        }
+      }
+      await arr.push(c);
+
+      return;
+    });
+    console.log('cardddd', arr);
+
+    await updateCard(arr, sum).then(() => {
+      this.setState({
+        card: arr,
+        sum: sum,
+      });
     });
   }
 
   componentDidMount() {
-    console.log('componentDidMount')
+    console.log('componentDidMount');
     console.log('this.props', this.props.match.params._id);
-    const {token} = this.state;
-    if (this.props && this.props.match && this.props.match.params && this.props.match.params._id) {
+    const { token } = this.state;
+    if (
+      this.props &&
+      this.props.match &&
+      this.props.match.params &&
+      this.props.match.params._id
+    ) {
       if (!token) {
         this.cameFromProduct(this.props.match.params._id);
-        this.setState({redirect: '/login'})
+        this.setState({ redirect: '/login' });
       } else {
         addToCard(this.props.match.params._id).then((card) => {
           console.log('hgfds', card);
-          this.setState({card})
+          this.setState({ card });
         });
       }
     }
@@ -305,8 +308,8 @@ class SubmitOrder extends React.Component {
     if (this.state.update)
       this.setState({
         redirect: null,
-        update: false
-      })
+        update: false,
+      });
     window.scrollTo(0, 0);
   }
 
@@ -315,9 +318,9 @@ class SubmitOrder extends React.Component {
   }
 
   render() {
-    const {t, _id} = this.props;
+    const { t, _id } = this.props;
     // let sum = 0;
-    let {card, redirect, sum,lan} = this.state;
+    let { card, redirect, sum, lan } = this.state;
     sum = 0;
     console.log('sum', sum);
     console.log('card', card);
@@ -328,13 +331,17 @@ class SubmitOrder extends React.Component {
       //   _id = this.props.match.params._id;
       // }
       // this.cameFromProduct(_id);
-      return <Navigate to={'/login/'} push={false} exact={true}/>
+      return <Navigate to={'/login/'} push={false} exact={true} />;
     } else {
       return (
         <Container fluid className="main-content-container px-4">
           <Row noGutters className="page-header py-4">
-            <PageTitle title={t('Submit order')} subtitle={t('order details')} md="12"
-                       className="ml-sm-auto mr-sm-auto"/>
+            <PageTitle
+              title={t('Submit order')}
+              subtitle={t('order details')}
+              md="12"
+              className="ml-sm-auto mr-sm-auto"
+            />
           </Row>
           <Row>
             {/*<Col lg="4">*/}
@@ -342,13 +349,12 @@ class SubmitOrder extends React.Component {
             {/*</Col>*/}
 
             <Col lg="6">
-
               <Card className="mb-3">
                 <CardHeader>
                   <h1 className="kjhghjk">
                     <div
                       className="d-inline-block item-icon-wrapper ytrerty"
-                      dangerouslySetInnerHTML={{__html: t('Your order')}}
+                      dangerouslySetInnerHTML={{ __html: t('Your order') }}
                     />
                   </h1>
                 </CardHeader>
@@ -356,87 +362,126 @@ class SubmitOrder extends React.Component {
                   {/*<Col lg="12">*/}
                   {/*<Row>*/}
                   <ListGroup flush className={'card-add'}>
+                    {card &&
+                      card.length > 0 &&
+                      card.map((item, idx) => {
+                        if (item.salePrice) {
+                          sum += item.salePrice * item.count;
+                        } else if (item.price && !item.salePrice) {
+                          sum += item.price * item.count;
+                        }
+                        return (
+                          <ListGroupItem
+                            key={idx}
+                            className="d-flex px-3 border-0 wedkuhg">
+                            {/*<ListGroupItemHeading>*/}
+                            <div className={'flex-1 txc'}>
+                              <div className={'bge'}>
+                                <Button
+                                  className={' thisiscarda'}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    this.addItem(idx);
+                                  }}>
+                                  {' '}
+                                  <span className="material-icons">add</span>
+                                </Button>
+                                <div className={'number'}>{item.count}</div>
+                                <Button
+                                  className={' thisiscarda'}
+                                  onClick={(e) => {
+                                    e.preventDefault();
 
-                    {card && card.length > 0 && card.map((item, idx) => {
-
-                      if (item.salePrice) {
-                        sum += (item.salePrice * item.count);
-
-                      } else if (item.price && !item.salePrice) {
-                        sum += (item.price * item.count);
-                      }
-                      return (<ListGroupItem key={idx} className="d-flex px-3 border-0 wedkuhg">
-                        {/*<ListGroupItemHeading>*/}
-                        <div className={'flex-1 txc'}>
-                          <div className={'bge'}>
-                            <Button className={' thisiscarda'} onClick={(e) => {
-                              e.preventDefault();
-                              this.addItem(idx);
-                            }}> <span className="material-icons">add</span></Button>
-                            <div className={'number'}>
-                              {item.count}
+                                    this.minusItem(idx);
+                                  }}>
+                                  {' '}
+                                  <span className="material-icons">remove</span>
+                                </Button>
+                              </div>
                             </div>
-                            <Button className={' thisiscarda'} onClick={(e) => {
-                              e.preventDefault();
-
-                              this.minusItem(idx);
-                            }}> <span className="material-icons">remove</span></Button>
-                          </div>
-                        </div>
-                        <div className={'flex-1 txc imgds mr-2 ml-1'}>
-                          {(item.photos && item.photos[0]) &&
-                          <img className={'gfdsdf'} src={MainUrl + '/' + item.photos[0]}/>}
-                        </div>
-                        <div className={'flex-8'}>
-                          <div className={'ttl'}>{item.title[lan]}</div>
-                          {(item.price && !item.salePrice) && <div
-                            className={'prc'}>{item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+t(' UZS')}</div>}
-                          {(item.price && item.salePrice) && <div
-                            className={'prc'}>{item.salePrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+t(' UZS')}
-                            <del
-                              className={'ml-2'}>{item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+t(' UZS')}</del>
-                          </div>}
-                        </div>
-                        <div className={'flex-1'}>
-                          <Button className={'red'} onClick={() => {
-                            this.removeItem(idx);
-                          }}> <span className="material-icons">clear</span></Button>
-                        </div>
-                        {/*</ListGroupItemHeading>*/}
-                      </ListGroupItem>);
-                    })}
+                            <div className={'flex-1 txc imgds mr-2 ml-1'}>
+                              {item.photos && item.photos[0] && (
+                                <img
+                                  className={'gfdsdf'}
+                                  src={combineUrl(MainUrl, item.photos[0])}
+                                />
+                              )}
+                            </div>
+                            <div className={'flex-8'}>
+                              <div className={'ttl'}>{item.title[lan]}</div>
+                              {item.price && !item.salePrice && (
+                                <div className={'prc'}>
+                                  {item.price
+                                    .toString()
+                                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+                                    t(' UZS')}
+                                </div>
+                              )}
+                              {item.price && item.salePrice && (
+                                <div className={'prc'}>
+                                  {item.salePrice
+                                    .toString()
+                                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+                                    t(' UZS')}
+                                  <del className={'ml-2'}>
+                                    {item.price
+                                      .toString()
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+                                      t(' UZS')}
+                                  </del>
+                                </div>
+                              )}
+                            </div>
+                            <div className={'flex-1'}>
+                              <Button
+                                className={'red'}
+                                onClick={() => {
+                                  this.removeItem(idx);
+                                }}>
+                                {' '}
+                                <span className="material-icons">clear</span>
+                              </Button>
+                            </div>
+                            {/*</ListGroupItemHeading>*/}
+                          </ListGroupItem>
+                        );
+                      })}
                     <ListGroupItem className={'bottom-row'}>
-                      {[<div className={'flex-1'}>
-                        <div className={'ttl'}>{t('sum') + ": "}</div>
-
-                      </div>,
+                      {[
                         <div className={'flex-1'}>
-                          {sum && <div
-                            className={'ttl gtrf'}>{sum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+t(' UZS')}</div>}
-
-                        </div>]}
+                          <div className={'ttl'}>{t('sum') + ': '}</div>
+                        </div>,
+                        <div className={'flex-1'}>
+                          {sum && (
+                            <div className={'ttl gtrf'}>
+                              {sum
+                                .toString()
+                                .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+                                t(' UZS')}
+                            </div>
+                          )}
+                        </div>,
+                      ]}
                     </ListGroupItem>
                   </ListGroup>
 
-                  <Col className={"empty " + "height50"} sm={12} lg={12}>
-
-                  </Col>
+                  <Col className={'empty ' + 'height50'} sm={12} lg={12}></Col>
                   <CreateForm
                     buttons={this.state.submitOrder.add.buttons}
-                    fields={[]}/>
+                    fields={[]}
+                  />
                   {/*</Row>*/}
                   {/*</Col>*/}
                 </CardBody>
               </Card>
             </Col>
             <Col lg="6">
-
               <Card className="mb-3">
                 <CardHeader>
                   <h1 className="kjhghjk">
                     <div
                       className="d-inline-block item-icon-wrapper ytrerty"
-                      dangerouslySetInnerHTML={{__html: t('Order details')}}
+                      dangerouslySetInnerHTML={{ __html: t('Order details') }}
                     />
                   </h1>
                 </CardHeader>
@@ -445,15 +490,13 @@ class SubmitOrder extends React.Component {
                     <Row>
                       <CreateForm
                         buttons={[]}
-                        fields={this.state.submitOrder.add.fields}/>
+                        fields={this.state.submitOrder.add.fields}
+                      />
                     </Row>
                   </Col>
                 </CardBody>
               </Card>
-
-
             </Col>
-
           </Row>
         </Container>
       );
