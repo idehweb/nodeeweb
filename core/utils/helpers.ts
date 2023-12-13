@@ -90,6 +90,12 @@ export function isExistsSync(path: string) {
   return fs.existsSync(path);
 }
 
+export async function safeRm(path: string) {
+  try {
+    await fs.promises.rm(path, { recursive: true, force: true });
+  } catch (err) {}
+}
+
 export function isAsync(fn: Function) {
   return fn['constructor'].name === 'AsyncFunction';
 }

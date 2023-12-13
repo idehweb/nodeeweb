@@ -15,6 +15,7 @@ import {
   getEnv,
   isExist,
   isExistsSync,
+  safeRm,
   satisfyExistence,
   satisfyExistenceSync,
 } from '../../utils/helpers';
@@ -155,6 +156,10 @@ async function linkIndex() {
 
   if (await isExist(target)) return;
 
+  // remove before link
+  await safeRm(target);
+
+  // link
   await fs.promises.symlink(source, target, 'file');
 }
 
