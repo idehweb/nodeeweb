@@ -12,8 +12,8 @@ services=$(docker service ls --format "{{.Name}}" | grep nwi-)
 for service in ${services[@]}
 do
     # rm static
-    rm -fr /var/instances/$service/public/front/* /var/instances/$service/public/admin/*
-    echo "remove static $service"
+    # rm -fr /var/instances/$service/public/front/* /var/instances/$service/public/admin/*
+    # echo "remove static $service"
 
     # update service
     docker service update -d --image $image_tag $service
