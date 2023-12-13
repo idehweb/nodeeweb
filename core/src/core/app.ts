@@ -15,6 +15,7 @@ import { initPlugins } from '../plugin';
 import { initRoutes } from './view';
 import initSupervisor from '../supervisor';
 import initSeo from '../seo';
+import { registerCoreSystemNotifs } from '../systemNotif';
 
 const app = express();
 
@@ -69,6 +70,9 @@ export default async function buildApp() {
 
   // routes
   await initRoutes();
+
+  // system notifs
+  await registerCoreSystemNotifs();
 
   return app;
 }

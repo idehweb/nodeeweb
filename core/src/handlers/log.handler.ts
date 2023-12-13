@@ -6,6 +6,13 @@ import store from '../../store';
 import { Colors, color, yellow } from '../../utils/color';
 import { convertToString } from '../../utils/helpers';
 
+export enum LOG_EVENT_NAME {
+  LOG = 'log_log',
+  ERROR = 'log_error',
+  WARN = 'log_warn',
+  ALL = 'log',
+}
+
 export class Logger {
   constructor(private logger: winston.Logger, private label?: string) {}
 
@@ -13,23 +20,44 @@ export class Logger {
     return convertToString(a);
   }
 
+  private emit(ev: LOG_EVENT_NAME, ...args: any[]) {
+    if (!store.event) return;
+
+    store.event.emit(LOG_EVENT_NAME.ALL, ev, ...args);
+    store.event.emit(ev, ...args);
+  }
+
   log(...args: any[]) {
-    this.logger.info({
+    const body = {
       message: args.map(this.convert).join(' '),
       label: this.label,
-    });
+    };
+
+    // log
+    this.logger.info(body);
+
+    // emit event
+    this.emit(LOG_EVENT_NAME.LOG, body, ...args);
   }
   warn(...args: any[]) {
-    this.logger.warn({
+    const body = {
       message: args.map(this.convert).join(' '),
       label: this.label,
-    });
+    };
+    this.logger.warn(body);
+
+    // emit event
+    this.emit(LOG_EVENT_NAME.WARN, body, ...args);
   }
   error(...args: any[]) {
-    this.logger.error({
+    const body = {
       message: args.map(this.convert).join(' '),
       label: this.label,
-    });
+    };
+    this.logger.error(body);
+
+    // emit event
+    this.emit(LOG_EVENT_NAME.ERROR, body, ...args);
   }
 }
 const logger = new Logger(

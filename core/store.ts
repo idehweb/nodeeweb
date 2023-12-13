@@ -13,6 +13,7 @@ import EventEmitter from 'events';
 import { PluginCore } from './src/plugin/plugin';
 import { StoreTemplate } from './types/template';
 import { StoreRoute } from './types/route';
+import { SystemNotif } from './types/systemNotif';
 export class Store {
   env: StoreEnv;
   db: typeof mongoose;
@@ -35,6 +36,7 @@ export class Store {
   config: ConfigType;
   event: EventEmitter;
   fixedHandlers: any[] = [];
+  sysNotifs: SystemNotif[] = [];
 
   constructor() {
     this.env = { ...process.env } as any;
