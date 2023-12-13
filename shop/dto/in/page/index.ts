@@ -1,5 +1,5 @@
 import { Custom, IsSlug } from '@nodeeweb/core/utils/validation';
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { Allow, IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
 import { PublishStatus, MultiLang } from '../../../schema/_base.schema';
 
@@ -138,13 +138,16 @@ export class PageUpdate {
 
   @Expose()
   @Allow()
+  @Transform(({ obj, key }) => obj[key])
   elements?: any;
 
   @Expose()
   @Allow()
+  @Transform(({ obj, key }) => obj[key])
   mobileElements?: any;
 
   @Expose()
+  @Transform(({ obj, key }) => obj[key])
   @Allow()
   desktopElements?: any;
 
