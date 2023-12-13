@@ -17,6 +17,7 @@ import store from '#c/functions/store';
 import { CartService } from '@/functions/order/cart';
 
 import CardbarMainNavbar from './CardbarMainNavbar';
+import { combineUrl } from '@/functions/utils';
 
 const CardSidebar = ({ t }) => {
   const themeData = useSelector((st) => st.store.themeData);
@@ -146,7 +147,7 @@ const CardSidebar = ({ t }) => {
                           <img
                             key={phk}
                             className={'gfdsdf'}
-                            src={MainUrl + '/' + ph}
+                            src={combineUrl(MainUrl, ph)}
                             alt={product.title?.fa}
                           />
                         );
