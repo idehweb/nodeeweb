@@ -15,7 +15,7 @@ import { initPlugins } from '../plugin';
 import { initRoutes } from './view';
 import initSupervisor from '../supervisor';
 import initSeo from '../seo';
-import { registerCoreSystemNotifs } from '../systemNotif';
+import { registerCoreSystemNotifs } from '../SystemNotif';
 
 const app = express();
 
