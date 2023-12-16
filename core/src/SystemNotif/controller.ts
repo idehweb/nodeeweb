@@ -46,7 +46,7 @@ export default function registerSystemNotifController() {
           validate: { reqPath: 'body', dto: SystemNotifUpdateBody },
         },
         crud: {
-          parseBody: service.parseUpdateBody,
+          parseUpdate: service.parseUpdateBody,
         },
       },
     },
