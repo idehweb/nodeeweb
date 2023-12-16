@@ -89,7 +89,6 @@ export class OtpStrategy extends AuthStrategy {
     );
 
     if (!codeDoc) throw new UnauthorizedError();
-    console.log(user, 'in verify');
     if (user.status?.find(({ status }) => status == UserStatus.NeedVerify)) {
       outUser = await store.db.model(userType).findOneAndUpdate(
         { _id: user._id },
@@ -275,7 +274,6 @@ export class OtpStrategy extends AuthStrategy {
     // create
     const userModel = store.db.model(req.modelName) as UserModel;
     try {
-      console.log('try to', Boolean);
       const newUser = user
         ? await userModel.findByIdAndUpdate(user._id, req.body.user, {
             new: true,

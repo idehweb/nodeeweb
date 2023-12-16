@@ -205,7 +205,6 @@ class TransactionService {
           quantityCheck.push(p._id);
       });
     });
-
     const errors = [
       activeCheck,
       priceCheck,

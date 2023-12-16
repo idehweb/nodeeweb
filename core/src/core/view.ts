@@ -12,7 +12,6 @@ export function getViewHandler(): [string, MiddleWare] {
   return [
     allPathExceptApi,
     (req, res) => {
-      console.log('here', req.path);
       res.sendFile(join(getPublicDir('front', true)[0], 'index.html'));
     },
   ];
