@@ -1,6 +1,8 @@
 import { IDParam } from '../../dto/in/crud.dto';
+import { SystemNotifUpdateBody } from '../../dto/in/systemNotif';
 import { AdminAccess } from '../handlers/auth.handler';
 import { registerEntityCRUD } from '../handlers/entity.handler';
+import service from './service';
 
 export default function registerSystemNotifController() {
   // crud notif
@@ -10,6 +12,7 @@ export default function registerSystemNotifController() {
       getAll: {
         controller: { access: AdminAccess },
         crud: {
+          parseFilter: service.parseFilter,
           paramFields: {
             limit: 'limit',
             offset: 'offset',
@@ -19,6 +22,7 @@ export default function registerSystemNotifController() {
       getCount: {
         controller: { access: AdminAccess },
         crud: {
+          parseFilter: service.parseFilter,
           paramFields: {
             limit: 'limit',
             offset: 'offset',
@@ -28,12 +32,21 @@ export default function registerSystemNotifController() {
       getOne: {
         controller: {
           access: AdminAccess,
-          validate: { dto: IDParam, reqPath: 'body' },
+          validate: { dto: IDParam, reqPath: 'params' },
         },
         crud: {
           paramFields: {
             id: 'id',
           },
+        },
+      },
+      updateOne: {
+        controller: {
+          access: AdminAccess,
+          validate: { reqPath: 'body', dto: SystemNotifUpdateBody },
+        },
+        crud: {
+          parseBody: service.parseUpdateBody,
         },
       },
     },
