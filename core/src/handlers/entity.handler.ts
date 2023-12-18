@@ -353,6 +353,23 @@ const defaultCrudOpt: Omit<CRUDCreatorOpt, 'httpCode'> = {
   queryFields: true,
 };
 
+export function normalizeCrudOpt(
+  opt: EntityCRUDOpt,
+  modelName: string,
+  crud: CRUD
+) {
+  // def controller
+  opt.controller = opt.controller ?? {};
+
+  // set default values
+  opt.crud = _.merge({ ...defaultCrudOpt }, opt.crud ?? {}, {
+    type: crud,
+    model: modelName,
+  });
+
+  return opt;
+}
+
 export function registerEntityCRUD(
   modelName: string,
   opts: EntityOpts,
@@ -369,13 +386,9 @@ export function registerEntityCRUD(
 
   for (const [name, opt] of Object.entries(ordered).filter(([k, v]) => v)) {
     const cName = name as CRUD;
-    opt.controller = opt.controller ?? {};
 
-    // set default values
-    opt.crud = _.merge({ ...defaultCrudOpt }, opt.crud ?? {}, {
-      type: cName,
-      model: modelName,
-    });
+    // normalize
+    normalizeCrudOpt(opt, modelName, cName);
 
     const defValidator = detectDefaultParamValidation(cName, opt);
 
