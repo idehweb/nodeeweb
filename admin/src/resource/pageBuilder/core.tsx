@@ -60,13 +60,12 @@ const Core = (props) => {
   });
 
   const { components, excludeArray, sourceAddress } = state;
-
   const LoadData = useCallback(() => {
     if (!_id) return;
 
     GetBuilder(model, _id)
       .then((r) => {
-        const elements = _get(r, 'data.elements', []);
+        const elements = _get(r, 'data.elements', []) ?? [];
         setState((s) => ({ ...s, components: elements }));
       })
       .catch((err) => {
@@ -168,6 +167,7 @@ const Core = (props) => {
   const handleDelete = useCallback(
     (id) => {
       const newComponents = DeleteItem(id, components);
+
       setState((s) => ({ ...s, components: newComponents }));
     },
     [components]
@@ -189,6 +189,7 @@ const Core = (props) => {
   const handleDuplicate = useCallback(
     (item) => {
       const newComponents = PushItem(item.id, components, item);
+
       setState((s) => ({ ...s, components: newComponents }));
     },
     [components]
