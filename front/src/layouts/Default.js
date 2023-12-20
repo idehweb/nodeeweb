@@ -8,39 +8,40 @@ import MainSidebar from '#c/components/layout/MainSidebar/MainSidebar';
 import MainSidebarNavItems from '#c/components/layout/MainSidebar/MainSidebarNavItems';
 
 const DefaultLayout = (props) => {
+  // console.clear();
   console.log('DefaultLayout...', props);
   // return
-  let { children, width, noNavbar, onChange = () => null, themeData } = props;
+  let { children, width, noNavbar, onChange = () => null, themeData,templates } = props;
   // const themeData = useSelector((st) => st.store.themeData);
   // const themeData = useSelector((st) => st.store.themeData);
   // const homeData = useSelector((st) => st.store.homeData);
   // useEffect(() => {
   //   console.log('homeData', themeData)
   // }, []);
-  if (!themeData) {
-    return;
-  }
+  // if (!templates) {
+  //   return;
+  // }
   console.log('children', children);
-  let headerStyle = setStyles(themeData.header);
+  let headerStyle = setStyles(templates?.header);
   delete headerStyle.maxWidth;
 
-  let footer = setStyles(themeData.footer);
+  let footer = setStyles(templates?.footer);
   delete footer.maxWidth;
   return (
     <>
-      {themeData.header && themeData.header.elements && (
+      {templates.header && templates.header.elements && (
         <header
           style={headerStyle}
           className={
             'main-header d-flex pt-3 pb-1 px-3  ' +
-            themeData.header.classes +
-            (themeData.header.showInDesktop ? ' showInDesktop ' : '') +
-            (themeData.header.showInMobile ? ' showInMobile ' : '')
+            templates.header.classes +
+            (templates.header.showInDesktop ? ' showInDesktop ' : '') +
+            (templates.header.showInMobile ? ' showInMobile ' : '')
           }
           key={0}>
           <PageBuilder
-            elements={themeData.header.elements}
-            maxWidth={themeData.header.maxWidth}
+            elements={templates.header.elements}
+            maxWidth={templates.header.maxWidth}
           />
         </header>
       )}
@@ -48,16 +49,16 @@ const DefaultLayout = (props) => {
       <CardSidebar />
 
       {/*<MainMobileNavbar search={false} />*/}
-      {themeData.footer && themeData.footer.elements && (
+      {templates.footer && templates.footer.elements && (
         <footer
           style={footer}
           className={
-            'main-footer p-2 px-3 border-top ' + themeData.footer.classes
+            'main-footer p-2 px-3 border-top ' + templates.footer.classes
           }
           key={2}>
           <PageBuilder
-            elements={themeData.footer.elements}
-            maxWidth={themeData.footer.maxWidth}
+            elements={templates.footer.elements}
+            maxWidth={templates.footer.maxWidth}
           />
         </footer>
       )}

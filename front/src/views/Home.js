@@ -24,30 +24,33 @@ import {store} from '#c/functions/store';
 
 import {withTranslation} from "react-i18next";
 import {useSelector} from "react-redux";
+import _isEqual from 'lodash/isEqual';
 
 // store.dispatch(fetchHome());
 
 const Home = (props) => {
 
-  const themeData = useSelector((st) => st.store.themeData);
+  // const themeData = useSelector((st) => st.store.themeData);
   const homeData = useSelector((st) => st.store.homeData);
+  const configData = useSelector((st) => st.store.configData, _isEqual);
 
   useEffect(() => {
   }, []);
-  if (themeData) {
+  if (configData) {
 
     return <>
 
 
-      {themeData.body && themeData.body.map((body, h) => {
+      {/*{themeData.body && themeData.body.map((body, h) => {*/}
 
-        if (body.name === 'MainContent') {
-          return <MainContent {...props}/>
+        {/*if (body.name === 'MainContent') {*/}
+          {/*return*/}
+      <MainContent {...props}/>
 
-        }
+        {/*}*/}
 
 
-      })}
+      {/*})}*/}
 
     </>
   } else

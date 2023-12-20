@@ -38,10 +38,14 @@ export const ApiUrl = process.env.REACT_APP_API_URL;
 export const AdminRoute = ServerUrl + '/admin';
 export const InstanceManagerUrl = 'https://instancemanager.nodeeweb.com/api/v1';
 export const THEME_URL = ApiUrl + '/theme';
+export const CONFIG_URL = ApiUrl + '/config/website';
 const token = getToken();
 
 export const admin_token = getToken();
-export const setStyles = (fields) => {
+export const setStyles = (fields = {}) => {
+  if (!fields) {
+    return;
+  }
   let style = {};
   let {
     textAlign,
@@ -459,6 +463,16 @@ export const fetchTheme = () => async (dispatch) => {
     });
   }
 };
+export const fetchConfig = () => async (dispatch) => {
+  // let themeData = store.getState().store.themeData;
+  // if (themeData && !themeData.length) {
+  const response = await getConfigData();
+  return await dispatch({
+    type: 'config/configLoaded',
+    payload: { configData: response },
+  });
+  // }
+};
 export const fetchHome = () => async (dispatch) => {
   let homeData = store.getState().store.homeData;
   if (homeData && !homeData.length) {
@@ -491,6 +505,16 @@ export const getThemeData = (i = '') =>
           handleErr(err);
           return err;
         });
+
+export const getConfigData = (i = '') =>
+  getAdminData(`${CONFIG_URL}`, {}, true)
+    .then((res) => {
+      return res?.data?.data || {};
+    })
+    .catch((err) => {
+      handleErr(err);
+      return err;
+    });
 export const getThemeDataold = (i = '') =>
   getAdminData(`${THEME_URL}`, {}, true)
     .then((res) => {
@@ -1240,7 +1264,7 @@ export const editRecord = (model, _id, obj) => {
 
 export const contactBoy = (d, obj) => {
   return new Promise(function (resolve, reject) {
-    getData(combineUrl(MainUrl,d), obj, false)
+    getData(combineUrl(MainUrl, d), obj, false)
       .then((data) => {
         let mainD = data['data'];
 
@@ -1767,6 +1791,17 @@ export const getBlogPost = (i) =>
     });
 
 export const getPage = (i) =>
+  getData(`${ApiUrl}/page/${i}`, {}, true)
+    .then((res) => {
+      if (res.data && res.data.data) {
+        return res.data.data;
+      } else return res.data;
+    })
+    .catch((err) => {
+      handleErr(err);
+    });
+
+export const getPageByPath = (i) =>
   getData(`${ApiUrl}/page/${i}`, {}, true)
     .then((res) => {
       if (res.data && res.data.data) {
