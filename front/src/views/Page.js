@@ -10,6 +10,7 @@ import Loading from '@/components/Loading';
 import store from '@/functions/store';
 
 export default function Page(props) {
+  console.clear();
   const page = useSelector((st) => {
     return st.store.page || [];
   });

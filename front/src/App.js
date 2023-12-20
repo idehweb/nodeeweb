@@ -29,9 +29,9 @@ const APP = (props) => {
         });
       } else {
         newRoutes.push({
-          path: route.path == '/home' ? '/' : route.path,
+          path: route.path == '/home' ? '/' : '/:_id',
           layout: 'DefaultLayout',
-          element: 'Home',
+          element: route.path == '/home' ? 'Home' : 'Page',
           exact: true,
         });
       }
