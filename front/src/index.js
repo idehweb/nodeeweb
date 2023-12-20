@@ -15,7 +15,7 @@ import '#c/assets/styles/global.css';
 import '#c/assets/styles/ltr.css';
 import '#c/assets/styles/rtl.css';
 import '@splidejs/react-splide/css/skyblue';
-store.dispatch(fetchTheme());
+// store.dispatch(fetchTheme());
 store.dispatch(fetchConfig());
 const container = document.getElementById('root');
 const root = createRoot(container);

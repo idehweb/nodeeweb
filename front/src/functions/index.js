@@ -1801,6 +1801,17 @@ export const getPage = (i) =>
       handleErr(err);
     });
 
+export const getPageByPath = (i) =>
+  getData(`${ApiUrl}/page/${i}`, {}, true)
+    .then((res) => {
+      if (res.data && res.data.data) {
+        return res.data.data;
+      } else return res.data;
+    })
+    .catch((err) => {
+      handleErr(err);
+    });
+
 export const getContactData = (i) => {
   return new Promise(function (resolve, reject) {
     getData(`${ApiUrl}/course/getContactData/${i}`, {}, true)
