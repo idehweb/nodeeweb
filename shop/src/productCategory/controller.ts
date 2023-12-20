@@ -15,20 +15,9 @@ export default function registerController() {
           access,
         },
       },
-      getCount: {
-        controller: {
-          access,
-        },
-      },
-      getOne: {
-        controller: {
-          access,
-        },
-      },
+      getCount: {},
+      getOne: {},
       getAll: {
-        controller: {
-          access,
-        },
         crud: {
           paramFields: {
             limit: 'limit',
