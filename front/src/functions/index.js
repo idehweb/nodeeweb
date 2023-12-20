@@ -1006,7 +1006,7 @@ export const getEntities = (
       };
     }
 
-    let url = `${ApiUrl}/${entity}/${offset}/${limit}/`;
+    let url = `/${entity}/${offset}/${limit}/`;
 
     if (search) url += search;
     // if (filter) {
