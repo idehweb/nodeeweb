@@ -12,10 +12,10 @@
     "config": {
         "inputs": [
             {
-                "key": "message",
+                "key": "redirect",
                 "title": {
-                    "en": "message",
-                    "fa": "متن"
+                    "en": "redirect",
+                    "fa": "ریدایرکت"
                 },
                 "type": "string"
             },
@@ -39,10 +39,10 @@
     "edit": {
         "inputs": [
             {
-                "key": "message",
+                "key": "redirect",
                 "title": {
-                    "en": "message",
-                    "fa": "متن"
+                    "en": "redirect",
+                    "fa": "ریدایرکت"
                 },
                 "type": "string"
             },
