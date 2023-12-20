@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Button,
@@ -38,10 +39,10 @@ const LastPart = (props) => {
   let [card, setCard] = useState({ data: [], state: 'none' });
 
   let [themeData, setThemeData] = useState(
-    store.getState().store.themeData || [],
+    store.getState().store.themeData || []
   );
   let [discountCode, setDiscountCode] = useState(
-    theParams.discountCode || null,
+    theParams.discountCode || null
   );
 
   const [price, setPrice] = useState({ data: null, state: 'none' });
@@ -73,7 +74,7 @@ const LastPart = (props) => {
   const onCreateTransaction = useCallback(async () => {
     setCard((data) => ({ ...data, state: 'loading' }));
     try {
-      const { transaction } = await OrderService.createTransaction({
+      const { transactions } = await OrderService.createTransaction({
         post: { id: post.id },
         address,
         discount: discountCode ?? undefined,
@@ -84,12 +85,13 @@ const LastPart = (props) => {
 
       toast.success(t('Place Order'), {
         autoClose: 1000,
-        onClose() {
-          if (transaction.payment_link)
-            return location.replace(transaction.payment_link);
-          return navigate('/profile', { replace: true });
-        },
       });
+      setTimeout(() => {
+        const transaction = transactions.pop();
+        if (transaction.payment_link)
+          return navigate(transaction.payment_link, { replace: true });
+        return navigate('/profile', { replace: true });
+      }, 1000);
     } catch (err) {
       toast.error(err.message);
     } finally {
