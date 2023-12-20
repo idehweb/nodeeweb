@@ -5,7 +5,7 @@ import {
 } from './type';
 
 let config: {
-  message: string;
+  redirect: string;
   lifeTime?: number;
   resolve: (key: string) => any;
 };
@@ -23,8 +23,7 @@ const create: BankGatewayPluginContent['stack'][0] = async () => {
       Date.now() + (config.lifeTime ?? 7) * 24 * 60 * 60 * 1000
     ),
     authority: new Date().toISOString(),
-    payment_link: config.message,
-    message: config.message,
+    payment_link: config.redirect,
   };
 };
 
