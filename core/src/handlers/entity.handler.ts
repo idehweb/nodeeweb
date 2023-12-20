@@ -15,6 +15,20 @@ import { CrudParamDto, MultiIDParam } from '../../dto/in/crud.dto';
 import _, { isNil, lowerFirst, orderBy } from 'lodash';
 import { ClassConstructor } from 'class-transformer';
 
+function normalizeSort(sort = {}) {
+  const flat = (sort = {} as any) => {
+    return Array.isArray(sort) ? sort.pop() : sort;
+  };
+  const wellknown = (sort = {} as any) => {
+    let newSort = sort;
+    if (typeof newSort === 'string') {
+      newSort = newSort.replace(/\b_?id\b/g, '_id');
+    }
+    return newSort;
+  };
+  return wellknown(flat(sort));
+}
+
 export function getEntityEventName(
   name: string,
   { pre, post, type }: { pre?: boolean; post?: boolean; type: CRUD }
@@ -180,7 +194,7 @@ export class EntityCreator {
     let result: any = query;
     const reqQuery = this.exportQueryParams(req.query, queryFields);
     const mySort: any = reqQuery['_sort'] ?? sort;
-    if (mySort) query.sort(Array.isArray(mySort) ? mySort.pop() : mySort);
+    if (mySort) query.sort(normalizeSort(mySort));
     if (project) query.projection(project);
     const offset = +(
       reqQuery['_offset'] ??
