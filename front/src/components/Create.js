@@ -1,13 +1,13 @@
 import React from 'react';
-import {getTheSingleData,createRecord} from '#c/functions/index';
-import CreateForm from "#c/components/form/CreateForm";
-import {withTranslation} from 'react-i18next';
-import {toast} from "react-toastify";
+import { getTheSingleData, createRecord } from '#c/functions/index';
+import CreateForm from '#c/components/form/CreateForm';
+import { withTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
 function Create(props) {
-  console.log('props', props)
-  let {model, _id, t, rules} = props
-  let {fields} = rules
+  console.log('props', props);
+  let { model, _id, t, rules } = props;
+  let { fields } = rules;
   // const [data, setData] = useState([]);
   // const [fields, setFields] = useState([]);
 
@@ -42,76 +42,65 @@ function Create(props) {
         };
         if (typeof data[d] == 'object') {
           lastObj.type = 'object';
-
         }
         if (typeof data[d] == 'number') {
           lastObj.type = 'number';
         }
         if (typeof data[d] == 'string') {
-
         }
         // console.log('type of ',d,typeof data[d])
-        formVals.push(lastObj)
-
-      })
-      console.log('formVals', formVals)
+        formVals.push(lastObj);
+      });
+      console.log('formVals', formVals);
       setData(data);
       setFields(data);
     });
-  }
+  };
   const onSubmit = (values) => {
-
     console.log('values', values);
-    createRecord(model,values).then(e=>{
-      console.log('e',e);
-      if(e.success || e._id) {
+    createRecord(model, values).then((e) => {
+      console.log('e', e);
+      if (e.success || e._id) {
         toast('created successfully!', {
-          type: "success"
+          type: 'success',
         });
-      }else{
-        let message=e.message;
-        if(e.err && e.err.message){
-          message=e.err.message;
+      } else {
+        let message = e.message;
+        if (e.err && e.err.message) {
+          message = e.err.message;
         }
         toast(message, {
-          type: "error"
+          type: 'error',
         });
       }
-    })
-  }
+    });
+  };
 
   // console.clear()
   // console.log('rules', rules);
   let c = {};
   if (fields)
     fields.forEach((d) => {
-      c[d.name] = ''
-      if(d.defaultValue==null){
-        delete c[d.name]
+      c[d.name] = '';
+      if (d.defaultValue == null) {
+        delete c[d.name];
       }
-      if(d.type=='object'){
-        c[d.name] ={}
-
+      if (d.type == 'object') {
+        c[d.name] = {};
       }
-      if(d.type=='array'){
-        c[d.name] =[]
-
+      if (d.type == 'array') {
+        c[d.name] = [];
       }
-      if(d.defaultValue!=null){
-        c[d.name]=d.defaultValue;
+      if (d.defaultValue != null) {
+        c[d.name] = d.defaultValue;
       }
 
       // c[d.name]=d.type
     });
-  console.clear()
-  console.log('fields', fields)
-  console.log('c', c)
+  console.log('fields', fields);
+  console.log('c', c);
   return (
-    <CreateForm
-      onSubmit={onSubmit}
-      rules={rules}
-      buttons={[]}
-      fields={c}/>
+    <CreateForm onSubmit={onSubmit} rules={rules} buttons={[]} fields={c} />
   );
 }
 

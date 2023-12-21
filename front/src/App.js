@@ -12,7 +12,6 @@ const APP = (props) => {
   // const themeData = useSelector((st) => st.store.themeData, _isEqual);
   const configData = useSelector((st) => st.store.configData, _isEqual);
   if (configData && configData.routes) {
-    console.clear();
     console.log('configData.routes', configData);
 
     const newRoutes = [];

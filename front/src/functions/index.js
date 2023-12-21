@@ -609,7 +609,6 @@ export const getContacts = () => {
     let c = [];
     getData(`${ApiUrl}/session/contacts/mine`, {}, true)
       .then(({ data = {} }) => {
-        console.clear();
         resolve(data);
       })
       .catch((err) => {
@@ -626,7 +625,6 @@ export const addToMyContacts = (phoneNumber) => {
       true
     )
       .then(({ data = {} }) => {
-        console.clear();
         resolve(data);
       })
       .catch((err) => {
@@ -640,7 +638,6 @@ export const startChat = (phoneNumber, from) => {
 
     getData(`${ApiUrl}/session/` + phoneNumber, true)
       .then(({ data = {} }) => {
-        console.clear();
         resolve(data);
       })
       .catch((err) => {
@@ -1006,7 +1003,7 @@ export const getEntities = (
       };
     }
 
-    let url = `/${entity}/${offset}/${limit}/`;
+    let url = `${ApiUrl}/${entity}/${offset}/${limit}/`;
 
     if (search) url += search;
     // if (filter) {
@@ -1043,6 +1040,7 @@ export const getEntitiesWithCount = async (
   filter,
   populate
 ) => {
+  // console.log('##$$ getEntitiesWithCount', entity);
   let params = {};
   const { country } = store.getState().store;
   if (country) {
@@ -1051,7 +1049,7 @@ export const getEntitiesWithCount = async (
     };
   }
 
-  let url = `${ApiUrl}/${entity}/${offset}/${limit}/`;
+  let url = `/${entity}/${offset}/${limit}/`;
 
   if (search) url += search;
 
