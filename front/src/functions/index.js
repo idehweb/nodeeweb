@@ -794,17 +794,6 @@ export const getMyInstances = async (offset = 0, limit = 100) => {
       expireAt: new Date(),
     },
   ];
-
-  // return getData(`${ApiUrl}/order/myOrders/mine/${offset}/${limit}`, {}, true)
-  //   .then((res) => {
-  //     if (res.data.success == false)
-  //       return [];
-  //     return res.data;
-  //   })
-  //   .catch((err) => {
-  //     handleErr(err);
-  //     return err;
-  //   });
 };
 export const getMyOrder = (_id) =>
   getData(`${ApiUrl}/order/myOrder/onlyMine/${_id}`, {}, true)
@@ -1040,7 +1029,6 @@ export const getEntitiesWithCount = async (
   filter,
   populate
 ) => {
-  // console.log('##$$ getEntitiesWithCount', entity);
   let params = {};
   const { country } = store.getState().store;
   if (country) {
@@ -1055,7 +1043,6 @@ export const getEntitiesWithCount = async (
 
   if (filter) {
     url += '?filter=' + filter;
-    // if (filter["type"]) params["type"] = filter["type"];
   }
   if (filter && populate) {
     url += '&populate=' + populate;
@@ -1076,7 +1063,6 @@ export const getEntitiesForAdmin = (
   filter = {}
 ) => {
   return new Promise(function (resolve, reject) {
-    // console.log('getPosts...',store.getState().store.country)
     let params = {};
     const { country } = store.getState().store;
     if (country) {
