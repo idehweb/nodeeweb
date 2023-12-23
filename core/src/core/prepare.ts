@@ -48,8 +48,11 @@ export default async function prepare() {
   // link
   await linkIndex();
 
-  // manifest
+  // create manifest
   await checkAndCreateManifest();
+
+  // link manifest
+  await linkManifest();
 }
 
 async function installRequirements() {
@@ -168,6 +171,19 @@ async function linkIndex() {
   await fs.promises.symlink(source, target, 'file');
 }
 
+async function linkManifest() {
+  const source = getSharedPath('manifest.json');
+  const target = getPublicDir('files/manifest.json', true)[0];
+
+  if (await isExist(target)) return;
+
+  // remove before link
+  await safeRm(target);
+
+  // link
+  await fs.promises.symlink(source, target, 'file');
+}
+
 async function copyStaticFiles(name: string) {
   const [dirLocalPath] = getStaticDir(name, true);
   const dirModulePath = getStaticDir(name, false).slice(1).filter(isExistsSync);
@@ -227,7 +243,7 @@ async function checkAndCreateManifest() {
     // check
     if (await isExist(target)) return;
 
-    // copy
+    // copy into shared
     await fs.promises.cp(source, target);
     logger.log(`copy manifest from ${source}`);
   })();
