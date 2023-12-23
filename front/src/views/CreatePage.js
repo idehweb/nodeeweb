@@ -235,7 +235,6 @@ const CreatePage = ({t}) => {
     } else {
       theNewComponents.forEach((compL1, indeL1) => {
         if ((compL1.id === sourceAddress)) {
-          console.clear();
           if (!theNewComponents[indeL1]['children']) {
             theNewComponents[indeL1]['children'] = [];
           }

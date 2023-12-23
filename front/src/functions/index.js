@@ -609,7 +609,6 @@ export const getContacts = () => {
     let c = [];
     getData(`${ApiUrl}/session/contacts/mine`, {}, true)
       .then(({ data = {} }) => {
-        console.clear();
         resolve(data);
       })
       .catch((err) => {
@@ -626,7 +625,6 @@ export const addToMyContacts = (phoneNumber) => {
       true
     )
       .then(({ data = {} }) => {
-        console.clear();
         resolve(data);
       })
       .catch((err) => {
@@ -640,7 +638,6 @@ export const startChat = (phoneNumber, from) => {
 
     getData(`${ApiUrl}/session/` + phoneNumber, true)
       .then(({ data = {} }) => {
-        console.clear();
         resolve(data);
       })
       .catch((err) => {
@@ -797,17 +794,6 @@ export const getMyInstances = async (offset = 0, limit = 100) => {
       expireAt: new Date(),
     },
   ];
-
-  // return getData(`${ApiUrl}/order/myOrders/mine/${offset}/${limit}`, {}, true)
-  //   .then((res) => {
-  //     if (res.data.success == false)
-  //       return [];
-  //     return res.data;
-  //   })
-  //   .catch((err) => {
-  //     handleErr(err);
-  //     return err;
-  //   });
 };
 export const getMyOrder = (_id) =>
   getData(`${ApiUrl}/order/myOrder/onlyMine/${_id}`, {}, true)
@@ -974,6 +960,7 @@ export const postPath = (path) => {
   });
 };
 export const getEntity = (entity, _id) => {
+  console.log('##$$ getEntity', `${ApiUrl}/${entity}/${_id}`);
   return new Promise(function (resolve, reject) {
     getData(`${ApiUrl}/${entity}/${_id}`, {}, true)
       .then((res) => {
@@ -1006,7 +993,7 @@ export const getEntities = (
       };
     }
 
-    let url = `/${entity}/${offset}/${limit}/`;
+    let url = `${ApiUrl}/${entity}/${offset}/${limit}/`;
 
     if (search) url += search;
     // if (filter) {
@@ -1025,6 +1012,8 @@ export const getEntities = (
     if (!filter && populate) {
       url += '?populate=' + populate;
     }
+    console.log('##$$ getEntities', url);
+
     getData(url, { params }, true)
       .then((data) => {
         resolve(data.data);
@@ -1051,13 +1040,12 @@ export const getEntitiesWithCount = async (
     };
   }
 
-  let url = `${ApiUrl}/${entity}/${offset}/${limit}/`;
+  let url = `/${entity}/${offset}/${limit}/`;
 
   if (search) url += search;
 
   if (filter) {
     url += '?filter=' + filter;
-    // if (filter["type"]) params["type"] = filter["type"];
   }
   if (filter && populate) {
     url += '&populate=' + populate;
@@ -1065,7 +1053,7 @@ export const getEntitiesWithCount = async (
   if (!filter && populate) {
     url += '?populate=' + populate;
   }
-
+  console.log('##$$ getEntityWithCount', url);
   const { data, headers } = await API.get(url, { params });
 
   return { items: data.data, count: headers ? headers['x-total-count'] : 0 };
@@ -1078,7 +1066,6 @@ export const getEntitiesForAdmin = (
   filter = {}
 ) => {
   return new Promise(function (resolve, reject) {
-    // console.log('getPosts...',store.getState().store.country)
     let params = {};
     const { country } = store.getState().store;
     if (country) {

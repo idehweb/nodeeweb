@@ -704,7 +704,6 @@ export function SWIPERSlide(props) {
 }
 
 export function ProductElement(props) {
-  console.clear();
   return <PostCard item={props} />;
 }
 
