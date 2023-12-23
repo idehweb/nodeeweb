@@ -960,6 +960,7 @@ export const postPath = (path) => {
   });
 };
 export const getEntity = (entity, _id) => {
+  console.log('##$$ getEntity', `${ApiUrl}/${entity}/${_id}`);
   return new Promise(function (resolve, reject) {
     getData(`${ApiUrl}/${entity}/${_id}`, {}, true)
       .then((res) => {
@@ -992,7 +993,7 @@ export const getEntities = (
       };
     }
 
-    let url = `/${entity}/${offset}/${limit}/`;
+    let url = `${ApiUrl}/${entity}/${offset}/${limit}/`;
 
     if (search) url += search;
     // if (filter) {
@@ -1011,6 +1012,8 @@ export const getEntities = (
     if (!filter && populate) {
       url += '?populate=' + populate;
     }
+    console.log('##$$ getEntities', url);
+
     getData(url, { params }, true)
       .then((data) => {
         resolve(data.data);
@@ -1050,7 +1053,7 @@ export const getEntitiesWithCount = async (
   if (!filter && populate) {
     url += '?populate=' + populate;
   }
-
+  console.log('##$$ getEntityWithCount', url);
   const { data, headers } = await API.get(url, { params });
 
   return { items: data.data, count: headers ? headers['x-total-count'] : 0 };
