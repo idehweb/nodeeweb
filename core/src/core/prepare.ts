@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import path, { join } from 'path';
 import {
+  getAssetsPath,
   getBuildDir,
   getPublicDir,
   getScriptFile,
@@ -26,6 +27,7 @@ import packageInfo, {
   CORE_NODE_MODULE_PATH_RELATIVE,
   dispatchPackageInfo,
 } from '../../utils/package';
+import { SingleJobProcess } from '../handlers/singleJob.handler';
 
 export default async function prepare() {
   // install requirements
@@ -45,6 +47,9 @@ export default async function prepare() {
 
   // link
   await linkIndex();
+
+  // manifest
+  await checkAndCreateManifest();
 }
 
 async function installRequirements() {
@@ -213,4 +218,17 @@ async function copyPublicFiles(name: string, condFiles: string[] = []) {
     )} ${dirModulePath} ${dirLocalPath} `
   );
   logger.log(name, 'folder:', dirLocalPath);
+}
+
+async function checkAndCreateManifest() {
+  await SingleJobProcess.builderAsync('manifest', async () => {
+    const target = getSharedPath('manifest.json');
+    const source = getAssetsPath('manifest.json');
+    // check
+    if (await isExist(target)) return;
+
+    // copy
+    await fs.promises.cp(source, target);
+    logger.log(`copy manifest from ${source}`);
+  })();
 }
