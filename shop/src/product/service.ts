@@ -4,131 +4,20 @@ import { show } from '../common/mustImplement';
 import { SortValues, isObjectIdOrHexString } from 'mongoose';
 import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
 import { CreateProductBody } from '../../dto/in/product';
-import { BadRequestError, NotFound } from '@nodeeweb/core';
+import { BadRequestError, EntityCreator, NotFound } from '@nodeeweb/core';
 import { FileModel } from '../../schema/file.schema';
+import { safeJsonParse } from '@nodeeweb/core/utils/helpers';
+import { ProductCategoryModel } from '../../schema/productCategory.schema';
 
 export default class Service {
   static get fileModel(): FileModel {
     return store.db.model('file');
   }
-  static getAll: MiddleWare = async (req, res) => {
-    const Product = store.db.model('product');
-    if (req.headers.response !== 'json') {
-      return show(req, res);
-    }
-    const sort: { [key: string]: SortValues } = { in_stock: -1, updatedAt: -1 };
 
-    let offset = 0;
-    if (req.params.offset) {
-      offset = parseInt(req.params.offset);
-    }
-    let fields: any = '';
-    if (req.headers && req.headers.fields) {
-      fields = req.headers.fields;
-    }
-    let search = {};
-    if (req.params.search) {
-      search['title.' + req.headers.lan] = {
-        $exists: true,
-        $regex: req.params.search,
-        $options: 'i',
-      };
-    }
-    if (req.query.search) {
-      search['title.' + req.headers.lan] = {
-        $exists: true,
-        $regex: req.query.search,
-        $options: 'i',
-      };
-    }
-    if (req.query.Search) {
-      search['title.' + req.headers.lan] = {
-        $exists: true,
-        $regex: req.query.Search,
-        $options: 'i',
-      };
-    }
-    if (req.query && req.query.status) {
-      search = { ...search, status: req.query.status };
-    }
-    const tt = Object.keys(req.query);
+  static get pcModel(): ProductCategoryModel {
+    return store.db.model('productCategory');
+  }
 
-    tt.forEach((item) => {
-      if (Product.schema.paths[item]) {
-        const split = String(req.query[item]).split(',');
-        if (store.db.isValidObjectId(split[0])) {
-          search[item] = {
-            $in: split,
-          };
-        }
-      }
-    });
-    let thef: any = '';
-    function isStringified(jsonValue: any) {
-      try {
-        return JSON.parse(jsonValue);
-      } catch (err) {
-        return jsonValue;
-      }
-    }
-
-    if (req.query.filter) {
-      const json = isStringified(req.query.filter);
-      if (typeof json == 'object') {
-        thef = json;
-        if (thef.search) {
-          thef['title.' + req.headers.lan] = {
-            $exists: true,
-            $regex: thef.search,
-            $options: 'i',
-          };
-          delete thef.search;
-        }
-      } else {
-        console.log('string is not a valid json');
-      }
-    }
-    if (thef && thef != '') search = thef;
-    let q: any;
-    if (search['productCategory.slug']) {
-      const ProductCategory = store.db.model('productCategory');
-      const productcategory = await ProductCategory.findOne({
-        slug: search['productCategory.slug'],
-      });
-      if (!productcategory) return res.json([]);
-
-      if (productcategory._id) {
-        const ss = { productCategory: productcategory._id };
-        if (thef.device) {
-          ss['attributes.values'] = thef.device;
-        }
-        if (thef.brand) {
-          ss['attributes.values'] = thef.brand;
-        }
-        const products = await Product.find(ss)
-          .populate('productCategory', '_id slug')
-          .skip(offset)
-          .sort(sort)
-          .limit(parseInt(req.params.limit));
-
-        const count = await Product.countDocuments(ss);
-        res.setHeader('X-Total-Count', count);
-        return res.json(products);
-      }
-    } else {
-      if (!search['status']) search['status'] = 'published';
-
-      const products = await Product.find(search, fields)
-        .populate('productCategory', '_id slug')
-        .skip(offset)
-        .sort(sort)
-        .limit(parseInt(req.params.limit));
-
-      const count = await Product.countDocuments(search);
-      res.setHeader('X-Total-Count', count);
-      return res.json(products);
-    }
-  };
   static torob: MiddleWare = async (req, res) => {
     let offset = 0;
     if (req.params.offset) {
@@ -160,7 +49,6 @@ export default class Service {
       t.map((item) => (item != 0 ? arr.push(item) : false));
       if (arr && arr.length > 0)
         return arr.reduce(function (p, v) {
-          // console.log("p", p, "v", v);
           return p < v ? p : v;
         });
       else return false;
@@ -269,8 +157,30 @@ export default class Service {
     });
     return res.json(modifedProducts);
   };
-  static getAllFilterParser = (req: Req) => {
-    return { status: { $ne: 'trash' } };
+  static getAllFilterParser = async (req: Req) => {
+    const filter = safeJsonParse(req.query.filter);
+    // product category
+    if (filter['productCategory.slug']) {
+      // find pc id
+      const pc = await Service.pcModel.findOne({
+        slug: filter['productCategory.slug'],
+      });
+
+      if (pc) {
+        delete filter['productCategory.slug'];
+        filter.productCategory = pc._id;
+      }
+    }
+
+    delete req.query.filter;
+    delete req.query._filter;
+
+    const filterFromBase = await new EntityCreator('').parseFilterQuery(
+      {},
+      req
+    );
+
+    return { ...filterFromBase, ...filter, active: true };
   };
   static getOneFilterParser = (req: Req) => {
     const obj = {

@@ -19,11 +19,6 @@ export default function registerController() {
         method: 'get',
         service: Service.torob,
       },
-      {
-        url: '/?:offset/?:limit',
-        method: 'get',
-        service: Service.getAll,
-      },
     ],
     { base_url: '/product', from: 'ShopEntity' }
   );
