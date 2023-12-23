@@ -360,3 +360,10 @@ export async function satisfyExistence(rootPath: string, condFiles: string[]) {
 
   return true;
 }
+export function safeJsonParse(obj: any) {
+  try {
+    return JSON.parse(obj);
+  } catch (err) {
+    return {};
+  }
+}
