@@ -21,6 +21,9 @@ export function getPluginPath(...path: string[]) {
 export function getSharedPath(...path: string[]) {
   return join(store.env.SHARED_PATH || './shared', ...path);
 }
+export function getAssetsPath(...path: string[]) {
+  return join(getStaticDir('assets', false).pop(), ...path);
+}
 
 export function getScriptFile(
   scriptName: 'cp' | 'mkdir' | 'mv' | 'restart' | 'download'

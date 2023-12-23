@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import path, { join } from 'path';
 import {
+  getAssetsPath,
   getBuildDir,
   getPublicDir,
   getScriptFile,
@@ -26,6 +27,7 @@ import packageInfo, {
   CORE_NODE_MODULE_PATH_RELATIVE,
   dispatchPackageInfo,
 } from '../../utils/package';
+import { SingleJobProcess } from '../handlers/singleJob.handler';
 
 export default async function prepare() {
   // install requirements
@@ -45,6 +47,12 @@ export default async function prepare() {
 
   // link
   await linkIndex();
+
+  // create manifest
+  await checkAndCreateManifest();
+
+  // link manifest
+  await linkManifest();
 }
 
 async function installRequirements() {
@@ -163,6 +171,19 @@ async function linkIndex() {
   await fs.promises.symlink(source, target, 'file');
 }
 
+async function linkManifest() {
+  const source = getSharedPath('manifest.json');
+  const target = getPublicDir('files/manifest.json', true)[0];
+
+  if (await isExist(target)) return;
+
+  // remove before link
+  await safeRm(target);
+
+  // link
+  await fs.promises.symlink(source, target, 'file');
+}
+
 async function copyStaticFiles(name: string) {
   const [dirLocalPath] = getStaticDir(name, true);
   const dirModulePath = getStaticDir(name, false).slice(1).filter(isExistsSync);
@@ -213,4 +234,17 @@ async function copyPublicFiles(name: string, condFiles: string[] = []) {
     )} ${dirModulePath} ${dirLocalPath} `
   );
   logger.log(name, 'folder:', dirLocalPath);
+}
+
+async function checkAndCreateManifest() {
+  await SingleJobProcess.builderAsync('manifest', async () => {
+    const target = getSharedPath('manifest.json');
+    const source = getAssetsPath('manifest.json');
+    // check
+    if (await isExist(target)) return;
+
+    // copy into shared
+    await fs.promises.cp(source, target);
+    logger.log(`copy manifest from ${source}`);
+  })();
 }
