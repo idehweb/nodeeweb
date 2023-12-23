@@ -19,7 +19,7 @@ import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
 import { Types } from 'mongoose';
 import { PriceType } from '../../../schema/product.schema';
 import { PublishStatus } from '../../../schema/_base.schema';
-import { ToObject } from '@nodeeweb/core/utils/transform';
+import { ToObject, ToSlug } from '@nodeeweb/core/utils/transform';
 
 class ExtraAtr {
   @Expose()
@@ -135,6 +135,7 @@ export class CreateProductBody {
 
   @Expose()
   @IsString()
+  @ToSlug()
   slug: string;
 
   @Expose()
@@ -257,6 +258,7 @@ export class UpdateProductBody {
   metadescription?: { [key: string]: string };
 
   @Expose()
+  @ToSlug()
   @IsString()
   @IsOptional()
   slug?: string;
