@@ -84,7 +84,7 @@ function Checkout({ t }) {
 
         break;
     }
-    navigate(`/checkout/${state}`);
+    navigate(`/checkout/${state}`, { replace: true });
   }, [state]);
 
   useEffect(() => {

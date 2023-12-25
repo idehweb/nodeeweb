@@ -52,6 +52,15 @@ export class AuthHandler {
       },
     });
   };
+
+  logout = () => {
+    return this.#query({
+      url: `/logout`,
+      data: {
+        userType: 'customer',
+      },
+    });
+  };
 }
 
 export const otpHandler = new AuthHandler('otp');
