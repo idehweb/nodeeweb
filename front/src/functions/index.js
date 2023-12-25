@@ -24,6 +24,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { getToken } from './utils';
 import API from './API';
 import UserService from './User';
+import { jwtHandler } from './auth';
 
 const DataContext = createContext(null);
 export const isClient = typeof window !== 'undefined';
@@ -285,8 +286,11 @@ const handleErr = (err) => {
   store.dispatch(receive_error(err));
 };
 
-export const Logout = () => {
+export const Logout = async () => {
   clearState();
+  try {
+    await jwtHandler.logout();
+  } catch (err) {}
   window.location.replace('/');
 };
 export const clearAdminState = () => {

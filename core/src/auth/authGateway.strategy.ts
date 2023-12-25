@@ -36,4 +36,10 @@ export default class AuthGatewayStrategy extends AuthStrategy {
     if (!strategy) return next();
     return strategy.signup(req, res, next);
   }
+  logout(req: Req, res: Res, next: NextFunction) {
+    this.exportModelName(req);
+    const strategy = this.getStrategy(req);
+    if (!strategy) return next();
+    return strategy.logout(req, res, next);
+  }
 }

@@ -1,7 +1,11 @@
 import { NextFunction } from 'express';
 import { AuthStrategy } from '../../types/auth';
 import { Req, Res } from '../../types/global';
-import { authWithToken } from '../handlers/auth.handler';
+import {
+  authWithToken,
+  clearTokenCookie,
+  setToCookie,
+} from '../handlers/auth.handler';
 
 export const JWT_STRATEGY = 'jwt';
 export class JwtStrategy extends AuthStrategy {
@@ -27,5 +31,9 @@ export class JwtStrategy extends AuthStrategy {
   }
   signup(req: Req, res: Res, next: NextFunction) {
     return next();
+  }
+  logout(req: Req, res: Res, next: NextFunction) {
+    clearTokenCookie(res);
+    return super.logout(req, res, next);
   }
 }
