@@ -236,6 +236,9 @@ export function setToCookie(res: Response, value: string, key = 'authToken') {
     expires: exp,
   });
 }
+export function clearCookie(res: Response, key: string) {
+  res.clearCookie(key);
+}
 
 export function tokenSetToCookie(
   tokenName: string,
@@ -246,7 +249,9 @@ export function tokenSetToCookie(
     next();
   };
 }
-
+export function clearTokenCookie(res: Response) {
+  clearCookie(res, 'authToken');
+}
 export type AuthCheckOpt = {
   modelName: string;
   checkerId: string;
