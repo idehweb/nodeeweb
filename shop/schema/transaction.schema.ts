@@ -51,7 +51,12 @@ export type TransactionDocument = Document<Types.ObjectId, {}, ITransaction> &
 export type TransactionModel = Model<ITransaction>;
 
 export const TransactionGridSchema = new mongoose.Schema({
-  _id: { type: mongoose.Schema.Types.ObjectId, required: true, unique: true },
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    unique: true,
+    sparse: true,
+  },
   provider: { type: String, default: TransactionProvider.Manual },
   payment_link: String,
   status: { type: String, required: true },
