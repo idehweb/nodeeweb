@@ -233,19 +233,19 @@ export default async function main() {
     console.log('create backup file');
 
     // upload to sftp server
-    if (process.env.SFTP_USERNAME) {
+    if (isInit(process.env.SFTP_USERNAME)) {
       await uploadToServer(backup_file);
       console.log('uploaded into sftp server');
     }
 
-    // upload to telegram
-    if (process.env.TELEGRAM_BOT_TOKEN) {
+    // upload to telegram and notif
+    if (isInit(process.env.TELEGRAM_BOT_TOKEN)) {
       await uploadToTelegram(backup_file);
       console.log('uploaded into telegram channel');
-    }
 
-    // send notification
-    await sendTelegramNotif(`Upload Complete\nfile name : ${backup_file}`);
+      // send notification
+      await sendTelegramNotif(`Upload Complete\nfile name : ${backup_file}`);
+    }
 
     // remove old
     await removeOldLocal();
