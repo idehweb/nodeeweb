@@ -185,6 +185,7 @@ async function getOldBackups() {
     reduce_size -= stat.size;
   }
 
+  oldBackups = must_remove_stats;
   return must_remove_stats;
 }
 
@@ -207,9 +208,9 @@ async function removeOldLocal() {
 }
 async function removeOldRemote() {
   // remove
-  if (!sftp_client && process.env.SFTP_USERNAME)
-    sftp_client = await getSftpClient();
   try {
+    if (!sftp_client && process.env.SFTP_USERNAME)
+      sftp_client = await getSftpClient();
     const must_remove_stats = await getOldBackups();
     for (const stat of must_remove_stats) {
       console.log('remove remote : ', stat.name);
