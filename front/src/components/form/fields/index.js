@@ -15,7 +15,6 @@ import FieldUploadMedia from './FieldUploadMedia';
 import FieldUploadDocument from './FieldUploadDocument';
 import ChatBase from './ChatBase';
 
-
 export {
   FieldObject,
   FieldNumber,
@@ -32,11 +31,10 @@ export {
   FieldRadio,
   FieldUploadDocument,
   FieldUploadMedia,
-  ChatBase
+  ChatBase,
 };
 
-
-export const getField = type => {
+export const getField = (type) => {
   switch (type) {
     case 'object':
       return FieldObject;

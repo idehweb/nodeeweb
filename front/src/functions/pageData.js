@@ -1,4 +1,4 @@
-import {store} from '#c/functions/store';
+import { store } from '#c/functions/store';
 import {
   addToDataArray,
   buy,
@@ -12,7 +12,6 @@ import {
 import { toast } from 'react-toastify';
 // console.log('store',store);
 let pageData = {
-
   submitOrder: {
     add: {
       data: {},
@@ -108,12 +107,8 @@ let pageData = {
           },
           onClick: async (e) => {
             console.log('this.data', pageData.submitOrder.add.data);
-            let {
-              firstName,
-              lastName,
-              phoneNumber,
-              email,
-            } = pageData.submitOrder.add.data;
+            let { firstName, lastName, phoneNumber, email } =
+              pageData.submitOrder.add.data;
             let { card, agent, link } = store.getState().store;
             let err = '';
             if (!firstName) err = 'Enter your first name';

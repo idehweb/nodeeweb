@@ -1,11 +1,11 @@
-#nodeeweb-page-builder{
+#nodeeweb-page-builder {
   display: flex;
   flex-direction: column;
   box-sizing: content-box;
   padding-bottom: 200px;
   height: auto !important;
 }
-.npb-d-flex{
+.npb-d-flex {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -13,39 +13,36 @@
   justify-content: space-between;
   align-items: center;
 }
-.element-wrapper-child{
+.element-wrapper-child {
   width: 100%;
   outline: 1px dashed;
   padding: 0px;
 }
 .element-wrapper-child .element-wrapper .npb-settings button,
-.element-wrapper-child .element-wrapper .npb-settings .btn
-{
+.element-wrapper-child .element-wrapper .npb-settings .btn {
   padding: 1px !important;
 }
-.nodeeweb-page-builder-wrapper .add-part{
+.nodeeweb-page-builder-wrapper .add-part {
   display: flex;
 }
-.component-id{
+.component-id {
   background-color: #eee;
   border-radius: 10px;
   margin: 10px;
   font-size: 10px;
   box-shadow: 0px 0px 1px;
   padding: 2px 5px;
-  color:#000;
+  color: #000;
 }
-.add-part.name-row > .element-wrapper-child{
+.add-part.name-row > .element-wrapper-child {
   display: flex;
   flex-wrap: wrap;
   align-content: center;
   justify-content: space-between;
   align-items: flex-start;
   flex-basis: auto;
-
-
 }
-.add-part.name-row > .element-wrapper-child > div{
+.add-part.name-row > .element-wrapper-child > div {
   display: block !important;
   width: auto !important;
   box-sizing: border-box !important;
@@ -53,33 +50,34 @@
   margin: 5px !important;
   /*height: 100% !important;*/
 }
-.component-address{
+.component-address {
   margin: 10px;
   font-size: 10px;
   padding: 2px 5px;
-  color:darkblue;
+  color: darkblue;
 }
-.npb-settings button,.top-bar-settings button{
+.npb-settings button,
+.top-bar-settings button {
   margin-right: 5px;
   margin-bottom: 5px;
   padding: 2px 5px;
   font-size: 13px;
 }
-.nodeeweb-page-builder-wrapper .clickable{
+.nodeeweb-page-builder-wrapper .clickable {
   cursor: pointer;
   text-align: center;
   outline: 1px solid #000;
 }
-.nodeeweb-page-builder-wrapper .clickable:hover{
+.nodeeweb-page-builder-wrapper .clickable:hover {
   background-color: #00adff;
   outline: 2px solid #0a53be;
   color: #fff;
 }
-#nodeeweb-page-builder .border-bottom{
+#nodeeweb-page-builder .border-bottom {
   border-bottom: 1px solid #eee;
   margin-bottom: 10px;
 }
-#nodeeweb-page-builder .add-component.element{
+#nodeeweb-page-builder .add-component.element {
   width: 100%;
   height: 70px;
   flex-basis: 100% !important;
@@ -96,46 +94,44 @@
   align-content: space-around;
   cursor: pointer;
 }
-#nodeeweb-page-builder .element-wrapper{
+#nodeeweb-page-builder .element-wrapper {
   box-sizing: border-box;
   margin: 5px;
 }
 #nodeeweb-page-builder .element-wrapper {
   outline: 1px solid #000;
   padding: 5px;
-
 }
-#nodeeweb-page-builder .element-wrapper .add-component.element{
+#nodeeweb-page-builder .element-wrapper .add-component.element {
   height: 30px;
-
 }
-#nodeeweb-page-builder .element:hover{
+#nodeeweb-page-builder .element:hover {
   background-color: #00adff;
   outline: 2px solid #0a53be;
   color: #fff;
 }
-.max-width100{
+.max-width100 {
   max-width: 100%;
 }
-.max-width100 img{
+.max-width100 img {
   max-width: 100%;
 }
-.the-body{
+.the-body {
   min-height: 70vh;
 }
-.splide{
+.splide {
   min-height: 80px;
 }
 /*.recharts-surface{*/
-  /*width:100%;*/
+/*width:100%;*/
 /*}*/
-.modal{
+.modal {
   overflow-y: scroll !important;
 }
 /*.recharts-wrapper{*/
-  /*width: 100% !important;*/
+/*width: 100% !important;*/
 /*}*/
-.nodeeweb-fixed-bottom-bar{
+.nodeeweb-fixed-bottom-bar {
   position: fixed;
   bottom: 0;
   width: 100%;
@@ -143,5 +139,4 @@
   padding: 10px;
   background-color: #eee;
   box-shadow: 0px -2px 3px #cdcdcd;
-
 }

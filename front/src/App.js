@@ -24,7 +24,7 @@ const APP = (props) => {
           element: 'DynamicPage',
           layout: 'DefaultLayout',
           exact: true,
-          slug:slug
+          slug: slug,
         });
       } else {
         newRoutes.push({
@@ -53,10 +53,14 @@ const APP = (props) => {
                 path={route.path}
                 exact={route.exact}
                 element={
-                  <route.layout {...props}
-                                // themeData={themeData}
-                                templates={configData?.templates}>
-                    <route.element elements={route.elements} slug={route?.slug} />
+                  <route.layout
+                    {...props}
+                    // themeData={themeData}
+                    templates={configData?.templates}>
+                    <route.element
+                      elements={route.elements}
+                      slug={route?.slug}
+                    />
                   </route.layout>
                 }
               />

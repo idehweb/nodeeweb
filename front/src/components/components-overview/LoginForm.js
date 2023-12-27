@@ -220,7 +220,7 @@ class LoginForm extends React.Component {
         //     getPassword: true,
         //   });
         // }
-      },
+      }
     );
   };
   handleWrongPhoneNumber = (e) => {
@@ -303,7 +303,7 @@ class LoginForm extends React.Component {
       console.log(
         'internationalCodeClass',
         internationalCodeClass,
-        !internationalCodeClass,
+        !internationalCodeClass
       );
       if (internationalCode) {
         if (checkCodeMeli(internationalCode)) {
@@ -356,7 +356,7 @@ class LoginForm extends React.Component {
       console.log(
         'store.getState().store',
         store.getState().store.user.token,
-        res,
+        res
       );
       if (
         res.success ||
@@ -604,7 +604,7 @@ class LoginForm extends React.Component {
                                   size={60}
                                   variant="determinate"
                                   value={parseInt(
-                                    (timer * 100) / globalTimerSet,
+                                    (timer * 100) / globalTimerSet
                                   )}
                                 />
                                 <div className={'flex-item-absolute '}>
@@ -741,7 +741,7 @@ class LoginForm extends React.Component {
                               this.setState({
                                 internationalCode: e.target.value,
                                 internationalCodeClass: checkCodeMeli(
-                                  e.target.value,
+                                  e.target.value
                                 ),
                               });
                             }}
@@ -801,7 +801,7 @@ class LoginForm extends React.Component {
                           }>
                           <div className={'mb-2 flex-item'}>
                             {t(
-                              'You registered before, please enter your password.',
+                              'You registered before, please enter your password.'
                             )}
                           </div>
                         </div>

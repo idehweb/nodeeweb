@@ -1,10 +1,19 @@
-import React from "react";
-import {Button,ButtonGroup, Card, CardBody, CardFooter, CardHeader, Col, Row} from "shards-react";
+import React from 'react';
+import {
+  Button,
+  ButtonGroup,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Col,
+  Row,
+} from 'shards-react';
 
-import store from "#c/functions/store";
+import store from '#c/functions/store';
 // import State from "#c/data/state";
-import CreateForm from "#c/components/form/CreateForm";
-import {withTranslation} from 'react-i18next';
+import CreateForm from '#c/components/form/CreateForm';
+import { withTranslation } from 'react-i18next';
 import {
   buy,
   changeAddressArr,
@@ -14,14 +23,14 @@ import {
   goToProduct,
   savePost,
   updateAddress,
-  updateCard
-} from "#c/functions/index"
-import {toast} from "react-toastify";
+  updateCard,
+} from '#c/functions/index';
+import { toast } from 'react-toastify';
 
 class GetInformation extends React.Component {
   constructor(props) {
     super(props);
-    const {t} = props;
+    const { t } = props;
     this.state = {
       lan: store.getState().store.lan || 'fa',
       card: store.getState().store.card || [],
@@ -65,7 +74,8 @@ class GetInformation extends React.Component {
                 lg: 6,
               },
               onChange: (text) => {
-                this.state.checkOutPhoneNumber.add.data['SecondPhoneNumber'] = text;
+                this.state.checkOutPhoneNumber.add.data['SecondPhoneNumber'] =
+                  text;
               },
               className: 'ltr',
               placeholder: t('Additional phone number'),
@@ -83,7 +93,7 @@ class GetInformation extends React.Component {
               },
               onChange: (text) => {
                 this.state.checkOutPhoneNumber.add.data['firstName'] = text;
-                let user = this.state.user.firstName = text;
+                let user = (this.state.user.firstName = text);
                 savePost(user);
               },
               className: 'rtl',
@@ -102,7 +112,7 @@ class GetInformation extends React.Component {
               },
               onChange: (text) => {
                 this.state.checkOutPhoneNumber.add.data['lastName'] = text;
-                let user = this.state.user.lastName = text;
+                let user = (this.state.user.lastName = text);
                 savePost(user);
               },
               className: 'rtl',
@@ -120,8 +130,9 @@ class GetInformation extends React.Component {
                 lg: 6,
               },
               onChange: (text) => {
-                this.state.checkOutPhoneNumber.add.data['internationalCode'] = text;
-                let user = this.state.user.internationalCode = text;
+                this.state.checkOutPhoneNumber.add.data['internationalCode'] =
+                  text;
+                let user = (this.state.user.internationalCode = text);
                 savePost(user);
               },
               className: 'ltr',
@@ -140,7 +151,7 @@ class GetInformation extends React.Component {
               },
               onChange: (text) => {
                 this.state.checkOutPhoneNumber.add.data['email'] = text;
-                let user = this.state.user.email = text;
+                let user = (this.state.user.email = text);
                 savePost(user);
               },
               className: 'ltr',
@@ -163,16 +174,15 @@ class GetInformation extends React.Component {
           ],
           buttons: [],
         },
-      }
+      },
     };
     // this.getSettings();
   }
 
-
   render() {
-    const {t, _id,onNext,card} = this.props;
+    const { t, _id, onNext, card } = this.props;
     // let sum = 0;
-    let {checkOutPhoneNumber} = this.state;
+    let { checkOutPhoneNumber } = this.state;
 
     return (
       <Card className="mb-3 pd-1">
@@ -180,7 +190,7 @@ class GetInformation extends React.Component {
           <div className="kjhghjk">
             <div
               className="d-inline-block item-icon-wrapper ytrerty"
-              dangerouslySetInnerHTML={{__html: t('Contact number')}}
+              dangerouslySetInnerHTML={{ __html: t('Contact number') }}
             />
           </div>
         </CardHeader>
@@ -196,16 +206,34 @@ class GetInformation extends React.Component {
                   phoneNumber: this.state.user.phoneNumber || '',
                   SecondPhoneNumber: '',
                 }}
-                onSubmit={()=>{}}
+                onSubmit={() => {}}
                 buttons={[]}
-                rules={{fields:[
-                  {"name":"firstName","label":t("First name"),"type":"string"},
-                  {"name":"lastName","label":t("Last name"),"type":"string"},
-                  {"name":"internationalCode","label":t("International Code"),"type":"string"},
-                  {"name":"email","label":t("Email"),"type":"string"},
-                  {"name":"phoneNumber","label":t("Phone number"),"type":"string"},
-                  {"name":"SecondPhoneNumber","label":t("Second Phone number"),"type":"string"},
-                ]}}
+                rules={{
+                  fields: [
+                    {
+                      name: 'firstName',
+                      label: t('First name'),
+                      type: 'string',
+                    },
+                    { name: 'lastName', label: t('Last name'), type: 'string' },
+                    {
+                      name: 'internationalCode',
+                      label: t('International Code'),
+                      type: 'string',
+                    },
+                    { name: 'email', label: t('Email'), type: 'string' },
+                    {
+                      name: 'phoneNumber',
+                      label: t('Phone number'),
+                      type: 'string',
+                    },
+                    {
+                      name: 'SecondPhoneNumber',
+                      label: t('Second Phone number'),
+                      type: 'string',
+                    },
+                  ],
+                }}
                 // fields={checkOutPhoneNumber.add.fields}
               />
             </Row>
@@ -213,15 +241,27 @@ class GetInformation extends React.Component {
         </CardBody>
         <CardFooter className={'pd-1'}>
           <ButtonGroup size="sm left">
-            <Button className={''} left={'true'} onClick={()=>{
-              this.state.card=store.getState().store.card;
-              console.log(' this.state.card', this.state.card);
-              if (!this.state.card || (this.state.card && !this.state.card[0])) {
-                toast(t('you have nothing in your cart!'), {
-                  type: 'error'
-                });
-                return;
-              }else{onNext()}}}>{t('next')}<i className="material-icons">{'chevron_left'}</i></Button>
+            <Button
+              className={''}
+              left={'true'}
+              onClick={() => {
+                this.state.card = store.getState().store.card;
+                console.log(' this.state.card', this.state.card);
+                if (
+                  !this.state.card ||
+                  (this.state.card && !this.state.card[0])
+                ) {
+                  toast(t('you have nothing in your cart!'), {
+                    type: 'error',
+                  });
+                  return;
+                } else {
+                  onNext();
+                }
+              }}>
+              {t('next')}
+              <i className="material-icons">{'chevron_left'}</i>
+            </Button>
           </ButtonGroup>
         </CardFooter>
       </Card>

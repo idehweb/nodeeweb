@@ -182,7 +182,7 @@ function GetAddress(props) {
 
             try {
               const response = await updateAddress(
-                checkOutBillingAddress.add.data,
+                checkOutBillingAddress.add.data
               );
               setAddress(response.address);
               setModals(false);
@@ -214,7 +214,7 @@ function GetAddress(props) {
     },
   });
   const [address, setAddress] = useState(
-    store.getState().store.user?.address || [],
+    store.getState().store.user?.address || []
   );
   let [addressDelModal, setAddressDelModal] = useState(null);
   let [deletModals, setDeletModals] = useState(false);

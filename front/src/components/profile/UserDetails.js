@@ -1,13 +1,13 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
   Card,
   CardHeader,
   Button,
   ListGroup,
   ListGroupItem,
-  Progress
-} from "shards-react";
+  Progress,
+} from 'shards-react';
 
 const UserDetails = ({ userDetails }) => (
   <Card small={'true'} className="mb-4 pt-3">
@@ -36,7 +36,5 @@ const UserDetails = ({ userDetails }) => (
     </ListGroup>
   </Card>
 );
-
-
 
 export default UserDetails;

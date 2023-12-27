@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Col, Container, Row} from 'shards-react';
+import { Col, Container, Row } from 'shards-react';
 
-
-const Nohf = ({children, width, noNavbar, onChange = () => null}) => {
+const Nohf = ({ children, width, noNavbar, onChange = () => null }) => {
   // console.log(width);
   // let [width2, setWindowSize] = useState(width);
   // useEffect(() => {
@@ -29,21 +28,17 @@ const Nohf = ({children, width, noNavbar, onChange = () => null}) => {
 
   console.log('Nohf...', width);
   return (
-
     <main>
-
       <Col
         className="main-content p-0"
-        lg={{size: 12, offset: 0}}
-        md={{size: 12, offset: 0}}
+        lg={{ size: 12, offset: 0 }}
+        md={{ size: 12, offset: 0 }}
         sm="12"
         // tag="main"
       >
-
-      {children}
+        {children}
       </Col>
     </main>
-
   );
 };
 

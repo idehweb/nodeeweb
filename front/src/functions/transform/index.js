@@ -85,7 +85,7 @@ export default class Transform {
       quantity: product.combinations[0].quantity,
       slug: product.slug,
       photos: product.photos?.map(({ url }) =>
-        url.startsWith('/') ? url.slice(1) : url,
+        url.startsWith('/') ? url.slice(1) : url
       ),
       labels: product.labels,
       attributes: product.attributes,
