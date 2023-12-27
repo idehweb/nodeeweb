@@ -4,20 +4,20 @@ import { spawn } from 'child_process';
 import { Telegraf } from 'telegraf';
 import * as fs from 'fs';
 import tryCount from './trycount.js';
-import { dirSize, getFileName } from './utils.js';
+import { dirSize, getFileName, isInit } from './utils.js';
 import getSftpClient from './sftp.js';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 
-const agent =
-  process.env.SOCKS_URL &&
-  process.env.SOCKS_URL !== 'false' &&
-  process.env.SOCKS_URL !== 'null'
-    ? new SocksProxyAgent(process.env.SOCKS_URL)
-    : undefined;
+const agent = isInit(process.env.SOCKS_URL)
+  ? new SocksProxyAgent(process.env.SOCKS_URL)
+  : undefined;
 
-const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN, {
-  telegram: { agent },
-});
+const bot = isInit(process.env.TELEGRAM_BOT_TOKEN)
+  ? new Telegraf(process.env.TELEGRAM_BOT_TOKEN, {
+      telegram: { agent },
+    })
+  : null;
+
 let sftp_client, oldBackups;
 
 async function backup() {
@@ -97,6 +97,10 @@ async function uploadToServer(src) {
 }
 
 async function uploadToTelegram(src) {
+  if (!bot) {
+    console.warn('try to upload into telegram while telegram bot not initiate');
+    return;
+  }
   const file_name = getFileName(src);
   const chunk_files = (await fs.promises.readdir(process.env.LOCAL_PATH))
     .filter((file) => file.includes(`${file_name}.part`))
@@ -122,7 +126,13 @@ async function uploadToTelegram(src) {
 }
 
 async function sendTelegramNotif(msg) {
-  if (!process.env.TELEGRAM_BOT_TOKEN) return;
+  if (!bot) {
+    console.warn(
+      'try to send notification into telegram while telegram bot not initiate'
+    );
+    return;
+  }
+
   try {
     await tryCount(
       async () => {
