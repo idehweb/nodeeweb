@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import {Nav} from 'shards-react';
-import {useSelector} from 'react-redux';
-import {withTranslation} from 'react-i18next';
-import {useParams} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Nav } from 'shards-react';
+import { useSelector } from 'react-redux';
+import { withTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import SidebarCatItem from './SidebarCatItem';
-import {savePost, toggleSidebar} from '#c/functions/index';
+import { savePost, toggleSidebar } from '#c/functions/index';
 
-const SidebarAttrItems = ({t}) => {
+const SidebarAttrItems = ({ t }) => {
   // console.clear();
-  const {_id} = useParams();
+  const { _id } = useParams();
   // console.log('_id', _id);
   const cat = useSelector((st) => st.store.cat);
   const menu = useSelector((st) => st.store.menuVisible);
@@ -40,9 +40,11 @@ const SidebarAttrItems = ({t}) => {
   // } else {
   //   let [selectedCats, setSelectedCats] = useState(appAllCategories || []);
   // }
-  let id = '', fid = '', sid = '', tid = '';
+  let id = '',
+    fid = '',
+    sid = '',
+    tid = '';
   // console.clear();
-
 
   // console.log('id', id);
   // console.log('fid', fid);
@@ -64,7 +66,7 @@ const SidebarAttrItems = ({t}) => {
   useEffect(() => {
     // console.log('ch/ange selectedCats...');
     //   getCategoriesData();
-    if (selectedCats && selectedCats.length>0)
+    if (selectedCats && selectedCats.length > 0)
       selectedCats.forEach((hgfds) => {
         // if (hgfds._id === _id) {
         //   console.log('parent is ',hgfds.name );
@@ -101,7 +103,7 @@ const SidebarAttrItems = ({t}) => {
     //   if (asdf._id == cat) {
     //     console.log('asdfasdf', asdf);
     //     if (asdf.child)
-    setSelectedCats(appAllCategories)
+    setSelectedCats(appAllCategories);
 
     // }
     // });
@@ -119,43 +121,26 @@ const SidebarAttrItems = ({t}) => {
   // }, [appSelectedParents]);
 
   const onClickF = (item, isParent, isNavItemClicked) => {
-    if (activeFClass == '')
-      setActiveFClass(item._id);
-    else if (item._id == activeFClass)
-      setActiveFClass('');
-    else
-      setActiveFClass(item._id);
-
+    if (activeFClass == '') setActiveFClass(item._id);
+    else if (item._id == activeFClass) setActiveFClass('');
+    else setActiveFClass(item._id);
   };
   const onClickS = (item, isParent, isNavItemClicked) => {
-    if (activeSClass == '')
-      setActiveSClass(item._id);
-    else if (item._id == activeSClass)
-      setActiveSClass('');
-    else
-      setActiveSClass(item._id);
-
+    if (activeSClass == '') setActiveSClass(item._id);
+    else if (item._id == activeSClass) setActiveSClass('');
+    else setActiveSClass(item._id);
   };
   const onClickT = (item, isParent, isNavItemClicked) => {
-
-    if (activeTClass == '')
-      setActiveTClass(item._id);
-    else if (item._id == activeTClass)
-      setActiveTClass('');
-    else
-      setActiveTClass(item._id);
-
+    if (activeTClass == '') setActiveTClass(item._id);
+    else if (item._id == activeTClass) setActiveTClass('');
+    else setActiveTClass(item._id);
   };
   const onClick = (item, isParent, isNavItemClicked) => {
     // console.log('on/Click');
     // handleClick();
-    if (activeClass == '')
-      setActiveClass(item._id);
-    else if (item._id == activeClass)
-      setActiveClass('');
-    else
-      setActiveClass(item._id);
-
+    if (activeClass == '') setActiveClass(item._id);
+    else if (item._id == activeClass) setActiveClass('');
+    else setActiveClass(item._id);
 
     // let closeMenu = true;
     // if (isNavItemClicked) {
@@ -190,7 +175,7 @@ const SidebarAttrItems = ({t}) => {
   };
   let ref = this;
   // console.log(activeCl/ass, selectedCats)
-// return false;
+  // return false;
   return (
     <div className="nav-wrapper">
       {/*<Nav className="nav--no-borders flex-column">*/}
@@ -222,52 +207,58 @@ const SidebarAttrItems = ({t}) => {
           {/*}*/}
           {/*/>*/}
           {/*)}*/}
-          {selectedCats && selectedCats.map((item, index) => (
-            <SidebarCatItem
-              key={index}
-              item={item}
-              className={activeClass}
-              onHandle={() => handleClick()}
-              onClick={() => onClick(item)}
-            >
-
-              {item.child &&
-              <Nav className="nav--no-borders flex-column childern">{item.child.map((itemfchild, indexf) => (
-                <SidebarCatItem
-                  key={indexf}
-                  item={itemfchild}
-                  className={activeFClass}
-                  onHandle={() => handleClick()}
-                  onClick={() => onClickF(itemfchild)}
-                >
-
-
-                  {itemfchild.child &&
-                  <Nav className="nav--no-borders flex-column childern">{itemfchild.child.map((itemschild, indexs) => (
-                    <SidebarCatItem
-                      key={indexs}
-                      item={itemschild}
-                      className={activeSClass}
-                      onHandle={() => handleClick()}
-                      onClick={() => onClickS(itemschild)}
-                    >
-
-                      {itemschild.child && <Nav
-                        className="nav--no-borders flex-column childern">{itemschild.child.map((itemtchild, indext) => (
-                        <SidebarCatItem
-                          key={indext}
-                          item={itemtchild}
-                          className={activeTClass}
-                          onHandle={() => handleClick()}
-                          onClick={() => onClickT(itemschild)}
-                        ></SidebarCatItem>
-                      ))}</Nav>}
-                    </SidebarCatItem>
-                  ))}</Nav>}
-                </SidebarCatItem>
-              ))}</Nav>}
-            </SidebarCatItem>
-          ))}
+          {selectedCats &&
+            selectedCats.map((item, index) => (
+              <SidebarCatItem
+                key={index}
+                item={item}
+                className={activeClass}
+                onHandle={() => handleClick()}
+                onClick={() => onClick(item)}>
+                {item.child && (
+                  <Nav className="nav--no-borders flex-column childern">
+                    {item.child.map((itemfchild, indexf) => (
+                      <SidebarCatItem
+                        key={indexf}
+                        item={itemfchild}
+                        className={activeFClass}
+                        onHandle={() => handleClick()}
+                        onClick={() => onClickF(itemfchild)}>
+                        {itemfchild.child && (
+                          <Nav className="nav--no-borders flex-column childern">
+                            {itemfchild.child.map((itemschild, indexs) => (
+                              <SidebarCatItem
+                                key={indexs}
+                                item={itemschild}
+                                className={activeSClass}
+                                onHandle={() => handleClick()}
+                                onClick={() => onClickS(itemschild)}>
+                                {itemschild.child && (
+                                  <Nav className="nav--no-borders flex-column childern">
+                                    {itemschild.child.map(
+                                      (itemtchild, indext) => (
+                                        <SidebarCatItem
+                                          key={indext}
+                                          item={itemtchild}
+                                          className={activeTClass}
+                                          onHandle={() => handleClick()}
+                                          onClick={() =>
+                                            onClickT(itemschild)
+                                          }></SidebarCatItem>
+                                      )
+                                    )}
+                                  </Nav>
+                                )}
+                              </SidebarCatItem>
+                            ))}
+                          </Nav>
+                        )}
+                      </SidebarCatItem>
+                    ))}
+                  </Nav>
+                )}
+              </SidebarCatItem>
+            ))}
         </Nav>
       )}
     </div>

@@ -88,7 +88,7 @@ const TheList = (props) => {
               <span>{op}</span>
               <span>:</span>
               <span>{combination.options[op]}</span>
-            </div>,
+            </div>
           );
       });
     }

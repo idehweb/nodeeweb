@@ -10,17 +10,13 @@ export default function NavbarToggle(props) {
 
   const handleClick = () => toggleSidebar(menu);
 
-  return (
-    [
-      <div className={"nav toggle-sidebar xtazin2 nonestf "}>
+  return [
+    <div className={'nav toggle-sidebar xtazin2 nonestf '}>
       <div
-
         onClick={handleClick}
         className="nav-link nav-link-icon toggle-sidebar d-sm-inline d-md-inline  text-center">
-        <MenuIcon/>
+        <MenuIcon />
       </div>
-    </div>
-
-    ]
-  );
+    </div>,
+  ];
 }

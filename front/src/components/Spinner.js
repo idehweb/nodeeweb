@@ -1,4 +1,4 @@
-export default function Spinner({active = true}) {
+export default function Spinner({ active = true }) {
   return (
     <div
       className={['spinner', active && 'spinner--active'].join(' ')}

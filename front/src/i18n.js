@@ -1,6 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import {store} from '#c/functions/store';
+import { store } from '#c/functions/store';
 import fa from '#c/language/fa/translation';
 import { setLanguage } from '#c/functions/index';
 

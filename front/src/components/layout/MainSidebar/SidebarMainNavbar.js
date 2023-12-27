@@ -5,8 +5,7 @@ import { withTranslation } from 'react-i18next';
 import { toggleSidebar } from '#c/functions/index';
 import { useSelector } from 'react-redux';
 
-import {logoImg} from '#c/assets/index';
-
+import { logoImg } from '#c/assets/index';
 
 function SidebarMainNavbar({ t, hideLogoText = false }) {
   const menu = useSelector((st) => !!st.store.menuVisible);
@@ -25,10 +24,9 @@ function SidebarMainNavbar({ t, hideLogoText = false }) {
           <div className="d-table m-auto oiuytrt tm-ksa-logo-parent1">
             {/*<img style={{ maxWidth: 58 }} src={logoImg} alt="logo" />*/}
             {/*{!hideLogoText && (*/}
-              {/*<span className=" d-md-inline ml-1 gfds">فروشگاه آروند</span>*/}
+            {/*<span className=" d-md-inline ml-1 gfds">فروشگاه آروند</span>*/}
             {/*)}*/}
             <span className=" d-md-inline ml-1">دسته بندی محصولات</span>
-
           </div>
         </NavbarBrand>
         {/* eslint-disable-next-line */}

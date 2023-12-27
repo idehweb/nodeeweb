@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Col, Container, Row} from 'shards-react';
+import { Col, Container, Row } from 'shards-react';
 
 import MainNavbar from '#c/components/layout/MainNavbar/MainNavbar';
 import MainMobileNavbar from '#c/components/layout/MainNavbar/MainMobileNavbar';
@@ -11,8 +11,7 @@ import MainFooter from '#c/components/layout/MainFooter';
 import SiteStatus from '#c/components/SiteStatus';
 // import useWindowSize from '#c/components/common/useWindowSize';
 
-
-const Nof = ({children, width, noNavbar, onChange = () => null}) => {
+const Nof = ({ children, width, noNavbar, onChange = () => null }) => {
   // console.log(width);
   // let [width2, setWindowSize] = useState(width);
   // useEffect(() => {
@@ -37,31 +36,32 @@ const Nof = ({children, width, noNavbar, onChange = () => null}) => {
   // }, []);
 
   console.log('DefaultLayout...', width);
-  return (
-    [<SiteStatus key={0}/>,
-      <Container fluid key={1}>
-        <Row>
-          {width < 1200 && <MainSidebar {...children.props} />}
-          {width > 1199 && <StickyCard {...children.props} />}
+  return [
+    <SiteStatus key={0} />,
+    <Container fluid key={1}>
+      <Row>
+        {width < 1200 && <MainSidebar {...children.props} />}
+        {width > 1199 && <StickyCard {...children.props} />}
 
-          <CardSidebar {...children.props} />
+        <CardSidebar {...children.props} />
 
-          <Col
-            className="main-content p-0"
-            lg={{size: 12, offset: 0}}
-            md={{size: 12, offset: 0}}
-            sm="12"
-            tag="main">
-            {(!noNavbar && width > 1199) && <MainNavbar onChange={onChange}/>}
-            {(!noNavbar && width < 1200) && <MainMobileNavbar onChange={onChange}/>}
-            {/*<MainHeader />*/}
+        <Col
+          className="main-content p-0"
+          lg={{ size: 12, offset: 0 }}
+          md={{ size: 12, offset: 0 }}
+          sm="12"
+          tag="main">
+          {!noNavbar && width > 1199 && <MainNavbar onChange={onChange} />}
+          {!noNavbar && width < 1200 && (
+            <MainMobileNavbar onChange={onChange} />
+          )}
+          {/*<MainHeader />*/}
 
-            {children}
-          </Col>
-        </Row>
-      </Container>
-    ]
-  );
+          {children}
+        </Col>
+      </Row>
+    </Container>,
+  ];
 };
 
 Nof.propTypes = {

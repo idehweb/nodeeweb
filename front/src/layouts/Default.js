@@ -11,7 +11,14 @@ const DefaultLayout = (props) => {
   // console.clear();
   console.log('DefaultLayout...', props);
   // return
-  let { children, width, noNavbar, onChange = () => null, themeData,templates } = props;
+  let {
+    children,
+    width,
+    noNavbar,
+    onChange = () => null,
+    themeData,
+    templates,
+  } = props;
   // const themeData = useSelector((st) => st.store.themeData);
   // const themeData = useSelector((st) => st.store.themeData);
   // const homeData = useSelector((st) => st.store.homeData);
