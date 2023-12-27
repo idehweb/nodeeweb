@@ -155,7 +155,7 @@ async function getOldBackups() {
   if (oldBackups) return oldBackups;
 
   const size = await dirSize(process.env.LOCAL_PATH);
-  if (size <= +process.env.MAX_BACKUP_STORAGE_MB) return;
+  if (size <= +process.env.MAX_BACKUP_STORAGE_MB) return [];
 
   //  detect old files
   let reduce_size = size - +process.env.MAX_BACKUP_STORAGE_MB;
