@@ -49,7 +49,7 @@ async function backup() {
     () =>
       new Promise((resolve, reject) => {
         const stream = spawn(
-          `./script/backup.sh ${process.env.MONGO_URL} ${res_path}`,
+          `./script/backup.sh "${process.env.MONGO_URL}" "${res_path}"`,
           {
             stdio: [process.stdin, process.stdout, process.stderr],
             shell: true,
