@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'Nodeeweb Document',
   tagline: 'Nodeeweb Document',
-  favicon: 'https://nodeeweb.com/favicon.ico',
+  favicon: 'img/favicon.ico',
   url: 'https://nodeeweb.com',
   baseUrl: '/',
   organizationName: 'idehweb',
@@ -40,12 +40,12 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      image: 'img/logo.webp',
       navbar: {
         title: 'Nodeeweb',
         logo: {
           alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          src: 'img/logo.webp',
         },
         items: [
           {
@@ -81,7 +81,7 @@ const config = {
         darkTheme: darkCodeTheme,
       },
       colorMode: {
-        defaultMode: 'light',
+        defaultMode: 'dark',
         disableSwitch: false,
         respectPrefersColorScheme: true,
       },
