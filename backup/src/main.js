@@ -240,6 +240,8 @@ async function removePartitions() {
 }
 
 export default async function main() {
+  console.log('### START ###');
+  console.time('time');
   try {
     // create backup files
     const backup_file = await backup();
@@ -278,6 +280,8 @@ export default async function main() {
       if (sftp_client) await sftp_client.end();
     } catch (err) {}
   }
+  console.log('### END ###');
+  console.timeEnd('time');
 }
 
 // main();

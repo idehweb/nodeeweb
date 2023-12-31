@@ -4,7 +4,7 @@ set -e
 
 # ./backup.sh {mongo_uri} {result_path}
 
-echo "start backup"
+echo "start backup.sh"
 
 mkdir -p ./temp
 
