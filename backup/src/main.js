@@ -39,8 +39,8 @@ async function backup() {
   if (process.env.NODE_ENV !== 'production') {
     return await new Promise((resolve, reject) => {
       fs.writeFileSync(res_path, 'my file', 'utf8');
-      fs.writeFileSync(`${res_path}-part00`, 'my file', 'utf8');
-      fs.writeFileSync(`${res_path}-part01`, 'my file', 'utf8');
+      fs.writeFileSync(`${res_path}.part00`, 'my file', 'utf8');
+      fs.writeFileSync(`${res_path}.part01`, 'my file', 'utf8');
       resolve(res_path);
     });
   }
@@ -226,7 +226,22 @@ async function removeOldRemote() {
   }
 }
 
+async function removePartitions() {
+  const chunk_files = (await fs.promises.readdir(process.env.LOCAL_PATH))
+    .filter((file) => /\.part[^.]+$/.test(file))
+    .map((file) => `${process.env.LOCAL_PATH}/${file}`);
+
+  try {
+    for (const chunk of chunk_files) {
+      console.log('remove partition : ', chunk);
+      await fs.promises.rm(chunk);
+    }
+  } catch (err) {}
+}
+
 export default async function main() {
+  console.log('### START ###');
+  console.time('time');
   try {
     // create backup files
     const backup_file = await backup();
@@ -247,6 +262,9 @@ export default async function main() {
       await sendTelegramNotif(`Upload Complete\nfile name : ${backup_file}`);
     }
 
+    // remove partitions
+    await removePartitions();
+
     // remove old
     await removeOldLocal();
     await removeOldRemote();
@@ -262,6 +280,8 @@ export default async function main() {
       if (sftp_client) await sftp_client.end();
     } catch (err) {}
   }
+  console.log('### END ###');
+  console.timeEnd('time');
 }
 
 // main();
