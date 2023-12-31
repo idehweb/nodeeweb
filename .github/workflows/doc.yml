@@ -1,0 +1,97 @@
+name: Deploy doc
+
+# Trigger when:
+#   push on main or release/** AND change doc files
+#   manually trigger
+
+on:
+  push:
+    branches:
+      - main
+      - 'releases/**'
+    paths:
+      - 'doc/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 'Build Application'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout to repository'
+        uses: actions/checkout@v4
+
+      - name: 'Setup nodeJs'
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: 'Install yarn'
+        run: npm i -g yarn
+
+      - name: Setup node-gyp
+        run: yarn global add node-gyp
+
+      - name: 'Install dependencies'
+        working-directory: doc
+        run: yarn
+
+      - name: 'Build App'
+        run: yarn build
+        working-directory: doc
+        env:
+          CI: 'false'
+
+      - name: 'Upload build artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: doc/build
+
+  deploy:
+    name: 'Deploy on server'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Download build artifacts'
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: build
+
+      - name: 'FTP to german server'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{secrets.GERMAN_HOST}}
+          username: ${{secrets.GERMAN_FTP_USER}}
+          password: ${{secrets.GERMAN_FTP_PASS}}
+          local-dir: 'build/'
+          server-dir: '/var/doc'
+          timeout: 600000
+
+      - name: 'Chmod on german server'
+        uses: appleboy/ssh-action@v1.0.0
+        env:
+          TARGET_PATH: '/var/doc'
+          USER_PASS: ${{secrets.GERMAN_FTP_PASS}}
+        with:
+          host: ${{secrets.GERMAN_HOST}}
+          username: ${{secrets.GERMAN_FTP_USER}}
+          password: ${{secrets.GERMAN_FTP_PASS}}
+          envs: TARGET_PATH,USER_PASS
+          script_stop: true
+          script: |
+            echo $USER_PASS | sudo -S chmod -R 755 $TARGET_PATH
+
+  cleanup:
+    name: Cleanup actions
+    needs:
+      - build
+      - deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Remove build artifacts'
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: |
+            build
