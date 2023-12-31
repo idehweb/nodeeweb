@@ -39,8 +39,8 @@ async function backup() {
   if (process.env.NODE_ENV !== 'production') {
     return await new Promise((resolve, reject) => {
       fs.writeFileSync(res_path, 'my file', 'utf8');
-      fs.writeFileSync(`${res_path}-part00`, 'my file', 'utf8');
-      fs.writeFileSync(`${res_path}-part01`, 'my file', 'utf8');
+      fs.writeFileSync(`${res_path}.part00`, 'my file', 'utf8');
+      fs.writeFileSync(`${res_path}.part01`, 'my file', 'utf8');
       resolve(res_path);
     });
   }
@@ -226,6 +226,19 @@ async function removeOldRemote() {
   }
 }
 
+async function removePartitions() {
+  const chunk_files = (await fs.promises.readdir(process.env.LOCAL_PATH))
+    .filter((file) => /\.part[^.]+$/.test(file))
+    .map((file) => `${process.env.LOCAL_PATH}/${file}`);
+
+  try {
+    for (const chunk of chunk_files) {
+      console.log('remove partition : ', chunk);
+      await fs.promises.rm(chunk);
+    }
+  } catch (err) {}
+}
+
 export default async function main() {
   try {
     // create backup files
@@ -246,6 +259,9 @@ export default async function main() {
       // send notification
       await sendTelegramNotif(`Upload Complete\nfile name : ${backup_file}`);
     }
+
+    // remove partitions
+    await removePartitions();
 
     // remove old
     await removeOldLocal();
