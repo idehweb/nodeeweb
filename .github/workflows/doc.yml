@@ -66,13 +66,13 @@ jobs:
           username: ${{secrets.GERMAN_FTP_USER}}
           password: ${{secrets.GERMAN_FTP_PASS}}
           local-dir: 'build/'
-          server-dir: '/var/doc'
+          server-dir: '/var/doc/'
           timeout: 600000
 
       - name: 'Chmod on german server'
         uses: appleboy/ssh-action@v1.0.0
         env:
-          TARGET_PATH: '/var/doc'
+          TARGET_PATH: '/var/doc/'
           USER_PASS: ${{secrets.GERMAN_FTP_PASS}}
         with:
           host: ${{secrets.GERMAN_HOST}}
