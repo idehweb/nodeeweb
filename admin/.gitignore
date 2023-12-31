@@ -4,3 +4,5 @@
 **/build/**
 
 deploy/.deploy.env
+
+.env.local

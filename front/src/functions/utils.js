@@ -397,7 +397,7 @@ export const getAdminData = (
   // return fetch(url, option).then(response => response.json()); // parses JSON response into native JavaScript objects
 };
 
-export const clearState = () => {
+export const clearState = async () => {
   try {
     localStorage.clear();
   } catch {

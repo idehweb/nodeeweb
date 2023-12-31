@@ -24,7 +24,6 @@ class PlaceOrder extends React.Component {
         }
       );
     }
-  
   }
 
   render() {

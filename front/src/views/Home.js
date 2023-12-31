@@ -1,8 +1,8 @@
-import React, {useEffect} from "react";
-import {Col, Row} from 'shards-react';
+import React, { useEffect } from 'react';
+import { Col, Row } from 'shards-react';
 
 import MainContent from '#c/components/MainContent';
-import PageBuilder from "#c/components/page-builder/PageBuilder";
+import PageBuilder from '#c/components/page-builder/PageBuilder';
 import CardSidebar from '#c/components/layout/MainSidebar/CardSidebar';
 
 import {
@@ -17,74 +17,72 @@ import {
   loadPosts,
   loadProducts,
   SaveData,
-  setCountry
-} from "#c/functions/index";
-import PostSlider from "#c/components/components-overview/PostSlider";
-import {store} from '#c/functions/store';
+  setCountry,
+} from '#c/functions/index';
+import PostSlider from '#c/components/components-overview/PostSlider';
+import { store } from '#c/functions/store';
 
-import {withTranslation} from "react-i18next";
-import {useSelector} from "react-redux";
+import { withTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import _isEqual from 'lodash/isEqual';
 
 // store.dispatch(fetchHome());
 
 const Home = (props) => {
-
-  const themeData = useSelector((st) => st.store.themeData);
+  // const themeData = useSelector((st) => st.store.themeData);
   const homeData = useSelector((st) => st.store.homeData);
+  const configData = useSelector((st) => st.store.configData, _isEqual);
 
-  useEffect(() => {
-  }, []);
-  if (themeData) {
+  useEffect(() => {}, []);
+  if (configData) {
+    return (
+      <>
+        {/*{themeData.body && themeData.body.map((body, h) => {*/}
 
-    return <>
+        {/*if (body.name === 'MainContent') {*/}
+        {/*return*/}
+        <MainContent {...props} />
 
+        {/*}*/}
 
-      {themeData.body && themeData.body.map((body, h) => {
-
-        if (body.name === 'MainContent') {
-          return <MainContent {...props}/>
-
-        }
-
-
-      })}
-
-    </>
-  } else
-    return <></>
+        {/*})}*/}
+      </>
+    );
+  } else return <></>;
 };
 export const HomeServer = [
   {
     func: loadProducts,
-    params: "61d58e38d931414fd78c7fca"
+    params: '61d58e38d931414fd78c7fca',
   },
   {
     func: loadProducts,
-    params: "61d58e37d931414fd78c7fbd"
+    params: '61d58e37d931414fd78c7fbd',
   },
   {
     func: loadProducts,
-    params: "61d58e37d931414fd78c7fb7"
+    params: '61d58e37d931414fd78c7fb7',
   },
   {
     func: loadProducts,
-    params: "61d58e37d931414fd78c7fb9"
+    params: '61d58e37d931414fd78c7fb9',
   },
   {
     func: loadProducts,
-    params: "61d58e37d931414fd78c7fbc"
+    params: '61d58e37d931414fd78c7fbc',
   },
   {
     func: loadProducts,
-    params: "61d58e37d931414fd78c7fba"
+    params: '61d58e37d931414fd78c7fba',
   },
   {
     func: loadPosts,
-    params: null
+    params: null,
   },
   {
     func: fetchCats,
-    params: null
-  }];
+    params: null,
+  },
+];
 
 export default withTranslation()(Home);

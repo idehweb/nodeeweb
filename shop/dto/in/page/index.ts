@@ -2,7 +2,7 @@ import { Custom, IsSlug } from '@nodeeweb/core/utils/validation';
 import { Expose, Transform } from 'class-transformer';
 import { Allow, IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
 import { PublishStatus, MultiLang } from '../../../schema/_base.schema';
-import { ToArray, ToObject } from '@nodeeweb/core/utils/transform';
+import { ToArray, ToObject, ToSlug } from '@nodeeweb/core/utils/transform';
 export class PageBody {
   @Expose()
   @IsOptional()
@@ -39,6 +39,7 @@ export class PageBody {
 
   @Expose()
   @IsString()
+  @ToSlug()
   @IsSlug()
   @Custom((value) => !String(value).startsWith('/'), {
     name: 'StartWith',
@@ -132,6 +133,7 @@ export class PageUpdate {
   @Expose()
   @IsOptional()
   @IsString()
+  @ToSlug()
   @IsSlug()
   @Custom((value) => !String(value).startsWith('/'), {
     name: 'StartWith',

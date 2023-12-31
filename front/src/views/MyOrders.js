@@ -1,18 +1,18 @@
 import React from 'react';
-import {Card, CardBody, Col, Container, Row} from 'shards-react';
-import { Link } from "react-router-dom";
-import {withTranslation} from 'react-i18next';
+import { Card, CardBody, Col, Container, Row } from 'shards-react';
+import { Link } from 'react-router-dom';
+import { withTranslation } from 'react-i18next';
 
 import PageTitle from '#c/components/common/PageTitle';
-import {getMyOrders} from '#c/functions/index';
+import { getMyOrders } from '#c/functions/index';
 
-import {dateFormat} from '#c/functions/utils';
+import { dateFormat } from '#c/functions/utils';
 
 class MyOrders extends React.Component {
   constructor(props) {
     super(props);
     let ref = this;
-    const {t} = props;
+    const { t } = props;
     this.state = {
       data: [],
       redirect: false,
@@ -25,7 +25,7 @@ class MyOrders extends React.Component {
           disablePadding: true,
           label: t('order number'),
         },
-        {id: 'sum', numeric: false, disablePadding: true, label: t('sum')},
+        { id: 'sum', numeric: false, disablePadding: true, label: t('sum') },
         {
           id: 'status',
           numeric: false,
@@ -62,7 +62,7 @@ class MyOrders extends React.Component {
           edit: true,
           editAction: function (_id) {
             ref.redirectTrue(_id);
-          }
+          },
         },
       ],
     };
@@ -80,7 +80,7 @@ class MyOrders extends React.Component {
   }
 
   getMyOrdersF() {
-    const {t} = this.props;
+    const { t } = this.props;
     getMyOrders().then((data) => {
       if (data && data.length > 0)
         data.map((post) => {
@@ -89,15 +89,20 @@ class MyOrders extends React.Component {
           if (post.updatedAt) post.updatedAt = dateFormat(post.updatedAt);
           if (post && post['sum']) {
             post['sum'] =
-              post['sum'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + t(' UZS');
+              post['sum'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+              t(' UZS');
 
             if (post && post['amount']) {
               post['amount'] =
-                post['amount'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + t(' UZS');
+                post['amount']
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',') + t(' UZS');
             }
             if (post && post['deliveryPrice']) {
               post['deliveryPrice'] =
-                post['deliveryPrice'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + t(' UZS');
+                post['deliveryPrice']
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',') + t(' UZS');
             }
             // link['kind']=t('product');
           }
@@ -188,8 +193,8 @@ class MyOrders extends React.Component {
   }
 
   render() {
-    let {t} = this.props;
-    let {data, headCells, newText, buttonText} = this.state;
+    let { t } = this.props;
+    let { data, headCells, newText, buttonText } = this.state;
     // if (redirect) {
     //   return <Navigate to='/add-new-post'/>;
     // } else {
@@ -211,63 +216,72 @@ class MyOrders extends React.Component {
             <Card small className="mb-4">
               <CardBody className="p-2 pb-3">
                 <Row>
-
-                  {data && data.map((dat, i) => {
-                    return (<Col lg={4} md={4} sm={6} xs={12}>
-                      <div className={'the-order mb-3'}>
-                        <div className={'the-order-purple p-4'}>
-                          <div className={'the-order-title'}>
-                            <div className={'the-order-number'}> {t('Order #') + dat.orderNumber}</div>
-                            <div className={'the-order-status '}><Link
-                              className={'gfdsdf'} to={'/order-details/'+dat._id}>{t("view items")}</Link></div>
+                  {data &&
+                    data.map((dat, i) => {
+                      return (
+                        <Col lg={4} md={4} sm={6} xs={12}>
+                          <div className={'the-order mb-3'}>
+                            <div className={'the-order-purple p-4'}>
+                              <div className={'the-order-title'}>
+                                <div className={'the-order-number'}>
+                                  {' '}
+                                  {t('Order #') + dat.orderNumber}
+                                </div>
+                                <div className={'the-order-status '}>
+                                  <Link
+                                    className={'gfdsdf'}
+                                    to={'/order-details/' + dat._id}>
+                                    {t('view items')}
+                                  </Link>
+                                </div>
+                              </div>
+                              <div className={'the-order-body'}>
+                                <div className={'the-order-body-line'}>
+                                  {t('Order Date')}:{dat.updatedAt}
+                                </div>
+                                <div className={'the-order-body-line'}>
+                                  {t('Order Status')}:
+                                  <span className={dat.status_cl}>
+                                    <span className={'gfdsdf'}>
+                                      {t(dat.status)}
+                                    </span>
+                                  </span>
+                                </div>
+                                <div className={'the-order-body-line'}>
+                                  {t('Payment Status')}:
+                                  <span className={dat.paymentStatus_cl}>
+                                    {' '}
+                                    {dat.paymentStatus}
+                                  </span>
+                                </div>
+                                <div className={'the-order-body-line'}>
+                                  {t('Card Price')}:{dat.sum}
+                                </div>
+                                <div className={'the-order-body-line'}>
+                                  {t('Delivery Price')}:{dat.deliveryPrice}
+                                </div>
+                                <div className={'the-order-body-line'}>
+                                  {t('Total Price')}:{dat.amount}
+                                </div>
+                                {dat.deliveryDay &&
+                                  dat.deliveryDay.description && (
+                                    <div className={'the-order-body-line'}>
+                                      {t('Delivery Time')}:
+                                      {dat.deliveryDay.description}
+                                    </div>
+                                  )}
+                                {dat.billingAddress && (
+                                  <div className={'the-order-body-line'}>
+                                    {t('Address')}:
+                                    {dat.billingAddress.StreetAddress}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                          <div className={'the-order-body'}>
-                            <div className={'the-order-body-line'}>
-                              {t('Order Date')}
-                              :
-                              {dat.updatedAt}
-                            </div>
-                            <div className={'the-order-body-line'}>
-                              {t('Order Status')}
-                              :
-                              <span className={dat.status_cl}><span
-                                className={'gfdsdf'}>{t(dat.status)}</span></span>
-                            </div>
-                            <div className={'the-order-body-line'}>
-                              {t('Payment Status')}
-                              :
-                              <span className={dat.paymentStatus_cl}> {dat.paymentStatus}</span>
-                            </div>
-                            <div className={'the-order-body-line'}>
-                              {t('Card Price')}
-                              :
-                              {dat.sum}
-                            </div>
-                            <div className={'the-order-body-line'}>
-                              {t('Delivery Price')}
-                              :
-                              {dat.deliveryPrice}
-                            </div>
-                            <div className={'the-order-body-line'}>
-                              {t('Total Price')}
-                              :
-                              {dat.amount}
-                            </div>
-                            {dat.deliveryDay && dat.deliveryDay.description && <div className={'the-order-body-line'}>
-                              {t('Delivery Time')}
-                              :
-                              {dat.deliveryDay.description}
-                            </div>}
-                            {dat.billingAddress && <div className={'the-order-body-line'}>
-                              {t('Address')}
-                              :
-                              {dat.billingAddress.StreetAddress}
-                            </div>}
-                          </div>
-                        </div>
-                      </div>
-                    </Col>)
-                  })}
+                        </Col>
+                      );
+                    })}
                 </Row>
                 {/*<Table*/}
                 {/*data={data}*/}

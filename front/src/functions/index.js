@@ -24,6 +24,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { getToken } from './utils';
 import API from './API';
 import UserService from './User';
+import { jwtHandler } from './auth';
 
 const DataContext = createContext(null);
 export const isClient = typeof window !== 'undefined';
@@ -38,10 +39,14 @@ export const ApiUrl = process.env.REACT_APP_API_URL;
 export const AdminRoute = ServerUrl + '/admin';
 export const InstanceManagerUrl = 'https://instancemanager.nodeeweb.com/api/v1';
 export const THEME_URL = ApiUrl + '/theme';
+export const CONFIG_URL = ApiUrl + '/config/website';
 const token = getToken();
 
 export const admin_token = getToken();
-export const setStyles = (fields) => {
+export const setStyles = (fields = {}) => {
+  if (!fields) {
+    return;
+  }
   let style = {};
   let {
     textAlign,
@@ -281,8 +286,11 @@ const handleErr = (err) => {
   store.dispatch(receive_error(err));
 };
 
-export const Logout = () => {
+export const Logout = async () => {
   clearState();
+  try {
+    await jwtHandler.logout();
+  } catch (err) {}
   window.location.replace('/');
 };
 export const clearAdminState = () => {
@@ -459,6 +467,16 @@ export const fetchTheme = () => async (dispatch) => {
     });
   }
 };
+export const fetchConfig = () => async (dispatch) => {
+  // let themeData = store.getState().store.themeData;
+  // if (themeData && !themeData.length) {
+  const response = await getConfigData();
+  return await dispatch({
+    type: 'config/configLoaded',
+    payload: { configData: response },
+  });
+  // }
+};
 export const fetchHome = () => async (dispatch) => {
   let homeData = store.getState().store.homeData;
   if (homeData && !homeData.length) {
@@ -491,6 +509,16 @@ export const getThemeData = (i = '') =>
           handleErr(err);
           return err;
         });
+
+export const getConfigData = (i = '') =>
+  getAdminData(`${CONFIG_URL}`, {}, true)
+    .then((res) => {
+      return res?.data?.data || {};
+    })
+    .catch((err) => {
+      handleErr(err);
+      return err;
+    });
 export const getThemeDataold = (i = '') =>
   getAdminData(`${THEME_URL}`, {}, true)
     .then((res) => {
@@ -585,7 +613,6 @@ export const getContacts = () => {
     let c = [];
     getData(`${ApiUrl}/session/contacts/mine`, {}, true)
       .then(({ data = {} }) => {
-        console.clear();
         resolve(data);
       })
       .catch((err) => {
@@ -602,7 +629,6 @@ export const addToMyContacts = (phoneNumber) => {
       true
     )
       .then(({ data = {} }) => {
-        console.clear();
         resolve(data);
       })
       .catch((err) => {
@@ -616,7 +642,6 @@ export const startChat = (phoneNumber, from) => {
 
     getData(`${ApiUrl}/session/` + phoneNumber, true)
       .then(({ data = {} }) => {
-        console.clear();
         resolve(data);
       })
       .catch((err) => {
@@ -773,17 +798,6 @@ export const getMyInstances = async (offset = 0, limit = 100) => {
       expireAt: new Date(),
     },
   ];
-
-  // return getData(`${ApiUrl}/order/myOrders/mine/${offset}/${limit}`, {}, true)
-  //   .then((res) => {
-  //     if (res.data.success == false)
-  //       return [];
-  //     return res.data;
-  //   })
-  //   .catch((err) => {
-  //     handleErr(err);
-  //     return err;
-  //   });
 };
 export const getMyOrder = (_id) =>
   getData(`${ApiUrl}/order/myOrder/onlyMine/${_id}`, {}, true)
@@ -950,6 +964,7 @@ export const postPath = (path) => {
   });
 };
 export const getEntity = (entity, _id) => {
+  console.log('##$$ getEntity', `${ApiUrl}/${entity}/${_id}`);
   return new Promise(function (resolve, reject) {
     getData(`${ApiUrl}/${entity}/${_id}`, {}, true)
       .then((res) => {
@@ -1001,6 +1016,8 @@ export const getEntities = (
     if (!filter && populate) {
       url += '?populate=' + populate;
     }
+    console.log('##$$ getEntities', url);
+
     getData(url, { params }, true)
       .then((data) => {
         resolve(data.data);
@@ -1027,13 +1044,12 @@ export const getEntitiesWithCount = async (
     };
   }
 
-  let url = `${ApiUrl}/${entity}/${offset}/${limit}/`;
+  let url = `/${entity}/${offset}/${limit}/`;
 
   if (search) url += search;
 
   if (filter) {
     url += '?filter=' + filter;
-    // if (filter["type"]) params["type"] = filter["type"];
   }
   if (filter && populate) {
     url += '&populate=' + populate;
@@ -1041,7 +1057,7 @@ export const getEntitiesWithCount = async (
   if (!filter && populate) {
     url += '?populate=' + populate;
   }
-
+  console.log('##$$ getEntityWithCount', url);
   const { data, headers } = await API.get(url, { params });
 
   return { items: data.data, count: headers ? headers['x-total-count'] : 0 };
@@ -1054,7 +1070,6 @@ export const getEntitiesForAdmin = (
   filter = {}
 ) => {
   return new Promise(function (resolve, reject) {
-    // console.log('getPosts...',store.getState().store.country)
     let params = {};
     const { country } = store.getState().store;
     if (country) {
@@ -1240,7 +1255,7 @@ export const editRecord = (model, _id, obj) => {
 
 export const contactBoy = (d, obj) => {
   return new Promise(function (resolve, reject) {
-    getData(combineUrl(MainUrl,d), obj, false)
+    getData(combineUrl(MainUrl, d), obj, false)
       .then((data) => {
         let mainD = data['data'];
 
@@ -1767,6 +1782,17 @@ export const getBlogPost = (i) =>
     });
 
 export const getPage = (i) =>
+  getData(`${ApiUrl}/page/${i}`, {}, true)
+    .then((res) => {
+      if (res.data && res.data.data) {
+        return res.data.data;
+      } else return res.data;
+    })
+    .catch((err) => {
+      handleErr(err);
+    });
+
+export const getPageByPath = (i) =>
   getData(`${ApiUrl}/page/${i}`, {}, true)
     .then((res) => {
       if (res.data && res.data.data) {

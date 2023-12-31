@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Card, Slide } from '@mui/material';
-import { Row} from "shards-react";
+import { Row } from 'shards-react';
 
 import { makeStyles } from '@mui/styles';
 import { CloseRounded } from '@mui/icons-material';
@@ -22,14 +22,13 @@ const useStyles = makeStyles({
     borderRadius: 20,
     boxShadow: '0 10px 25px 0 rgba(0, 0, 0, 0.05)',
     animation: 'zoomIn 1s',
-
   },
   header: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     color: '#052971',
-    marginBottom:'30px',
+    marginBottom: '30px',
     fontSize: 22,
     fontWeight: 'bold',
     zIndex: 100000,
@@ -47,14 +46,7 @@ const useStyles = makeStyles({
   },
 });
 
-function CustomModal({
-  open = false,
-  onClose,
-  title,
-  className,
-  children,
-  t
-}) {
+function CustomModal({ open = false, onClose, title, className, children, t }) {
   const cls = useStyles();
   return (
     <Modal
@@ -74,9 +66,7 @@ function CustomModal({
             </Tooltip>
             <span>{title}</span>
           </div>
-          <Row>
-          {children}
-          </Row>
+          <Row>{children}</Row>
         </Card>
       </Slide>
     </Modal>

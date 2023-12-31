@@ -11,15 +11,8 @@ export default function registerController() {
   registerEntityCRUD(
     'form',
     {
-      getOne: {
-        controller: {
-          access: AdminAccess,
-        },
-      },
+      getOne: {},
       getAll: {
-        controller: {
-          access: AdminAccess,
-        },
         crud: {
           paramFields: {
             limit: 'limit',
@@ -27,11 +20,7 @@ export default function registerController() {
           },
         },
       },
-      getCount: {
-        controller: {
-          access: AdminAccess,
-        },
-      },
+      getCount: {},
       create: {
         controller: {
           access: AdminAccess,

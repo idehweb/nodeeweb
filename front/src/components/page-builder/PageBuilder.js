@@ -35,6 +35,7 @@ import { Button } from 'shards-react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { combineUrl } from '@/functions/utils';
+import { CartService } from '@/functions/order/cart';
 
 export function ShowElement(p) {
   let { element, content, params, condition, handleStep } = p;
@@ -334,7 +335,7 @@ export function TheButton(p) {
             <span>{React.createElement(Icons[iconFont])}</span>
           )}
           <span className={'badge'} theme="info">
-            {card && card.length}
+            {CartService.getCartLength(CartService.getLocal())}
           </span>
           <span>{text}</span>
         </Button>
@@ -703,7 +704,6 @@ export function SWIPERSlide(props) {
 }
 
 export function ProductElement(props) {
-  console.clear();
   return <PostCard item={props} />;
 }
 

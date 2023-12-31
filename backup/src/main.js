@@ -4,21 +4,21 @@ import { spawn } from 'child_process';
 import { Telegraf } from 'telegraf';
 import * as fs from 'fs';
 import tryCount from './trycount.js';
-import { dirSize, getFileName } from './utils.js';
+import { dirSize, getFileName, isInit } from './utils.js';
 import getSftpClient from './sftp.js';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 
-const agent =
-  process.env.SOCKS_URL &&
-  process.env.SOCKS_URL !== 'false' &&
-  process.env.SOCKS_URL !== 'null'
-    ? new SocksProxyAgent(process.env.SOCKS_URL)
-    : undefined;
+const agent = isInit(process.env.SOCKS_URL)
+  ? new SocksProxyAgent(process.env.SOCKS_URL)
+  : undefined;
 
-const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN, {
-  telegram: { agent },
-});
-let sftp_client;
+const bot = isInit(process.env.TELEGRAM_BOT_TOKEN)
+  ? new Telegraf(process.env.TELEGRAM_BOT_TOKEN, {
+      telegram: { agent },
+    })
+  : null;
+
+let sftp_client, oldBackups;
 
 async function backup() {
   const res_path = join(
@@ -39,8 +39,8 @@ async function backup() {
   if (process.env.NODE_ENV !== 'production') {
     return await new Promise((resolve, reject) => {
       fs.writeFileSync(res_path, 'my file', 'utf8');
-      fs.writeFileSync(`${res_path}-part00`, 'my file', 'utf8');
-      fs.writeFileSync(`${res_path}-part01`, 'my file', 'utf8');
+      fs.writeFileSync(`${res_path}.part00`, 'my file', 'utf8');
+      fs.writeFileSync(`${res_path}.part01`, 'my file', 'utf8');
       resolve(res_path);
     });
   }
@@ -49,7 +49,7 @@ async function backup() {
     () =>
       new Promise((resolve, reject) => {
         const stream = spawn(
-          `./script/backup.sh ${process.env.MONGO_URL} ${res_path}`,
+          `./script/backup.sh "${process.env.MONGO_URL}" "${res_path}"`,
           {
             stdio: [process.stdin, process.stdout, process.stderr],
             shell: true,
@@ -77,9 +77,8 @@ async function backup() {
 }
 
 async function uploadToServer(src) {
-  if (!sftp_client) sftp_client = await getSftpClient();
-
   try {
+    if (!sftp_client) sftp_client = await getSftpClient();
     const file_name = getFileName(src);
     await tryCount(
       async () => {
@@ -92,55 +91,71 @@ async function uploadToServer(src) {
       { max_count: 10, name: 'SFTP' }
     );
   } catch (err) {
-    console.log('sftp error : ', err);
-    throw err;
+    console.error('sftp error : ', err);
+    await sendTelegramNotif(`SFTP Error\n${err?.toString()}`);
   }
 }
 
 async function uploadToTelegram(src) {
+  if (!bot) {
+    console.warn('try to upload into telegram while telegram bot not initiate');
+    return;
+  }
   const file_name = getFileName(src);
   const chunk_files = (await fs.promises.readdir(process.env.LOCAL_PATH))
     .filter((file) => file.includes(`${file_name}.part`))
     .map((file) => `${process.env.LOCAL_PATH}/${file}`);
 
-  for (const chunk of chunk_files) {
-    await tryCount(
-      async () => {
-        await bot.telegram.sendDocument(process.env.TELEGRAM_CHANNEL_ID, {
-          source: new fs.createReadStream(chunk),
-          filename: getFileName(chunk),
-        });
-        await fs.promises.rm(chunk);
-      },
-      { max_count: 20, name: 'Telegram Upload' }
-    );
+  try {
+    for (const chunk of chunk_files) {
+      await tryCount(
+        async () => {
+          await bot.telegram.sendDocument(process.env.TELEGRAM_CHANNEL_ID, {
+            source: new fs.createReadStream(chunk),
+            filename: getFileName(chunk),
+          });
+          await fs.promises.rm(chunk);
+        },
+        { max_count: 20, name: 'Telegram Upload' }
+      );
+    }
+  } catch (err) {
+    console.error('telegram error : ', err);
+    await sendTelegramNotif(`telegram error\n${err?.toString()}`);
   }
 }
 
 async function sendTelegramNotif(msg) {
-  if (!process.env.TELEGRAM_BOT_TOKEN) return;
-  await tryCount(
-    async () => {
-      await bot.telegram.sendMessage(
-        process.env.TELEGRAM_CHANNEL_ID,
-        `<b>${process.env.SERVER_NAME}</b>\n${msg}`,
-        {
-          parse_mode: 'HTML',
-        }
-      );
-    },
-    { max_count: 10, name: 'Telegram Notification' }
-  );
+  if (!bot) {
+    console.warn(
+      'try to send notification into telegram while telegram bot not initiate'
+    );
+    return;
+  }
+
+  try {
+    await tryCount(
+      async () => {
+        await bot.telegram.sendMessage(
+          process.env.TELEGRAM_CHANNEL_ID,
+          `<b>${process.env.SERVER_NAME}</b>\n${msg}`,
+          {
+            parse_mode: 'HTML',
+          }
+        );
+      },
+      { max_count: 10, name: 'Telegram Notification' }
+    );
+  } catch (err) {
+    console.error('telegram notif error:', `message: ${msg}\n`, err);
+  }
 }
 
-async function removeOld() {
-  if (!sftp_client && process.env.SFTP_USERNAME)
-    try {
-      sftp_client = await getSftpClient();
-    } catch (err) {}
+async function getOldBackups() {
+  if (oldBackups) return oldBackups;
 
   const size = await dirSize(process.env.LOCAL_PATH);
-  if (size <= +process.env.MAX_BACKUP_STORAGE_MB) return;
+  if (size <= +process.env.MAX_BACKUP_STORAGE_MB) return [];
 
   //  detect old files
   let reduce_size = size - +process.env.MAX_BACKUP_STORAGE_MB;
@@ -170,57 +185,91 @@ async function removeOld() {
     reduce_size -= stat.size;
   }
 
+  oldBackups = must_remove_stats;
+  return must_remove_stats;
+}
+
+async function removeOldLocal() {
   // remove
-  for (const stat of must_remove_stats) {
-    console.log('remove : ', stat.name);
-    try {
-      await fs.promises.rm(stat.local_path);
-      if (sftp_client) await sftp_client.delete(stat.sftp_path, true);
-    } catch (err) {
-      console.log('remove error\n', err);
+  try {
+    const must_remove_stats = await getOldBackups();
+    for (const stat of must_remove_stats) {
+      console.log('remove local : ', stat.name);
+      try {
+        await fs.promises.rm(stat.local_path);
+      } catch (err) {
+        console.error(`remove local stat ${stat.name} error\n`, err);
+      }
     }
+  } catch (err) {
+    console.error('remove local error\n', err);
+    await sendTelegramNotif(`remove local error\n${err?.toString()}`);
+  }
+}
+async function removeOldRemote() {
+  // remove
+  try {
+    if (!sftp_client && process.env.SFTP_USERNAME)
+      sftp_client = await getSftpClient();
+    const must_remove_stats = await getOldBackups();
+    for (const stat of must_remove_stats) {
+      console.log('remove remote : ', stat.name);
+      try {
+        await sftp_client.delete(stat.sftp_path, true);
+      } catch (err) {
+        console.error(`remove remote stat ${stat.name} error\n`, err);
+      }
+    }
+  } catch (err) {
+    console.error('remove remote error\n', err);
+    await sendTelegramNotif(`remove remote error\n${err?.toString()}`);
   }
 }
 
+async function removePartitions() {
+  const chunk_files = (await fs.promises.readdir(process.env.LOCAL_PATH))
+    .filter((file) => /\.part[^.]+$/.test(file))
+    .map((file) => `${process.env.LOCAL_PATH}/${file}`);
+
+  try {
+    for (const chunk of chunk_files) {
+      console.log('remove partition : ', chunk);
+      await fs.promises.rm(chunk);
+    }
+  } catch (err) {}
+}
+
 export default async function main() {
+  console.log('### START ###');
+  console.time('time');
   try {
     // create backup files
     const backup_file = await backup();
     console.log('create backup file');
 
     // upload to sftp server
-    if (process.env.SFTP_USERNAME) {
-      try {
-        await uploadToServer(backup_file);
-        console.log('uploaded into sftp server');
-      } catch (err) {
-        console.log('sftp error', err);
-        await sendTelegramNotif(`SFTP Error\n${err?.toString()}`);
-      }
+    if (isInit(process.env.SFTP_USERNAME)) {
+      await uploadToServer(backup_file);
+      console.log('uploaded into sftp server');
     }
 
-    // upload to telegram
-    if (process.env.TELEGRAM_BOT_TOKEN) {
-      try {
-        await uploadToTelegram(backup_file);
-        console.log('uploaded into telegram channel');
-      } catch (err) {
-        console.log('telegram upload', err);
-        await sendTelegramNotif(`Telegram Upload Error\n${err?.toString()}`);
-      }
+    // upload to telegram and notif
+    if (isInit(process.env.TELEGRAM_BOT_TOKEN)) {
+      await uploadToTelegram(backup_file);
+      console.log('uploaded into telegram channel');
+
+      // send notification
+      await sendTelegramNotif(`Upload Complete\nfile name : ${backup_file}`);
     }
 
-    // send notification
-    await sendTelegramNotif(`Upload Complete\nfile name : ${backup_file}`);
+    // remove partitions
+    await removePartitions();
 
     // remove old
-    try {
-      await removeOld();
-    } catch (err) {
-      console.log('remove old error', err);
-      await sendTelegramNotif(`Remove old Error\n${err?.toString()}`);
-    }
+    await removeOldLocal();
+    await removeOldRemote();
 
+    // close sftp
     try {
       if (sftp_client) await sftp_client.end();
     } catch (err) {}
@@ -231,6 +280,8 @@ export default async function main() {
       if (sftp_client) await sftp_client.end();
     } catch (err) {}
   }
+  console.log('### END ###');
+  console.timeEnd('time');
 }
 
 // main();

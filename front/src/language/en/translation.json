@@ -37,7 +37,7 @@
   "add voice": "add voice",
   "last step": "last step",
   "next step": "next step",
-  "createdAt":"Created at",
+  "createdAt": "Created at",
   "in category": "in category",
   "login / register": "login / register",
   "account details": "account details",
@@ -97,13 +97,12 @@
   "Iran": "Iran",
   "Turkey": "Turkey",
   "make money": "make money",
-  "Creating link...":"Creating link...",
-  "somethings_wrong":"Something went wrong , please try again...",
+  "Creating link...": "Creating link...",
+  "somethings_wrong": "Something went wrong , please try again...",
   "You did not created a post until now! please create one...": "You did not created a post until now! please create one...",
   "job-create": "in progress",
   "up": "up",
   "down": "down",
   "error": "error",
   "job-error": "error in creation"
-  
 }

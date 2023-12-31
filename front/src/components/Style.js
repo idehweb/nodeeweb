@@ -1,10 +1,10 @@
 import React from 'react';
 
-import {withTranslation} from 'react-i18next';
+import { withTranslation } from 'react-i18next';
 
 const Style = (props) => {
-  console.log('props', props)
-  let {css} = props;
+  console.log('props', props);
+  let { css } = props;
   // let {styles} = props,styleString='';
   // styles.forEach(e => {
   //   let {selectors, style} = e,selec=[];
@@ -19,11 +19,7 @@ const Style = (props) => {
   //   })
   //   styleString+="}\n\n";
   // })
-  return (
-    <style>
-      {css}
-    </style>
-  );
+  return <style>{css}</style>;
 };
 
 export default withTranslation()(Style);

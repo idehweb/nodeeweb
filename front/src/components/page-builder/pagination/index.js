@@ -138,7 +138,7 @@ const Pagination = (props) => {
       limit,
       '',
       filter,
-      JSON.stringify(populateQuery),
+      JSON.stringify(populateQuery)
     ).then((resp) => {
       afterGetData(resp);
     });
@@ -271,7 +271,7 @@ const Pagination = (props) => {
                   previousiconbuttontext={t('previous page')}
                   labelDisplayedRows={({ from, to, count }) =>
                     `${from} ${t('to')} ${to === -1 ? count : to} ${t(
-                      'from',
+                      'from'
                     )} ${counts} ${t('item')}`
                   }
                   onPageChange={(e, newPage) => handleChangePage(e, newPage)}

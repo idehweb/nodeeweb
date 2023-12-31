@@ -1,13 +1,19 @@
-import React, {Suspense, useState,useEffect} from 'react';
-import {useSelector} from 'react-redux';
+import React, { Suspense, useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
-import {withTranslation} from 'react-i18next';
-import {Dropdown, DropdownItem, DropdownMenu, DropdownToggle, NavLink} from "shards-react";
-import {savePost, setCat} from "#c/functions/index";
-import {store} from "#c/functions/store";
+import { withTranslation } from 'react-i18next';
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  NavLink,
+} from 'shards-react';
+import { savePost, setCat } from '#c/functions/index';
+import { store } from '#c/functions/store';
 
 // class MainCats extends React.Component {
-const MainCats = ({t}) => {
+const MainCats = ({ t }) => {
   let cat = useSelector((st) => st.store.cat);
   // const appSelectedCats = useSelector((st) => st.store.selectedCats);
   // const appSelectedParents = useSelector((st) => st.store.selectedParents);
@@ -17,7 +23,7 @@ const MainCats = ({t}) => {
   const [visible, setvisible] = useState(false);
   // const [selectedParents, setSelectedParents] = useState([]);
   useEffect(() => {
-    console.log('useEffect',cat);
+    console.log('useEffect', cat);
     changeCat(cat);
   }, [cat]);
   // constructor(props) {
@@ -37,8 +43,7 @@ const MainCats = ({t}) => {
     // localstorage.getItem('token');
     console.log('set State');
     setvisible(!visible);
-
-  }
+  };
 
   const showCatName = (cat_id) => {
     // console.clear();
@@ -50,7 +55,6 @@ const MainCats = ({t}) => {
         console.log('ca._id', ca);
 
         if (ca._id === cat_id) {
-
           name = ca.name[lan];
         }
       });
@@ -75,40 +79,45 @@ const MainCats = ({t}) => {
 
   console.log('cats', cats);
   return (
-    <Suspense fallback={() => {
-      console.log('gfdes')
-    }}>
-      <Dropdown className={"ytrdf "} toggle={toggleUserActions}>
+    <Suspense
+      fallback={() => {
+        console.log('gfdes');
+      }}>
+      <Dropdown className={'ytrdf '} toggle={toggleUserActions}>
+        <DropdownToggle
+          caret={true}
+          tag={NavLink}
+          className="text-nowrap px-3 helldone">
+          {!cat && (
+            <span className={'mr-2'}>
+              <span className="d-md-inline-block">{t('Select Category')}</span>
+            </span>
+          )}
 
-        <DropdownToggle caret={true} tag={NavLink} className="text-nowrap px-3 helldone">
-          {!cat &&
-          <span className={'mr-2'}>
-          <span className="d-md-inline-block">{t('Select Category')}</span></span>
-          }
-
-          {cat &&
-          <span className={'mr-2'}>
-          <span className="d-md-inline-block">{showCatName(cat)}</span></span>
-          }
-
+          {cat && (
+            <span className={'mr-2'}>
+              <span className="d-md-inline-block">{showCatName(cat)}</span>
+            </span>
+          )}
         </DropdownToggle>
         <DropdownMenu open={visible}>
-          {(cats && cats.length > 0) && cats.map((cate, t) => {
-            // console.log('cate', cate);
-            return (<DropdownItem
-              key={t}
-              className={'dropdown-item'}
-              to={'/category/' + cate._id + '/' + cate.name[lan]}
-              onClick={() => {
-                changeCat(cate._id)
-              }}>
-
-              {cate.title[lan]}
-            </DropdownItem>);
-          })}
+          {cats &&
+            cats.length > 0 &&
+            cats.map((cate, t) => {
+              // console.log('cate', cate);
+              return (
+                <DropdownItem
+                  key={t}
+                  className={'dropdown-item'}
+                  to={'/category/' + cate._id + '/' + cate.name[lan]}
+                  onClick={() => {
+                    changeCat(cate._id);
+                  }}>
+                  {cate.title[lan]}
+                </DropdownItem>
+              );
+            })}
         </DropdownMenu>
-
-
       </Dropdown>
     </Suspense>
   );

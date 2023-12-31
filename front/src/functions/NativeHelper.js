@@ -1,6 +1,6 @@
 import copy from 'copy-to-clipboard';
 import { Plugins } from '@capacitor/core';
-const { Clipboard, Share ,Browser} = Plugins;
+const { Clipboard, Share, Browser } = Plugins;
 
 export const CopyToClipboard = (txt, type = 'string') => {
   Clipboard.write({
@@ -10,7 +10,7 @@ export const CopyToClipboard = (txt, type = 'string') => {
 };
 
 export const CallPhoneNumber = async (url) => {
-  console.log('url',url);
+  console.log('url', url);
   await Browser.open({ url: url });
 };
 

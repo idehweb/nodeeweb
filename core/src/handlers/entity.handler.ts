@@ -10,10 +10,28 @@ import {
 } from './controller.handler';
 import { CRUD_DEFAULT_REQ_KEY } from '../constants/String';
 import { BadRequestError, GeneralError, NotFound } from '../../types/error';
-import { call } from '../../utils/helpers';
+import { call, safeJsonParse } from '../../utils/helpers';
 import { CrudParamDto, MultiIDParam } from '../../dto/in/crud.dto';
 import _, { isNil, lowerFirst, orderBy } from 'lodash';
 import { ClassConstructor } from 'class-transformer';
+
+export type SpecQueryParamsOut = {
+  [k in '_limit' | '_sort' | '_offset']?: string | string[] | object;
+};
+
+function normalizeSort(sort = {}) {
+  const flat = (sort = {} as any) => {
+    return Array.isArray(sort) ? sort.pop() : sort;
+  };
+  const wellknown = (sort = {} as any) => {
+    let newSort = sort;
+    if (typeof newSort === 'string') {
+      newSort = newSort.replace(/\b_?id\b/g, '_id');
+    }
+    return newSort;
+  };
+  return wellknown(flat(sort));
+}
 
 export function getEntityEventName(
   name: string,
@@ -27,15 +45,15 @@ export class EntityCreator {
     return store.db.model(this.modelName);
   }
 
-  private exportQueryParams(
+  private specQueryParams(
     reqQuery: Req['query'],
     queryFields?: CRUDCreatorOpt['queryFields']
-  ) {
+  ): SpecQueryParamsOut {
     if (!queryFields) return {};
 
     let mapper: (key: string) => string | undefined;
     const defaultMapper = (key: string) =>
-      ['sort', 'limit', 'offset', 'filter'].includes(key) ? `_${key}` : key;
+      ['sort', 'limit', 'offset'].includes(key) ? `_${key}` : null;
 
     switch (typeof queryFields) {
       case 'function':
@@ -58,7 +76,7 @@ export class EntityCreator {
       query[newKey] = v;
     });
 
-    return query as { [k: string]: string | string[] | object };
+    return query;
   }
 
   async parseFilterQuery(opt: CRUDCreatorOpt, req: Req) {
@@ -66,21 +84,35 @@ export class EntityCreator {
 
     const pf = opt.paramFields || { id: 'id', slug: 'slug' };
 
+    const _internalFilter = () => {
+      const extraFilter = safeJsonParse(req.query._filter || req.query.filter);
+      const directFilters = Object.fromEntries(
+        Object.entries(req.query).filter(
+          ([k, v]) =>
+            !['sort', 'filter', 'limit', 'offset', 'skip'].includes(k) &&
+            !k.startsWith('_')
+        )
+      );
+      return {
+        ...directFilters,
+        ...extraFilter,
+        _id:
+          pf?.id &&
+          req.params[pf.id] &&
+          new mongoose.Types.ObjectId(req.params[pf.id]),
+        slug: req.params[pf?.slug],
+        $expr: {
+          $or: [
+            { $eq: ['$active', true] },
+            { $eq: ['missing', { $type: '$active' }] },
+          ],
+        },
+      };
+    };
+
     const f = opt.parseFilter
       ? await call(opt.parseFilter, req)
-      : {
-          _id:
-            pf?.id &&
-            req.params[pf.id] &&
-            new mongoose.Types.ObjectId(req.params[pf.id]),
-          slug: req.params[pf?.slug],
-          $expr: {
-            $or: [
-              { $eq: ['$active', true] },
-              { $eq: ['missing', { $type: '$active' }] },
-            ],
-          },
-        };
+      : _internalFilter();
 
     for (const key in f) {
       if (f[key] === undefined) delete f[key];
@@ -169,54 +201,13 @@ export class EntityCreator {
     {
       executeQuery,
       project,
-      sort,
-      paramFields,
       httpCode = 200,
       autoSetCount,
-      queryFields,
       populate,
     }: Partial<CRUDCreatorOpt>
   ) {
     let result: any = query;
-    const reqQuery = this.exportQueryParams(req.query, queryFields);
-    const mySort: any = reqQuery['_sort'] ?? sort;
-    if (mySort) query.sort(Array.isArray(mySort) ? mySort.pop() : mySort);
     if (project) query.projection(project);
-    const offset = +(
-      reqQuery['_offset'] ??
-      this.getFrom(
-        req,
-        [{ reqKey: 'params', objKey: paramFields }],
-        'offset',
-        0
-      )
-    );
-
-    const limit = +(
-      reqQuery['_limit'] ??
-      this.getFrom(
-        req,
-        [
-          { reqKey: 'query', objKey: queryFields },
-          { reqKey: 'params', objKey: paramFields },
-        ],
-        'limit',
-        req.method === 'GET' ? 12 : 0
-      )
-    );
-    if (offset) query.skip(offset);
-    if (limit) query.limit(limit);
-
-    // filter
-    const filterFromQuery = Object.fromEntries(
-      Object.entries(reqQuery).filter(([k, v]) => !k.startsWith('_'))
-    );
-    const directFilterQ: any = reqQuery._filter ?? {};
-    query.setQuery({
-      ...query.getQuery(),
-      ...filterFromQuery,
-      ...directFilterQ,
-    });
 
     // populate
     if (populate) {
@@ -285,11 +276,47 @@ export class EntityCreator {
       });
     };
   }
-  getAllCreator({ ...opt }: CRUDCreatorOpt): MiddleWare {
+  getAllCreator({ queryFields, sort, ...opt }: CRUDCreatorOpt): MiddleWare {
     return async (req, res, next) => {
+      // filter query
       const f = await this.parseFilterQuery(opt, req);
-      if (!opt.sort) opt.sort = { createdAt: -1 };
+
+      // other query params
+      const reqQuery = this.specQueryParams(req.query, queryFields);
+
+      // init query
       const query = this.model.find(f);
+
+      // sort
+      const mySort: any = reqQuery._sort ?? sort ?? { createdAt: -1 };
+      if (mySort) query.sort(normalizeSort(mySort));
+
+      // skip and limit
+      const offset = +(
+        reqQuery._offset ??
+        this.getFrom(
+          req,
+          [{ reqKey: 'params', objKey: opt.paramFields }],
+          'offset',
+          0
+        )
+      );
+
+      const limit = +(
+        reqQuery._limit ??
+        this.getFrom(
+          req,
+          [
+            { reqKey: 'query', objKey: queryFields },
+            { reqKey: 'params', objKey: opt.paramFields },
+          ],
+          'limit',
+          req.method === 'GET' ? 12 : 0
+        )
+      );
+      if (offset) query.skip(offset);
+      if (limit) query.limit(limit);
+
       return await this.baseCreator(query, req, res, next, opt);
     };
   }

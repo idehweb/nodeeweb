@@ -35,3 +35,17 @@ export function ToObject(opt?: TransformOptions) {
     return value;
   }, opt);
 }
+
+export function ToSlug(opt?: TransformOptions) {
+  return Transform(({ obj, key }) => {
+    const value = obj[key];
+
+    // null or undefine
+    if (_.isNil(value)) return value;
+
+    // not string
+    if (typeof value !== 'string') return value;
+
+    return value.trim().toLowerCase().replace(/\s+/g, '-');
+  }, opt);
+}

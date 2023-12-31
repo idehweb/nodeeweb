@@ -84,12 +84,13 @@ function Checkout({ t }) {
 
         break;
     }
-    navigate(`/checkout/${state}`);
+    navigate(`/checkout/${state}`, { replace: true });
   }, [state]);
 
   useEffect(() => {
-    // const from = query.get('from');
-    // if (from !== '/login') return;
+    const user = UserService.getMeLocal(null);
+    const needLogin = !Boolean(user._id);
+    if (needLogin) return;
     CartService.sync().catch((err) => {
       CartService.clear();
       toast.error(

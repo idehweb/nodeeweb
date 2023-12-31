@@ -1,8 +1,8 @@
-import * as fs from "fs";
-import path from "path";
+import * as fs from 'fs';
+import path from 'path';
 
-export function getFileName(path, def = "backup.tar.gz") {
-  return path.split("/").pop() ?? def;
+export function getFileName(path, def = 'backup.tar.gz') {
+  return path.split('/').pop() ?? def;
 }
 
 export async function dirSize(directory) {
@@ -16,4 +16,8 @@ export async function dirSize(directory) {
     0
   );
   return byteSize / 1024 ** 2;
+}
+
+export function isInit(value) {
+  return value && value !== 'false' && value !== 'null';
 }

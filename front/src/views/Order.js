@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Button,
   Card,
@@ -9,20 +9,20 @@ import {
   Container,
   ListGroup,
   ListGroupItem,
-  Row
-} from "shards-react";
+  Row,
+} from 'shards-react';
 
-import store from "../functions/store";
-import PageTitle from "../components/common/PageTitle";
+import store from '../functions/store';
+import PageTitle from '../components/common/PageTitle';
 // import UserDetails from "../components/profile/UserDetails";
-import {withTranslation} from 'react-i18next';
-import {buy, getOrder} from "../functions/index"
-import {Navigate} from "react-router-dom";
+import { withTranslation } from 'react-i18next';
+import { buy, getOrder } from '../functions/index';
+import { Navigate } from 'react-router-dom';
 
 class Order extends React.Component {
   constructor(props) {
     super(props);
-    const {match} = props;
+    const { match } = props;
     this.state = {
       _id: match.params._id,
       sum: 0,
@@ -39,7 +39,7 @@ class Order extends React.Component {
       status: '',
       paymentStatus: '',
       billingAddress: {},
-      customer_data: {}
+      customer_data: {},
 
       // settings: store.getState().store.settings || []
     };
@@ -47,7 +47,7 @@ class Order extends React.Component {
   }
 
   getTheOrder() {
-    let {_id} = this.state;
+    let { _id } = this.state;
     getOrder(_id).then((response) => {
       if (response.success) {
         this.setState({
@@ -59,18 +59,22 @@ class Order extends React.Component {
           paymentStatus: response.order.paymentStatus,
           status: response.order.status,
           sum: response.order.sum,
-        })
+        });
       }
-
     });
   }
 
   componentDidMount() {
-    const {token} = this.state;
-    if (this.props && this.props.match && this.props.match.params && this.props.match.params._id) {
+    const { token } = this.state;
+    if (
+      this.props &&
+      this.props.match &&
+      this.props.match.params &&
+      this.props.match.params._id
+    ) {
       if (!token) {
         this.cameFromProduct(this.props.match.params._id);
-        this.setState({redirect: '/login'})
+        this.setState({ redirect: '/login' });
       } else {
         this.getTheOrder();
       }
@@ -81,37 +85,35 @@ class Order extends React.Component {
     if (this.state.update)
       this.setState({
         redirect: null,
-        update: false
-      })
+        update: false,
+      });
     // window.scrollTo(0, 0);
   }
 
-  editThisAdd() {
+  editThisAdd() {}
 
-  }
-
-  CancelOrder() {
-
-
-  }
+  CancelOrder() {}
 
   PayForOrder() {
-    let {sum,_id,customer_data} = this.state;
-    buy(_id,{
-      sum:sum,
-      customer:customer_data._id
+    let { sum, _id, customer_data } = this.state;
+    buy(_id, {
+      sum: sum,
+      customer: customer_data._id,
     }).then((trans) => {
-      window.createPaymentRequest({
-        service_id: 18875,
-        merchant_id: 13468,
-        amount: sum,
-        transaction_param: "rqBEoqFwJt2L",
-        merchant_user_id: 21132,
-      }, function (data) {
-        if (data && data.status == 2) {
-          console.log('payment success');
+      window.createPaymentRequest(
+        {
+          service_id: 18875,
+          merchant_id: 13468,
+          amount: sum,
+          transaction_param: 'rqBEoqFwJt2L',
+          merchant_user_id: 21132,
+        },
+        function (data) {
+          if (data && data.status == 2) {
+            console.log('payment success');
+          }
         }
-      });
+      );
     });
   }
 
@@ -120,22 +122,47 @@ class Order extends React.Component {
   }
 
   render() {
-    const {t, _id} = this.props;
+    const { t, _id } = this.props;
     // let sum = 0;
-    let {card, orderNumber, redirect, redirect_url, paymentStatus, status, deliveryDay, sum, lan, modals, token, billingAddress, customer_data, hoverD} = this.state;
+    let {
+      card,
+      orderNumber,
+      redirect,
+      redirect_url,
+      paymentStatus,
+      status,
+      deliveryDay,
+      sum,
+      lan,
+      modals,
+      token,
+      billingAddress,
+      customer_data,
+      hoverD,
+    } = this.state;
     sum = 0;
     if (!token) {
       redirect = true;
     }
     if (redirect) {
-      return <Navigate to={redirect_url} push={false} exact={true}/>
+      return <Navigate to={redirect_url} push={false} exact={true} />;
     } else {
       return (
         <Container fluid className="main-content-container px-4 maxWidth1200">
           <Row noGutters className="page-header py-4">
-            <PageTitle title={t('Order #') + orderNumber + ' - ' + t(paymentStatus) + ' - ' + t(status)}
-                       subtitle={t('order details')} md="12"
-                       className="ml-sm-auto mr-sm-auto"/>
+            <PageTitle
+              title={
+                t('Order #') +
+                orderNumber +
+                ' - ' +
+                t(paymentStatus) +
+                ' - ' +
+                t(status)
+              }
+              subtitle={t('order details')}
+              md="12"
+              className="ml-sm-auto mr-sm-auto"
+            />
           </Row>
           <Row>
             {/*<Col lg="4">*/}
@@ -143,21 +170,18 @@ class Order extends React.Component {
             {/*</Col>*/}
 
             <Col lg="7">
-
               <Card className="mb-3">
                 <CardHeader>
                   <h1 className="kjhghjk">
                     <div
                       className="d-inline-block item-icon-wrapper ytrerty"
-                      dangerouslySetInnerHTML={{__html: t('Contact number')}}
+                      dangerouslySetInnerHTML={{ __html: t('Contact number') }}
                     />
                   </h1>
                 </CardHeader>
                 <CardBody>
                   <Col lg="12">
-                    <Row>
-                      {customer_data && customer_data.phoneNumber}
-                    </Row>
+                    <Row>{customer_data && customer_data.phoneNumber}</Row>
                   </Col>
                 </CardBody>
               </Card>
@@ -167,48 +191,45 @@ class Order extends React.Component {
                   <h1 className="kjhghjk">
                     <div
                       className="d-inline-block item-icon-wrapper ytrerty"
-                      dangerouslySetInnerHTML={{__html: t('Address')}}
+                      dangerouslySetInnerHTML={{ __html: t('Address') }}
                     />
-
                   </h1>
                 </CardHeader>
                 <CardBody>
                   <Col lg="12">
                     <Row>
+                      {billingAddress && (
+                        <Col md={4} lg={4} sm={4}>
+                          <div className={'theadds posrel hover'}>
+                            {/*<div className={'white p-2'}>*/}
+                            <div className={'ttl'}>{billingAddress.Title}</div>
+                            <div className={'desc'}>
+                              {billingAddress.Country}
+                              <br></br>
+                              {billingAddress.State}
+                              <br></br>
+                              {billingAddress.City}
+                              <br></br>
 
-                      {billingAddress && (<Col md={4} lg={4} sm={4}>
-                        <div className={'theadds posrel hover'}>
-                          {/*<div className={'white p-2'}>*/}
-                          <div className={'ttl'}>
-                            {billingAddress.Title}
-                          </div>
-                          <div className={'desc'}>
-                            {billingAddress.Country}
-                            <br></br>
-                            {billingAddress.State}
-                            <br></br>
-                            {billingAddress.City}
-                            <br></br>
+                              {billingAddress.StreetAddress}
+                              <br></br>
 
-                            {billingAddress.StreetAddress}
-                            <br></br>
-
-                            {billingAddress.Zip}
-
-                          </div>
-                          <div className={' d-flex posab bilar'}>
-                            <div className={'flex-1 pr-2 textAlignLeft theb'}>
-
-                                  <span className="material-icons circle-button green" onClick={() => {
-                                    this.editThisAdd(billingAddress)
-                                  }}>edit</span>
+                              {billingAddress.Zip}
                             </div>
-
+                            <div className={' d-flex posab bilar'}>
+                              <div className={'flex-1 pr-2 textAlignLeft theb'}>
+                                <span
+                                  className="material-icons circle-button green"
+                                  onClick={() => {
+                                    this.editThisAdd(billingAddress);
+                                  }}>
+                                  edit
+                                </span>
+                              </div>
+                            </div>
                           </div>
-
-                        </div>
-                      </Col>)
-                      }
+                        </Col>
+                      )}
                     </Row>
                   </Col>
                 </CardBody>
@@ -219,44 +240,37 @@ class Order extends React.Component {
                   <h1 className="kjhghjk">
                     <div
                       className="d-inline-block item-icon-wrapper ytrerty"
-                      dangerouslySetInnerHTML={{__html: t('Delivery Schedule')}}
+                      dangerouslySetInnerHTML={{
+                        __html: t('Delivery Schedule'),
+                      }}
                     />
-
                   </h1>
                 </CardHeader>
                 <CardBody>
                   <Col lg="12">
                     <Row>
                       {deliveryDay && (
-
                         <Col className={'mb-4'} md={4} lg={4} sm={4}>
                           <div className={'theadds hover'}>
-                            <div className={'ttl'}>
-                              {deliveryDay.title}
-                            </div>
+                            <div className={'ttl'}>{deliveryDay.title}</div>
                             <div className={'desc'}>
                               {deliveryDay.description}
                             </div>
-
                           </div>
                         </Col>
-                      )
-                      }
+                      )}
                     </Row>
                   </Col>
                 </CardBody>
               </Card>
-
-
             </Col>
             <Col lg="5">
-
               <Card className="mb-3">
                 <CardHeader>
                   <h1 className="kjhghjk">
                     <div
                       className="d-inline-block item-icon-wrapper ytrerty"
-                      dangerouslySetInnerHTML={{__html: t('Your order')}}
+                      dangerouslySetInnerHTML={{ __html: t('Your order') }}
                     />
                   </h1>
                 </CardHeader>
@@ -264,73 +278,99 @@ class Order extends React.Component {
                   {/*<Col lg="12">*/}
                   {/*<Row>*/}
                   <ListGroup flush className={'card-add checkout'}>
+                    {card &&
+                      card.length > 0 &&
+                      card.map((item, idx2) => {
+                        if (item.salePrice) {
+                          sum += item.salePrice * item.count;
+                        } else if (item.price && !item.salePrice) {
+                          sum += item.price * item.count;
+                        }
+                        return (
+                          <ListGroupItem
+                            key={idx2}
+                            className="d-flex px-3 border-0 wedkuhg">
+                            {/*<ListGroupItemHeading>*/}
+                            <div className={'flex-1 txc'}>
+                              <div className={'bge'}>{item.count}</div>
+                            </div>
+                            <div className={'flex-1 txc'}>x</div>
+                            <div className={'flex-8'}>
+                              <div className={'ttl'}>{item.title[lan]}</div>
+                            </div>
+                            <div className={'flex-2'}>
+                              {item.price && !item.salePrice && (
+                                <div className={'prc'}>
+                                  {item.price
+                                    .toString()
+                                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+                                    t(' UZS')}
+                                </div>
+                              )}
+                              {item.price && item.salePrice && (
+                                <div className={'prc'}>
+                                  {item.salePrice
+                                    .toString()
+                                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+                                    t(' UZS')}
+                                  <del className={'ml-2'}>
+                                    {item.price
+                                      .toString()
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+                                      t(' UZS')}
+                                  </del>
+                                </div>
+                              )}
+                            </div>
 
-                    {card && card.length > 0 && card.map((item, idx2) => {
-
-                      if (item.salePrice) {
-                        sum += (item.salePrice * item.count);
-
-                      } else if (item.price && !item.salePrice) {
-                        sum += (item.price * item.count);
-                      }
-                      return (<ListGroupItem key={idx2} className="d-flex px-3 border-0 wedkuhg">
-                        {/*<ListGroupItemHeading>*/}
-                        <div className={'flex-1 txc'}>
-                          <div className={'bge'}>
-                            {item.count}
-                          </div>
-                        </div>
-                        <div className={'flex-1 txc'}>
-                          x
-                        </div>
-                        <div className={'flex-8'}>
-                          <div className={'ttl'}>{item.title[lan]}</div>
-
-                        </div>
-                        <div className={'flex-2'}>
-                          {(item.price && !item.salePrice) && <div
-                            className={'prc'}>{item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+t(' UZS')}</div>}
-                          {(item.price && item.salePrice) && <div
-                            className={'prc'}>{item.salePrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+t(' UZS')}
-                            <del
-                              className={'ml-2'}>{item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+t(' UZS')}</del>
-                          </div>}
-                        </div>
-
-                        {/*</ListGroupItemHeading>*/}
-                      </ListGroupItem>);
-                    })}
+                            {/*</ListGroupItemHeading>*/}
+                          </ListGroupItem>
+                        );
+                      })}
                     <hr></hr>
                     <ListGroupItem className={'d-flex px-3 border-0 '}>
-                      {[<div className={'flex-1'}>
-                        <div className={'ttl'}>{t('sum') + ": "}</div>
-
-                      </div>,
+                      {[
+                        <div className={'flex-1'}>
+                          <div className={'ttl'}>{t('sum') + ': '}</div>
+                        </div>,
                         <div className={'flex-1 textAlignRight'}>
-                          {sum && <div
-                            className={'ttl '}>{sum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+t(' UZS')}</div>}
-
-                        </div>]}
+                          {sum && (
+                            <div className={'ttl '}>
+                              {sum
+                                .toString()
+                                .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+                                t(' UZS')}
+                            </div>
+                          )}
+                        </div>,
+                      ]}
                     </ListGroupItem>
                   </ListGroup>
 
-
-                  <Col className={"empty " + "height50"} sm={12} lg={12}>
-
-                  </Col>
+                  <Col className={'empty ' + 'height50'} sm={12} lg={12}></Col>
                 </CardBody>
                 <CardFooter>
-                  {paymentStatus == 'notpaid' && <Button className={''} block onClick={() => {
-                    this.PayForOrder()
-                  }}>{t('Pay')}</Button>}
-                  <Button className={''} block onClick={() => {
-                    this.CancelOrder()
-                  }}>{t('Cancel Order')}</Button>
-
+                  {paymentStatus == 'notpaid' && (
+                    <Button
+                      className={''}
+                      block
+                      onClick={() => {
+                        this.PayForOrder();
+                      }}>
+                      {t('Pay')}
+                    </Button>
+                  )}
+                  <Button
+                    className={''}
+                    block
+                    onClick={() => {
+                      this.CancelOrder();
+                    }}>
+                    {t('Cancel Order')}
+                  </Button>
                 </CardFooter>
               </Card>
             </Col>
-
           </Row>
         </Container>
       );

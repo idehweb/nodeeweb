@@ -5,7 +5,10 @@ import { withTranslation } from 'react-i18next';
 
 const SidebarNavItem = ({ item, t, onClick }) => (
   <NavItem>
-    <NavLink tag={(props) => <RouteNavLink {...props} />} to={item.to} onClick={() => onClick(item)}>
+    <NavLink
+      tag={(props) => <RouteNavLink {...props} />}
+      to={item.to}
+      onClick={() => onClick(item)}>
       {item.htmlBefore && (
         <div
           className="d-inline-block item-icon-wrapper"

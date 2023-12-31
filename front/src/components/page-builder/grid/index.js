@@ -139,7 +139,7 @@ const Grid = (props) => {
       'filter:',
       filter,
       'query:',
-      query,
+      query
     );
     if (query) {
       filter = JSON.stringify(query);
@@ -151,7 +151,7 @@ const Grid = (props) => {
       params.limit,
       '',
       filter,
-      JSON.stringify(populateQuery),
+      JSON.stringify(populateQuery)
     ).then((resp) => {
       // setLoadingMoreItems(false);
       afterGetData(resp);

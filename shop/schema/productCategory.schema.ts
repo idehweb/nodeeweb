@@ -1,4 +1,24 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model, Types } from 'mongoose';
+
+export interface IProductCategory {
+  name: any;
+  slug: string;
+  type: string;
+  image?: string;
+  data?: any;
+  metatitle?: any;
+  metadescription?: any;
+  description?: any;
+  values?: any[];
+  parent?: Types.ObjectId;
+}
+export type ProductCategoryDocument = Document<
+  Types.ObjectId,
+  {},
+  IProductCategory
+> &
+  IProductCategory;
+export type ProductCategoryModel = Model<IProductCategory>;
 
 const schema = new mongoose.Schema(
   {

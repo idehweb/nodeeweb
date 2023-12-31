@@ -57,7 +57,7 @@ function Checkout(props) {
             `/login?redirect=${encodeURIComponent('/checkout')}&check=false`,
             {
               replace: true,
-            },
+            }
           );
         } else {
           toast.error(e.message);
@@ -160,7 +160,7 @@ function Checkout(props) {
         {
           method: paymentMethod,
         },
-        theprice,
+        theprice
       ).then((add) => {
         if (add.success)
           toast(t('Navigating...'), {

@@ -149,6 +149,9 @@ export default function createRoutes(themeRoutes) {
     if (e.element == 'Admin') {
       e.element = Admin;
     }
+    if (e.element == 'Page') {
+      e.element = Page;
+    }
     if (e.element == 'Home') {
       e.element = Home;
     }
