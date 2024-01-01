@@ -122,6 +122,7 @@ export default () => ({
   now: 'اکنون',
   close: 'بستن',
   edit: 'ویرایش',
+  'need-to-pay': 'نیاز به پرداخت',
   'number per row:': 'تعداد سطر ها',
   'edit with page builder': 'ویرایش با صفحه ساز',
   'reset form': 'پاکسازی فرم',
