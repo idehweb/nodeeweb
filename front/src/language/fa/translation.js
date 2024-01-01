@@ -134,7 +134,7 @@ export default () => ({
   'System restarted!': 'سیستم در حال ری استارت شدن است!',
   'System did not restart!': 'متاسفانه ری استارت سیستم با مشکل مواجه شد!',
   slug: 'نامک',
-  createdAt: 'ساخته شده در',
+  // createdAt: 'ساخته شده در', no duplicateS
   updatedAt: 'بروزرسانی در',
   percent: 'درصد',
   orderNumber: 'شماره سفارش',
