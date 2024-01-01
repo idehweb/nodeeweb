@@ -771,7 +771,7 @@ export const updateStatus = (S, A) => {
   });
 };
 export const getMyOrders = (offset = 0, limit = 100) =>
-  getData(`${ApiUrl}/order/myOrders/mine/${offset}/${limit}`, {}, true)
+  getData(`${ApiUrl}/order/${offset}/${limit}`, {}, true)
     .then((res) => {
       if (res.data.success == false) return [];
       return res.data;
@@ -800,7 +800,7 @@ export const getMyInstances = async (offset = 0, limit = 100) => {
   ];
 };
 export const getMyOrder = (_id) =>
-  getData(`${ApiUrl}/order/myOrder/onlyMine/${_id}`, {}, true)
+  getData(`${ApiUrl}/order/${_id}`, {}, true)
     .then((res) => {
       if (res.data.success == false) return [];
       return res.data;

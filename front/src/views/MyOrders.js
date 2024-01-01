@@ -8,6 +8,8 @@ import { getMyOrders } from '#c/functions/index';
 
 import { dateFormat } from '#c/functions/utils';
 
+import OrderItemCard from '@/components/order/OrderItemCard';
+
 class MyOrders extends React.Component {
   constructor(props) {
     super(props);
@@ -83,7 +85,7 @@ class MyOrders extends React.Component {
     const { t } = this.props;
     getMyOrders().then((data) => {
       if (data && data.length > 0)
-        data.map((post) => {
+        data.data.map((post) => {
           if (post.createdAt) post.createdAt = dateFormat(post.createdAt);
 
           if (post.updatedAt) post.updatedAt = dateFormat(post.updatedAt);
@@ -195,6 +197,7 @@ class MyOrders extends React.Component {
   render() {
     let { t } = this.props;
     let { data, headCells, newText, buttonText } = this.state;
+    console.log(data);
     // if (redirect) {
     //   return <Navigate to='/add-new-post'/>;
     // } else {
@@ -217,69 +220,14 @@ class MyOrders extends React.Component {
               <CardBody className="p-2 pb-3">
                 <Row>
                   {data &&
-                    data.map((dat, i) => {
+                    data.length !== 0 &&
+                    data.data.map((dat, i) => {
                       return (
-                        <Col lg={4} md={4} sm={6} xs={12}>
-                          <div className={'the-order mb-3'}>
-                            <div className={'the-order-purple p-4'}>
-                              <div className={'the-order-title'}>
-                                <div className={'the-order-number'}>
-                                  {' '}
-                                  {t('Order #') + dat.orderNumber}
-                                </div>
-                                <div className={'the-order-status '}>
-                                  <Link
-                                    className={'gfdsdf'}
-                                    to={'/order-details/' + dat._id}>
-                                    {t('view items')}
-                                  </Link>
-                                </div>
-                              </div>
-                              <div className={'the-order-body'}>
-                                <div className={'the-order-body-line'}>
-                                  {t('Order Date')}:{dat.updatedAt}
-                                </div>
-                                <div className={'the-order-body-line'}>
-                                  {t('Order Status')}:
-                                  <span className={dat.status_cl}>
-                                    <span className={'gfdsdf'}>
-                                      {t(dat.status)}
-                                    </span>
-                                  </span>
-                                </div>
-                                <div className={'the-order-body-line'}>
-                                  {t('Payment Status')}:
-                                  <span className={dat.paymentStatus_cl}>
-                                    {' '}
-                                    {dat.paymentStatus}
-                                  </span>
-                                </div>
-                                <div className={'the-order-body-line'}>
-                                  {t('Card Price')}:{dat.sum}
-                                </div>
-                                <div className={'the-order-body-line'}>
-                                  {t('Delivery Price')}:{dat.deliveryPrice}
-                                </div>
-                                <div className={'the-order-body-line'}>
-                                  {t('Total Price')}:{dat.amount}
-                                </div>
-                                {dat.deliveryDay &&
-                                  dat.deliveryDay.description && (
-                                    <div className={'the-order-body-line'}>
-                                      {t('Delivery Time')}:
-                                      {dat.deliveryDay.description}
-                                    </div>
-                                  )}
-                                {dat.billingAddress && (
-                                  <div className={'the-order-body-line'}>
-                                    {t('Address')}:
-                                    {dat.billingAddress.StreetAddress}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </Col>
+                        <div key={dat._id}>
+                          <Col lg={4} md={4} sm={6} xs={12}>
+                            <OrderItemCard OrderData={dat} translator={t} />
+                          </Col>
+                        </div>
                       );
                     })}
                 </Row>
