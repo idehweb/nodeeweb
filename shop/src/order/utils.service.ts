@@ -330,8 +330,7 @@ export class Utils {
   }
 
   getPrice(comb: Partial<IProduct['combinations'][0]>, effectQuantity = true) {
-    const price = comb.salePrice || comb.price;
-    if (isNil(price)) return price;
+    const price = comb.salePrice ?? comb.price;
     return effectQuantity ? price * comb.quantity : price;
   }
 }

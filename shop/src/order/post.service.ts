@@ -112,7 +112,15 @@ class PostService {
         acc +
         p.combinations.reduce((acc, c) => {
           const fillValue = replaceValue({
-            data: [p, c, address],
+            data: [
+              p,
+              c,
+              address,
+              {
+                finalPrice: utils.getPrice(c, false),
+                finalPriceWithQuantity: utils.getPrice(c),
+              },
+            ],
             text: post.priceFormula,
             boundary: '%',
           });

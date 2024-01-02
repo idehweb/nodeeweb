@@ -63,7 +63,7 @@ export interface IOrder {
       _id: string;
       options?: { [key: string]: string };
       price: number;
-      salePrice: number;
+      salePrice?: number;
       quantity: number;
       weight: number;
     }[];
@@ -154,7 +154,7 @@ const schema = new mongoose.Schema(
             _id: { type: String, required: true },
             options: {},
             price: { type: Number, required: true },
-            salePrice: { type: Number, required: true },
+            salePrice: { type: Number },
             quantity: { type: Number, required: true },
             weight: { type: Number, required: true },
           },

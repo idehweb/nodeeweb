@@ -67,7 +67,7 @@ export default class CartService {
         ({ _id }) => _id === combination._id
       );
 
-      if (isNil(utils.getPrice(combination)))
+      if (isNil(utils.getPrice(docCombinations, false)))
         throw new ValidationError(
           `product with ID ${product._id.toString()} in combination with ID ${
             docCombinations._id
