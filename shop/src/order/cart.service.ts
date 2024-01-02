@@ -1,3 +1,4 @@
+import { isNil } from 'lodash';
 import {
   MiddleWare,
   NotFound,
@@ -19,6 +20,7 @@ import {
   UpdateCartBody,
 } from '../../dto/in/order/cart';
 import { UserDocument } from '@nodeeweb/core/types/user';
+import utils from './utils.service';
 
 export default class CartService {
   static get orderModel() {
@@ -65,10 +67,7 @@ export default class CartService {
         ({ _id }) => _id === combination._id
       );
 
-      if (
-        docCombinations.price === undefined ||
-        docCombinations.salePrice === undefined
-      )
+      if (isNil(utils.getPrice(docCombinations, false)))
         throw new ValidationError(
           `product with ID ${product._id.toString()} in combination with ID ${
             docCombinations._id

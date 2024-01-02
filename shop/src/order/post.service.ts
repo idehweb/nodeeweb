@@ -11,6 +11,7 @@ import {
 import { evaluate } from 'mathjs';
 import { replaceValue } from '@nodeeweb/core/utils/helpers';
 import { ProductDocument } from '../../schema/product.schema';
+import utils from './utils.service';
 
 class PostService {
   get orderModel(): OrderModel {
@@ -64,7 +65,8 @@ class PostService {
   public filterByProducts(post: ShopPost, cart: OrderDocument['products']) {
     const totalPrice = cart.reduce(
       (acc, p) =>
-        acc + p.combinations.reduce((acc, c) => acc + (c.salePrice ?? 0), 0),
+        acc +
+        p.combinations.reduce((acc, c) => acc + (utils.getPrice(c) ?? 0), 0),
       0
     );
     const totalWeight = cart.reduce(
@@ -110,7 +112,15 @@ class PostService {
         acc +
         p.combinations.reduce((acc, c) => {
           const fillValue = replaceValue({
-            data: [p, c, address],
+            data: [
+              p,
+              c,
+              address,
+              {
+                finalPrice: utils.getPrice(c, false),
+                finalPriceWithQuantity: utils.getPrice(c),
+              },
+            ],
             text: post.priceFormula,
             boundary: '%',
           });
