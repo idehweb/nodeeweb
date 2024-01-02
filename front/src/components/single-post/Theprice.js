@@ -146,9 +146,11 @@ const Theprice = (props) => {
             <span className="card-non-title-item">
               {salePrice + ' ' + t(themeData.currency)}
             </span>
-            <span className="card-non-title-item ml-2">
-              <del>{price + ' ' + t(themeData.currency)}</del>
-            </span>
+            {salePrice !== price && (
+              <span className="card-non-title-item ml-2">
+                <del>{price + ' ' + t(themeData.currency)}</del>
+              </span>
+            )}
           </div>
         )}
       </div>
