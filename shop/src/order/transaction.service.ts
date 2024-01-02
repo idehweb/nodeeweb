@@ -1,3 +1,4 @@
+import { isNil } from 'lodash';
 import {
   BadRequestError,
   ErrorType,
@@ -191,17 +192,18 @@ class TransactionService {
       const mp = productMap.get(p._id.toString());
       if (!mp) return;
 
-      p.combinations.forEach((combinations) => {
+      p.combinations.forEach((comb) => {
         const productCombination = mp.combinations.find(
-          (d) => d._id === combinations._id
+          (d) => d._id === comb._id
         );
         if (!productCombination.in_stock) inStockCheck.push(p._id);
         if (
-          productCombination.salePrice !== combinations.salePrice ||
-          productCombination.salePrice === undefined
+          utils.getPrice(productCombination, false) !==
+            utils.getPrice(comb, false) ||
+          isNil(utils.getPrice(productCombination, false))
         )
           priceCheck.push(p._id);
-        if (productCombination.quantity - combinations.quantity < 0)
+        if (productCombination.quantity - comb.quantity < 0)
           quantityCheck.push(p._id);
       });
     });
@@ -284,7 +286,7 @@ class TransactionService {
               (acc, { combinations }) =>
                 acc +
                 combinations.reduce(
-                  (acc, { salePrice, quantity }) => acc + salePrice * quantity,
+                  (acc, comb) => acc + utils.getPrice(comb, true),
                   0
                 ),
               0

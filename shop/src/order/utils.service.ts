@@ -1,3 +1,4 @@
+import { isNil } from 'lodash';
 import {
   IOrder,
   OrderDocument,
@@ -18,7 +19,7 @@ import {
   TransactionStatus,
 } from '../../schema/transaction.schema';
 import { PostGatewayPluginContent, ShopPluginType } from '../../types/plugin';
-import { ProductModel } from '../../schema/product.schema';
+import { IProduct, ProductModel } from '../../schema/product.schema';
 import { DiscountModel } from '../../schema/discount.schema';
 import { merge } from 'lodash';
 import { UpdateQuery } from 'mongoose';
@@ -326,6 +327,12 @@ export class Utils {
 
     if (transaction) return await _updateWithTransaction();
     if (order && newStatus) return await _updateWithNewStatus();
+  }
+
+  getPrice(comb: Partial<IProduct['combinations'][0]>, effectQuantity = true) {
+    const price = comb.salePrice || comb.price;
+    if (isNil(price)) return price;
+    return effectQuantity ? price * comb.quantity : price;
   }
 }
 
