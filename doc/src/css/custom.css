@@ -28,3 +28,11 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  scroll-margin-top: 4.5rem;
+}
