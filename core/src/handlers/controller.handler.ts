@@ -4,8 +4,8 @@ import { ControllerAccess, ControllerSchema } from '../../types/controller';
 import { MiddleWare, MiddleWareError } from '../../types/global';
 import {
   JwtStrategyOpt,
-  authenticate,
-  authorizeWithToken,
+  authorization,
+  authenticateWithToken,
 } from './auth.handler';
 import { Logger } from './log.handler';
 import { join } from 'path';
@@ -171,7 +171,7 @@ function translateAccess(accesses: ControllerAccess[]): MiddleWare[] {
   }
 
   return [
-    ...authorizeWithToken(_.uniq(accesses.map((a) => a.modelName)), opt),
-    authenticate(...accesses),
+    ...authenticateWithToken(_.uniq(accesses.map((a) => a.modelName)), opt),
+    authorization(...accesses),
   ];
 }
