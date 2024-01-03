@@ -275,6 +275,7 @@ export default () => ({
   'previous step': 'مرحله قبل',
   confirmed: 'تایید شده',
   canceled: 'لغو شده',
+  'Out Of Stock': 'ناموجود',
   'smaller list': 'کوچک کردن لیست',
   'edit post': 'ویرایش آگهی',
   'get contact': 'دریافت شماره تماس',

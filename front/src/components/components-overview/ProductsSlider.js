@@ -31,47 +31,43 @@ const ProductsSlider = ({
   );
   let params = useParams();
 
+  // console.log('hello im loaded!');
+
   // const [tracks, settracks] = useState([]);
   // console.log("cat_id:", cat_id);
   // console.log("ProductsSlider:", productSliderData[cat_id]);
-  if (isClient)
-    useEffect(() => {
-      console.log('\nuseEffect ProductsSlider==================>');
+  useEffect(() => {
+    console.log('\nuseEffect ProductsSlider==================>');
 
-      let query = {},
-        filter = {};
-      if (customQuery) {
-        console.log('customQuery main', customQuery);
+    let query = {},
+      filter = {};
+    if (customQuery) {
+      console.log('customQuery main', customQuery);
 
-        if (typeof customQuery == 'string') {
-          customQuery = JSON.parse(customQuery);
+      if (typeof customQuery == 'string') {
+        customQuery = JSON.parse(customQuery);
+      }
+
+      Object.keys(customQuery).forEach((item) => {
+        let main = customQuery[item];
+        if (params && params._id) {
+          console.log('main:', main);
+          main = main.replace('params._id', JSON.stringify(params._id));
         }
+        console.log('customQuery[item]', item, customQuery, customQuery[item]);
+        console.log('main', main);
+        const json = isStringified(main);
 
-        Object.keys(customQuery).forEach((item) => {
-          let main = customQuery[item];
-          if (params && params._id) {
-            console.log('main:', main);
-            main = main.replace('params._id', JSON.stringify(params._id));
-          }
-          console.log(
-            'customQuery[item]',
-            item,
-            customQuery,
-            customQuery[item]
-          );
-          console.log('main', main);
-          const json = isStringified(main);
-
-          if (typeof json == 'object') query[item] = json;
-          else query[item] = main;
-        });
-      }
-      // console.log("==> loadProductItems() offset:", offset, "filter:", filter, "query:", query);
-      if (query) {
-        filter = JSON.stringify(query);
-      }
-      loadProductItems(cat_id, filter).then((res) => settracks(res));
-    }, []);
+        if (typeof json == 'object') query[item] = json;
+        else query[item] = main;
+      });
+    }
+    // console.log("==> loadProductItems() offset:", offset, "filter:", filter, "query:", query);
+    if (query) {
+      filter = JSON.stringify(query);
+    }
+    loadProductItems(cat_id, filter).then((res) => settracks(res));
+  }, []);
   // if (tracks)
   //   console.log("product tracks", tracks.length);
   // if ((tracks && tracks.length > 0))
