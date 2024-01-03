@@ -28,6 +28,7 @@ class OrderService {
     }
     return {
       'customer._id': req.user._id,
+      status: { $ne: OrderStatus.Cart },
       active: true,
     };
   }
