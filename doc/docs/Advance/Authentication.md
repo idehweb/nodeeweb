@@ -10,7 +10,8 @@ Let's flesh out our requirements. For this use case, clients will start by authe
 ## Table of Contents
 
 - [Gateway](#gateway)
-- [Strategy](#seo-interface)
+- [Strategy](#strategy)
+- [Usage](#usage)
 
 
 ## Gateway
@@ -62,3 +63,6 @@ by default core register these strategies:
 - **NodeewebStrategy:** use nodeeweb hub as auth provider, after authenticate from nodeeweb hub create local jwt token
 - **OtpStrategy:** use `SMSPlugin` for send verification code, activate this strategy by install at least one `SMSPluginType`, use `OtpUserDetect`, `OtpUserLogin`, `OtpUserSignup` DTO.
 
+
+## Usage
+for protect API gateways on `controllerRegister` use access attribute.
