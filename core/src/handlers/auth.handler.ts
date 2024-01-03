@@ -176,7 +176,7 @@ export function authWithToken(opt: JwtStrategyOpt): MiddleWare {
 
 export function authWithGoogle() {}
 
-export function authorizeWithToken(
+export function authenticateWithToken(
   modelNames: string[],
   opt: Partial<JwtStrategyOpt> = {}
 ): MiddleWare[] {
@@ -188,7 +188,7 @@ export function authorizeWithToken(
     }),
   ];
 }
-export function authenticate(...accesses: ControllerAccess[]): MiddleWare {
+export function authorization(...accesses: ControllerAccess[]): MiddleWare {
   return (req, res, next) => {
     const modelName = req.modelName ?? req.user?.['constructor']?.['modelName'];
     // not login and there is optional login role
