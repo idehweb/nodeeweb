@@ -15,6 +15,7 @@ const OrderDetails = ({ t }) => {
   let [dat, setDat] = useState({});
   let [card, setCard] = useState([]);
   let [lan, setLan] = useState(store.getState().store.lan || 'fa');
+  const [loading, setLoading] = useState(false);
 
   let [headCells, setHeadCells] = useState([
     {
@@ -37,13 +38,14 @@ const OrderDetails = ({ t }) => {
     },
   ]);
   const getMyOrdersF = (_id) => {
+    setLoading(true);
     getMyOrder(_id).then((post) => {
-      console.log('post', post);
-      if (post.data.createdAt)
+      if (!post || !post.data) return null;
+      if (post.data && post.data.createdAt)
         post.data.createdAt = dateFormat(post.data.createdAt);
-      if (post.data.updatedAt)
+      if (post.data && post.data.updatedAt)
         post.data.updatedAt = dateFormat(post.data.updatedAt);
-      if (post && post.data['totalPrice']) {
+      if (post.data && post.data['totalPrice']) {
         post.data['totalPrice'] =
           post.data['totalPrice']
             .toString()
@@ -62,7 +64,7 @@ const OrderDetails = ({ t }) => {
         }
         // link['kind'] = t('product');
       }
-      if (post && post.data['status']) {
+      if (post.data && post.data['status']) {
         switch (post.data['status']) {
           case 'processing':
             post.data['status'] = t('waiting to review');
@@ -118,7 +120,7 @@ const OrderDetails = ({ t }) => {
             break;
         }
       }
-      if (post && post.data['paymentStatus']) {
+      if (post.data && post.data['paymentStatus']) {
         switch (post.data['paymentStatus']) {
           case 'paid':
             post.data['paymentStatus'] = t('successful');
@@ -139,22 +141,21 @@ const OrderDetails = ({ t }) => {
             break;
         }
       }
-      post.data.products.forEach((item, key) => {
-        post.data.products[key]['id'] = item._id;
-        post.data.products[key]['title'] = item.title[lan];
-        if (item.price)
-          post.data.products[key]['price'] =
-            item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
-            t(' UZS');
-        if (item.salePrice)
-          post.data.products[key]['salePrice'] =
-            item.salePrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
-            t(' UZS');
-      });
-
+      post.data &&
+        post.data.products.forEach((item, key) => {
+          post.data.products[key]['id'] = item._id;
+          post.data.products[key]['title'] = item.title[lan];
+          if (item.price)
+            post.data.products[key]['price'] =
+              item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+              t(' UZS');
+          if (item.salePrice)
+            post.data.products[key]['salePrice'] =
+              item.salePrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+              t(' UZS');
+        });
       setCard(post.data.products);
       setDat({ ...dat.data, ...post.data });
-
       return 0;
     });
   };
@@ -282,208 +283,206 @@ const OrderDetails = ({ t }) => {
     padding: '12px',
   };
 
-  return (
-    dat &&
-    dat.post && (
-      <Container fluid className="main-content-container px-4">
-        {/* Page Header */}
-        <Row noGutters className="page-header py-4">
-          <PageTitle
-            sm="12"
-            title={t('My order details')}
-            subtitle={t('user account')}
-            className="text-sm-left"
-          />
-        </Row>
+  return dat && dat.post ? (
+    <Container fluid className="main-content-container px-4">
+      {/* Page Header */}
+      <Row noGutters className="page-header py-4">
+        <PageTitle
+          sm="12"
+          title={t('My order details')}
+          subtitle={t('user account')}
+          className="text-sm-left"
+        />
+      </Row>
 
-        {/* Default Light Table */}
-        <Row>
-          <Col>
-            <Card small className="mb-4">
-              <CardBody className="p-2 pb-3">
-                <Row>
-                  <Col lg={12} md={12} sm={12} xs={12}>
-                    <div className={'the-order mb-3'}>
-                      <div className={'the-order-purple p-4'}>
-                        <div className={'the-order-title'}>
-                          <div className={'the-order-number'}>
-                            <div>{t('Order #') + dat._id}</div>
-                            <div className={'mb-2'}>
-                              {' '}
-                              {t('Order Date')}:{dateFormat(dat.updatedAt)}
-                            </div>
-                          </div>
-                          <div className={'the-order-status '}>
-                            <div className={'mb-2'}>
-                              <span>{t('Order Status') + ':'}</span>
-                              <span className={dat.status_cl}>
-                                <span className={'gfdsdf'}>
-                                  {t(dat.status)}
-                                </span>
-                              </span>
-                            </div>
-                            {/* <div>
-                            <span>{t('Payment Status') + ':'}</span>
-                            <span className={dat.paymentStatus_cl}>
-                              <span className={'gfdsdf'}>
-                                {dat.paymentStatus}
-                              </span>
-                            </span>
-                          </div> */}
+      {/* Default Light Table */}
+      <Row>
+        <Col>
+          <Card small className="mb-4">
+            <CardBody className="p-2 pb-3">
+              <Row>
+                <Col lg={12} md={12} sm={12} xs={12}>
+                  <div className={'the-order mb-3'}>
+                    <div className={'the-order-purple p-4'}>
+                      <div className={'the-order-title'}>
+                        <div className={'the-order-number'}>
+                          <div>{t('Order #') + dat._id}</div>
+                          <div className={'mb-2'}>
+                            {' '}
+                            {t('Order Date')}:{dateFormat(dat.updatedAt)}
                           </div>
                         </div>
+                        <div className={'the-order-status '}>
+                          <div className={'mb-2'}>
+                            <span>{t('Order Status') + ':'}</span>
+                            <span className={dat.status_cl}>
+                              <span className={'gfdsdf'}>{t(dat.status)}</span>
+                            </span>
+                          </div>
+                          {/* <div>
+                        <span>{t('Payment Status') + ':'}</span>
+                        <span className={dat.paymentStatus_cl}>
+                          <span className={'gfdsdf'}>
+                            {dat.paymentStatus}
+                          </span>
+                        </span>
+                      </div> */}
+                        </div>
+                      </div>
 
-                        <div className={'the-order-body'}>
-                          <table className={'width100darsad'}>
-                            <tbody>
-                              <tr>
-                                <td>
-                                  {/* <div className={'the-order-body-line'}>
-                                    {t('Order Status')} : {t(dat.status)}
-                                  </div> */}
-                                  <div className={'the-order-body-line'}>
-                                    {t('Delivery Time')} :{' '}
-                                    {dat.post.description}
-                                  </div>
-                                  <div className={'the-order-body-line'}>
-                                    {t('Delivery Price')} :{' '}
-                                    {dat.post.price.toLocaleString()}
-                                  </div>
+                      <div className={'the-order-body'}>
+                        <table className={'width100darsad'}>
+                          <tbody>
+                            <tr>
+                              <td>
+                                {/* <div className={'the-order-body-line'}>
+                                {t('Order Status')} : {t(dat.status)}
+                              </div> */}
+                                <div className={'the-order-body-line'}>
+                                  {t('Delivery Time')} : {dat.post.description}
+                                </div>
+                                <div className={'the-order-body-line'}>
+                                  {t('Delivery Price')} :{' '}
+                                  {dat.post.price.toLocaleString()}
+                                </div>
+                                {dat.totalPrice && (
                                   <div className={'the-order-body-line'}>
                                     {t('Total Price')} : {dat.totalPrice}
                                   </div>
-                                </td>
-                                {/* <td>
-                                {dat.post.description && (
-                                  <div className={'the-order-body-line'}>
-                                    {t('Delivery Time')}:{dat.post.description}
-                                  </div>
                                 )}
-                                {dat.billingAddress && (
-                                  <div className={'the-order-body-line'}>
-                                    {t('Address')}:
-                                    {dat.billingAddress.StreetAddress}
-                                  </div>
-                                )}
-                              </td> */}
-                              </tr>
-                            </tbody>
-                          </table>
-                          {/* <div className={'the-order-number'}></div>
-                        <div className={'the-order-status '}></div>
-
-                        <div className={'clear'}></div> */}
-                        </div>
-                        {/* <div className={'the-order-body-table'}>
-                        <div style={{ display: 'flex', height: '100%' }}>
-                          <div style={{ flexGrow: 1 }}>
-                            {Boolean(
-                              dat.transaction && dat.transaction.length > 0
-                            ) && (
-                              <div className={'mt-3'}>
-                                <div className={'the-header bold mb-2'}>
-                                  {t('transaction list') + ':'}
-                                </div>
-                                <div
-                                  className={'flex-box row border-bottom-1px'}>
-                                  <div
-                                    className={'flex-item col-md-4 bold sz-14'}>
-                                    {t('transaction authority')}
-                                  </div>
-                                  <div
-                                    className={'flex-item col-md-4 bold sz-14'}>
-                                    {t('amount')}
-                                  </div>
-                                  <div
-                                    className={'flex-item col-md-4 bold sz-14'}>
-                                    {t('status code')}
-                                  </div>
-                                </div>
-                                {dat.transaction.map((tt, xx) => {
-                                  return (
-                                    <div
-                                      className={
-                                        'flex-box row border-bottom-1px'
-                                      }
-                                      key={xx}>
-                                      <div className={'hidden d-none'}>
-                                        {tt._id}
-                                      </div>
-                                      <div
-                                        className={'flex-item col-md-4 sz-13'}>
-                                        {tt.Authority}
-                                      </div>
-                                      <div
-                                        className={'flex-item col-md-4 sz-13'}>
-                                        {tt.amount
-                                          .toString()
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ','
-                                          ) + t('Rial')}
-                                      </div>
-                                      <div
-                                        className={'flex-item col-md-4 sz-13'}>
-                                        {tt.statusCode}
-                                      </div>
-                                    </div>
-                                  );
-                                })}
+                              </td>
+                              {/* <td>
+                            {dat.post.description && (
+                              <div className={'the-order-body-line'}>
+                                {t('Delivery Time')}:{dat.post.description}
                               </div>
                             )}
-                          </div>
-                        </div>
-                      </div> */}
-                        <div className={'the-order-body-table'}>
-                          <div style={{ display: 'flex', height: '100%' }}>
-                            <div style={{ flexGrow: 1 }}>
-                              {Boolean(card && card.length > 0) && (
-                                <>
-                                  {/* {renderOrderedProducts} */}
-                                  {/* <DataGrid
-                                    rows={card}
-                                    disableColumnFilter={true}
-                                    disableColumnMenu={true}
-                                    columns={columns}
-                                    columnBuffer={8}
-                                    hideFooterPagination={true}
-                                    hideFooter={true}
-                                    disableVirtualization
-                                    autoHeight={true}
-                                  /> */}
+                            {dat.billingAddress && (
+                              <div className={'the-order-body-line'}>
+                                {t('Address')}:
+                                {dat.billingAddress.StreetAddress}
+                              </div>
+                            )}
+                          </td> */}
+                            </tr>
+                          </tbody>
+                        </table>
+                        {/* <div className={'the-order-number'}></div>
+                    <div className={'the-order-status '}></div>
 
-                                  {card.map((item) => (
-                                    <div
-                                      key={item._id}
-                                      style={{
-                                        padding: '0.5rem',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        justifyContent: 'space-between',
-                                        marginTop: '1rem',
-                                      }}>
-                                      <hr />
-                                      <p>{item.title}</p>
-                                      {renderCombinationsTable(
-                                        item.combinations
-                                      )}
-                                    </div>
-                                  ))}
-                                </>
-                              )}
+                    <div className={'clear'}></div> */}
+                      </div>
+                      {/* <div className={'the-order-body-table'}>
+                    <div style={{ display: 'flex', height: '100%' }}>
+                      <div style={{ flexGrow: 1 }}>
+                        {Boolean(
+                          dat.transaction && dat.transaction.length > 0
+                        ) && (
+                          <div className={'mt-3'}>
+                            <div className={'the-header bold mb-2'}>
+                              {t('transaction list') + ':'}
                             </div>
+                            <div
+                              className={'flex-box row border-bottom-1px'}>
+                              <div
+                                className={'flex-item col-md-4 bold sz-14'}>
+                                {t('transaction authority')}
+                              </div>
+                              <div
+                                className={'flex-item col-md-4 bold sz-14'}>
+                                {t('amount')}
+                              </div>
+                              <div
+                                className={'flex-item col-md-4 bold sz-14'}>
+                                {t('status code')}
+                              </div>
+                            </div>
+                            {dat.transaction.map((tt, xx) => {
+                              return (
+                                <div
+                                  className={
+                                    'flex-box row border-bottom-1px'
+                                  }
+                                  key={xx}>
+                                  <div className={'hidden d-none'}>
+                                    {tt._id}
+                                  </div>
+                                  <div
+                                    className={'flex-item col-md-4 sz-13'}>
+                                    {tt.Authority}
+                                  </div>
+                                  <div
+                                    className={'flex-item col-md-4 sz-13'}>
+                                    {tt.amount
+                                      .toString()
+                                      .replace(
+                                        /\B(?=(\d{3})+(?!\d))/g,
+                                        ','
+                                      ) + t('Rial')}
+                                  </div>
+                                  <div
+                                    className={'flex-item col-md-4 sz-13'}>
+                                    {tt.statusCode}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div> */}
+                      <div className={'the-order-body-table'}>
+                        <div style={{ display: 'flex', height: '100%' }}>
+                          <div style={{ flexGrow: 1 }}>
+                            {Boolean(card && card.length > 0) && (
+                              <>
+                                {/* {renderOrderedProducts} */}
+                                {/* <DataGrid
+                                rows={card}
+                                disableColumnFilter={true}
+                                disableColumnMenu={true}
+                                columns={columns}
+                                columnBuffer={8}
+                                hideFooterPagination={true}
+                                hideFooter={true}
+                                disableVirtualization
+                                autoHeight={true}
+                              /> */}
+
+                                {card.map((item) => (
+                                  <div
+                                    key={item._id}
+                                    style={{
+                                      padding: '0.5rem',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      justifyContent: 'space-between',
+                                      marginTop: '1rem',
+                                    }}>
+                                    <hr />
+                                    <p>{item.title}</p>
+                                    {renderCombinationsTable(item.combinations)}
+                                  </div>
+                                ))}
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
                     </div>
-                  </Col>
-                </Row>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    )
+                  </div>
+                </Col>
+              </Row>
+            </CardBody>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
+  ) : (
+    <div style={{ display: 'flex', justifyContent: 'center' }}>
+      سفارش نهایی نشده است
+    </div>
   );
   // }
 };

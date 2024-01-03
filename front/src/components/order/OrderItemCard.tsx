@@ -11,7 +11,6 @@ import { Link } from 'react-router-dom';
 
 export default function OrderItemCard({ OrderData, translator }) {
   if (!OrderData) return null;
-  console.log('OrderData', OrderData);
   return (
     <div className={'the-order mb-3'}>
       <div className={'the-order-purple p-4'}>
@@ -34,13 +33,19 @@ export default function OrderItemCard({ OrderData, translator }) {
             {translator('Order Status')}:
             <span className={'gfdsdf'}>{translator(OrderData.status)}</span>
           </div>
-          <div className={'the-order-body-line'}>
-            {translator('Total Price')}: {OrderData.totalPrice.toLocaleString()}{' '}
-            {translator(OrderData.currency)}
-          </div>
-          <div className={'the-order-body-line'}>
-            {translator('Delivery Time')}: {OrderData.post.description}
-          </div>
+          {OrderData.totalPrice && (
+            <div className={'the-order-body-line'}>
+              {translator('Total Price')}:{' '}
+              {OrderData.totalPrice.toLocaleString()}{' '}
+              {translator(OrderData.currency)}
+            </div>
+          )}
+
+          {OrderData.post && (
+            <div className={'the-order-body-line'}>
+              {translator('Delivery Time')}: {OrderData.post.description}
+            </div>
+          )}
         </div>
       </div>
     </div>
