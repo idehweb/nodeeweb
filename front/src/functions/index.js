@@ -1007,8 +1007,8 @@ export const getEntities = (
     console.log('filter', filter);
 
     if (filter) {
-      url += '?filter=' + filter;
-      // if (filter["type"]) params["type"] = filter["type"];
+      // url += '?filter=' + filter;
+      if (filter['type']) params['type'] = filter['type'];
     }
     if (filter && populate) {
       url += '&populate=' + populate;

@@ -19,8 +19,9 @@ function AddToCardButton({
   children,
   t,
   product,
-  combination,
+  combination = [],
 }) {
+  // if (!combination) return;
   const [count, setCount] = useState(CartService.getQuantity(combination._id));
   let [Navigate, SetNavigate] = useState(null);
   const onCreate = useCallback(
@@ -117,7 +118,7 @@ function AddToCardButton({
       );
     }
   }
-  return (
+  return combination.length !== 0 ? (
     <div className="AddToCardButton">
       {count !== 0 && (
         <Button size="md" className={'buy-button kjhgfgh'} theme="primary">
@@ -138,6 +139,15 @@ function AddToCardButton({
         </Button>
       )}
       {children}
+    </div>
+  ) : (
+    <div className="AddToCardButton">
+      <Button
+        size="md"
+        className={'buy-button kjhgfgh empty-card '}
+        theme="primary">
+        {t('Out Of Stock')}
+      </Button>
     </div>
   );
 }
