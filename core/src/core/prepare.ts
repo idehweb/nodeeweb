@@ -168,8 +168,8 @@ async function linkIndex() {
   // remove before link
   await safeRm(target);
 
-  // hard link
-  await fs.promises.link(source, target);
+  // link
+  await relativeLink(source, target);
 }
 
 async function linkManifest() {
@@ -181,8 +181,8 @@ async function linkManifest() {
   // remove before link
   await safeRm(target);
 
-  // hard link
-  await fs.promises.link(source, target);
+  // link
+  await relativeLink(source, target);
 }
 
 async function copyStaticFiles(name: string) {
