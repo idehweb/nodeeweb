@@ -7,7 +7,9 @@ import bfs from './bfs';
 import { StoreRoute } from '../types/route';
 import { Req } from '../types/global';
 import { networkInterfaces } from 'os';
-import { join } from 'path';
+import path, { join } from 'path';
+import { getScriptFile } from './path';
+import exec from './exec';
 
 export function page2Route(page: any): StoreRoute {
   return { path: page.path || page.slug };
@@ -366,4 +368,13 @@ export function safeJsonParse(obj: any) {
   } catch (err) {
     return {};
   }
+}
+
+export async function relativeLink(src: string, dist: string) {
+  const root = join(dist, '..');
+  const relativeSrc = path.relative(root, src);
+  const relativeDist = path.relative(root, dist);
+
+  const script = getScriptFile('ln-relative');
+  await exec(`${script} "${root}" "${relativeSrc}" "${relativeDist}"`);
 }

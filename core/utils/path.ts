@@ -26,7 +26,7 @@ export function getAssetsPath(...path: string[]) {
 }
 
 export function getScriptFile(
-  scriptName: 'cp' | 'mkdir' | 'mv' | 'restart' | 'download'
+  scriptName: 'cp' | 'mkdir' | 'mv' | 'restart' | 'download' | 'ln-relative'
 ) {
   const appDirectory = fs.realpathSync(process.cwd());
   const resolveApp = (relativePath: string) =>
