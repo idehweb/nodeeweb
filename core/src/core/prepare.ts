@@ -16,6 +16,7 @@ import {
   getEnv,
   isExist,
   isExistsSync,
+  relativeLink,
   safeRm,
   satisfyExistence,
   satisfyExistenceSync,
@@ -168,7 +169,7 @@ async function linkIndex() {
   await safeRm(target);
 
   // link
-  await fs.promises.symlink(source, target, 'file');
+  await relativeLink(source, target);
 }
 
 async function linkManifest() {
@@ -181,7 +182,7 @@ async function linkManifest() {
   await safeRm(target);
 
   // link
-  await fs.promises.symlink(source, target, 'file');
+  await relativeLink(source, target);
 }
 
 async function copyStaticFiles(name: string) {
