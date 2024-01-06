@@ -8,6 +8,10 @@ export enum PublishStatus {
   Processing = 'processing',
 }
 
+export type ProductCategory = {
+  _id: string;
+} & any;
+
 export type ProductOut = {
   title: { [key: string]: string };
   miniTitle: { [key: string]: string };
@@ -30,7 +34,7 @@ export type ProductOut = {
     name: string;
     values: { name: string }[];
   }[];
-  productCategory?: string[];
+  productCategory?: ProductCategory[];
   attributes: { attribute: string; values: string[] }[];
   labels: { title: string }[];
   data?: any;

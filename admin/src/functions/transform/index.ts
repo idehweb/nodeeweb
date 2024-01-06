@@ -1,7 +1,17 @@
 import { slugify, toNumber } from '../utils';
 
 import { ProductIn } from './in.type';
-import { PriceType, ProductOut, PublishStatus } from './out.type';
+import {
+  PriceType,
+  ProductCategory,
+  ProductOut,
+  PublishStatus,
+} from './out.type';
+
+function convertPC2string(pc: ProductCategory) {
+  if (typeof pc === 'string') return pc;
+  return pc?._id;
+}
 
 export default class Transform {
   static productInOut(
@@ -49,7 +59,9 @@ export default class Transform {
       description: product.description,
       metatitle: product.metatitle,
       metadescription: product.metadescription,
-      productCategory: product.productCategory,
+      productCategory: Array.isArray(product.productCategory)
+        ? product.productCategory.map((pc) => convertPC2string(pc))
+        : product.productCategory,
     };
     let extraOut: ExtraOut;
     if (product.type === 'normal') {
@@ -115,7 +127,9 @@ export default class Transform {
       description: product.description,
       metatitle: product.metatitle,
       metadescription: product.metadescription,
-      productCategory: product.productCategory,
+      productCategory: Array.isArray(product.productCategory)
+        ? product.productCategory.map((pc) => convertPC2string(pc))
+        : product.productCategory,
       access: 'public',
       requireWarranty: false,
     };
