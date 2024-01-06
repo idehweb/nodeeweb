@@ -42,6 +42,9 @@ export default function registerController() {
         controller: {
           service: Service.getOneAfter,
         },
+        crud: {
+          populate: { path: 'productCategory' },
+        },
       },
       create: {
         controller: {
