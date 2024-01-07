@@ -20,6 +20,8 @@ import {
 
 import API, { BASE_URL } from '@/functions/API';
 import { ColorPicker, ShowImageField } from '@/components';
+
+import SystemConfigs from './SystemConfigs';
 // import {  } from 'react-hook-form';
 const Configuration = (props) => {
   const refresh = useRefresh();
@@ -417,6 +419,9 @@ const Configuration = (props) => {
               </SaveButton>
             </CardActions>
           </Card>
+          <div>
+            <SystemConfigs />
+          </div>
         </Box>
       </Form>
     );
