@@ -4,6 +4,7 @@ import {
 } from '@nodeeweb/core/src/constants/String';
 import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
+import { CategoryCreateDTO, CategoryUpdateDTO } from '../../dto/in/category';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
@@ -13,6 +14,7 @@ export default function registerController() {
       create: {
         controller: {
           access,
+          validate: { dto: CategoryCreateDTO, reqPath: 'body' },
         },
       },
       getCount: {},
@@ -34,6 +36,7 @@ export default function registerController() {
       updateOne: {
         controller: {
           access,
+          validate: { dto: CategoryUpdateDTO, reqPath: 'body' },
         },
       },
       deleteOne: {

@@ -63,3 +63,7 @@ export function ToUnset({
     return;
   }, opt);
 }
+
+export function ToAny(opt?: TransformOptions) {
+  return Transform(({ obj, key }) => obj[key], opt);
+}
