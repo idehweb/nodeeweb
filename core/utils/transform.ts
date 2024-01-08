@@ -49,3 +49,17 @@ export function ToSlug(opt?: TransformOptions) {
     return value.trim().toLowerCase().replace(/\s+/g, '-');
   }, opt);
 }
+
+export function ToUnset({
+  signs = [''],
+  ...opt
+}: TransformOptions & { signs?: any[] } = {}) {
+  return Transform(({ obj, key, value }) => {
+    // not in
+    if (signs.findIndex((val) => _.isEqual(val, obj[key])) === -1) return value;
+
+    // in
+    _.set(obj, `$unset.${key}`, '');
+    return;
+  }, opt);
+}
