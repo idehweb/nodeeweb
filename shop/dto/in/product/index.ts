@@ -19,7 +19,7 @@ import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
 import { Types } from 'mongoose';
 import { PriceType } from '../../../schema/product.schema';
 import { PublishStatus } from '../../../schema/_base.schema';
-import { ToObject, ToSlug } from '@nodeeweb/core/utils/transform';
+import { ToObject, ToSlug, ToUnset } from '@nodeeweb/core/utils/transform';
 
 class ExtraAtr {
   @Expose()
@@ -74,35 +74,41 @@ class CombinationProduct {
   options?: { [key: string]: string };
 
   @Expose()
+  @ToUnset()
   @IsOptional()
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   price?: number;
 
   @Expose()
+  @ToUnset()
   @IsNumber()
   @IsOptional()
-  @IsPositive()
+  @Min(0)
   salePrice?: number;
 
   @Expose()
+  @ToUnset()
   @IsNumber()
   @IsOptional()
-  @IsPositive()
+  @Min(0)
   weight?: number;
 
   @Expose()
+  @ToUnset()
   @IsOptional()
   @IsNumber()
   @Min(0)
   quantity?: number;
 
   @Expose()
+  @ToUnset()
   @IsOptional()
   @IsBoolean()
   in_stock?: boolean;
 
   @Expose()
+  @ToUnset()
   @IsOptional()
   @IsString()
   sku?: string;
@@ -187,6 +193,7 @@ export class CreateProductBody {
   labels?: Labels[];
 
   @Expose()
+  @ToUnset()
   @IsOptional()
   @ToObject()
   @IsObject()
@@ -308,6 +315,7 @@ export class UpdateProductBody {
   labels?: Labels[];
 
   @Expose()
+  @ToUnset()
   @IsOptional()
   @ToObject()
   @IsObject()
