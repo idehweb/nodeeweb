@@ -168,7 +168,7 @@ export const setStyles = (fields = {}) => {
   return style;
 };
 
-export const loadProductItems = (cat_id = null, filter = {}) => {
+export const loadProductItems = (cat_id = null, filter) => {
   return new Promise(function (resolve, reject) {
     // if (cat_id)
     //   getPostsByCat(0, 8, cat_id, "", {}, include).then((resp) => {
@@ -1007,8 +1007,9 @@ export const getEntities = (
     console.log('filter', filter);
 
     if (filter) {
-      // url += '?filter=' + filter;
-      if (filter['type']) params['type'] = filter['type'];
+      if (filter['type']) {
+        params['type'] = filter['type'];
+      } else url += '?filter=' + filter;
     }
     if (filter && populate) {
       url += '&populate=' + populate;
