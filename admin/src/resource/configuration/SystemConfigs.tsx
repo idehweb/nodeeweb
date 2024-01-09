@@ -8,6 +8,7 @@ import {
   TextInput,
   maxValue,
   minValue,
+  required,
   useNotify,
   useTranslate,
 } from 'react-admin';
@@ -26,11 +27,20 @@ export interface WebAppConfigProps {
     key: string;
     value: string;
   }[];
-  currency: string;
+  currency: {
+    Toman: 'Toman';
+    Rial: 'Rial';
+  };
   entry_submit_message: string;
   factor: {
     name: string;
     url: string;
+    address?: string;
+    tel?: string;
+    fax?: string;
+    postalCode?: string;
+    registrationCode?: string;
+    economicCode?: string;
   };
   favicons: string[];
   host: string;
@@ -94,6 +104,7 @@ export default function SystemConfigs() {
   const notify = useNotify();
 
   const onSubmit = (values) => {
+    console.log('hey im called');
     API.put('/config/website' + values._id, JSON.stringify({ ...values }))
       .then(({ data = {} }) => {
         notify(translate('saved successfully.'), {
@@ -136,13 +147,15 @@ export default function SystemConfigs() {
   return WebAppConfigData.isLoading ? (
     <Loading />
   ) : WebAppConfigData.error ? (
-    <></>
+    <p style={{ color: 'red', fontWeight: 'bold', textAlign: 'center' }}>
+      مشکل در دریافت اطلاعات از سرور
+    </p>
   ) : (
     WebAppConfigData.data && (
       <Paper className={styles.container}>
         <SimpleForm
           defaultValues={ConfigData}
-          onSubmit={(values) => onSubmit(values)}>
+          onSubmit={(values) => console.log('lets submit - > ', values)}>
           <TextInput
             className={styles.input}
             source="app_name"
@@ -150,7 +163,7 @@ export default function SystemConfigs() {
             // validate={required()}
           />
           <NumberInput
-            source="taxAmount"
+            source="tax"
             label={translate('resources.settings.taxAmount')}
             validate={[minValue(0), maxValue(1)]}
           />
@@ -172,7 +185,7 @@ export default function SystemConfigs() {
           </ArrayInput>
           <TextInput
             source="currency"
-            label={translate('resources.settings.currency')}
+            label={translate('resources.settings.currency.title')}
             className={styles.input}
             // validate={required()}
           />
@@ -207,7 +220,15 @@ export default function SystemConfigs() {
             // validate={required()}
           />
 
-          <div id="config-limit-inputs">
+          <div id="config-limit-inputs" style={{ padding: '1.5rem' }}>
+            <p
+              style={{
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              {translate('resources.settings.limit.headTitle')}
+            </p>
             <TextInput
               fullWidth
               source={'limit.approach_transaction_expiration'}
@@ -263,7 +284,15 @@ export default function SystemConfigs() {
             />
           </div>
 
-          <div id="config-manualpost-inputs">
+          <div id="config-manualpost-inputs" style={{ padding: '1rem' }}>
+            <p
+              style={{
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              {translate('resources.settings.manual_post.headTitle')}
+            </p>
             <ArrayInput
               source="manual_post"
               label={translate('resources.settings.manualPost')}>
@@ -384,7 +413,15 @@ export default function SystemConfigs() {
             </ArrayInput>
           </div>
 
-          <div id="config-sms-message-on">
+          <div id="config-sms-message-on" style={{ padding: '1rem' }}>
+            <p
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              {translate('resources.settings.sms_message_on.title')}
+            </p>
             <TextInput
               fullWidth
               source={'sms_message_on.approach_transaction_expiration'}
@@ -415,6 +452,59 @@ export default function SystemConfigs() {
               label={translate(
                 'resources.settings.sms_message_on.complete_order'
               )}
+            />
+          </div>
+
+          <div id="config-factor-details" style={{ padding: '1rem' }}>
+            <p
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              {translate('resources.settings.factor.title')}
+            </p>
+            <TextInput
+              fullWidth
+              source={'factor.name'}
+              label={translate('resources.settings.factor.name')}
+              validate={required()}
+            />
+            <TextInput
+              fullWidth
+              source={'factor.url'}
+              label={translate('resources.settings.factor.url')}
+              validate={required()}
+            />
+            <TextInput
+              fullWidth
+              source={'factor.address'}
+              label={translate('resources.settings.factor.address')}
+            />
+            <TextInput
+              fullWidth
+              source={'factor.tel'}
+              label={translate('resources.settings.factor.tel')}
+            />
+            <TextInput
+              fullWidth
+              source={'factor.fax'}
+              label={translate('resources.settings.factor.fax')}
+            />
+            <TextInput
+              fullWidth
+              source={'factor.postalCode'}
+              label={translate('resources.settings.factor.postalCode')}
+            />
+            <TextInput
+              fullWidth
+              source={'factor.registrationCode'}
+              label={translate('resources.settings.factor.registrationCode')}
+            />
+            <TextInput
+              fullWidth
+              source={'factor.economicCode'}
+              label={translate('resources.settings.factor.economicCode')}
             />
           </div>
         </SimpleForm>

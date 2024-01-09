@@ -708,7 +708,11 @@ const customFarsiMessages = {
       shop_submitCode: 'کد ثبتی (فاکتور)',
       shop_internationalCode: 'کد اقتصادی، شماره ملی (فاکتور)',
       tax: 'مالیات',
-      currency: 'واحد پول',
+      currency: {
+        title: 'واحد پول',
+        Toman: 'تومان',
+        Rial: 'ریال',
+      },
       activeCategory: 'دسته های فعال',
       siteStatus: 'وضعیت سایت',
       siteActiveMessage: 'پیام برای کاربر وقتی سایت غیر فعاله',
@@ -744,6 +748,7 @@ const customFarsiMessages = {
       entry_submit_message: 'پیام برای کاربر وقتی ورودی ثبت میشه',
       payment_redirect: 'انتقال به درگاه پرداخت',
       limit: {
+        headTitle: 'تنظیمات محدودیت ها',
         approach_transaction_expiration: 'زمان انقضای تراکنش به پایان می رسد',
         max_need_to_pay_order: 'حداکثر مبلغ سفارش برای پرداخت',
         max_need_to_pay_transaction: 'حداکثر مبلغ تراکنش برای پرداخت',
@@ -760,6 +765,7 @@ const customFarsiMessages = {
       },
       manualPost: 'ارسال دستی',
       manual_post: {
+        headTitle: 'تنظیمات ارسال',
         id: 'شناسه',
         provider: 'ارائه دهنده',
         title: 'عنوان',
@@ -786,6 +792,7 @@ const customFarsiMessages = {
         products_max_weight: 'حداکثر وزن محصولات',
       },
       sms_message_on: {
+        title: 'تنظیمات پیام رسان',
         approach_transaction_expiration: 'زمان انقضای تراکنش به پایان می رسد',
         paid_order: 'سفارش پرداخت شد',
         cancel_order: 'سفارش لغو شد',
