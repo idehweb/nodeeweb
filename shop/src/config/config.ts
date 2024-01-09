@@ -1,6 +1,5 @@
 import { Config } from '@nodeeweb/core/src/config/config';
 import { Currency, ShopConfigDto } from '../../dto/config';
-import store from '../../store';
 import {
   DEFAULT_REQ_LIMIT,
   DEFAULT_REQ_WINDOW_LIMIT,
@@ -14,6 +13,13 @@ import {
   MAX_PRODUCTS_IN_CART,
   MAX_PRODUCT_QUANTITY_IN_CART,
 } from '../../constants/limit';
+import {
+  DEFAULT_COLOR_BACKGROUND,
+  DEFAULT_COLOR_FOOTER_BACKGROUND,
+  DEFAULT_COLOR_PRIMARY,
+  DEFAULT_COLOR_SECONDARY,
+  DEFAULT_COLOR_TEXT,
+} from '../../constants/color';
 import {
   DEFAULT_APPROACH_TRANSACTION_EXP_MSG,
   DEFAULT_CANCEL_ORDER_MSG,
@@ -98,6 +104,13 @@ export class ShopConfig extends Config<ShopConfigDto> {
         paid_order: DEFAULT_PAID_MSG,
       },
       payment_redirect: '/order/payment',
+      color: {
+        primary: DEFAULT_COLOR_PRIMARY,
+        secondary: DEFAULT_COLOR_SECONDARY,
+        background: DEFAULT_COLOR_BACKGROUND,
+        footerBackground: DEFAULT_COLOR_FOOTER_BACKGROUND,
+        text: DEFAULT_COLOR_TEXT,
+      },
     };
   }
 
@@ -137,6 +150,7 @@ export class ShopConfig extends Config<ShopConfigDto> {
       shop_inactive_message: this._config.shop_inactive_message,
       tax: this._config.tax,
       auth: this._filterAuth(),
+      color: this._config.color,
     };
   }
 }
