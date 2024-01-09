@@ -292,7 +292,6 @@ const Form = ({ children, ...props }) => {
     if (e.target.name.includes('metatitle')) {
       setCharLeft({
         ...charLeft,
-        // metatitle: charLimit.metatitle - e.target.value.length,
         metatitle: e.target.value.length,
       });
     }
@@ -303,12 +302,19 @@ const Form = ({ children, ...props }) => {
       });
     }
   };
-  const richHelperTextHandler = (e) => {
-    setCharLeft({
-      ...charLeft,
-      description: e.length,
-    });
-  };
+  // const richHelperTextHandler = (e) => {
+  //   setCharLeft({
+  //     ...charLeft,
+  //     description: e.length,
+  //   });
+  // };
+
+  // const inputRef = useRef(null);
+  // const changeHandler = (e) => {
+  //   inputRef.current = e.target.value;
+  //   console.log(inputRef.current);
+  //   inputRef.current.focus();
+  // };
 
   return (
     <SimpleForm
@@ -324,7 +330,6 @@ const Form = ({ children, ...props }) => {
         inputProps={{ maxLength: 20 }}
         label={translate('resources.page.title')}
         className={'width100 mb-20'}
-        // validate={Val.req}
         validate={Val.reqMinLenn(6)}
       />
       <div className={'mb-20'}></div>
@@ -371,9 +376,9 @@ const Form = ({ children, ...props }) => {
         source={'description.' + translate('lan')}
         label={translate('resources.page.description')}
         // validate={Val.reqMaxLenn(250)}
-        inputProps={{ maxLength: 250 }}
-        onChange={richHelperTextHandler}
-        helperText={`${description}/${charLimit.description} charachters left`}
+        // inputProps={{ maxLength: 250 }}
+        // onChange={richHelperTextHandler}
+        // helperText={`${description}/${charLimit.description} charachters left`}
       />
       <div className={'mb-20'}></div>
       {/*<UploaderField*/}
