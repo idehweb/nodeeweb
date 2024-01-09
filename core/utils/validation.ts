@@ -14,6 +14,7 @@ import {
 import { ValidationError as VE } from '../types/error';
 import _ from 'lodash';
 import { Types } from 'mongoose';
+import parse from 'node-html-parser';
 
 export function ToMongoID(opt?: TransformOptions) {
   return Transform(({ value, key, options }) => {
@@ -193,6 +194,32 @@ export function Custom(
               ? value.every(validation)
               : false
             : validation(value);
+        },
+      },
+    });
+  };
+}
+
+export function IsHTMLString(validationOptions?: ValidationOptions) {
+  return function (object: Object, propertyName: string) {
+    registerDecorator({
+      name: 'IsHTMLString',
+      target: object.constructor,
+      propertyName,
+      options: {
+        message() {
+          return `${propertyName} must be valid ${
+            validationOptions?.each ? 'array of ' : ''
+          }html string format`;
+        },
+        ...validationOptions,
+      },
+      validator: {
+        validate(value: any) {
+          try {
+            if (!value || parse(value)) return true;
+          } catch (err) {}
+          return false;
         },
       },
     });

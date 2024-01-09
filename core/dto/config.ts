@@ -11,8 +11,9 @@ import {
   IsObject,
   IsUrl,
   IsArray,
+  IsHexColor,
 } from 'class-validator';
-import { IsMongoID, ToMongoID } from '../utils/validation';
+import { IsHTMLString, IsMongoID, ToMongoID } from '../utils/validation';
 import { Types } from 'mongoose';
 
 export class Favicon {
@@ -82,6 +83,50 @@ export class CoreConfigSmsOn {
   register?: string;
 }
 
+export class CoreConfigColor {
+  @Expose()
+  @IsOptional()
+  @IsHexColor()
+  primary: string;
+
+  @Expose()
+  @IsOptional()
+  @IsHexColor()
+  secondary: string;
+
+  @Expose()
+  @IsOptional()
+  @IsHexColor()
+  text: string;
+
+  @Expose()
+  @IsOptional()
+  @IsHexColor()
+  background: string;
+
+  @Expose()
+  @IsOptional()
+  @IsHexColor()
+  footerBackground: string;
+}
+
+export class CoreConfigColorBody extends CoreConfigColor {
+  @IsOptional()
+  primary: string;
+
+  @IsOptional()
+  secondary: string;
+
+  @IsOptional()
+  text: string;
+
+  @IsOptional()
+  background: string;
+
+  @IsOptional()
+  footerBackground: string;
+}
+
 export class CoreConfigSmsOnBody extends CoreConfigSmsOn {
   @IsOptional()
   otp: string;
@@ -134,6 +179,36 @@ export class CoreConfigDto {
   @IsOptional()
   @ValidateNested()
   supervisor?: ConfigSupervisor;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  @IsHTMLString()
+  head_first?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  @IsHTMLString()
+  head_last?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  @IsHTMLString()
+  body_first?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  @IsHTMLString()
+  body_last?: string;
+
+  @Expose()
+  @Type(() => CoreConfigColor)
+  @IsObject()
+  @ValidateNested()
+  color: CoreConfigColor;
 }
 
 class CoreConfConfBody extends CoreConfigDto {
@@ -159,6 +234,10 @@ class CoreConfConfBody extends CoreConfigDto {
   @IsMongoID()
   @ToMongoID()
   favicon_id?: Types.ObjectId;
+
+  @IsOptional()
+  @Type(() => CoreConfigColorBody)
+  color: CoreConfigColorBody;
 }
 
 export class CoreConfigBody {

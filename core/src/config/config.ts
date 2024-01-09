@@ -18,6 +18,13 @@ import logger from '../handlers/log.handler';
 import { USE_ENV } from '../../types/global';
 import { ConfigChangeOpt } from '../../types/config';
 import { detectVE } from '../../utils/validation';
+import {
+  DEFAULT_COLOR_BACKGROUND,
+  DEFAULT_COLOR_FOOTER_BACKGROUND,
+  DEFAULT_COLOR_PRIMARY,
+  DEFAULT_COLOR_SECONDARY,
+  DEFAULT_COLOR_TEXT,
+} from '../constants/color';
 
 export abstract class Config<C extends CoreConfigDto> {
   private __config: C;
@@ -172,6 +179,14 @@ class CoreConfig extends Config<CoreConfigDto> {
       sms_message_on: {
         otp: DEFAULT_SMS_ON_OTP,
       },
+
+      color: {
+        primary: DEFAULT_COLOR_PRIMARY,
+        secondary: DEFAULT_COLOR_SECONDARY,
+        background: DEFAULT_COLOR_BACKGROUND,
+        footerBackground: DEFAULT_COLOR_FOOTER_BACKGROUND,
+        text: DEFAULT_COLOR_TEXT,
+      },
     };
   }
 
@@ -199,6 +214,7 @@ class CoreConfig extends Config<CoreConfigDto> {
       host: this._config.host,
       auth: this._filterAuth(),
       favicon: this._config.favicons[0]?.dist,
+      color: this._config.color,
     };
   }
 }
