@@ -33,6 +33,7 @@ import {
   SimpleForm,
   SimpleImageField,
   UploaderField,
+  LimitCharacter,
 } from '@/components';
 import { Val } from '@/Utils';
 
@@ -281,39 +282,32 @@ const Form = ({ children, ...props }) => {
     }
   }
 
-  const [charLeft, setCharLeft] = useState({
-    metatitle: 0,
-    description: 0,
-    metadescription: 0,
-  });
-  const { metatitle, description, metadescription } = charLeft;
-  const charLimit = { metatitle: 100, description: 250, metadescription: 250 };
-  const helperTextHandler = (e) => {
-    if (e.target.name.includes('metatitle')) {
-      setCharLeft({
-        ...charLeft,
-        metatitle: e.target.value.length,
-      });
-    }
-    if (e.target.name.includes('metadescription')) {
-      setCharLeft({
-        ...charLeft,
-        metadescription: e.target.value.length,
-      });
-    }
-  };
+  // const [charLeft, setCharLeft] = useState({
+  //   metatitle: 0,
+  //   description: 0,
+  //   metadescription: 0,
+  // });
+  // const { metatitle, description, metadescription } = charLeft;
+  // const charLimit = { metatitle: 100, description: 250, metadescription: 250 };
+  // const helperTextHandler = (e) => {
+  //   if (e.target.name.includes('metatitle')) {
+  //     setCharLeft({
+  //       ...charLeft,
+  //       metatitle: e.target.value.length,
+  //     });
+  //   }
+  //   if (e.target.name.includes('metadescription')) {
+  //     setCharLeft({
+  //       ...charLeft,
+  //       metadescription: e.target.value.length,
+  //     });
+  //   }
+  // };
   // const richHelperTextHandler = (e) => {
   //   setCharLeft({
   //     ...charLeft,
   //     description: e.length,
   //   });
-  // };
-
-  // const inputRef = useRef(null);
-  // const changeHandler = (e) => {
-  //   inputRef.current = e.target.value;
-  //   console.log(inputRef.current);
-  //   inputRef.current.focus();
   // };
 
   return (
@@ -340,7 +334,9 @@ const Form = ({ children, ...props }) => {
         label={translate('resources.page.slug')}
         className={'width100 mb-20 ltr'}
       />
-      <TextInput
+      <LimitCharacter />
+      {/* 2 below textInput moved to LimitCharacter for performance improvement  */}
+      {/* <TextInput
         fullWidth
         source={'metatitle.' + translate('lan')}
         label={translate('resources.product.metatitle')}
@@ -357,7 +353,7 @@ const Form = ({ children, ...props }) => {
         inputProps={{ maxLength: 250 }}
         onChange={helperTextHandler}
         helperText={`${metadescription}/${charLimit.metadescription} charachters left`}
-      />
+      /> */}
       <TextInput
         source="path"
         fullWidth

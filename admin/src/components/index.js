@@ -55,6 +55,7 @@ export { default as ToggleConfigButton } from './ToggleConfigButton';
 // export { default as PageBuilder } from './page-builder/PageBuilder';
 export { default as ColorPicker } from './ColorPicker';
 export { default as CustomModal } from './CustomModal';
+export { default as LimitCharacter } from './LimitCharacter';
 // export { default as DeleteElement } from './DeleteElement';
 // export { default as PostFilterButton } from './PostFilterButton';
 // export { default as PostFilterForm } from './PostFilterForm';
