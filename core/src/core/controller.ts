@@ -52,6 +52,6 @@ export function registerDefaultControllers() {
       service: viewService,
       url: viewPath,
     },
-    { base_url: '/', from: 'CoreController', logger }
+    { base_url: '/', from: 'CoreController', logger, strategy: 'insertAfter' }
   );
 }
