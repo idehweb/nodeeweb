@@ -54,7 +54,8 @@ const customFarsiMessages = {
   complete: 'تکمیل شده',
   cancel: 'لغو شده',
   restarted: 'سیستم ری استارت شد.',
-
+  margin: 'margin',
+  kind: 'kind',
   websiteName: 'arvandshop',
   _id: 'شناسه',
   lan: 'fa',
@@ -159,6 +160,7 @@ const customFarsiMessages = {
       allCustomers: 'همه مشتریان',
       orders: 'سفارشات',
       transactions: 'تراکنش ها',
+      addTransaction: 'افزودن تراکنش',
       allTransactions: 'همه تراکنش ها',
       allSms: 'همه پیامک ها',
       allNotification: 'همه اعلان ها',
