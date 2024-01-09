@@ -12,7 +12,7 @@ import {
   IsUrl,
   IsArray,
 } from 'class-validator';
-import { IsMongoID, ToMongoID } from '../utils/validation';
+import { IsHTMLString, IsMongoID, ToMongoID } from '../utils/validation';
 import { Types } from 'mongoose';
 
 export class Favicon {
@@ -134,6 +134,30 @@ export class CoreConfigDto {
   @IsOptional()
   @ValidateNested()
   supervisor?: ConfigSupervisor;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  @IsHTMLString()
+  head_first?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  @IsHTMLString()
+  head_last?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  @IsHTMLString()
+  body_first?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  @IsHTMLString()
+  body_last?: string;
 }
 
 class CoreConfConfBody extends CoreConfigDto {
