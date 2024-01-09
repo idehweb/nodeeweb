@@ -32,7 +32,7 @@ import { getEntityEventName } from '../handlers/entity.handler';
 import isbot from 'isbot';
 import { getPublicDir } from '../../utils/path';
 import { join } from 'path';
-import parse from 'node-html-parser';
+import parse, { HTMLElement } from 'node-html-parser';
 
 type Conf = { logger: Logger };
 const defaultConf: Conf = { logger };
@@ -267,55 +267,10 @@ export class SeoCore implements Seo {
       }
     });
   }
-  getPage: MiddleWare = async (req, res, next) => {
-    // if (!isbot(req.get('user-agent'))) {
-    //   return next();
-    // }
 
-    let slug: string;
-
-    if (req.path === '/home') throw new NotFound('page not found');
-
-    if (req.path === '/') slug = 'home';
-    else [, slug] = /^\/([^/]+)$/.exec(req.path) ?? [];
-
-    if (!slug) {
-      // not cover
-      return next();
-    }
-    const page = await this.pageModel.findOne(
-      {
-        slug,
-        active: true,
-        status: PublishStatus.Published,
-      },
-      { metadescription: 1, metatitle: 1, title: 1 }
-    );
-
-    if (!page) {
-      //not cover
-      return next();
-    }
-
-    const des = Object.values(page.metadescription ?? {}).filter((d) => d)[0];
-    const title =
-      Object.values({ ...page.title, ...page.metatitle }).filter((d) => d)[0] ||
-      store.config.app_name;
-
-    const htmlStr = await fs.promises.readFile(
-      join(getPublicDir('front', true)[0], 'index.html'),
-      'utf8'
-    );
-    const html = parse(htmlStr, { comment: false });
-    const head = html.querySelector('head');
-    const body = html.querySelector('body');
-
-    // title
-    if (title) head.appendChild(parse(`<title>${title}</title>`));
-
-    // des
-    if (des)
-      head.appendChild(parse(`<meta name="description" content="${des}" />`));
+  private effectConfig(root: HTMLElement) {
+    const head = root.querySelector('head');
+    const body = root.querySelector('body');
 
     // head config
     if (store.config.head_first)
@@ -327,7 +282,62 @@ export class SeoCore implements Seo {
     if (store.config.body_first)
       body.insertAdjacentHTML('afterbegin', store.config.body_first);
     if (store.config.body_last)
-      body.insertAdjacentHTML('beforeend', store.config.head_last);
+      body.insertAdjacentHTML('beforeend', store.config.body_last);
+  }
+
+  private effectPageMeta(root: HTMLElement, page: PageDocument) {
+    const des = Object.values(page.metadescription ?? {}).filter((d) => d)[0];
+    const title =
+      Object.values({ ...page.title, ...page.metatitle }).filter((d) => d)[0] ||
+      store.config.app_name;
+
+    const head = root.querySelector('head');
+
+    // title
+    if (title) head.insertAdjacentHTML('beforeend', `<title>${title}</title>`);
+
+    // des
+    if (des)
+      head.insertAdjacentHTML(
+        'beforeend',
+        `<meta name="description" content="${des}" />`
+      );
+  }
+
+  private async effectPage(root: HTMLElement, path: string) {
+    let slug: string;
+
+    if (path === '/') slug = 'home';
+    else [, slug] = /^\/([^/]+)$/.exec(path) ?? [];
+
+    if (slug) {
+      const page = await this.pageModel.findOne(
+        {
+          slug,
+          active: true,
+          status: PublishStatus.Published,
+        },
+        { metadescription: 1, metatitle: 1, title: 1 }
+      );
+
+      if (page) this.effectPageMeta(root, page);
+    }
+  }
+
+  getPage: MiddleWare = async (req, res, next) => {
+    // if (!isbot(req.get('user-agent'))) {
+    //   return next();
+    // }
+    if (req.path === '/home') throw new NotFound('page not found');
+
+    const htmlStr = await fs.promises.readFile(
+      join(getPublicDir('front', true)[0], 'index.html'),
+      'utf8'
+    );
+    const html = parse(htmlStr, { comment: false });
+
+    await this.effectPage(html, req.path);
+    this.effectConfig(html);
 
     res.setHeader('content-type', 'text/html');
     return res.status(200).send(html.toString());
