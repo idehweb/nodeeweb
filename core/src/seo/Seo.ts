@@ -307,12 +307,27 @@ export class SeoCore implements Seo {
       'utf8'
     );
     const html = parse(htmlStr, { comment: false });
-    if (title)
-      html.querySelector('head').appendChild(parse(`<title>${title}</title>`));
+    const head = html.querySelector('head');
+    const body = html.querySelector('body');
+
+    // title
+    if (title) head.appendChild(parse(`<title>${title}</title>`));
+
+    // des
     if (des)
-      html
-        .querySelector('head')
-        .appendChild(parse(`<meta name="description" content="${des}" />`));
+      head.appendChild(parse(`<meta name="description" content="${des}" />`));
+
+    // head config
+    if (store.config.head_first)
+      head.insertAdjacentHTML('afterbegin', store.config.head_first);
+    if (store.config.head_last)
+      head.insertAdjacentHTML('beforeend', store.config.head_last);
+
+    // body config
+    if (store.config.body_first)
+      body.insertAdjacentHTML('afterbegin', store.config.body_first);
+    if (store.config.body_last)
+      body.insertAdjacentHTML('beforeend', store.config.head_last);
 
     res.setHeader('content-type', 'text/html');
     return res.status(200).send(html.toString());
