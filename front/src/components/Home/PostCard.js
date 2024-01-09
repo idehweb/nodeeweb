@@ -123,38 +123,9 @@ function PostCard({ onClick, item, method, t, entity }) {
                   product={item}
                   item={item}
                   text={t('options')}
-                  variable={true}>
-                  {item.options && item.options.length > 0 && (
-                    <div className={'show-options'}>
-                      <Link to={'/' + cat_inLink + '/'}>
-                        <ul>
-                          {item.options.map((comb, c) => {
-                            let string = [];
-                            if (comb.values) {
-                              comb.values.map((val, ct) => {
-                                // console.log('val',val.name);
-
-                                string.push(
-                                  <li key={ct}>
-                                    {val.name &&
-                                      (val.name.fa
-                                        ? val.name.fa
-                                        : typeof val.name == 'string'
-                                        ? val.name
-                                        : '')}
-                                  </li>
-                                );
-                                // return <div className={'option-name'}>{val.name.join('\n')}</div>;
-                              });
-                            }
-
-                            return string;
-                          })}
-                        </ul>
-                      </Link>
-                      <div className={'underbar-triangle'}></div>
-                    </div>
-                  )}
+                  variable={true}
+                  redirectFlag>
+                  مشاهده
                 </AddToCardButton>
               )}
               {item.type === 'normal' && (
@@ -162,6 +133,7 @@ function PostCard({ onClick, item, method, t, entity }) {
                   item={item}
                   product={item}
                   combination={item.combinations[0]}
+                  redirectFlag
                 />
               )}
             </>
