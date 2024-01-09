@@ -1,20 +1,22 @@
 import React from 'react';
+
+import * as Icons from '@mui/icons-material';
+
+import { Button } from 'shards-react';
+
+import { useSelector } from 'react-redux';
+
+import { Link } from 'react-router-dom';
+
 import Swiper from '#c/components/swiper';
-import ProductsSlider, {
-  ProductsSliderServer,
-} from '#c/components/components-overview/ProductsSlider';
-import PostSlider, {
-  PostSliderServer,
-} from '#c/components/components-overview/PostSlider';
+import ProductsSlider from '#c/components/components-overview/ProductsSlider';
+import PostSlider from '#c/components/components-overview/PostSlider';
 import NavbarSearch from '#c/components/layout/MainNavbar/NavbarSearch';
 import MainNavbar from '#c/components/layout/MainNavbar/MainNavbar';
 import {
-  getEntities,
-  Logout,
   MainUrl,
   setStyles,
   toggleCardbar,
-  toggleSearch,
   toggleSidebar,
 } from '#c/functions/index';
 import PostCard from '#c/components/Home/PostCard';
@@ -25,15 +27,11 @@ import Grid from '#c/components/page-builder/grid';
 import LoadMore from '#c/components/page-builder/loadmore';
 import Pagination from '#c/components/page-builder/pagination';
 import Form from '#c/components/page-builder/form';
-import Stepper from '#c/components/page-builder/stepper';
 import ConditionSteps from '#c/components/page-builder/conditionStepper';
 import ConditionStep from '#c/components/page-builder/conditionStepper/detail';
 import ChatBase from '#c/components/page-builder/chatgpt/ChatBase';
 import Description from '#c/components/page-builder/description';
-import * as Icons from '@mui/icons-material';
-import { Button } from 'shards-react';
-import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+
 import { combineUrl } from '@/functions/utils';
 import { CartService } from '@/functions/order/cart';
 
@@ -59,13 +57,13 @@ export function ShowElement(p) {
       return <SWIPERSlide element={element} />;
     case 'swiper-container':
       return <SWIPER element={element} />;
+    default:
+      <></>;
   }
 
   switch (name) {
     case 'html':
       return <div>html</div>;
-    case 'text':
-      return <TITLE element={element} />;
     case 'chatgpt':
       return <ChatBase element={element} />;
     case 'conditionsteps':
@@ -124,7 +122,7 @@ export function ShowElement(p) {
       );
     case 'ProductSlider':
       return (
-        <ProductSlider element={element} content={content} params={params} />
+        <ProductsSlider element={element} content={content} params={params} />
       );
     case 'ProductElement':
       return (
@@ -186,7 +184,7 @@ export function TEXTNODE({ element }) {
 }
 
 export function TITLE({ element }) {
-  let { type, components, classes, settings } = element;
+  let { settings } = element;
   let { general } = settings;
   let { fields } = general;
   let {
@@ -239,18 +237,10 @@ export function TITLE({ element }) {
 }
 
 export function TheNavbarSearch({ element }) {
-  let { type, components, settings } = element;
+  let { settings } = element;
   let { general } = settings;
   let { fields } = general;
-  let {
-    text,
-    iconFont,
-    direction,
-    link,
-    display,
-    target = '_blank',
-    classes,
-  } = fields;
+  let { direction, display, classes } = fields;
   let style = setStyles({ ...fields, direction: direction, display: display });
 
   return <NavbarSearch type={'append'} style={style} classes={classes} />;
@@ -260,10 +250,10 @@ export function TheNavbarSearch({ element }) {
 }
 
 export function TheMainNavbar({ element }) {
-  let { type, components, classes, settings } = element;
+  let { settings } = element;
   let { general } = settings;
   let { fields } = general;
-  let { text, iconFont, direction, link, display, target = '_blank' } = fields;
+  let { direction, display } = fields;
   let style = setStyles({ ...fields, direction: direction, display: display });
 
   return <MainNavbar element={element} style={style} setStyles={setStyles} />;
@@ -274,7 +264,7 @@ export function TheMainNavbar({ element }) {
 
 export function TheButton(p) {
   const { element, conditionStep, handleStep } = p;
-  let { type, components, classes, settings, handleCard, card } = element;
+  let { settings, handleCard } = element;
   let { general } = settings;
   let { fields } = general;
   let {
@@ -283,7 +273,6 @@ export function TheButton(p) {
     action,
     classess,
     showInMobile,
-    showInDesktop,
     target = '_self',
     link,
     iconImage,
@@ -312,6 +301,7 @@ export function TheButton(p) {
             src={combineUrl(MainUrl, iconImage)}
             width={imgWidth}
             height={imgHeight}
+            alt="loading"
             style={{ margin: imgMargin }}
           />
         )}
@@ -321,7 +311,7 @@ export function TheButton(p) {
   }
 
   if (iconFont && action) {
-    if (action == 'toggleCart') {
+    if (action === 'toggleCart') {
       return (
         <Button
           onClick={() => {
@@ -341,7 +331,7 @@ export function TheButton(p) {
         </Button>
       );
     }
-    if (action == 'toggleMenu') {
+    if (action === 'toggleMenu') {
       return (
         <Button
           onClick={() => {
@@ -362,10 +352,10 @@ export function TheButton(p) {
 
     if (action) {
       if (
-        action.substring(0, 4) == 'http' ||
-        action.substring(0, 3) == 'tel' ||
-        action.substring(0, 3) == 'mai' ||
-        action.substring(0, 3) == 'sms'
+        action.substring(0, 4) === 'http' ||
+        action.substring(0, 3) === 'tel' ||
+        action.substring(0, 3) === 'mai' ||
+        action.substring(0, 3) === 'sms'
       ) {
         return (
           <a
@@ -416,10 +406,10 @@ export function TheButton(p) {
   }
   if (action) {
     if (
-      action.substring(0, 4) == 'http' ||
-      action.substring(0, 3) == 'tel' ||
-      action.substring(0, 3) == 'mai' ||
-      action.substring(0, 3) == 'sms'
+      action.substring(0, 4) === 'http' ||
+      action.substring(0, 3) === 'tel' ||
+      action.substring(0, 3) === 'mai' ||
+      action.substring(0, 3) === 'sms'
     )
       return (
         <a target={target} href={action}>
@@ -451,17 +441,17 @@ export function TheButton(p) {
 }
 
 export function Hr({ element }) {
-  let { type, components, classes, settings, handleCard, card } = element;
+  let { settings } = element;
   let { general } = settings;
   let { fields } = general;
-  let { text, iconFont, action, classess } = fields;
+  let { classess } = fields;
   let style = setStyles(fields);
   // return JSON.stringify(style)
   return <hr className={classess} style={style} />;
 }
 
 export function HEADER({ element }) {
-  let { type, components, classes, settings } = element;
+  let { settings } = element;
   let { general } = settings;
   let { fields } = general;
   let { text } = fields;
@@ -471,12 +461,11 @@ export function HEADER({ element }) {
 }
 
 export function CAROUSEL({ element }) {
-  let { type, fields } = element;
   return 'CAROUSEL';
 }
 
 export function SWIPER({ element }) {
-  let { type, components, params } = element;
+  let { components, params } = element;
   if (components)
     return components.map((com, index) => {
       return <ShowElement params={params} key={index} element={com} />;
@@ -499,20 +488,19 @@ export function SWIPERWrapper(props) {
     autoplay = true,
     perPage = 1,
     type = 'slide',
-    margin,
     customQuery,
     breakpoints = null,
   } = fields;
   let style = setStyles(fields);
 
-  if (arrows == 'false') {
+  if (arrows === 'false') {
     arrows = false;
   }
-  if (pagination == 'false') {
+  if (pagination === 'false') {
     pagination = false;
   }
   if (entity) {
-    if (entity == 'product')
+    if (entity === 'product')
       return (
         <ProductsSlider
           breakpoints={breakpoints}
@@ -522,7 +510,7 @@ export function SWIPERWrapper(props) {
           customQuery={customQuery}
         />
       );
-    if (entity == 'post')
+    if (entity === 'post')
       return (
         <PostSlider
           breakpoints={breakpoints}
@@ -588,16 +576,16 @@ export function SWIPERWrapper(props) {
 }
 
 export function TheLoadMore(props) {
-  let { element, content } = props;
-  let { type, children, settings, classes } = element;
+  let { element } = props;
+  let { settings } = element;
   let { general } = settings;
   let { fields } = general;
   if (!fields) {
     return;
   }
-  let { entity, arrows = true, perPage = 1 } = fields;
+  let { arrows = true } = fields;
   // console.clear()
-  if (arrows == 'false') {
+  if (arrows === 'false') {
     arrows = false;
   }
   // return JSON.stringify(element.data)
@@ -605,16 +593,16 @@ export function TheLoadMore(props) {
 }
 
 export function ThePagination(props) {
-  let { element, content, params } = props;
-  let { type, children, settings, classes } = element;
+  let { element, params } = props;
+  let { settings } = element;
   let { general } = settings;
   let { fields } = general;
   if (!fields) {
     return;
   }
-  let { entity, arrows = true, perPage = 1 } = fields;
+  let { arrows = true } = fields;
   // console.clear()
-  if (arrows == 'false') {
+  if (arrows === 'false') {
     arrows = false;
   }
   // return JSON.stringify(element.data)
@@ -622,16 +610,16 @@ export function ThePagination(props) {
 }
 
 export function TheGrid(props) {
-  let { element, content, params } = props;
-  let { type, children, settings, classes } = element;
+  let { element, params } = props;
+  let { settings } = element;
   let { general } = settings;
   let { fields } = general;
   if (!fields) {
     return;
   }
-  let { entity, arrows = true, perPage = 1 } = fields;
+  let { arrows = true } = fields;
   // console.clear()
-  if (arrows == 'false') {
+  if (arrows === 'false') {
     arrows = false;
   }
   // return JSON.stringify(element.data)
@@ -639,29 +627,28 @@ export function TheGrid(props) {
 }
 
 export function TheForm(props) {
-  let { element, content, p } = props;
-  let { type, children, settings, classes } = element;
+  let { element } = props;
+  let { settings } = element;
   let { general } = settings;
   let { fields } = general;
 
   return <Form element={element} formFileds={fields} />;
 }
 export function TheDescription(props) {
-  let { element, content } = props;
-  let { type, children, settings, classes } = element;
+  let { element } = props;
+  let { settings } = element;
   let { general } = settings;
   let { fields } = general;
   if (!fields) {
     return;
   }
-  let { entity } = fields;
 
   return <Description element={element} />;
 }
 
 export function SWIPERSlide(props) {
   let { element, content, params } = props;
-  let { type, children, classes, kind, text, src } = element;
+  let { children, classes, kind, text, src } = element;
   if (children)
     return children.map((com, index) => {
       return (
@@ -672,15 +659,13 @@ export function SWIPERSlide(props) {
               ? classes.map((ob) => (ob.name ? ob.name : ob)).join(' ')
               : '')
           }>
-          {kind == 'link' && (
-            <a href={'#'}>
-              <ShowElement
-                params={params}
-                key={index}
-                element={com}
-                content={content}
-              />
-            </a>
+          {kind === 'link' && (
+            <ShowElement
+              params={params}
+              key={index}
+              element={com}
+              content={content}
+            />
           )}
           {/*{kind=='text' && <a href={"#"}><ShowElement key={index} element={com} content={content}/></a>}*/}
           {/*{kind=='image' && <a href={"#"}><ShowElement key={index} element={com} content={content}/></a>}*/}
@@ -697,8 +682,8 @@ export function SWIPERSlide(props) {
             ? classes.map((ob) => (ob.name ? ob.name : ob)).join(' ')
             : '')
         }>
-        {kind == 'text' && text}
-        {kind == 'image' && <img src={src} />}
+        {kind === 'text' && text}
+        {kind === 'image' && <img alt="loading..." src={src} />}
       </div>
     );
 }
@@ -708,7 +693,7 @@ export function ProductElement(props) {
 }
 
 export function TEXTBOX(element) {
-  let { type, fields } = element;
+  // let { type, fields } = element;
 
   return 'TEXTBOX';
 }
@@ -732,7 +717,7 @@ export function IMAGE(props) {
   // let {settings, classes} = element;
   const { element } = props;
 
-  let { type, components, classes, settings } = element;
+  let { classes, settings } = element;
   let { general } = settings;
   let { fields } = general;
   if (!fields) {
@@ -765,6 +750,7 @@ export function IMAGE(props) {
   }
   return (
     <img
+      alt={title}
       title={title}
       style={style}
       className={
@@ -779,22 +765,21 @@ export function IMAGE(props) {
 }
 
 export function SLIDER(props) {
-  let { element, content } = props;
-  let { type, components, classes } = element;
+  // let { element } = props;
+  // let { type, components, classes } = element;
   return 'SLIDER';
 }
 
 export function GRID_LAYOUT(props) {
-  let { element, content, params } = props;
+  let { element, params } = props;
   // let {type, components, children, classes, handleCard, card} = element;
-  let { type, components, classess, children, settings, handleCard, card } =
-    element;
+  let { children, settings, handleCard, card } = element;
   let { general } = settings;
   let { fields } = general;
   if (!fields) {
     return;
   }
-  let { link, title, src, classes, showInDesktop, showInMobile } = fields;
+  let { classes, showInDesktop, showInMobile } = fields;
   let style = setStyles(fields);
 
   return (
@@ -821,15 +806,14 @@ export function GRID_LAYOUT(props) {
 }
 
 export function THE_TABS(props) {
-  let { element, content, params } = props;
-  let { type, components, classess, children, settings, handleCard, card } =
-    element;
+  let { element, params } = props;
+  let { children, settings, handleCard, card } = element;
   let { general } = settings;
   let { fields } = general;
   if (!fields) {
     return;
   }
-  let { link, title, src, classes, showInDesktop, showInMobile } = fields;
+  let { classes, showInDesktop, showInMobile } = fields;
   let style = setStyles(fields);
 
   return (
@@ -856,18 +840,17 @@ export function THE_TABS(props) {
 }
 
 export function THE_STEPS(props) {
-  let { element, content, params } = props;
-  let { type, components, classess, children, settings, handleCard, card } =
-    element;
+  let { element, params } = props;
+  let { children, settings, handleCard, card } = element;
   let { general } = settings;
   let { fields } = general;
   if (!fields) {
     return;
   }
-  let { link, title, src, classes, showInDesktop, showInMobile } = fields;
+  let { classes, showInDesktop, showInMobile } = fields;
   let style = setStyles(fields);
-  return 'jk';
-  return <Stepper />;
+  // return 'jk';
+  // return <Stepper />;
   return (
     <div
       className={
@@ -892,10 +875,9 @@ export function THE_STEPS(props) {
 }
 
 export function THE_STEP(props) {
-  const { element, content, params } = props;
+  const { element, params } = props;
 
-  const { payload, type, components, children, settings, handleCard, card } =
-    element;
+  const { children, settings, handleCard, card } = element;
   let { general } = settings;
   let { fields } = general;
   let { showInDesktop, showInMobile, direction, display, classess, classes } =
@@ -930,10 +912,9 @@ export function THE_STEP(props) {
   );
 }
 export function GRID_COL(props) {
-  const { element, content, params } = props;
+  const { element, params } = props;
 
-  const { payload, type, components, children, settings, handleCard, card } =
-    element;
+  const { children, settings, handleCard, card } = element;
   let { general } = settings;
   let { fields } = general;
   let { showInDesktop, showInMobile, direction, display, classess, classes } =
@@ -968,10 +949,9 @@ export function GRID_COL(props) {
   );
 }
 export function THE_TAB(props) {
-  const { element, content, params } = props;
+  const { element, params } = props;
 
-  const { payload, type, components, children, settings, handleCard, card } =
-    element;
+  const { children, settings, handleCard, card } = element;
   let { general } = settings;
   let { fields } = general;
   let { showInDesktop, showInMobile, direction, display, classess, classes } =
@@ -1020,7 +1000,7 @@ export default function PageBuilder(props) {
     style = {},
     kind = 'container-fluid',
     maxWidth = '100%',
-    data,
+    // data,
     description = null,
     params,
   } = props;

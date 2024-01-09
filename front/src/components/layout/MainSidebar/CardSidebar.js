@@ -162,7 +162,11 @@ const CardSidebar = ({ t }) => {
                   {product.price && product.salePrice && (
                     <div className={'prc'}>
                       {returnPrice(product.salePrice)}
-                      <del className={'ml-2'}>{returnPrice(product.price)}</del>
+                      {product.price !== product.salePrice && (
+                        <del className={'ml-2'}>
+                          {returnPrice(product.price)}
+                        </del>
+                      )}{' '}
                     </div>
                   )}
                 </div>

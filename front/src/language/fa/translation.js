@@ -130,6 +130,7 @@ export default () => ({
   canceled: 'لغو شده',
   failed: 'ناموفق',
   expired: 'منقضی شده',
+  View: 'مشاهده',
   'number per row:': 'تعداد سطر ها',
   'edit with page builder': 'ویرایش با صفحه ساز',
   'reset form': 'پاکسازی فرم',

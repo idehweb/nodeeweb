@@ -250,9 +250,9 @@ const Pagination = (props) => {
                     md="3"
                     sm="4"
                     xs="6"
-                    className={'nbghjk  post-style-' + 'grid'}>
-                    {entity == 'post' && <BlogCard item={i} method={'grid'} />}
-                    {entity != 'post' && (
+                    className={'nbghjk  post-style-grid'}>
+                    {entity === 'post' && <BlogCard item={i} method={'grid'} />}
+                    {entity !== 'post' && (
                       <PostCard item={i} method={'grid'} entity={entity} />
                     )}
                   </Col>
