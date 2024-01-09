@@ -1,5 +1,7 @@
 import {
   CoreConfigBody,
+  CoreConfigColor,
+  CoreConfigColorBody,
   CoreConfigDto,
   CoreConfigLimit,
   CoreConfigLimitBody,
@@ -311,6 +313,10 @@ export class ShopConfConfBody extends ShopConfigDto {
   @IsMongoID()
   @ToMongoID()
   favicon_id?: Types.ObjectId;
+
+  @IsOptional()
+  @Type(() => CoreConfigColorBody)
+  color: CoreConfigColor;
 }
 
 export class ShopConfigBody extends CoreConfigBody {
