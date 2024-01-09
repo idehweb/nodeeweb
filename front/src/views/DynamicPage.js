@@ -2,44 +2,46 @@ import React, { useEffect, useState } from 'react';
 import { Container } from 'shards-react';
 import { useParams } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
-import { dFormat, PriceFormat } from '#c/functions/utils';
+
+// import { dFormat, PriceFormat } from '#c/functions/utils';
+import { useSelector } from 'react-redux';
+
 import PageBuilder from '#c/components/page-builder/PageBuilder';
 import {
-  addBookmark,
-  clearPost,
-  getPage,
+  // addBookmark,
+  // clearPost,
+  // getPage,
   isClient,
   loadPost,
-  loveIt,
-  MainUrl,
-  savePost,
+  // loveIt,
+  // MainUrl,
+  // savePost,
   getPageByPath,
 } from '#c/functions/index';
-import { SnapChatIcon } from '#c/assets/index';
-import store from '../functions/store';
-import { useSelector } from 'react-redux';
+// import { SnapChatIcon } from '#c/assets/index';
+// import store from '../functions/store';
 
 const DynamicPage = (props) => {
   // console.clear();
   let {
-    match,
-    location,
-    history,
-    t,
-    url,
+    // match,
+    // location,
+    // history,
+    // t,
+    // url,
     // elements,
     slug,
   } = props;
   console.log('props', props);
-  let page = useSelector((st) => {
+  const page = useSelector((st) => {
     return st.store.page || [];
   });
-  let params = useParams();
-  let the_id = params._id;
-  const [mainId, setMainId] = useState(the_id);
-  const [tab, setTab] = useState('description');
+  const params = useParams();
+  // let the_id = params._id;
+  // const [mainId, setMainId] = useState(the_id);
+  // const [tab, setTab] = useState('description');
   const [state, setState] = useState(isClient ? [] : page || []);
-  const [lan, setLan] = useState(store.getState().store.lan || 'fa');
+  // const [lan, setLan] = useState(store.getState().store.lan || 'fa');
 
   const getThePost = (_id) => {
     return new Promise(function (resolve, reject) {
@@ -86,20 +88,20 @@ const DynamicPage = (props) => {
   // useEffect(() => {
   // }, []);
   let {
-    load,
-    title,
-    description,
-    photos,
-    redirect,
-    _id,
-    thumbnail,
+    // load,
+    // title,
+    // description,
+    // photos,
+    // redirect,
+    // _id,
+    // thumbnail,
     kind,
-    excerpt,
+    // excerpt,
     maxWidth,
-    notfound,
+    // notfound,
     elements,
-    enableAdmin = false,
-    views = null,
+    // enableAdmin = false,
+    // views = null,
   } = state;
   return (
     <Container
