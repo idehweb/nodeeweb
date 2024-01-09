@@ -1196,7 +1196,7 @@ export const submitForm = (_id, obj) => {
   // uploadMedia
 
   return new Promise(function (resolve, reject) {
-    postData(`${ApiUrl}/form/entry/${_id}`, obj, false)
+    postData(`${ApiUrl}/entry/${_id}`, obj, false)
       .then((data) => {
         let mainD = data['data'];
         resolve(mainD);
