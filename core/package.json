@@ -8,7 +8,7 @@
     "build:post": "copyfiles -F -e 'node_modules/**' -e 'public/**' '**/*.sh' '**/*.json' dist",
     "dev": "nodemon --config nodemon.json start.ts",
     "log": "nodemon src/core/log.ts",
-    "start:ts":"ts-node start.ts",
+    "start:ts": "ts-node start.ts",
     "start": "node dist/start.js",
     "publish": "npm publish --access public"
   },
@@ -16,8 +16,8 @@
   "license": "ISC",
   "dependencies": {
     "@godaddy/terminus": "^4.12.1",
-    "@nodeeweb/admin-build": "^0.1.0",
-    "@nodeeweb/front-build": "^0.1.0",
+    "@nodeeweb/admin-build": "^0.1.2",
+    "@nodeeweb/front-build": "^0.1.7",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",

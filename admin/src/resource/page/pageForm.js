@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   DeleteButton,
   SaveButton,
@@ -7,9 +8,11 @@ import {
   useNotify,
   useRedirect,
   useTranslate,
+  Edit,
 } from 'react-admin';
 
 import React from 'react';
+import { useState, useRef } from 'react';
 
 import { RichTextInput } from 'ra-input-rich-text';
 
@@ -38,6 +41,7 @@ import { Val } from '@/Utils';
 let combs = [];
 let _The_ID = null;
 
+// let valuess = { photos: [], files: [], thumbnail: '', combinations: [] };
 let valuess = { photos: [], files: [], thumbnail: '', combinations: [] };
 
 function setPhotos(values) {
@@ -277,6 +281,35 @@ const Form = ({ children, ...props }) => {
     }
   }
 
+  const [charLeft, setCharLeft] = useState({
+    metatitle: 0,
+    description: 0,
+    metadescription: 0,
+  });
+  const { metatitle, description, metadescription } = charLeft;
+  const charLimit = { metatitle: 100, description: 250, metadescription: 250 };
+  const helperTextHandler = (e) => {
+    if (e.target.name.includes('metatitle')) {
+      setCharLeft({
+        ...charLeft,
+        // metatitle: charLimit.metatitle - e.target.value.length,
+        metatitle: e.target.value.length,
+      });
+    }
+    if (e.target.name.includes('metadescription')) {
+      setCharLeft({
+        ...charLeft,
+        metadescription: e.target.value.length,
+      });
+    }
+  };
+  const richHelperTextHandler = (e) => {
+    setCharLeft({
+      ...charLeft,
+      description: e.length,
+    });
+  };
+
   return (
     <SimpleForm
       {...props}
@@ -288,9 +321,11 @@ const Form = ({ children, ...props }) => {
       <TextInput
         source={'title.' + translate('lan')}
         fullWidth
+        inputProps={{ maxLength: 20 }}
         label={translate('resources.page.title')}
         className={'width100 mb-20'}
-        validate={Val.req}
+        // validate={Val.req}
+        validate={Val.reqMinLenn(6)}
       />
       <div className={'mb-20'}></div>
       <div className={'mb-20'}></div>
@@ -304,12 +339,19 @@ const Form = ({ children, ...props }) => {
         fullWidth
         source={'metatitle.' + translate('lan')}
         label={translate('resources.product.metatitle')}
+        inputProps={{ maxLength: 100 }}
+        onChange={helperTextHandler}
+        helperText={`${metatitle}/${charLimit.metatitle} charachters left`}
       />
       <TextInput
         multiline
         fullWidth
         source={'metadescription.' + translate('lan')}
         label={translate('resources.product.metadescription')}
+        // validate={Val.reqMaxLenn(250)}
+        inputProps={{ maxLength: 250 }}
+        onChange={helperTextHandler}
+        helperText={`${metadescription}/${charLimit.metadescription} charachters left`}
       />
       <TextInput
         source="path"
@@ -324,10 +366,14 @@ const Form = ({ children, ...props }) => {
         label={translate('resources.page.excerpt')}
       />
       <RichTextInput
-        multiline
+        // multiline
         fullWidth
         source={'description.' + translate('lan')}
         label={translate('resources.page.description')}
+        // validate={Val.reqMaxLenn(250)}
+        inputProps={{ maxLength: 250 }}
+        onChange={richHelperTextHandler}
+        helperText={`${description}/${charLimit.description} charachters left`}
       />
       <div className={'mb-20'}></div>
       {/*<UploaderField*/}

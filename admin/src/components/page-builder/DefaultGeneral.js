@@ -1,3 +1,5 @@
+import { RichTextInput } from 'ra-input-rich-text';
+
 export const fields = {
   classes: '',
   margin: '',
@@ -15,7 +17,6 @@ export const fields = {
 };
 export const rules = [
   { name: 'classes', type: 'string' },
-
   { name: 'margin', type: 'string' },
   { name: 'display', type: 'string' },
   { name: 'padding', type: 'string' },
@@ -30,4 +31,9 @@ export const rules = [
   { name: 'bottom', type: 'string' },
   { name: 'showInDesktop', type: 'boolean', value: false },
   { name: 'showInMobile', type: 'boolean', value: false },
+  //Added by me (below object)
+  {
+    name: 'richText',
+    type: 'textarea',
+  },
 ];

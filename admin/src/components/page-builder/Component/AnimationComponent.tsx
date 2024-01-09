@@ -20,7 +20,6 @@ export function AnimatedComponent({ animationKey, ...props }: ComponentProps) {
     </motion.div>
   );
 }
-
 export function AnimatedEmptyDropSlot(props: EmptyDropSlotProps) {
   return (
     <motion.div

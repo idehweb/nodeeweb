@@ -146,7 +146,7 @@ const Post = (props) => {
         <Col lg="9" md="8" xs="12">
           <Row>
             <Col lg="12" md="12" className={'single-product'}>
-              <h1 className="kjhghjk hgfd ">{title && title.fa}</h1>
+              <h1 className="kjhghjk hgfd ">{title && title.fa} </h1>
 
               {excerpt && (
                 <div

@@ -20,6 +20,7 @@ import {
 import { useFormContext } from 'react-hook-form';
 
 import React, { useCallback, useEffect, useState } from 'react';
+import { useLocaleState } from 'react-admin';
 
 import { RichTextInput } from 'ra-input-rich-text';
 
@@ -59,6 +60,8 @@ function setPhotos(values) {
   // setV(!v);
   // this.forceUpdate();
 }
+
+// const [checkPrice, setCheckPrice] = useLocaleState();
 
 function returnToHome(values) {
   if (values['firstCategory'])
@@ -188,6 +191,7 @@ const Form = ({ children, ...props }) => {
   const { record } = props;
   const [photos, setPhotos] = useState(record?.photos ?? []);
   const [thumbnail, setThumbnail] = useState(record?.thumbnail);
+  const [checkPrice, setCheckPrice] = useState('');
 
   let _The_ID = '';
   const translate = useTranslate();
@@ -425,19 +429,19 @@ const Form = ({ children, ...props }) => {
                   <TextInput
                     fullWidth
                     // record={scopedFormData}
-
                     source={'price'}
                     validate={Val.num}
                     className={'ltr'}
                     label={translate('resources.product.price')}
                     format={(v) => {
                       if (!v) return '';
-
+                      setCheckPrice(
+                        v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                      );
                       return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
                     }}
                     parse={(v) => {
                       if (!v) return '';
-
                       return v.toString().replace(/,/g, '');
                     }}
                     {...rest}
@@ -452,9 +456,12 @@ const Form = ({ children, ...props }) => {
                     className={'ltr'}
                     label={translate('resources.product.salePrice')}
                     format={(v) => {
-                      if (!v) return '';
+                      // if (!v) return '';
 
-                      return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                      return !v
+                        ? checkPrice
+                        : v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                      // return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
                     }}
                     parse={(v) => {
                       if (!v) return '';

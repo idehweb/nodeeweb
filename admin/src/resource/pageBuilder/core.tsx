@@ -30,6 +30,7 @@ import {
   AddToIndex,
   AddInside,
 } from './utils';
+import { elements } from 'chart.js';
 
 interface StateType {
   components: Array<ItemType>;

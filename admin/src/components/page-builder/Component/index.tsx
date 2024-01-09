@@ -23,7 +23,7 @@ export interface ComponentProps {
   onDrop: OnDropType;
   animationKey?: React.Key;
 }
-
+// console.log('hi there')
 const Component = ({
   index,
   item,

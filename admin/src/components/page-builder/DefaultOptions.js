@@ -1,6 +1,52 @@
 import { fields, rules } from './DefaultGeneral';
 
+import { Edit, SimpleForm, TextInput } from 'react-admin';
+import { RichTextInput } from 'ra-input-rich-text';
+
+{
+  /* <RichTextInput fullWidth source={'description.'} />; */
+}
+
+{
+  /* <RichTextInput
+        fullWidth
+        source={'description.' + translate('lan')}
+        label={translate('resources.product.description')}
+      /> */
+}
+
 const DefaultOptions = [
+  //Added by me (Text-R)
+  {
+    label: 'Text-R',
+    name: 'text',
+    addable: false,
+    settings: {
+      general: {
+        fields: {
+          text: '',
+          title: '',
+          tag: 'p',
+          direction: '',
+          fontSize: '13px',
+          lineHeight: '1',
+          fontWeight: 'normal',
+          ...fields,
+        },
+        rules: [
+          { name: 'text', type: 'textarea' },
+          { name: 'title', type: 'string' },
+          { name: 'tag', type: 'string' },
+          { name: 'direction', type: 'string' },
+          { name: 'fontSize', type: 'string' },
+          { name: 'lineHeight', type: 'string' },
+          { name: 'fontWeight', type: 'string' },
+          ...rules,
+        ],
+      },
+      design: [{ name: 'padding', type: 'string' }],
+    },
+  },
   {
     label: 'Login',
     name: 'login',
@@ -109,6 +155,7 @@ const DefaultOptions = [
       design: [],
     },
   },
+
   {
     label: 'Image',
     name: 'image',

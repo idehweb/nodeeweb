@@ -17,4 +17,7 @@ export const Val = {
   reqMax: (max) => [required(), number(), maxValue(max)],
   reqMinLen: (min) => [required(), number(), minLength(min)],
   reqMaxLen: (max) => [required(), number(), maxLength(max)],
+  reqMinLenn: (min) => [required(), minLength(min)],
+  reqMaxLenn: (max) => [maxLength(max)],
+  reqMaxAndMinLenn: (min, max) => [minLength(min), maxLength(max)],
 };
