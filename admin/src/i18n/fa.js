@@ -799,6 +799,17 @@ const customFarsiMessages = {
       },
       shop_active: 'وضعیت فعالیت وبسایت',
       shop_inactive_message: 'پیام غیرفعال بودن وبسایت',
+      factor: {
+        title: 'اطلاعات مورد نیاز برای صدور فاکتور',
+        name: 'نام فاکتور',
+        url: 'آدرس فاکتور',
+        address: 'آدرس',
+        tel: 'تلفن',
+        fax: 'فکس',
+        postalCode: 'کد پستی',
+        registrationCode: 'کد ثبت',
+        economicCode: 'کد اقتصادی',
+      },
     },
     notification: {
       user: 'کاربر',
