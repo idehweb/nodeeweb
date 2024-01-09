@@ -17,6 +17,7 @@ function AddToCardButton({
   text = '',
   variable = false,
   children,
+  redirectFlag = false,
   t,
   product,
   combination = [],
@@ -24,6 +25,7 @@ function AddToCardButton({
   // if (!combination) return;
   const [count, setCount] = useState(CartService.getQuantity(combination._id));
   let [Navigate, SetNavigate] = useState(null);
+  const router = useNavigate();
   const onCreate = useCallback(
     async (e) => {
       try {
@@ -118,37 +120,49 @@ function AddToCardButton({
       );
     }
   }
-  return combination.length !== 0 ? (
-    <div className="AddToCardButton">
-      {count !== 0 && (
-        <Button size="md" className={'buy-button kjhgfgh'} theme="primary">
-          <RemoveCircleOutlineIcon className={'left'} onClick={onDecrease} />
-          {count}
-          <AddCircleOutlineIcon className={''} onClick={onIncrease} />
-        </Button>
-      )}
-      {count === 0 && (
+  return redirectFlag === false ? (
+    combination.length !== 0 ? (
+      <div className="AddToCardButton">
+        {count !== 0 && (
+          <Button size="md" className={'buy-button kjhgfgh'} theme="primary">
+            <RemoveCircleOutlineIcon className={'left'} onClick={onDecrease} />
+            {count}
+            <AddCircleOutlineIcon className={''} onClick={onIncrease} />
+          </Button>
+        )}
+        {count === 0 && (
+          <Button
+            size="md"
+            className={'buy-button kjhgfgh empty-card '}
+            theme="primary"
+            onClick={onCreate}>
+            {!item.single && <span>{text}</span>}
+            {!item.single && <ShoppingBagIcon className="center" />}
+            {!variable && <span>{t('add to cart')}</span>}
+          </Button>
+        )}
+        {children}
+      </div>
+    ) : (
+      <div className="AddToCardButton">
         <Button
           size="md"
           className={'buy-button kjhgfgh empty-card '}
-          theme="primary"
-          onClick={onCreate}>
-          {!item.single && <span>{text}</span>}
-          {!item.single && <ShoppingBagIcon className="center" />}
-          {!variable && <span>{t('add to cart')}</span>}
+          theme="primary">
+          {t('Out Of Stock')}
         </Button>
-      )}
-      {children}
-    </div>
+      </div>
+    )
   ) : (
-    <div className="AddToCardButton">
+    <>
       <Button
         size="md"
         className={'buy-button kjhgfgh empty-card '}
-        theme="primary">
-        {t('Out Of Stock')}
+        theme="primary"
+        onClick={() => router(`/product/${product.slug}`)}>
+        <span>{t('View')}</span>
       </Button>
-    </div>
+    </>
   );
 }
 
