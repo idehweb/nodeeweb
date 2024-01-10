@@ -290,12 +290,12 @@ export class SeoCore implements Seo {
       store.config;
     if (meta_title) this.effectMeta(root, { key: 'title', value: meta_title });
     if (meta_description)
-      this.effectMeta(root, { key: 'desc', value: meta_description });
+      this.effectMeta(root, { key: 'description', value: meta_description });
   }
 
   private effectMeta(
     root: HTMLElement,
-    { key, value }: { key: 'title' | 'desc'; value: string }
+    { key, value }: { key: 'title' | 'description' | 'keywords'; value: string }
   ) {
     const head = root.querySelector('head');
 
@@ -309,7 +309,7 @@ export class SeoCore implements Seo {
       else head.insertAdjacentHTML('beforeend', `<title>${value}</title>`);
     } else {
       // description
-      const el = root.querySelector(`head meta[name='description']`);
+      const el = root.querySelector(`head meta[name='${key}']`);
       if (el)
         // change atr
         el.setAttribute('content', value);
@@ -317,7 +317,7 @@ export class SeoCore implements Seo {
       else
         head.insertAdjacentHTML(
           'beforeend',
-          `<meta name="description" content="${value}" />`
+          `<meta name="${key}" content="${value}" />`
         );
     }
   }
@@ -335,21 +335,22 @@ export class SeoCore implements Seo {
           active: true,
           status: PublishStatus.Published,
         },
-        { metadescription: 1, metatitle: 1, title: 1 }
+        { metadescription: 1, metatitle: 1, title: 1, keywords: 1 }
       );
 
-      if (page) {
-        const title = Object.values({
-          ...page.title,
-          ...page.metatitle,
-        }).filter((d) => d)[0] as string;
-        if (title) this.effectMeta(root, { key: 'title', value: title });
+      if (!page) return;
+      const title = Object.values({
+        ...page.title,
+        ...page.metatitle,
+      }).filter((d) => d)[0] as string;
+      if (title) this.effectMeta(root, { key: 'title', value: title });
 
-        const des = Object.values(page.metadescription ?? {}).filter(
-          (d) => d
-        )[0];
-        if (des) this.effectMeta(root, { key: 'desc', value: des });
-      }
+      const des = Object.values(page.metadescription ?? {}).filter((d) => d)[0];
+      if (des) this.effectMeta(root, { key: 'description', value: des });
+
+      // keywords
+      const keywords = page.keywords?.join(',');
+      if (keywords) this.effectMeta(root, { key: 'keywords', value: keywords });
     }
   }
 
