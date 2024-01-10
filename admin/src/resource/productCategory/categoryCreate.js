@@ -9,7 +9,12 @@ import {
 } from 'react-admin';
 import React from 'react';
 
-import { CustomResetViewsButton, List, SimpleForm } from '@/components';
+import {
+  CustomResetViewsButton,
+  List,
+  SimpleForm,
+  LimitCharacter,
+} from '@/components';
 import useStyles from '@/styles';
 import { Val } from '@/Utils';
 import { BASE_URL } from '@/functions/API';
@@ -60,6 +65,7 @@ const Form = ({ children, ...rest }) => {
         formClassName={cls.f2}
         fullWidth
       />
+      <LimitCharacter />
       <TextInput
         source="keywords"
         multiline

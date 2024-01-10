@@ -43,6 +43,7 @@ import {
   SimpleImageField,
   StockStatus,
   UploaderField,
+  LimitCharacter,
 } from '@/components';
 import { Val } from '@/Utils';
 import Transform from '@/functions/transform';
@@ -300,7 +301,8 @@ const Form = ({ children, ...props }) => {
         fullWidth
         validate={Val.req}
       />
-      <TextInput
+      <LimitCharacter />
+      {/* <TextInput
         fullWidth
         source={'metatitle.' + translate('lan')}
         label={translate('resources.product.metatitle')}
@@ -310,7 +312,7 @@ const Form = ({ children, ...props }) => {
         fullWidth
         source={'metadescription.' + translate('lan')}
         label={translate('resources.product.metadescription')}
-      />
+      /> */}
 
       <TextInput
         multiline
