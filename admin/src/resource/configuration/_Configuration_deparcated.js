@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { useState } from 'react';
 // import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -21,8 +21,17 @@ import {
 import API, { BASE_URL } from '@/functions/API';
 import { ColorPicker, ShowImageField } from '@/components';
 
-import SystemConfigs from './SystemConfigs';
+// import SystemConfigs from './SystemConfigs';
 // import {  } from 'react-hook-form';
+
+/**
+ * @module Configuration
+ * @deprecated This module is deprecated.
+ * @desc This module contains the configuration settings for the application.
+ * @param {Object} props - The props object.
+ * @returns {JSX.Element} The configuration form.
+ */
+
 const Configuration = (props) => {
   const refresh = useRefresh();
   const {
@@ -419,9 +428,7 @@ const Configuration = (props) => {
               </SaveButton>
             </CardActions>
           </Card>
-          <div>
-            <SystemConfigs />
-          </div>
+          <div>{/* <SystemConfigs /> */}</div>
         </Box>
       </Form>
     );
