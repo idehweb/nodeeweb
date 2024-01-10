@@ -205,6 +205,16 @@ export class CoreConfigDto {
   body_last?: string;
 
   @Expose()
+  @IsOptional()
+  @IsString()
+  meta_title?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  meta_description?: string;
+
+  @Expose()
   @Type(() => CoreConfigColor)
   @IsObject()
   @ValidateNested()

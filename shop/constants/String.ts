@@ -11,3 +11,5 @@ export const DEFAULT_CANCEL_ORDER_MSG = 'order $ORDER_ID$ has been cancel';
 export const DEFAULT_COMPLETE_ORDER_MSG = 'order $ORDER_ID$ has been complete';
 export const DEFAULT_POST_ORDER_MSG = 'order $ORDER_ID$ has been post';
 export const DEFAULT_PAID_MSG = 'order $ORDER_ID$ paid successfully!';
+export const DEFAULT_META_DESC =
+  'Fast and efficient open-source Node.js library for building efficient and scalable applications';

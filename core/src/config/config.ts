@@ -11,7 +11,7 @@ import {
   DEFAULT_REQ_LIMIT,
   DEFAULT_REQ_WINDOW_LIMIT,
 } from '../constants/limit';
-import { DEFAULT_SMS_ON_OTP } from '../constants/String';
+import { DEFAULT_META_DESC, DEFAULT_SMS_ON_OTP } from '../constants/String';
 import { validateSync } from 'class-validator';
 import { registerConfig } from '../handlers/config.handler';
 import logger from '../handlers/log.handler';
@@ -154,6 +154,8 @@ class CoreConfig extends Config<CoreConfigDto> {
 
     return {
       app_name: app_name ?? 'Nodeeweb Core',
+      meta_title: app_name ?? 'Nodeeweb Core',
+      meta_description: DEFAULT_META_DESC,
       host,
       auth: {
         ...(nodeewebApiUrl

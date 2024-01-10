@@ -268,7 +268,7 @@ export class SeoCore implements Seo {
     });
   }
 
-  private effectConfig(root: HTMLElement) {
+  private effectPostConfig(root: HTMLElement) {
     const head = root.querySelector('head');
     const body = root.querySelector('body');
 
@@ -285,23 +285,41 @@ export class SeoCore implements Seo {
       body.insertAdjacentHTML('beforeend', store.config.body_last);
   }
 
-  private effectPageMeta(root: HTMLElement, page: PageDocument) {
-    const des = Object.values(page.metadescription ?? {}).filter((d) => d)[0];
-    const title =
-      Object.values({ ...page.title, ...page.metatitle }).filter((d) => d)[0] ||
-      store.config.app_name;
+  private effectPreConfig(root: HTMLElement) {
+    const { meta_title = store.config.app_name, meta_description } =
+      store.config;
+    if (meta_title) this.effectMeta(root, { key: 'title', value: meta_title });
+    if (meta_description)
+      this.effectMeta(root, { key: 'desc', value: meta_description });
+  }
 
+  private effectMeta(
+    root: HTMLElement,
+    { key, value }: { key: 'title' | 'desc'; value: string }
+  ) {
     const head = root.querySelector('head');
 
-    // title
-    if (title) head.insertAdjacentHTML('beforeend', `<title>${title}</title>`);
-
-    // des
-    if (des)
-      head.insertAdjacentHTML(
-        'beforeend',
-        `<meta name="description" content="${des}" />`
-      );
+    if (key === 'title') {
+      // title
+      const el = root.querySelector(`head title`);
+      if (el)
+        // change inner
+        el.innerHTML = value;
+      // create new tag
+      else head.insertAdjacentHTML('beforeend', `<title>${value}</title>`);
+    } else {
+      // description
+      const el = root.querySelector(`head meta[name='description']`);
+      if (el)
+        // change atr
+        el.setAttribute('content', value);
+      // create new tag
+      else
+        head.insertAdjacentHTML(
+          'beforeend',
+          `<meta name="description" content="${value}" />`
+        );
+    }
   }
 
   private async effectPage(root: HTMLElement, path: string) {
@@ -320,7 +338,18 @@ export class SeoCore implements Seo {
         { metadescription: 1, metatitle: 1, title: 1 }
       );
 
-      if (page) this.effectPageMeta(root, page);
+      if (page) {
+        const title = Object.values({
+          ...page.title,
+          ...page.metatitle,
+        }).filter((d) => d)[0] as string;
+        if (title) this.effectMeta(root, { key: 'title', value: title });
+
+        const des = Object.values(page.metadescription ?? {}).filter(
+          (d) => d
+        )[0];
+        if (des) this.effectMeta(root, { key: 'desc', value: des });
+      }
     }
   }
 
@@ -336,8 +365,9 @@ export class SeoCore implements Seo {
     );
     const html = parse(htmlStr, { comment: false });
 
+    this.effectPreConfig(html);
     await this.effectPage(html, req.path);
-    this.effectConfig(html);
+    this.effectPostConfig(html);
 
     res.setHeader('content-type', 'text/html');
     return res.status(200).send(html.toString());
