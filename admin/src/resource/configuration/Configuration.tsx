@@ -1,28 +1,30 @@
 import {
   ArrayInput,
   BooleanInput,
+  ImageInput,
   Loading,
   NumberInput,
+  SelectArrayInput,
   SimpleForm,
   SimpleFormIterator,
   TextInput,
   maxValue,
   minValue,
   required,
-  useNotify,
   useTranslate,
 } from 'react-admin';
 
 import { Paper } from '@mui/material';
 
+import { useEffect } from 'react';
+
 import useFetch from '@/hooks/useFetch';
 
 import styles from '@/assets/SystemConfigs.module.css';
-import API from '@/functions/API';
+import useSubmit from '@/hooks/useSubmit';
 
 export interface WebAppConfigProps {
   app_name: string;
-  auth: { nodeeweb: { api_url: string } };
   consumer_status: {
     key: string;
     value: string;
@@ -42,7 +44,8 @@ export interface WebAppConfigProps {
     registrationCode?: string;
     economicCode?: string;
   };
-  favicons: string[];
+  favicon?: string;
+  favicons?: string[];
   host: string;
   limit: {
     approach_transaction_expiration: number;
@@ -65,10 +68,7 @@ export interface WebAppConfigProps {
     base_price?: number;
     min_price?: number;
     max_price?: number;
-    cities?: {
-      id: string;
-      name: string;
-    }[];
+    cities?: string[];
     states?: {
       id: string;
       name: string;
@@ -94,57 +94,48 @@ export interface WebAppConfigProps {
   shop_inactive_message: string;
   payment_redirect: string;
   tax: number;
+  head_first?: string;
+  head_last?: string;
+  body_first?: string;
+  body_last?: string;
+  color?: {
+    primary: string;
+  };
 }
 
 export default function SystemConfigs() {
   const WebAppConfigData = useFetch({ requestQuery: '/config/system' });
-  const ConfigData =
-    (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null;
   const translate = useTranslate();
-  const notify = useNotify();
+  const { isLoading, sendRequest, data } = useSubmit();
 
-  const onSubmit = (values) => {
+  const SubmitForm = (values) => {
     console.log('hey im called');
-    API.put('/config/website' + values._id, JSON.stringify({ ...values }))
-      .then(({ data = {} }) => {
-        notify(translate('saved successfully.'), {
-          type: 'success',
-        });
-        if (data.success) {
-          values = [];
-          // valuess = [];
-        }
-      })
-      .catch((err) => {
-        console.log('error', err);
-      });
+    console.log(values);
+    sendRequest('/config/system', values, 'put');
   };
 
-  // const typeChoices = [
-  //   {
-  //     id: 'تهران',
-  //     name: 'تهران',
-  //   },
-  //   {
-  //     id: 'شهرستان',
-  //     name: 'شهرستان',
-  //   },
-  // ];
+  const cityChoices = [
+    { id: '1', name: 'Tehran' },
+    { id: '2', name: 'Qom' },
+    { id: '3', name: 'Isfahan' },
+  ];
+  useEffect(() => {
+    WebAppConfigData.refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
-  // const typeChoices3 = [
-  //   {
-  //     id: 'is',
-  //     name: 'هست',
-  //   },
-  //   {
-  //     id: 'isnt',
-  //     name: 'نیست',
-  //   },
-  // ];
+  // console.log(
+  //   'consumer_status is ',
+  //   (WebAppConfigData.data?.data as WebAppConfigProps)?.consumer_status
+  // );
 
-  console.log(WebAppConfigData);
+  // console.log(
+  //   typeof (WebAppConfigData.data?.data as WebAppConfigProps)?.consumer_status
+  // );
 
-  return WebAppConfigData.isLoading ? (
+  // console.log(typeof (WebAppConfigData.data?.data as WebAppConfigProps));
+
+  return WebAppConfigData.isLoading || isLoading ? (
     <Loading />
   ) : WebAppConfigData.error ? (
     <p style={{ color: 'red', fontWeight: 'bold', textAlign: 'center' }}>
@@ -154,8 +145,77 @@ export default function SystemConfigs() {
     WebAppConfigData.data && (
       <Paper className={styles.container}>
         <SimpleForm
-          defaultValues={ConfigData}
-          onSubmit={(values) => console.log('lets submit - > ', values)}>
+          defaultValues={
+            (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null
+          }
+          onSubmit={(values) => SubmitForm(values)}>
+          <div id="config-favicon" style={{ padding: '1rem' }}>
+            <p
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              {translate('resources.settings.favicon.title')}
+            </p>
+            <ImageInput
+              fullWidth
+              source={'favicon'}
+              label={translate('resources.settings.favicon.logo')}
+            />
+            <ArrayInput
+              source="favicons"
+              label={translate('resources.settings.favicon.favicons')}>
+              <SimpleFormIterator>
+                <TextInput
+                  fullWidth
+                  source={'favicon'}
+                  label={translate('resources.settings.favicon.placeholder')}
+                />
+              </SimpleFormIterator>
+            </ArrayInput>
+          </div>
+          <div id="config-head-inputs" style={{ padding: '1rem' }}>
+            <p
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              {translate('resources.settings.head.title')}
+            </p>
+            <TextInput
+              fullWidth
+              source={'head_first'}
+              label={translate('resources.settings.head.head_first')}
+            />
+            <TextInput
+              fullWidth
+              source={'head_last'}
+              label={translate('resources.settings.head.head_last')}
+            />
+          </div>
+
+          <div id="config-body-inputs" style={{ padding: '1rem' }}>
+            <p
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              {translate('resources.settings.body.title')}
+            </p>
+            <TextInput
+              fullWidth
+              source={'body_first'}
+              label={translate('resources.settings.body.body_first')}
+            />
+            <TextInput
+              fullWidth
+              source={'body_last'}
+              label={translate('resources.settings.body.body_last')}
+            />
+          </div>
           <TextInput
             className={styles.input}
             source="app_name"
@@ -167,22 +227,24 @@ export default function SystemConfigs() {
             label={translate('resources.settings.taxAmount')}
             validate={[minValue(0), maxValue(1)]}
           />
-          <ArrayInput
-            source="consumer_status"
-            label={translate('resources.settings.consumerStatus')}>
-            <SimpleFormIterator>
-              <TextInput
-                fullWidth
-                source="consumer_status.key"
-                label={translate('resources.settings.consumer_status.key')}
-              />
-              <TextInput
-                fullWidth
-                source={'consumer_status.value'}
-                label={translate('resources.settings.consumer_status.value')}
-              />
-            </SimpleFormIterator>
-          </ArrayInput>
+          <div id="config-consumer_status">
+            <ArrayInput
+              source="consumer_status"
+              label={translate('resources.settings.consumerStatus')}>
+              <SimpleFormIterator>
+                <TextInput
+                  fullWidth
+                  source={'key'}
+                  label={translate('resources.settings.consumer_status.key')}
+                />
+                <TextInput
+                  fullWidth
+                  source={'value'}
+                  label={translate('resources.settings.consumer_status.value')}
+                />
+              </SimpleFormIterator>
+            </ArrayInput>
+          </div>
           <TextInput
             source="currency"
             label={translate('resources.settings.currency.title')}
@@ -297,114 +359,106 @@ export default function SystemConfigs() {
               source="manual_post"
               label={translate('resources.settings.manualPost')}>
               <SimpleFormIterator>
-                {/* <TextInput
-                  fullWidth
-                  source="manual_post.id"
-                  label={translate('resources.settings.manual_post.id')}
-                /> */}
                 <TextInput
                   fullWidth
-                  source={'manual_post.provider'}
+                  source="id"
+                  label={translate('resources.settings.manual_post.id')}
+                />
+                <TextInput
+                  fullWidth
+                  source={'provider'}
                   label={translate('resources.settings.manual_post.provider')}
                 />
                 <TextInput
                   fullWidth
-                  source={'manual_post.title'}
+                  source={'title'}
                   label={translate('resources.settings.manual_post.title')}
                 />
                 <TextInput
                   fullWidth
-                  source={'manual_post.description'}
+                  source={'description'}
                   label={translate(
                     'resources.settings.manual_post.description'
                   )}
                 />
                 <BooleanInput
-                  source={'manual_post.active'}
+                  source={'active'}
                   label={translate('resources.settings.manual_post.active')}
                 />
                 <NumberInput
-                  source={'manual_post.price'}
+                  source={'price'}
                   label={translate('resources.settings.manual_post.price')}
                 />
                 <NumberInput
-                  source={'manual_post.priceFormula'}
+                  source={'priceFormula'}
                   label={translate(
                     'resources.settings.manual_post.priceFormula'
                   )}
                 />
                 <NumberInput
-                  source={'manual_post.base_price'}
+                  source={'base_price'}
                   label={translate('resources.settings.manual_post.base_price')}
                 />
                 <NumberInput
-                  source={'manual_post.min_price'}
+                  source={'min_price'}
                   label={translate('resources.settings.manual_post.min_price')}
                 />
                 <NumberInput
-                  source={'manual_post.max_price'}
+                  source={'max_price'}
                   label={translate('resources.settings.manual_post.max_price')}
                 />
-                <ArrayInput
-                  source="manual_post.cities"
-                  label={translate('resources.settings.manual_post.cities')}>
-                  <SimpleFormIterator>
-                    <TextInput
-                      fullWidth
-                      source="manual_post.cities.id"
-                      label={translate(
-                        'resources.settings.manual_post.citiesProps.id'
-                      )}
-                    />
-                    <TextInput
-                      fullWidth
-                      source={'manual_post.cities.name'}
-                      label={translate(
-                        'resources.settings.manual_post.citiesProps.name'
-                      )}
-                    />
-                  </SimpleFormIterator>
-                </ArrayInput>
-                <ArrayInput
-                  source="manual_post.states"
-                  label={translate('resources.settings.manual_post.states')}>
-                  <SimpleFormIterator>
-                    <TextInput
-                      fullWidth
-                      source="manual_post.states.id"
-                      label={translate(
-                        'resources.settings.manual_post.statesProps.id'
-                      )}
-                    />
-                    <TextInput
-                      fullWidth
-                      source={'manual_post.states.name'}
-                      label={translate(
-                        'resources.settings.manual_post.statesProps.name'
-                      )}
-                    />
-                  </SimpleFormIterator>
-                </ArrayInput>
+                <div id="manual-post-cities">
+                  {/* <ArrayInput
+                    source="cities"
+                    label={translate('resources.settings.manual_post.cities')}>
+                    <SimpleFormIterator source="cities">
+                      <TextInput
+                        fullWidth
+                        source="" // Set source to null to prevent creating an object
+                        label={translate(
+                          'resources.settings.manual_post.citiesProps.name'
+                        )}
+                      />
+                      <input />
+                    </SimpleFormIterator>
+                  </ArrayInput> */}
+                  <SelectArrayInput source="cities" choices={cityChoices} />
+                </div>
+                <div id="manual-post-states">
+                  <ArrayInput
+                    source="states"
+                    label={translate('resources.settings.manual_post.states')}>
+                    <SimpleFormIterator>
+                      <TextInput
+                        fullWidth
+                        source={'name'}
+                        label={translate(
+                          'resources.settings.manual_post.statesProps.name'
+                        )}
+                      />
+                    </SimpleFormIterator>
+                  </ArrayInput>
+                </div>
                 <NumberInput
-                  source={'manual_post.products_min_price'}
+                  source={'products_min_price'}
                   label={translate(
                     'resources.settings.manual_post.products_min_price'
                   )}
                 />
                 <NumberInput
-                  source={'manual_post.products_max_price'}
+                  source={'products_max_price'}
                   label={translate(
                     'resources.settings.manual_post.products_max_price'
                   )}
                 />
                 <NumberInput
-                  source={'manual_post.products_min_weight'}
+                  source={'products_min_weight'}
                   label={translate(
                     'resources.settings.manual_post.products_min_weight'
                   )}
                 />
                 <NumberInput
-                  source={'manual_post.products_max_weight'}
+                  source={'products_max_weight'}
                   label={translate(
                     'resources.settings.manual_post.products_max_weight'
                   )}

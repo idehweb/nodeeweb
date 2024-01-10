@@ -817,6 +817,23 @@ const customFarsiMessages = {
         registrationCode: 'کد ثبت',
         economicCode: 'کد اقتصادی',
       },
+      favicon: {
+        title: 'تنظیمات آیکون',
+        favicons: 'آیکون ها',
+        label: 'آیکون',
+        logo: 'لوگو',
+        placeholder: 'انتخاب کنید',
+      },
+      head: {
+        title: 'تنظیمات تگ های هد',
+        head_first: 'تگ هد اول',
+        head_last: 'تگ هد آخر',
+      },
+      body: {
+        title: 'تنظیمات تگ های بدنه',
+        body_first: 'تگ بدنه اول',
+        body_last: 'تگ بدنه آخر',
+      },
     },
     notification: {
       user: 'کاربر',

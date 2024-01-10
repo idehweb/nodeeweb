@@ -247,11 +247,11 @@ export default function App() {
         options={{ label: translate('pos.menu.notification') }}
         {...Notification}
       />
-      <Resource
+      {/* <Resource
         name="settings"
         options={{ label: translate('pos.menu.settings') }}
         {...Settings}
-      />
+      /> */}
       <Resource
         name="action"
         options={{ label: translate('pos.menu.actions') }}
