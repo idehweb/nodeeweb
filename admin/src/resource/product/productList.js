@@ -380,7 +380,7 @@ const TabbedDatagrid = (props) => {
                   <div className={'categories'}>
                     {record.productCategory &&
                       record.productCategory.map((item, it) => (
-                        <div>
+                        <div key={item.slug}>
                           <ChipField
                             source={'productCategory[' + it + '].slug'}
                             label={item.slug}
@@ -408,7 +408,7 @@ const TabbedDatagrid = (props) => {
                   thecl = 'erro';
 
                 if (record.type == 'variable') {
-                  if (record.combinations) {
+                  if (record.combinations && record.combinations.length > 0) {
                     record.combinations.map((comb, key) => {
                       if (comb.in_stock == true) {
                         tt = translate('resources.product.stock');
