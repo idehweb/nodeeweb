@@ -83,6 +83,18 @@ function PostCard({ onClick, item, method, t, entity }) {
                 {_truncate(item.title['fa'], { length: 120 })}
               </Link>
             </span>
+            <span className="card-non-title-item">
+              {item.combinations[0].price &&
+              typeof item.combinations[0].price === 'number' ? (
+                <Theprice price={item.combinations[0].price} />
+              ) : (
+                <Theprice price={''} />
+              )}
+              {/* {item.combinations[0].price &&
+                typeof item.combinations[0].price === 'number' && (
+                  <Theprice price={item.combinations[0].price} />
+                )} */}
+            </span>
           </div>
 
           {method === 'list' && (
