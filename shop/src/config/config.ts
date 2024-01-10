@@ -29,6 +29,7 @@ import {
   DEFAULT_POST_ORDER_MSG,
   DEFAULT_REGISTER_MSG,
   DEFAULT_SHOP_INACTIVE_MSG,
+  DEFAULT_META_DESC,
 } from '../../constants/String';
 import { plainToInstance } from 'class-transformer';
 import { registerConfig } from '@nodeeweb/core/src/handlers/config.handler';
@@ -54,6 +55,8 @@ export class ShopConfig extends Config<ShopConfigDto> {
 
     return {
       app_name: app_name ?? 'Nodeeweb Shop',
+      meta_title: app_name ?? 'Nodeeweb Shop',
+      meta_description: DEFAULT_META_DESC,
       host,
       favicons: [],
       auth: {

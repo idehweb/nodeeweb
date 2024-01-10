@@ -5,3 +5,5 @@ export const ACTIVITY_TARGET_AFTER_REQ_KEY = 'target_after';
 export const OPTIONAL_LOGIN = 'optional_login';
 export const BASE_API_URL = '/api/v1';
 export const DEFAULT_SMS_ON_OTP = '%APP_NAME%\nyour verification code: %CODE%';
+export const DEFAULT_META_DESC =
+  'Fast and efficient open-source Node.js library for building efficient and scalable applications';
