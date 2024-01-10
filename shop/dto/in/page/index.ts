@@ -1,6 +1,13 @@
 import { Custom, IsSlug } from '@nodeeweb/core/utils/validation';
 import { Expose, Transform } from 'class-transformer';
-import { Allow, IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
+import {
+  Allow,
+  IsArray,
+  IsEnum,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { PublishStatus, MultiLang } from '../../../schema/_base.schema';
 import { ToArray, ToObject, ToSlug } from '@nodeeweb/core/utils/transform';
 export class PageBody {
@@ -109,6 +116,12 @@ export class PageBody {
   @IsObject()
   @ToObject()
   metadescription: any;
+
+  @Expose()
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  keywords?: string[];
 }
 
 export class PageUpdate {
@@ -219,4 +232,10 @@ export class PageUpdate {
   @IsObject()
   @ToObject()
   metadescription: any;
+
+  @Expose()
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  keywords?: string[];
 }
