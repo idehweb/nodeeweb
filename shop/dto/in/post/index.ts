@@ -69,6 +69,16 @@ export class PostCreateDTO {
   @ToAny()
   @IsOptional()
   thumbnail?: string;
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  metatitle?: any;
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  metadescription?: any;
 }
 
 export class PostUpdateDTO {
@@ -136,4 +146,14 @@ export class PostUpdateDTO {
   @ToAny()
   @IsOptional()
   thumbnail?: string;
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  metatitle?: any;
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  metadescription?: any;
 }
