@@ -47,6 +47,16 @@ export class FormCreateDTO {
   @ToAny()
   @IsOptional()
   view?: number;
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  metatitle?: any;
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  metadescription?: any;
 }
 
 export class FormUpdateDTO {
@@ -94,4 +104,14 @@ export class FormUpdateDTO {
   @ToAny()
   @IsOptional()
   view?: number;
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  metatitle?: any;
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  metadescription?: any;
 }

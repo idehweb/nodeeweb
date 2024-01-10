@@ -26,6 +26,7 @@ export interface IPage {
   thumbnail?: string;
   metatitle?: { [key: string]: string };
   metadescription?: { [key: string]: string };
+  keywords?: string[];
 }
 
 export type PageDocument = Document<Types.ObjectId, {}, IPage> & IPage;
@@ -66,6 +67,7 @@ const schema = new mongoose.Schema(
     thumbnail: String,
     metatitle: MultiLang,
     metadescription: MultiLang,
+    keywords: [String],
   },
   { timestamps: true }
 );

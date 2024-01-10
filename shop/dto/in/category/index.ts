@@ -37,6 +37,16 @@ export class CategoryCreateDTO {
   @ToAny()
   @IsOptional()
   parent?: any;
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  metatitle?: any;
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  metadescription?: any;
 }
 
 export class CategoryUpdateDTO {
@@ -74,4 +84,14 @@ export class CategoryUpdateDTO {
   @ToAny()
   @IsOptional()
   parent?: any;
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  metatitle?: any;
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  metadescription?: any;
 }

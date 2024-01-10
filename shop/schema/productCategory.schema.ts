@@ -1,4 +1,5 @@
 import mongoose, { Document, Model, Types } from 'mongoose';
+import { MultiLang } from './_base.schema';
 
 export interface IProductCategory {
   name: any;
@@ -34,8 +35,8 @@ const schema = new mongoose.Schema(
     },
     image: String,
     data: {},
-    metatitle: {},
-    metadescription: {},
+    metatitle: MultiLang,
+    metadescription: MultiLang,
     description: {},
     values: [],
     parent: { type: mongoose.Schema.Types.ObjectId, ref: 'productCategory' }, //category_id

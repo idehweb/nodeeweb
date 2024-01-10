@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { MultiLang } from './_base.schema';
 
 const schema = new mongoose.Schema(
   {
@@ -19,6 +20,8 @@ const schema = new mongoose.Schema(
     responses: [],
     status: { type: String, default: 'processing' },
     view: { type: Number, default: 1 },
+    metatitle: MultiLang,
+    metadescription: MultiLang,
   },
   { timestamps: true }
 );
