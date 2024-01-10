@@ -313,6 +313,7 @@ const Form = ({ children, ...props }) => {
   return (
     <SimpleForm
       {...props}
+
       // toolbar={<CustomToolbar record={props.record}/>}
       // onSubmit={v => save(v)}
     >
@@ -365,6 +366,12 @@ const Form = ({ children, ...props }) => {
         fullWidth
         source={'excerpt.' + translate('lan')}
         label={translate('resources.page.excerpt')}
+      />
+      <TextInput
+        source="keywords"
+        multiline
+        fullWidth
+        label={translate('resources.product.keywords')}
       />
       <RichTextInput
         // multiline

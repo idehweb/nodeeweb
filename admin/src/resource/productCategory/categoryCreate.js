@@ -60,6 +60,12 @@ const Form = ({ children, ...rest }) => {
         formClassName={cls.f2}
         fullWidth
       />
+      <TextInput
+        source="keywords"
+        multiline
+        fullWidth
+        label={translate('resources.product.keywords')}
+      />
       <ReferenceInput
         label={translate('resources.category.parent')}
         source="parent"
