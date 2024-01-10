@@ -10,7 +10,7 @@ export default () => {
     metadescription: 0,
   });
   const { metatitle, metadescription } = charLeft;
-  const charLimit = { metatitle: 100, metadescription: 250 };
+  const charLimit = { metatitle: 65, metadescription: 150 };
   const helperTextHandler = (e) => {
     if (e.target.name.includes('metatitle')) {
       setCharLeft({
@@ -33,7 +33,7 @@ export default () => {
         fullWidth
         source={'metatitle.' + translate('lan')}
         label={translate('resources.product.metatitle')}
-        inputProps={{ maxLength: 100 }}
+        inputProps={{ maxLength: 65 }}
         onChange={helperTextHandler}
         helperText={`${metatitle}/${charLimit.metatitle}`}
       />
@@ -42,7 +42,7 @@ export default () => {
         fullWidth
         source={'metadescription.' + translate('lan')}
         label={translate('resources.product.metadescription')}
-        inputProps={{ maxLength: 250 }}
+        inputProps={{ maxLength: 150 }}
         onChange={helperTextHandler}
         helperText={`${metadescription}/${charLimit.metadescription}`}
       />
