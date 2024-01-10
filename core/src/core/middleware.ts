@@ -64,7 +64,9 @@ export function commonMiddleware(): {
     const adminFolder = getPublicDir('admin', true)[0];
     const frontFolder = getPublicDir('front', true)[0];
 
-    const filesStatic = express.static(filesFolder, { maxAge: '1y' });
+    const filesStatic = express.static(filesFolder, {
+      maxAge: '1y',
+    });
 
     filesStatic['shadowName'] = `Server-Static / => ${filesFolder}`;
 
@@ -93,6 +95,7 @@ export function commonMiddleware(): {
     adminStatic['shadowName'] = `Server-Static /admin => ${adminFolder}`;
 
     mw.push(filesStatic, frontSettingStatic, frontStatic, adminStatic);
+    fixedHandlers.push(adminStatic[1]);
   }
 
   // insert error packages
@@ -123,7 +126,7 @@ function setFixedHandlers(fixedHandlers: any[]) {
   const expressFixed = (store.app._router.stack.slice(0, 2) as any[]).map(
     (l) => l.handle
   );
-  [...expressFixed, ...fixedHandlers].forEach((handle) =>
-    store.fixedHandlers.push(handle)
-  );
+  [...expressFixed, ...fixedHandlers].forEach((handle) => {
+    store.fixedHandlers.push(handle);
+  });
 }
