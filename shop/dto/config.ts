@@ -8,6 +8,7 @@ import {
   CoreConfigSmsOn,
   Favicon,
 } from '@nodeeweb/core';
+import { ToAny, ToArray } from '@nodeeweb/core/utils/transform';
 import { IsMongoID, ToMongoID } from '@nodeeweb/core/utils/validation';
 import { Exclude, Expose, Type } from 'class-transformer';
 import {
@@ -28,6 +29,15 @@ import { Types } from 'mongoose';
 export enum Currency {
   Toman = 'Toman',
   Rial = 'Rial',
+}
+class Consumer {
+  @Expose()
+  @IsString()
+  key: string;
+
+  @Expose()
+  @IsString()
+  value: string;
 }
 class Factor {
   @Expose()
@@ -283,7 +293,9 @@ export class ShopConfigDto extends CoreConfigDto {
   @Expose()
   @IsOptional()
   @IsArray()
-  consumer_status: { key: string; value: string }[];
+  @Type(() => Consumer)
+  @ValidateNested({ each: true })
+  consumer_status: Consumer[];
 }
 
 export class ShopConfConfBody extends ShopConfigDto {
