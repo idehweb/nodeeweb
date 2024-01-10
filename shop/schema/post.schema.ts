@@ -1,5 +1,6 @@
 import { Photo } from '@nodeeweb/core';
 import mongoose, { Document, Model, Types } from 'mongoose';
+import { MultiLang } from './_base.schema';
 
 export interface IPost {
   active: boolean;
@@ -15,6 +16,8 @@ export interface IPost {
   status: string;
   photos: Photo[];
   thumbnail: string;
+  metatitle?: { [key: string]: string };
+  metadescription?: { [key: string]: string };
 }
 
 export type PostDocument = IPost & Document<Types.ObjectId, {}, IPost>;
@@ -49,6 +52,8 @@ const schema = new mongoose.Schema(
       },
     ],
     thumbnail: String,
+    metatitle: MultiLang,
+    metadescription: MultiLang,
   },
   { timestamps: true }
 );

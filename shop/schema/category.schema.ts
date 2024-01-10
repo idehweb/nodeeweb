@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { MultiLang } from './_base.schema';
 
 const schema = new mongoose.Schema({
   name: {},
@@ -14,7 +15,9 @@ const schema = new mongoose.Schema({
   image: String,
   data: {},
   values: [],
-  parent: { type: mongoose.Schema.Types.ObjectId, ref: 'productCategory' }, //category_id
+  parent: { type: mongoose.Schema.Types.ObjectId, ref: 'productCategory' },
+  metatitle: MultiLang,
+  metadescription: MultiLang,
 });
 
 export default schema;
