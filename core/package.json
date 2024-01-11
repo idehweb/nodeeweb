@@ -1,16 +1,16 @@
 {
   "name": "@nodeeweb/core",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Nodeeweb Core is a NodeJs framework",
   "main": "index",
   "scripts": {
     "build": "tsc --build",
-    "build:post": "copyfiles -F -e 'node_modules/**' -e 'public/**' '**/*.sh' '**/*.json' dist",
+    "build:post": "copyfiles -F -e \"dist/**\" -e \"node_modules/**\" -e \"public/**\" \"**/*.sh\" \"**/*.bat\" \"**/*.json\" dist",
     "dev": "nodemon --config nodemon.json start.ts",
     "log": "nodemon src/core/log.ts",
     "start:ts":"ts-node start.ts",
     "start": "node dist/start.js",
-    "publish": "./publish"
+    "publish": "./publish.sh"
   },
   "author": "",
   "license": "ISC",

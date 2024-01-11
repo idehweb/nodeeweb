@@ -1,4 +1,4 @@
-name: Publish & Deploy shop on npm
+name: Deploy Shop
 
 # Trigger when:
 #   push on main or dev or release/**   AND   change shop or core files
