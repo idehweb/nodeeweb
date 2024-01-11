@@ -1,0 +1,110 @@
+name: Publish Shop on npm
+
+# Trigger when:
+#   push on main or dev or release/**   AND   change front files
+#   manually trigger
+
+on:
+  push:
+    branches:
+      - main
+      - 'releases/**'
+    paths:
+      - 'shop/**'
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 'Build Application'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout to repository'
+        uses: actions/checkout@v4
+
+      - name: 'Setup nodeJs'
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 'Install yarn'
+        run: npm i -g yarn
+
+      - name: Setup node-gyp
+        run: yarn global add node-gyp
+
+      - name: 'Install dependencies'
+        working-directory: shop
+        run: yarn
+
+      - name: 'Repository visualizer'
+        id: diagram
+        uses: githubocto/repo-visualizer@0.9.1
+        with:
+          excluded_paths: 'node_modules,build,.storybook,.github'
+          output_file: 'shop/diagram.svg'
+          should_push: false
+          root_path: 'shop/src/'
+          artifact_name: 'diagram'
+
+      - name: 'Build App'
+        run: yarn build
+        working-directory: shop
+
+      - name: 'Post build App'
+        run: yarn build:post
+        working-directory: shop
+
+      - name: 'Pre Publish App'
+        run: yarn prepublish
+        working-directory: shop
+
+      - name: 'Upload build artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: shop/dist
+
+  publish-npm:
+    needs: build
+    name: Publish on npm
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout to repository'
+        uses: actions/checkout@v4
+
+      - name: 'Setup nodeJs'
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 'Download build artifacts'
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: shop/dist
+
+      - name: 'Download diagram artifacts'
+        uses: actions/download-artifact@v3
+        with:
+          name: diagram
+          path: shop/dist
+
+      - name: 'Publish'
+        working-directory: shop
+        run: npm run publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+
+  cleanup:
+    name: Cleanup actions
+    needs:
+      - publish-npm
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Remove build artifacts'
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: |
+            build
+            diagram
