@@ -75,7 +75,20 @@ export abstract class Config<C extends CoreConfigDto> {
   }
   private _merge(newConf: any) {
     const mergedValue = {};
-    _.merge(mergedValue, this._config, JSON.parse(JSON.stringify(newConf)));
+    _.mergeWith(
+      mergedValue,
+      this._config,
+      JSON.parse(JSON.stringify(newConf)),
+      (value, srcValue) => {
+        if (Array.isArray(value) && Array.isArray(srcValue)) return srcValue;
+      }
+    );
+    console.log(
+      'new config',
+      JSON.parse(JSON.stringify(newConf)).consumer_status
+    );
+    console.log('old config', this._config['consumer_status']);
+    console.log('merge config', mergedValue['consumer_status']);
     this._config = mergedValue;
   }
   private _readAndCreate() {
