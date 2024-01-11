@@ -456,7 +456,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
         isOpen={state.menuPlugin}
         name="plugin"
         label={translate(`pos.menu.plugin`)}
-        icon={<SettingsInputHdmiIcon />}
+        // icon={<SettingsInputHdmiIcon />} no such icon
         dense={dense}>
         <MenuItemLink
           to={{
@@ -612,7 +612,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
         {/*/>*/}
         <MenuItemLink
           to={{
-            pathname: '/settings',
+            pathname: '/configuration',
             state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.siteSettings`)}

@@ -19,6 +19,7 @@ import PageBuilder from './pageBuilder/index';
 import Page from './page/index';
 import Post from './post/index';
 import Product from './product/index';
+// import Configuration from './configuration/_Configuration_deparcated';
 import Configuration from './configuration/Configuration';
 import Plugins from './plugins/Plugins';
 // import Plugin from './plugins/Plugin';
