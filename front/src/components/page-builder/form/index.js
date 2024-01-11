@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -7,34 +6,32 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { Col, Row } from 'shards-react';
+
+import { withTranslation } from 'react-i18next';
+
+import { toast } from 'react-toastify';
+
 import LoadingComponent from '#c/components/components-overview/LoadingComponent';
 import CreateForm from '#c/components/form/CreateForm';
 
-import { getEntity, isClient, setStyles, submitForm } from '#c/functions/index';
+import { getEntity, setStyles, submitForm } from '#c/functions/index';
 
-import { withTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
-
-const getURIParts = (url) => {
-  var loc = new URL(url);
-  return loc;
-};
+/**
+ * Represents a form component.
+ * @param {Object} props - The props for the form component.
+ * @returns {JSX.Element} - The rendered form component.
+ */
 const Form = (props) => {
-  let navigate = useNavigate();
   const [tracks, settracks] = useState([]);
   const [theformFields, setformFields] = useState([]);
   const [trackingCodeBlock, setTrackingCodeBlock] = React.useState(false);
   const [response, setResponse] = React.useState([]);
-  const [counts, setcount] = useState(0);
   const [theload, settheload] = useState(false);
-  let { match, location, history, t, url } = props;
   let { element = {} } = props;
   let { data = {}, settings = {} } = element;
   let { general = {} } = settings;
   let { fields = {} } = general;
-  let { entity = 'form', _id = '' } = fields;
-  let mainParams = useParams();
+  let { _id = '' } = fields;
   let params = data;
   if (!params.offset) {
     params.offset = 0;
@@ -42,8 +39,6 @@ const Form = (props) => {
   if (!params.limit) {
     params.limit = 24;
   }
-  url = isClient ? new URL(window.location.href) : '';
-  let theurl = getURIParts(url);
   const loadForm = async () => {
     getEntity('form', _id).then((resp) => {
       console.log('on line 49 ' + resp);
@@ -51,65 +46,18 @@ const Form = (props) => {
     });
   };
 
-  //
-  // useEffect(() => {
-  //   console.log("params.offset");
-  //   loadProductItems(0);
-  // }, [params.offset]);
-
   useEffect(() => {
-    // console.log("params._id");
     loadForm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   //
 
-  const returnVariable = (d) => {
-    let { settings = {}, children } = d;
-    let { general = {} } = settings;
-    let { fields = [] } = general;
-    let { name, label, value = '', placeholder, classes, sm, lg } = fields;
-    let lastObj = {
-      type: ch.name || 'string',
-      label: label || name,
-      name: name,
-
-      size: {
-        sm: 6,
-        lg: 6,
-      },
-      onChange: (text) => {
-        // setFields([...fields,])
-        // this.state.checkOutBillingAddress.add.data[d] = text;
-      },
-      className:
-        'rtl ' +
-        (classes
-          ? classes.map((ob) => (ob.name ? ob.name : ob)).join(' ')
-          : ''),
-      placeholder: placeholder,
-      child: [],
-      children: children || [],
-      value: value,
-    };
-    if (typeof data[d] == 'object') {
-      lastObj.type = 'object';
-    }
-    if (typeof data[d] == 'number') {
-      lastObj.type = 'number';
-    }
-    if (typeof data[d] == 'string') {
-    }
-  };
   const afterGetData = (resp, tracks = []) => {
     if (resp) {
       let formVals = [];
       let formFields = [];
-      // items.forEach((item) => {
-      //   trackss.push(item);
-      // });
       resp.data.elements.forEach((d) => {
         console.log('dd', d);
-        // formFields.push()
         let { settings = {}, children } = d;
         let { general = {} } = settings;
         let { fields = [] } = general;
@@ -130,7 +78,7 @@ const Form = (props) => {
         formFields[name] = value;
         let theChildren = [];
         if (children) {
-          children.forEach((ch) => {
+          children.forEach(() => {
             theChildren.push(lastObj);
           });
         }
@@ -144,7 +92,7 @@ const Form = (props) => {
             sm: sm ? sm : 6,
             lg: lg ? lg : 6,
           },
-          onChange: (text) => {
+          onChange: () => {
             // setFields([...fields,])
             // this.state.checkOutBillingAddress.add.data[d] = text;
           },
@@ -168,24 +116,17 @@ const Form = (props) => {
         }
         if (typeof data[d] == 'string') {
         }
-        // console.log('type of ',d,typeof data[d])
         formVals.push(lastObj);
       });
       setformFields({ ...formFields });
       settracks([...formVals]);
-      // setcount(count);
       settheload(false);
-
-      // if (resp && resp.length < 1) sethasMoreItems(false);
     } else {
-      // sethasMoreItems(false);
-      // setLoad(false);
       settheload(false);
     }
   };
   const loader = (
     <div className="loadNotFound loader " key={23}>
-      {t('loading...')}
       <LoadingComponent height={30} width={30} type="spin" color="#3d5070" />
     </div>
   );
@@ -207,27 +148,20 @@ const Form = (props) => {
                 <CreateForm
                   formFiledsDetail={fields}
                   rules={{ fields: tracks }}
-                  onSubmit={(e) => {
-                    submitForm(_id, e).then((d) => {
-                      setResponse(d);
-
-                      if (d.success && d.message)
-                        toast(t(d.message), {
-                          type: 'success',
-                        });
-
-                      if (d.trackingCode) {
+                  onSubmit={async (e) => {
+                    try {
+                      const submitionResponse = await submitForm(_id, e);
+                      setResponse(submitionResponse.data);
+                      toast('اطلاعات با موفقیت ثبت شد', {
+                        type: 'success',
+                      });
+                      if (submitionResponse.data.trackingCode)
                         setTrackingCodeBlock(true);
-                      } else {
-                        setTrackingCodeBlock(false);
-                      }
-                    });
-                    // .catch(err => {
-                    //   console.log('ddddddddddd',err);
-                    //   toast(t('sth wrong happened!'), {
-                    //     type: "error"
-                    //   });
-                    // })
+                    } catch (err) {
+                      toast('خطا', {
+                        type: 'error',
+                      });
+                    }
                   }}
                   buttons={[]}
                   theFields={tracks}
