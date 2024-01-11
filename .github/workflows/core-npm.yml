@@ -12,6 +12,8 @@ on:
     paths:
       - 'core/**'
 
+  workflow_dispatch:
+
 jobs:
   build:
     name: 'Build Application'
