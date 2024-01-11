@@ -698,6 +698,9 @@ const customFarsiMessages = {
     reviews: {},
 
     settings: {
+      meta_title: 'عنوان متا',
+      meta_description: 'توضیحات متا',
+      metaTags: 'تگ های متا',
       taxAmount: 'رقم مالیات',
       shop_name: 'اسم فروشگاه (فاکتور)',
       shop_site_address: 'آدرس سایت (فاکتور)',
