@@ -1,6 +1,7 @@
 import {
   ArrayInput,
   BooleanInput,
+  ImageField,
   ImageInput,
   Loading,
   NumberInput,
@@ -23,39 +24,30 @@ import useFetch from '@/hooks/useFetch';
 import styles from '@/assets/SystemConfigs.module.css';
 import useSubmit from '@/hooks/useSubmit';
 
+import useUploadImage from '@/hooks/useUploadImage';
+
 import { WebAppConfigProps } from './types';
 
 export default function SystemConfigs() {
   const WebAppConfigData = useFetch({ requestQuery: '/config/system' });
   const translate = useTranslate();
   const { isLoading, sendRequest, data } = useSubmit();
-
-  const SubmitForm = (values) => {
-    console.log('hey im called');
-    console.log(values);
-    sendRequest('/config/system', values, 'put');
-  };
+  const SingleImageUploader = useUploadImage();
 
   const cityChoices = [
     { id: '1', name: 'Tehran' },
     { id: '2', name: 'Qom' },
     { id: '3', name: 'Isfahan' },
   ];
+
+  console.log(SingleImageUploader);
+
   useEffect(() => {
     WebAppConfigData.refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  // console.log(
-  //   'consumer_status is ',
-  //   (WebAppConfigData.data?.data as WebAppConfigProps)?.consumer_status
-  // );
-
-  // console.log(
-  //   typeof (WebAppConfigData.data?.data as WebAppConfigProps)?.consumer_status
-  // );
-
-  // console.log(typeof (WebAppConfigData.data?.data as WebAppConfigProps));
+  console.log('image data is : ', SingleImageUploader.fileData);
 
   return WebAppConfigData.isLoading || isLoading ? (
     <Loading />
@@ -70,7 +62,13 @@ export default function SystemConfigs() {
           defaultValues={
             (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null
           }
-          onSubmit={(values) => SubmitForm(values)}>
+          onSubmit={(values) =>
+            sendRequest(
+              '/config/system',
+              { ...values, favicon_id: SingleImageUploader.fileData._id },
+              'put'
+            )
+          }>
           <div id="config-favicon" style={{ padding: '1rem' }}>
             <p
               style={{
@@ -80,22 +78,41 @@ export default function SystemConfigs() {
               }}>
               {translate('resources.settings.favicon.title')}
             </p>
+
             <ImageInput
+              className={'the-label2 show-image-uploader'}
+              source={'favicon_id'}
+              label={translate('resources.settings.uploadLogo')}
+              accept=".ico"
+              // disabled={loading}
+              options={{
+                onDrop: (file) => {
+                  const result = SingleImageUploader.uploadImage(file[0]);
+                  console.log(result);
+                },
+              }}>
+              <ImageField source="src" title="title" />
+            </ImageInput>
+          </div>
+          <div>
+            <p
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              {translate('resources.settings.metaTags')}
+            </p>
+            <TextInput
               fullWidth
-              source={'favicon'}
-              label={translate('resources.settings.favicon.logo')}
+              source={'meta_title'}
+              label={translate('resources.settings.meta_title')}
             />
-            <ArrayInput
-              source="favicons"
-              label={translate('resources.settings.favicon.favicons')}>
-              <SimpleFormIterator>
-                <TextInput
-                  fullWidth
-                  source={'favicon'}
-                  label={translate('resources.settings.favicon.placeholder')}
-                />
-              </SimpleFormIterator>
-            </ArrayInput>
+            <TextInput
+              fullWidth
+              source={'meta_title'}
+              label={translate('resources.settings.meta_description')}
+            />
           </div>
           <div id="config-head-inputs" style={{ padding: '1rem' }}>
             <p
@@ -106,6 +123,7 @@ export default function SystemConfigs() {
               }}>
               {translate('resources.settings.head.title')}
             </p>
+
             <TextInput
               fullWidth
               source={'head_first'}
