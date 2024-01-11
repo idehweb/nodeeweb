@@ -10,7 +10,7 @@
     "log": "nodemon src/core/log.ts",
     "start:ts":"ts-node start.ts",
     "start": "node dist/start.js",
-    "publish": "npm publish --access public"
+    "publish": "./publish"
   },
   "author": "",
   "license": "ISC",
