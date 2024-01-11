@@ -5,12 +5,15 @@
   "main": "index.ts",
   "scripts": {
     "build": "tsc --build",
-    "build:post": "copyfiles -F -e 'node_modules/**' -e 'public/**' '**/*.sh' '**/*.json' dist",
+    "build:post": "copyfiles -F -e \"dist/**\" -e \"node_modules/**\" -e \"public/**\" \"**/*.sh\" \"**/*.bat\" \"**/*.json\" dist",
     "dev": "nodemon --config nodemon.json index.ts",
     "dev:start": "ts-node index.ts",
     "log": "nodemon src/core/log.ts",
     "start": "node dist/index.js",
-    "typecheck": "tsc --project tsconfig.json --noEmit"
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "prepublish": "node prepublish.js",
+    "publish": "./public.sh"
+    
   },
   "author": "",
   "license": "ISC",
