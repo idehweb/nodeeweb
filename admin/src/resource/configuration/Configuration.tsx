@@ -58,7 +58,7 @@ export default function SystemConfigs() {
           onSubmit={(values) =>
             sendRequest(
               '/config/system',
-              { ...values, favicon_id: SingleImageUploader.fileData._id },
+              { ...values, favicon_id: SingleImageUploader.fileData?._id },
               'put'
             )
           }>
@@ -356,7 +356,34 @@ export default function SystemConfigs() {
                   source={'max_price'}
                   label={translate('resources.settings.manual_post.max_price')}
                 />
-                <div id="manual-post-cities">
+                <ArrayInput
+                  source="cities"
+                  label={translate('resources.settings.manual_post.cities')}>
+                  <SimpleFormIterator source="cities">
+                    <TextInput
+                      fullWidth
+                      source="" // Set source to null to prevent creating an object
+                      label={translate(
+                        'resources.settings.manual_post.citiesProps.name'
+                      )}
+                    />
+                  </SimpleFormIterator>
+                </ArrayInput>
+                <ArrayInput
+                  source="states"
+                  label={translate('resources.settings.manual_post.states')}>
+                  <SimpleFormIterator>
+                    <TextInput
+                      fullWidth
+                      source=""
+                      // source={'name'}
+                      label={translate(
+                        'resources.settings.manual_post.statesProps.name'
+                      )}
+                    />
+                  </SimpleFormIterator>
+                </ArrayInput>
+                {/* <div id="manual-post-cities">
                   <ArrayInput
                     source="cities"
                     label={translate('resources.settings.manual_post.cities')}>
@@ -368,11 +395,10 @@ export default function SystemConfigs() {
                           'resources.settings.manual_post.citiesProps.name'
                         )}
                       />
-                      <input />
                     </SimpleFormIterator>
                   </ArrayInput>
-                </div>
-                <div id="manual-post-states">
+                </div> */}
+                {/* <div id="manual-post-states">
                   <ArrayInput
                     source="states"
                     label={translate('resources.settings.manual_post.states')}>
@@ -386,7 +412,7 @@ export default function SystemConfigs() {
                       />
                     </SimpleFormIterator>
                   </ArrayInput>
-                </div>
+                </div> */}
                 <NumberInput
                   source={'products_min_price'}
                   label={translate(
