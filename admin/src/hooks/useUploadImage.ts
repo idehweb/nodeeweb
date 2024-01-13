@@ -45,10 +45,8 @@ const useUploadImage = () => {
 
     try {
       const res = await axios.post(BASE_URL + '/file', formData, config);
-      console.log('image upload result is ', res);
       return res.data;
     } catch (err) {
-      console.error('err in axios => ', err);
       throw err;
     }
   };

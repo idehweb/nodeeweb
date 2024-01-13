@@ -5,7 +5,6 @@ import {
   ImageInput,
   Loading,
   NumberInput,
-  SelectArrayInput,
   SimpleForm,
   SimpleFormIterator,
   TextInput,
@@ -34,20 +33,14 @@ export default function SystemConfigs() {
   const { isLoading, sendRequest, data } = useSubmit();
   const SingleImageUploader = useUploadImage();
 
-  const cityChoices = [
-    { id: '1', name: 'Tehran' },
-    { id: '2', name: 'Qom' },
-    { id: '3', name: 'Isfahan' },
-  ];
-
-  console.log(SingleImageUploader);
+  // console.log(SingleImageUploader);
 
   useEffect(() => {
     WebAppConfigData.refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  console.log('image data is : ', SingleImageUploader.fileData);
+  // console.log('image data is : ', SingleImageUploader.fileData);e
 
   return WebAppConfigData.isLoading || isLoading ? (
     <Loading />
@@ -88,11 +81,27 @@ export default function SystemConfigs() {
               options={{
                 onDrop: (file) => {
                   const result = SingleImageUploader.uploadImage(file[0]);
-                  console.log(result);
+                  console.log('resutl is ', result);
                 },
               }}>
               <ImageField source="src" title="title" />
             </ImageInput>
+          </div>
+          <div>
+            {(
+              WebAppConfigData.data as { data: WebAppConfigProps }
+            )?.data.favicons.map((item: any) => (
+              <div key={item._id} className={styles.faviconContainer}>
+                <img
+                  src={
+                    `${process.env.REACT_APP_API_BASE_URL_DEV}/` +
+                      item.source || ''
+                  }
+                  alt="favicon"
+                  className={styles.favicon}
+                />
+              </div>
+            ))}
           </div>
           <div>
             <p
@@ -110,7 +119,7 @@ export default function SystemConfigs() {
             />
             <TextInput
               fullWidth
-              source={'meta_title'}
+              source={'meta_description'}
               label={translate('resources.settings.meta_description')}
             />
           </div>
@@ -348,7 +357,7 @@ export default function SystemConfigs() {
                   label={translate('resources.settings.manual_post.max_price')}
                 />
                 <div id="manual-post-cities">
-                  {/* <ArrayInput
+                  <ArrayInput
                     source="cities"
                     label={translate('resources.settings.manual_post.cities')}>
                     <SimpleFormIterator source="cities">
@@ -361,8 +370,7 @@ export default function SystemConfigs() {
                       />
                       <input />
                     </SimpleFormIterator>
-                  </ArrayInput> */}
-                  <SelectArrayInput source="cities" choices={cityChoices} />
+                  </ArrayInput>
                 </div>
                 <div id="manual-post-states">
                   <ArrayInput

@@ -19,3 +19,23 @@
   margin-bottom: 1rem;
   text-align: center;
 }
+
+.faviconContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.favicon {
+  width: 10rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border-radius: 0.5rem;
+}
