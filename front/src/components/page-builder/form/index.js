@@ -155,8 +155,10 @@ const Form = (props) => {
                       toast('اطلاعات با موفقیت ثبت شد', {
                         type: 'success',
                       });
-                      if (submitionResponse.data.trackingCode)
+                      if (submitionResponse.data.trackingCode) {
                         setTrackingCodeBlock(true);
+                        setformFields([]);
+                      }
                     } catch (err) {
                       toast('خطا', {
                         type: 'error',
