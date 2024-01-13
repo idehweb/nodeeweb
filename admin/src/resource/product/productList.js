@@ -108,10 +108,10 @@ const exporter = (posts) => {
             title: postForExport.title,
             description: post && post.description && post.description.fa,
             category: cats,
-            price: com.price,
-            salePrice: com.salePrice,
-            in_stock: com.in_stock,
-            quantity: com.quantity,
+            price: com.price && com.price,
+            salePrice: com.salePrice && com.salePrice,
+            in_stock: com.in_stock && com.in_stock,
+            quantity: com.quantity && com.quantity,
             type: post.type,
             options: com.options ? Object.values(com.options).toString() : '',
             combination_id: i + 1,
@@ -124,10 +124,10 @@ const exporter = (posts) => {
         title: postForExport.title,
         description: post && post.description && post.description.fa,
         category: cats,
-        price: post.price,
-        salePrice: post.salePrice,
-        in_stock: post.in_stock,
-        quantity: post.quantity,
+        price: post.price && post.price,
+        salePrice: post.salePrice && post.salePrice,
+        in_stock: post.in_stock && post.in_stock,
+        quantity: post.quantity && post.quantity,
         type: post.type,
       });
     }
@@ -399,7 +399,7 @@ const TabbedDatagrid = (props) => {
                 if (record.type == 'variable') {
                   if (record.combinations && record.combinations.length > 0) {
                     record.combinations.map((comb, key) => {
-                      if (comb.in_stock == true) {
+                      if (comb.in_stock === true) {
                         tt = translate('resources.product.stock');
                         thecl = 'succ';
                       }
@@ -475,7 +475,7 @@ const TabbedDatagrid = (props) => {
                                       {comb.in_stock && (
                                         <div className={''}>
                                           <span>
-                                            {comb.in_stock == true
+                                            {comb.in_stock === true
                                               ? translate(
                                                   'resources.product.inStock'
                                                 )
@@ -502,7 +502,7 @@ const TabbedDatagrid = (props) => {
                     );
                   }
                 } else {
-                  if (record.in_stock == true) {
+                  if (record.in_stock === true) {
                     tt = translate('resources.product.inStock');
                     thecl = 'succ';
                   }
@@ -513,10 +513,9 @@ const TabbedDatagrid = (props) => {
                           <div className={'flex-1'}>
                             <span>{translate('resources.product.price')}:</span>
                             <span>
-                              {record.price &&
-                                record.price
-                                  .toString()
-                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                              {record.price
+                                .toString()
+                                .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                             </span>
                           </div>
                         )}
@@ -526,10 +525,9 @@ const TabbedDatagrid = (props) => {
                               {translate('resources.product.salePrice')}:
                             </span>
                             <span>
-                              {record.salePrice &&
-                                record.salePrice
-                                  .toString()
-                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                              {record.salePrice
+                                .toString()
+                                .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                             </span>
                           </div>
                         )}
@@ -621,7 +619,6 @@ const TabbedDatagrid = (props) => {
                       }
                       target={'_blank'}
                       color="primary"
-                      size="small"
                       onClick={() => {}}
                       rel="noreferrer">
                       <PendingActionsIcon />
@@ -653,7 +650,6 @@ const tabs = [
 const list = (props) => {
   // console.clear();
   // console.log('props', props);
-  const translate = useTranslate();
 
   return (
     <List
