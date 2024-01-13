@@ -383,36 +383,7 @@ export default function SystemConfigs() {
                     />
                   </SimpleFormIterator>
                 </ArrayInput>
-                {/* <div id="manual-post-cities">
-                  <ArrayInput
-                    source="cities"
-                    label={translate('resources.settings.manual_post.cities')}>
-                    <SimpleFormIterator source="cities">
-                      <TextInput
-                        fullWidth
-                        source="" // Set source to null to prevent creating an object
-                        label={translate(
-                          'resources.settings.manual_post.citiesProps.name'
-                        )}
-                      />
-                    </SimpleFormIterator>
-                  </ArrayInput>
-                </div> */}
-                {/* <div id="manual-post-states">
-                  <ArrayInput
-                    source="states"
-                    label={translate('resources.settings.manual_post.states')}>
-                    <SimpleFormIterator>
-                      <TextInput
-                        fullWidth
-                        source={'name'}
-                        label={translate(
-                          'resources.settings.manual_post.statesProps.name'
-                        )}
-                      />
-                    </SimpleFormIterator>
-                  </ArrayInput>
-                </div> */}
+
                 <NumberInput
                   source={'products_min_price'}
                   label={translate(
