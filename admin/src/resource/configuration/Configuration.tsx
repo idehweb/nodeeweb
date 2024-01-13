@@ -5,7 +5,6 @@ import {
   ImageInput,
   Loading,
   NumberInput,
-  SelectArrayInput,
   SimpleForm,
   SimpleFormIterator,
   TextInput,
@@ -33,12 +32,6 @@ export default function SystemConfigs() {
   const translate = useTranslate();
   const { isLoading, sendRequest, data } = useSubmit();
   const SingleImageUploader = useUploadImage();
-
-  const cityChoices = [
-    { id: '1', name: 'Tehran' },
-    { id: '2', name: 'Qom' },
-    { id: '3', name: 'Isfahan' },
-  ];
 
   // console.log(SingleImageUploader);
 
@@ -364,7 +357,7 @@ export default function SystemConfigs() {
                   label={translate('resources.settings.manual_post.max_price')}
                 />
                 <div id="manual-post-cities">
-                  {/* <ArrayInput
+                  <ArrayInput
                     source="cities"
                     label={translate('resources.settings.manual_post.cities')}>
                     <SimpleFormIterator source="cities">
@@ -377,8 +370,7 @@ export default function SystemConfigs() {
                       />
                       <input />
                     </SimpleFormIterator>
-                  </ArrayInput> */}
-                  <SelectArrayInput source="cities" choices={cityChoices} />
+                  </ArrayInput>
                 </div>
                 <div id="manual-post-states">
                   <ArrayInput
