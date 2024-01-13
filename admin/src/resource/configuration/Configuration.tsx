@@ -213,12 +213,14 @@ export default function SystemConfigs() {
             // validate={required()}
           />
           <TextInput
+            multiline
             source="shop_inactive_message"
             className={styles.input}
             label={translate('resources.settings.siteActiveMessage')}
             // validate={required()}
           />
           <TextInput
+            multiline
             source="entry_submit_message"
             className={styles.input}
             label={translate('resources.settings.entry_submit_message')}
@@ -309,21 +311,25 @@ export default function SystemConfigs() {
               label={translate('resources.settings.manualPost')}>
               <SimpleFormIterator>
                 <TextInput
+                  multiline
                   fullWidth
                   source="id"
                   label={translate('resources.settings.manual_post.id')}
                 />
                 <TextInput
+                  multiline
                   fullWidth
                   source={'provider'}
                   label={translate('resources.settings.manual_post.provider')}
                 />
                 <TextInput
+                  multiline
                   fullWidth
                   source={'title'}
                   label={translate('resources.settings.manual_post.title')}
                 />
                 <TextInput
+                  multiline
                   fullWidth
                   source={'description'}
                   label={translate(
@@ -423,17 +429,20 @@ export default function SystemConfigs() {
             </p>
             <TextInput
               fullWidth
+              multiline
               source={'sms_message_on.approach_transaction_expiration'}
               label={translate(
                 'resources.settings.sms_message_on.approach_transaction_expiration'
               )}
             />
             <TextInput
+              multiline
               fullWidth
               source={'sms_message_on.paid_order'}
               label={translate('resources.settings.sms_message_on.paid_order')}
             />
             <TextInput
+              multiline
               fullWidth
               source={'sms_message_on.cancel_order'}
               label={translate(
@@ -441,11 +450,13 @@ export default function SystemConfigs() {
               )}
             />
             <TextInput
+              multiline
               fullWidth
               source={'sms_message_on.post_order'}
               label={translate('resources.settings.sms_message_on.post_order')}
             />
             <TextInput
+              multiline
               fullWidth
               source={'sms_message_on.complete_order'}
               label={translate(
