@@ -27,6 +27,7 @@ import useSubmit from '@/hooks/useSubmit';
 import useUploadImage from '@/hooks/useUploadImage';
 
 import { WebAppConfigProps } from './types';
+import { BASE_URL } from '@/functions/API';
 
 export default function SystemConfigs() {
   const WebAppConfigData = useFetch({ requestQuery: '/config/system' });
@@ -40,14 +41,14 @@ export default function SystemConfigs() {
     { id: '3', name: 'Isfahan' },
   ];
 
-  console.log(SingleImageUploader);
+  // console.log(SingleImageUploader);
 
   useEffect(() => {
     WebAppConfigData.refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  console.log('image data is : ', SingleImageUploader.fileData);
+  // console.log('image data is : ', SingleImageUploader.fileData);e
 
   return WebAppConfigData.isLoading || isLoading ? (
     <Loading />
@@ -88,11 +89,27 @@ export default function SystemConfigs() {
               options={{
                 onDrop: (file) => {
                   const result = SingleImageUploader.uploadImage(file[0]);
-                  console.log(result);
+                  console.log('resutl is ', result);
                 },
               }}>
               <ImageField source="src" title="title" />
             </ImageInput>
+          </div>
+          <div>
+            {(
+              WebAppConfigData.data as { data: WebAppConfigProps }
+            )?.data.favicons.map((item: any) => (
+              <div key={item._id} className={styles.faviconContainer}>
+                <img
+                  src={
+                    `${process.env.REACT_APP_API_BASE_URL_DEV}/` +
+                      item.source || ''
+                  }
+                  alt="favicon"
+                  className={styles.favicon}
+                />
+              </div>
+            ))}
           </div>
           <div>
             <p
