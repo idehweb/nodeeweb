@@ -27,7 +27,6 @@ import useSubmit from '@/hooks/useSubmit';
 import useUploadImage from '@/hooks/useUploadImage';
 
 import { WebAppConfigProps } from './types';
-import { BASE_URL } from '@/functions/API';
 
 export default function SystemConfigs() {
   const WebAppConfigData = useFetch({ requestQuery: '/config/system' });
@@ -127,7 +126,7 @@ export default function SystemConfigs() {
             />
             <TextInput
               fullWidth
-              source={'meta_title'}
+              source={'meta_description'}
               label={translate('resources.settings.meta_description')}
             />
           </div>
