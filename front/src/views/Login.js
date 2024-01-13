@@ -5,16 +5,17 @@ import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 
 import PageTitle from '#c/components/common/PageTitle';
 import LoginForm from '#c/components/components-overview/NewLoginForm';
-import { SaveData, savePost } from '../functions/index';
+import { SaveData } from '../functions/index';
 import { getToken } from '../functions/utils';
 import { jwtHandler } from '#c/functions/auth';
 import Loading from '../components/Loading';
 
 function useDetectRedirect() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const params = useParams();
   let redirect = params._state || searchParams.get('redirect') || '/profile';
   if (!redirect.startsWith('/')) redirect = '/' + redirect;
+  // eslint-disable-next-line no-restricted-globals
   return `${redirect}?from=${encodeURIComponent(location.pathname)}`;
 }
 
@@ -25,7 +26,7 @@ const Status = {
 };
 
 const Login = ({ t }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const redirectTo = useDetectRedirect();
   const [status, setStatus] = useState(
     searchParams.get('check') === 'false' ? Status.NeedAuth : Status.NeedToCheck
@@ -47,7 +48,8 @@ const Login = ({ t }) => {
 
   useEffect(() => {
     if (status === Status.NeedToCheck) check();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
 
   if (status === Status.Authenticated) {
     return <Navigate to={redirectTo} />;

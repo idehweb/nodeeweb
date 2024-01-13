@@ -1,5 +1,4 @@
 import React from 'react';
-import store from '#c/functions/store';
 
 import {
   Button,
@@ -13,30 +12,27 @@ import {
   ListGroupItem,
   Row,
 } from 'shards-react';
-import {
-  active,
-  authCustomerForgotPass,
-  authCustomerWithPassword,
-  CameFromPost,
-  checkCodeMeli,
-  goToProduct,
-  Logout,
-  register,
-  savePost,
-  setPassWithPhoneNumber,
-} from '#c/functions/index';
+
 import { withTranslation } from 'react-i18next';
+
 import { Navigate } from 'react-router-dom';
+
 import { toast } from 'react-toastify';
+
+import CircularProgress from '@mui/material/CircularProgress';
+
+import { CameFromPost, goToProduct } from '#c/functions/index';
+
 import Captcha from '#c/components/captcha';
 import { fNum } from '#c/functions/utils';
 
-import CircularProgress from '@mui/material/CircularProgress';
 import { otpHandler } from '@/functions/auth';
 import { SaveData } from '@/functions';
+
+import Loading from '../Loading';
+
 import SSO from './SSO';
 import Overlay from './Overlay';
-import Loading from '../Loading';
 
 const globalTimerSet = 120;
 
@@ -147,7 +143,6 @@ class LoginForm extends React.Component {
       lastName,
       username,
     } = this.state;
-    let { t } = this.props;
     if (!countryCode) {
       countryCode = '98';
     }
@@ -178,21 +173,21 @@ class LoginForm extends React.Component {
       this.state;
     const { t } = this.props;
     let fd = countryCode || '98';
-    if (!firstName || firstName == '') {
+    if (!firstName || firstName === '') {
       toast(t('fill everything!'), {
         type: 'error',
       });
       return;
     }
 
-    if (!lastName || lastName == '') {
+    if (!lastName || lastName === '') {
       toast(t('fill everything!'), {
         type: 'error',
       });
       return;
     }
 
-    if (!username || username == '') {
+    if (!username || username === '') {
       toast(t('fill everything!'), {
         type: 'error',
       });
@@ -238,11 +233,11 @@ class LoginForm extends React.Component {
     let fd = this.state.countryCode || '98';
     let number = this.state.phoneNumber || '0';
     let captcha = this.state.captcha;
-    if (!number || number == '' || number == 0) {
+    if (!number || number === '' || number === 0) {
       alert('enter phone number!');
       return;
     }
-    if (!captcha || captcha == false || captcha == 'undefined') {
+    if (!captcha || captcha === false || captcha === 'undefined') {
       alert('enter captcha');
       return;
     }
@@ -391,7 +386,7 @@ class LoginForm extends React.Component {
                             {t('your phone number') + ':'}
                           </div>
                           <div className={'flex-item ltr'}>
-                            {'+' + '98' + this.state.phoneNumber}
+                            {'+98' + this.state.phoneNumber}
                           </div>
                         </div>
                         <div className={'your-timer'}>
