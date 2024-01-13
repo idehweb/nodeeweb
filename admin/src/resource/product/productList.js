@@ -24,25 +24,13 @@ import PendingActionsIcon from '@mui/icons-material/PendingActions';
 
 import { Button, Chip, Divider, Tab, Tabs } from '@mui/material';
 
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useListContext } from 'react-admin';
 import { makeStyles } from '@mui/styles';
 
-import {
-  CatRefField,
-  EditOptions,
-  FileChips,
-  List,
-  ShowDescription,
-  ShowLink,
-  ShowOptions,
-  ShowPictures,
-  SimpleForm,
-  SimpleImageField,
-  UploaderField,
-} from '@/components';
+import { List, ShowLink, SimpleImageField } from '@/components';
 import { dateFormat } from '@/functions';
-import API, { BASE_URL } from '@/functions/API';
+import API from '@/functions/API';
 import ProductRewriteButton from '@/components/ProductRewriteButton';
 
 const PostPagination = (props) => (
@@ -112,22 +100,23 @@ const exporter = (posts) => {
       // postForExport.in_stock=[];
       // postForExport.quantity=[];
       // allpros.pop();
-      post.combinations.map((com, i) => {
-        allpros.push({
-          _id: post._id,
-          slug: postForExport.slug,
-          title: postForExport.title,
-          description: post && post.description && post.description.fa,
-          category: cats,
-          price: com.price,
-          salePrice: com.salePrice,
-          in_stock: com.in_stock,
-          quantity: com.quantity,
-          type: post.type,
-          options: com.options ? Object.values(com.options).toString() : '',
-          combination_id: i + 1,
+      post.combinations &&
+        post.combinations.map((com, i) => {
+          allpros.push({
+            _id: post._id,
+            slug: postForExport.slug,
+            title: postForExport.title,
+            description: post && post.description && post.description.fa,
+            category: cats,
+            price: com.price,
+            salePrice: com.salePrice,
+            in_stock: com.in_stock,
+            quantity: com.quantity,
+            type: post.type,
+            options: com.options ? Object.values(com.options).toString() : '',
+            combination_id: i + 1,
+          });
         });
-      });
     } else {
       allpros.push({
         _id: post._id,
@@ -420,90 +409,93 @@ const TabbedDatagrid = (props) => {
                         <div className="theDate hoverparent">
                           <Chip className={thecl} label={tt} />
                           <div className="theDate thehover">
-                            {record.combinations.map((comb, key) => {
-                              return (
-                                <div
-                                  className={'cobm flex-d cobm' + key}
-                                  key={key}>
-                                  <div className={'flex-1'}>
-                                    {comb.options && (
-                                      <div className={''}>
-                                        {Object.keys(comb.options).map(
-                                          (item, index) => {
-                                            return (
-                                              <div key={index}>
-                                                {item +
-                                                  ' : ' +
-                                                  comb.options[item] +
-                                                  '\n'}
-                                              </div>
-                                            );
-                                          }
-                                        )}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className={'flex-1'}>
-                                    {comb.price && (
-                                      <div className={'FDFD'}>
-                                        <span>
-                                          {translate('resources.product.price')}
-                                        </span>
-                                        <span>
-                                          {comb.price
-                                            .toString()
-                                            .replace(
-                                              /\B(?=(\d{3})+(?!\d))/g,
-                                              ','
-                                            )}
-                                        </span>
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className={'flex-1'}>
-                                    {comb.salePrice && (
-                                      <div className={'vfdsf'}>
-                                        <span>
-                                          {translate(
-                                            'resources.product.salePrice'
+                            {record.combinations &&
+                              record.combinations.map((comb, key) => {
+                                return (
+                                  <div
+                                    className={'cobm flex-d cobm' + key}
+                                    key={key}>
+                                    <div className={'flex-1'}>
+                                      {comb.options && (
+                                        <div className={''}>
+                                          {Object.keys(comb.options).map(
+                                            (item, index) => {
+                                              return (
+                                                <div key={index}>
+                                                  {item +
+                                                    ' : ' +
+                                                    comb.options[item] +
+                                                    '\n'}
+                                                </div>
+                                              );
+                                            }
                                           )}
-                                        </span>
-                                        <span>
-                                          {comb.salePrice
-                                            .toString()
-                                            .replace(
-                                              /\B(?=(\d{3})+(?!\d))/g,
-                                              ','
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className={'flex-1'}>
+                                      {comb.price && (
+                                        <div className={'FDFD'}>
+                                          <span>
+                                            {translate(
+                                              'resources.product.price'
                                             )}
-                                        </span>
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className={'flex-1'}>
-                                    {comb.in_stock && (
-                                      <div className={''}>
-                                        <span>
-                                          {comb.in_stock == true
-                                            ? translate(
-                                                'resources.product.inStock'
-                                              )
-                                            : translate(
-                                                'resources.product.outOfStock'
+                                          </span>
+                                          <span>
+                                            {comb.price
+                                              .toString()
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ','
                                               )}
-                                        </span>
-                                      </div>
-                                    )}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className={'flex-1'}>
+                                      {comb.salePrice && (
+                                        <div className={'vfdsf'}>
+                                          <span>
+                                            {translate(
+                                              'resources.product.salePrice'
+                                            )}
+                                          </span>
+                                          <span>
+                                            {comb.salePrice
+                                              .toString()
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ','
+                                              )}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className={'flex-1'}>
+                                      {comb.in_stock && (
+                                        <div className={''}>
+                                          <span>
+                                            {comb.in_stock == true
+                                              ? translate(
+                                                  'resources.product.inStock'
+                                                )
+                                              : translate(
+                                                  'resources.product.outOfStock'
+                                                )}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className={'flex-1'}>
+                                      {comb.quantity && (
+                                        <div className={''}>
+                                          <span>{comb.quantity}</span>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
-                                  <div className={'flex-1'}>
-                                    {comb.quantity && (
-                                      <div className={''}>
-                                        <span>{comb.quantity}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              );
-                            })}
+                                );
+                              })}
                           </div>
                         </div>
                       </div>
