@@ -14,7 +14,7 @@ for service in ${services[@]}
 do
     dist_path="${service}public/$type"
 
-    if [ ${source_path::-1} != $dist_path ] && [ $service != "nwi-fa" ]
+    if [ ${source_path::-1} != $dist_path ] && [ $service != "/var/instances/nwi-fa/" ]
     then
       # rm static
       rm -fr $dist_path/*
