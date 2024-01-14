@@ -188,6 +188,7 @@ const Form = ({ children, ...props }) => {
   const { record } = props;
   const [photos, setPhotos] = useState(record?.photos ?? []);
   const [thumbnail, setThumbnail] = useState(record?.thumbnail);
+  const [checkPrice, setCheckPrice] = useState('');
 
   let _The_ID = '';
   const translate = useTranslate();
@@ -432,7 +433,9 @@ const Form = ({ children, ...props }) => {
                     label={translate('resources.product.price')}
                     format={(v) => {
                       if (!v) return '';
-
+                      setCheckPrice(
+                        v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                      );
                       return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
                     }}
                     parse={(v) => {
@@ -452,9 +455,9 @@ const Form = ({ children, ...props }) => {
                     className={'ltr'}
                     label={translate('resources.product.salePrice')}
                     format={(v) => {
-                      if (!v) return '';
-
-                      return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                      return !v
+                        ? checkPrice
+                        : v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
                     }}
                     parse={(v) => {
                       if (!v) return '';
