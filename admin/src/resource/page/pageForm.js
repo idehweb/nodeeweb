@@ -30,6 +30,7 @@ import {
   SimpleForm,
   SimpleImageField,
   UploaderField,
+  LimitCharacter,
 } from '@/components';
 import { Val } from '@/Utils';
 
@@ -288,9 +289,10 @@ const Form = ({ children, ...props }) => {
       <TextInput
         source={'title.' + translate('lan')}
         fullWidth
+        inputProps={{ maxLength: 20 }}
         label={translate('resources.page.title')}
         className={'width100 mb-20'}
-        validate={Val.req}
+        validate={Val.reqMinLenn(6)}
       />
       <div className={'mb-20'}></div>
       <div className={'mb-20'}></div>
@@ -300,17 +302,7 @@ const Form = ({ children, ...props }) => {
         label={translate('resources.page.slug')}
         className={'width100 mb-20 ltr'}
       />
-      <TextInput
-        fullWidth
-        source={'metatitle.' + translate('lan')}
-        label={translate('resources.product.metatitle')}
-      />
-      <TextInput
-        multiline
-        fullWidth
-        source={'metadescription.' + translate('lan')}
-        label={translate('resources.product.metadescription')}
-      />
+      <LimitCharacter />
       <TextInput
         source="path"
         fullWidth
@@ -324,7 +316,6 @@ const Form = ({ children, ...props }) => {
         label={translate('resources.page.excerpt')}
       />
       <RichTextInput
-        multiline
         fullWidth
         source={'description.' + translate('lan')}
         label={translate('resources.page.description')}
