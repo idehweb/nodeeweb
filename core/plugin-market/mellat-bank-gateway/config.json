@@ -1,0 +1,62 @@
+{
+    "name": "Manual Bank Gateway",
+    "version": "1.0.0",
+    "description": {
+        "en": "for manual payment",
+        "fa": "برای پرداخت های دستی"
+    },
+    "type": "bank-gateway",
+    "author": "Nodeeweb",
+    "main": "index",
+    "slug": "manual-bank-gateway",
+    "config": {
+        "inputs": [
+            {
+                "key": "redirect",
+                "title": {
+                    "en": "redirect",
+                    "fa": "ریدایرکت"
+                },
+                "type": "string"
+            },
+            {
+                "key": "lifeTime",
+                "title": {
+                    "en": "life time days",
+                    "fa": "زمان مجاز برای تراکنش ( روز )"
+                },
+                "type": "number",
+                "required":false
+            }
+        ],
+        "dto": "dto/config",
+        "run": "config"
+    },
+    "active":{
+        "dto":"dto/config",
+        "run":"active"
+    },
+    "edit": {
+        "inputs": [
+            {
+                "key": "redirect",
+                "title": {
+                    "en": "redirect",
+                    "fa": "ریدایرکت"
+                },
+                "type": "string"
+            },
+            {
+                "key": "lifeTime",
+                "title": {
+                    "en": "life time days",
+                    "fa": "زمان مجاز برای تراکنش ( روز )"
+                },
+                "type": "number",
+                "required":false
+            }
+        ],
+        "dto": "dto/edit",
+        "run": "edit"
+    }
+}
