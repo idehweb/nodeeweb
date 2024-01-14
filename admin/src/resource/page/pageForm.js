@@ -315,6 +315,12 @@ const Form = ({ children, ...props }) => {
         source={'excerpt.' + translate('lan')}
         label={translate('resources.page.excerpt')}
       />
+      <TextInput
+        source="keywords"
+        multiline
+        fullWidth
+        label={translate('resources.product.keywords')}
+      />
       <RichTextInput
         fullWidth
         source={'description.' + translate('lan')}

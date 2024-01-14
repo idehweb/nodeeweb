@@ -9,7 +9,12 @@ import {
 } from 'react-admin';
 import React from 'react';
 
-import { CustomResetViewsButton, List, SimpleForm } from '@/components';
+import {
+  CustomResetViewsButton,
+  List,
+  SimpleForm,
+  LimitCharacter,
+} from '@/components';
 import useStyles from '@/styles';
 import { Val } from '@/Utils';
 import { BASE_URL } from '@/functions/API';
@@ -59,6 +64,13 @@ const Form = ({ children, ...rest }) => {
         validate={Val.req}
         formClassName={cls.f2}
         fullWidth
+      />
+      <LimitCharacter />
+      <TextInput
+        source="keywords"
+        multiline
+        fullWidth
+        label={translate('resources.product.keywords')}
       />
       <ReferenceInput
         label={translate('resources.category.parent')}

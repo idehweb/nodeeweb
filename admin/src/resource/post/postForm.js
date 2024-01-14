@@ -31,6 +31,7 @@ import {
   SimpleForm,
   SimpleImageField,
   UploaderField,
+  LimitCharacter,
 } from '@/components';
 import { Val } from '@/Utils';
 
@@ -307,8 +308,14 @@ const Form = ({ children, ...props }) => {
         source={'excerpt.' + translate('lan')}
         label={translate('resources.post.excerpt')}
       />
-      <RichTextInput
+      <LimitCharacter />
+      <TextInput
+        source="keywords"
         multiline
+        fullWidth
+        label={translate('resources.product.keywords')}
+      />
+      <RichTextInput
         fullWidth
         source={'description.' + translate('lan')}
         label={translate('resources.post.description')}
