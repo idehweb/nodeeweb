@@ -112,17 +112,35 @@ export default function SystemConfigs() {
               }}>
               {translate('resources.settings.metaTags')}
             </p>
-            <TextInput
+            {/* <TextInput
+              multiline
               fullWidth
+              minRows={3}
               source={'meta_title'}
               label={translate('resources.settings.meta_title')}
             />
             <TextInput
               fullWidth
+              multiline
+              minRows={3}
               source={'meta_description'}
               label={translate('resources.settings.meta_description')}
-            />
+            /> */}
           </div>
+          <TextInput
+            multiline
+            fullWidth
+            minRows={3}
+            source={'meta_title'}
+            label={translate('resources.settings.meta_title')}
+          />
+          <TextInput
+            fullWidth
+            multiline
+            minRows={3}
+            source={'meta_description'}
+            label={translate('resources.settings.meta_description')}
+          />
           <div id="config-head-inputs" style={{ padding: '1rem' }}>
             <p
               style={{
@@ -133,17 +151,35 @@ export default function SystemConfigs() {
               {translate('resources.settings.head.title')}
             </p>
 
-            <TextInput
+            {/* <TextInput
+              multiline
+              minRows={8}
               fullWidth
               source={'head_first'}
               label={translate('resources.settings.head.head_first')}
             />
             <TextInput
+              multiline
+              minRows={8}
               fullWidth
               source={'head_last'}
               label={translate('resources.settings.head.head_last')}
-            />
+            /> */}
           </div>
+          <TextInput
+            multiline
+            minRows={8}
+            fullWidth
+            source={'head_first'}
+            label={translate('resources.settings.head.head_first')}
+          />
+          <TextInput
+            multiline
+            minRows={8}
+            fullWidth
+            source={'head_last'}
+            label={translate('resources.settings.head.head_last')}
+          />
 
           <div id="config-body-inputs" style={{ padding: '1rem' }}>
             <p
@@ -154,18 +190,38 @@ export default function SystemConfigs() {
               }}>
               {translate('resources.settings.body.title')}
             </p>
-            <TextInput
+            {/* <TextInput
+              multiline
+              minRows={8}
               fullWidth
               source={'body_first'}
               label={translate('resources.settings.body.body_first')}
             />
             <TextInput
+              multiline
+              minRows={8}
               fullWidth
               source={'body_last'}
               label={translate('resources.settings.body.body_last')}
-            />
+            /> */}
           </div>
           <TextInput
+            multiline
+            minRows={8}
+            fullWidth
+            source={'body_first'}
+            label={translate('resources.settings.body.body_first')}
+          />
+          <TextInput
+            multiline
+            minRows={8}
+            fullWidth
+            source={'body_last'}
+            label={translate('resources.settings.body.body_last')}
+          />
+          <TextInput
+            multiline
+            minRows={2}
             className={styles.input}
             source="app_name"
             label={translate('resources.settings.shop_name')}
@@ -221,12 +277,15 @@ export default function SystemConfigs() {
           />
           <TextInput
             multiline
+            minRows={3}
             source="entry_submit_message"
             className={styles.input}
             label={translate('resources.settings.entry_submit_message')}
             // validate={required()}
           />
           <TextInput
+            multiline
+            minRows={3}
             source="payment_redirect"
             className={styles.input}
             label={translate('resources.settings.payment_redirect')}
@@ -319,18 +378,21 @@ export default function SystemConfigs() {
                 <TextInput
                   multiline
                   fullWidth
+                  minRows={2}
                   source={'provider'}
                   label={translate('resources.settings.manual_post.provider')}
                 />
                 <TextInput
                   multiline
                   fullWidth
+                  minRows={2}
                   source={'title'}
                   label={translate('resources.settings.manual_post.title')}
                 />
                 <TextInput
                   multiline
                   fullWidth
+                  minRows={2}
                   source={'description'}
                   label={translate(
                     'resources.settings.manual_post.description'
@@ -430,6 +492,7 @@ export default function SystemConfigs() {
             <TextInput
               fullWidth
               multiline
+              minRows={3}
               source={'sms_message_on.approach_transaction_expiration'}
               label={translate(
                 'resources.settings.sms_message_on.approach_transaction_expiration'
@@ -438,12 +501,14 @@ export default function SystemConfigs() {
             <TextInput
               multiline
               fullWidth
+              minRows={3}
               source={'sms_message_on.paid_order'}
               label={translate('resources.settings.sms_message_on.paid_order')}
             />
             <TextInput
               multiline
               fullWidth
+              minRows={3}
               source={'sms_message_on.cancel_order'}
               label={translate(
                 'resources.settings.sms_message_on.cancel_order'
@@ -452,12 +517,14 @@ export default function SystemConfigs() {
             <TextInput
               multiline
               fullWidth
+              minRows={3}
               source={'sms_message_on.post_order'}
               label={translate('resources.settings.sms_message_on.post_order')}
             />
             <TextInput
               multiline
               fullWidth
+              minRows={3}
               source={'sms_message_on.complete_order'}
               label={translate(
                 'resources.settings.sms_message_on.complete_order'
@@ -487,7 +554,9 @@ export default function SystemConfigs() {
               validate={required()}
             />
             <TextInput
+              multiline
               fullWidth
+              minRows={3}
               source={'factor.address'}
               label={translate('resources.settings.factor.address')}
             />
