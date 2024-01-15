@@ -15,6 +15,7 @@ import {
 } from 'class-validator';
 import { IsHTMLString, IsMongoID, ToMongoID } from '../utils/validation';
 import { Types } from 'mongoose';
+import { ToObject } from '../utils/transform';
 
 export class Favicon {
   @Expose()
@@ -160,6 +161,7 @@ export class CoreConfigDto {
 
   @Expose()
   @Allow()
+  @ToObject()
   auth: { [key: string]: any };
 
   @Expose()

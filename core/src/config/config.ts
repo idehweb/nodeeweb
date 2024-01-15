@@ -83,12 +83,9 @@ export abstract class Config<C extends CoreConfigDto> {
         if (Array.isArray(value) && Array.isArray(srcValue)) return srcValue;
       }
     );
-    console.log(
-      'new config',
-      JSON.parse(JSON.stringify(newConf)).consumer_status
-    );
-    console.log('old config', this._config['consumer_status']);
-    console.log('merge config', mergedValue['consumer_status']);
+    // console.log('new config', JSON.parse(JSON.stringify(newConf)).auth);
+    // console.log('old config', this._config['auth']);
+    // console.log('merge config', mergedValue['auth']);
     this._config = mergedValue;
   }
   private _readAndCreate() {
