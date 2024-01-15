@@ -33,7 +33,11 @@ jobs:
       - name: Setup node-gyp
         run: yarn global add node-gyp
 
-      - name: 'Install dependencies'
+      - name: 'Install Core dependencies'
+        working-directory: core
+        run: yarn
+
+      - name: 'Install Shop dependencies'
         working-directory: shop
         run: yarn
 
@@ -56,7 +60,7 @@ jobs:
         working-directory: shop
 
       - name: 'Pre Publish App'
-        run: yarn prepublish
+        run: yarn publish:pre
         working-directory: shop
 
       - name: 'Upload build artifact'
