@@ -26,7 +26,7 @@ import { CameFromPost, goToProduct } from '#c/functions/index';
 import Captcha from '#c/components/captcha';
 import { fNum } from '#c/functions/utils';
 
-import { otpHandler } from '@/functions/auth';
+import { otpHandler, passHandler } from '@/functions/auth';
 import { SaveData } from '@/functions';
 
 import Loading from '../Loading';
@@ -55,6 +55,7 @@ class LoginForm extends React.Component {
       goToCheckout: props.goToCheckout,
       goToChat: props.goToChat,
       timer: globalTimerSet,
+      authenticatingProtocol: 'otp',
     };
     window.scrollTo(0, 0);
     this.captchaAction = this.captchaAction.bind(this);
@@ -73,6 +74,7 @@ class LoginForm extends React.Component {
     user.phoneNumber = user.phone;
     SaveData({ user, token });
   }
+
   afterSSO(res) {
     const { user, token } = res;
     this.afterAuth(user, token);
@@ -81,13 +83,18 @@ class LoginForm extends React.Component {
 
   async detect(phone, signup = false) {
     try {
-      const data = await otpHandler.detect(
+      const data = await passHandler.detect(
         { phone },
         {
           login: true,
           signup,
         }
       );
+
+      this.setState((state) => ({
+        ...state,
+        authenticatingProtocol: 'password',
+      }));
 
       return {
         isOk: true,
@@ -106,17 +113,29 @@ class LoginForm extends React.Component {
     }
   }
 
-  async login(phone, code) {
-    try {
-      const data = await otpHandler.login({ phone, code });
-      this.afterAuth(data.user, data.token);
-      return { isOk: true };
-    } catch (err) {
-      return {
-        isOk: false,
-        message: err.response?.data?.message ?? err.message,
-      };
-    }
+  async login(phone, code, password) {
+    if (this.state.authenticatingProtocol === 'password') {
+      try {
+        const data = await passHandler.login({ phone, password });
+        this.afterAuth(data.user, data.token);
+        return { isOk: true };
+      } catch (err) {
+        return {
+          isOk: false,
+          message: err.response?.data?.message ?? err.message,
+        };
+      }
+    } else
+      try {
+        const data = await otpHandler.login({ phone, code });
+        this.afterAuth(data.user, data.token);
+        return { isOk: true };
+      } catch (err) {
+        return {
+          isOk: false,
+          message: err.response?.data?.message ?? err.message,
+        };
+      }
   }
 
   async signup(user) {
@@ -142,6 +161,7 @@ class LoginForm extends React.Component {
       firstName,
       lastName,
       username,
+      password,
     } = this.state;
     if (!countryCode) {
       countryCode = '98';
@@ -159,6 +179,7 @@ class LoginForm extends React.Component {
           firstName,
           lastName,
           username,
+          password,
           phone: req.phoneNumber,
           code: activationCode,
         })
@@ -169,9 +190,20 @@ class LoginForm extends React.Component {
   };
   handleSignup = async (e) => {
     e.preventDefault();
-    const { countryCode, phoneNumber, firstName, lastName, username } =
-      this.state;
+    const {
+      countryCode,
+      phoneNumber,
+      firstName,
+      lastName,
+      username,
+      password,
+      confirmPassword,
+    } = this.state;
     const { t } = this.props;
+    if (confirmPassword !== password) {
+      toast.error(t('passwords-do-not-match'));
+      return;
+    }
     let fd = countryCode || '98';
     if (!firstName || firstName === '') {
       toast(t('fill everything!'), {
@@ -375,7 +407,28 @@ class LoginForm extends React.Component {
             <ListGroupItem className="p-3">
               <Row>
                 <Col>
-                  <Form onSubmit={this.handleCode}>
+                  <Form
+                    onSubmit={
+                      this.state.authenticatingProtocol === 'password'
+                        ? () => {}
+                        : this.handleCode
+                    }>
+                    <button
+                      onClick={() => {
+                        if (this.state.authenticatingProtocol === 'password') {
+                          this.setState((state) => ({
+                            ...state,
+                            authenticatingProtocol: 'otp',
+                          }));
+                        } else {
+                          this.setState((state) => ({
+                            ...state,
+                            authenticatingProtocol: 'password',
+                          }));
+                        }
+                      }}>
+                      {t(this.state.authenticatingProtocol)}
+                    </button>
                     <Row form>
                       <Col md="12" className="form-group">
                         <div
@@ -388,54 +441,75 @@ class LoginForm extends React.Component {
                           <div className={'flex-item ltr'}>
                             {'+98' + this.state.phoneNumber}
                           </div>
-                        </div>
-                        <div className={'your-timer'}>
-                          <div className={'flex-item '}>
-                            {Boolean(timer) && (
-                              <div className={'flex-item-relative center '}>
-                                <CircularProgress
-                                  className={'red-progress'}
-                                  thickness={2}
-                                  size={60}
-                                  variant="determinate"
-                                  value={parseInt(
-                                    (timer * 100) / globalTimerSet
+                        </div>{' '}
+                        {this.state.authenticatingProtocol === 'password' ? (
+                          <InputGroup className="mb-3">
+                            <FormInput
+                              placeholder={'password'}
+                              type="password"
+                              className={'iuygfghuji'}
+                              dir="ltr"
+                              onChange={(e) => {
+                                this.setState((state) => ({
+                                  ...state,
+                                  activationCode: e.target.value,
+                                }));
+                              }}
+                            />
+                          </InputGroup>
+                        ) : (
+                          <>
+                            <>
+                              <div className={'your-timer'}>
+                                <div className={'flex-item '}>
+                                  {Boolean(timer) && (
+                                    <div
+                                      className={'flex-item-relative center '}>
+                                      <CircularProgress
+                                        className={'red-progress'}
+                                        thickness={2}
+                                        size={60}
+                                        variant="determinate"
+                                        value={parseInt(
+                                          (timer * 100) / globalTimerSet
+                                        )}
+                                      />
+                                      <div className={'flex-item-absolute '}>
+                                        {timer}
+                                      </div>
+                                    </div>
                                   )}
-                                />
-                                <div className={'flex-item-absolute '}>
-                                  {timer}
                                 </div>
                               </div>
-                            )}
-                          </div>
-                        </div>
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'start',
-                          }}>
-                          <label
-                            style={{ fontSize: 12 }}
-                            htmlFor="feEmailAddress">
-                            {t('enter sent code')}
-                          </label>
-                        </div>
-
-                        <InputGroup className="mb-3">
-                          <FormInput
-                            placeholder="_ _ _ _ _ _"
-                            type="number"
-                            className={'iuygfghuji'}
-                            dir="ltr"
-                            onChange={(e) => {
-                              this.setState((state) => ({
-                                ...state,
-                                activationCode: e.target.value,
-                              }));
-                            }}
-                          />
-                        </InputGroup>
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  justifyContent: 'start',
+                                }}>
+                                <label
+                                  style={{ fontSize: 12 }}
+                                  htmlFor="feEmailAddress">
+                                  {t('enter sent code')}
+                                </label>
+                              </div>
+                            </>
+                            <InputGroup className="mb-3">
+                              <FormInput
+                                placeholder="_ _ _ _ _ _"
+                                type="number"
+                                className={'iuygfghuji'}
+                                dir="ltr"
+                                onChange={(e) => {
+                                  this.setState((state) => ({
+                                    ...state,
+                                    activationCode: e.target.value,
+                                  }));
+                                }}
+                              />
+                            </InputGroup>
+                          </>
+                        )}
                       </Col>
                     </Row>
                     <Button
@@ -542,6 +616,7 @@ class LoginForm extends React.Component {
                         <InputGroup className="mb-3">
                           <InputGroupAddon type="prepend">
                             <FormSelect
+                              disabled
                               onChange={(e) =>
                                 this.setState((state) => ({
                                   ...state,
@@ -562,6 +637,35 @@ class LoginForm extends React.Component {
                               this.setState((state) => ({
                                 ...state,
                                 phoneNumber: e.target.value,
+                              }));
+                            }}
+                          />
+                        </InputGroup>
+
+                        <InputGroup className="mb-3">
+                          <FormInput
+                            placeholder={t('password')}
+                            id="password"
+                            dir="ltr"
+                            type="password"
+                            value={this.state.password}
+                            onChange={(e) => {
+                              this.setState((state) => ({
+                                ...state,
+                                password: e.target.value,
+                              }));
+                            }}
+                          />
+                          <FormInput
+                            placeholder={t('confirm-password')}
+                            id="confirm password"
+                            dir="ltr"
+                            type="password"
+                            value={this.state.confirmPassword}
+                            onChange={(e) => {
+                              this.setState((state) => ({
+                                ...state,
+                                confirmPassword: e.target.value,
                               }));
                             }}
                           />
