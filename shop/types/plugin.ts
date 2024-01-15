@@ -22,7 +22,11 @@ export type BankGatewayCreateOut =
       authority: string;
       payment_link: string;
       expiredAt: Date;
+      payment_message?: string;
       message?: string;
+      payment_method?: string;
+      payment_headers?: { [key: string]: string };
+      payment_body?: any;
     };
 export type PostGatewaySendPostReq = (args: {
   products: {
