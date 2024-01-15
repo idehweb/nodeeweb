@@ -38,6 +38,8 @@ const Pagination = (props) => {
   let navigate = useNavigate();
   const [tracks, settracks] = useState([]);
   const [counts, setcount] = useState(0);
+  const [fetchLoading, setFetchLoading] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
   const [theload, settheload] = useState(false);
   let { match, location, history, t } = props;
   let { element = {}, params = {} } = props;
@@ -74,7 +76,6 @@ const Pagination = (props) => {
       limit = 32;
     }
     settracks([]);
-    settheload(true);
     let query = {};
     // params = useParams();
     if (customQuery) {
@@ -132,16 +133,24 @@ const Pagination = (props) => {
     if (query) {
       filter = JSON.stringify(query);
     }
-    getEntitiesWithCount(
-      entity || params.entity,
-      offset,
-      limit,
-      '',
-      filter,
-      JSON.stringify(populateQuery)
-    ).then((resp) => {
+
+    try {
+      setFetchLoading(true);
+      const resp = await getEntitiesWithCount(
+        entity || params.entity,
+        offset,
+        limit,
+        '',
+        filter,
+        JSON.stringify(populateQuery)
+      );
       afterGetData(resp);
-    });
+    } catch (err) {
+      console.log(err);
+      setFetchError(true);
+    } finally {
+      setFetchLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -210,13 +219,11 @@ const Pagination = (props) => {
       });
       settracks(trackss);
       setcount(count);
-      settheload(true);
-    } else {
-      settheload(false);
+      // settheload(true);
     }
   };
   const loader = (
-    <div className="loadNotFound loader " key={23}>
+    <div className="loadNotFound loader " key={23} style={{ height: '70vh' }}>
       {t('loading...')}
       <LoadingComponent height={30} width={30} type="spin" color="#3d5070" />
     </div>
@@ -229,62 +236,68 @@ const Pagination = (props) => {
     limit = 32;
   }
 
-  return (
+  return fetchLoading ? (
+    loader
+  ) : tracks.length > 0 ? (
     <div className="main-content-container fghjkjhgf ">
       <Row className={'m-0'}>
-        {!theload && loader}
-        {theload && (
-          <Col
-            className="main-content iuytfghj pb-5 "
-            lg={{ size: 12 }}
-            md={{ size: 12 }}
-            sm="12"
-            tag="main">
-            {/*<Sort/>*/}
-            <Row className={' p-3 productsmobile'}>
-              {tracks &&
-                tracks.map((i, idxx) => (
-                  <Col
-                    key={idxx}
-                    lg="3"
-                    md="3"
-                    sm="4"
-                    xs="6"
-                    className={'nbghjk  post-style-grid'}>
-                    {entity === 'post' && <BlogCard item={i} method={'grid'} />}
-                    {entity !== 'post' && (
-                      <PostCard item={i} method={'grid'} entity={entity} />
-                    )}
-                  </Col>
-                ))}
-            </Row>
-            <Row className={' p-3 productsmobile'}>
-              {counts > 0 && (
-                <TablePagination
-                  rowsPerPageOptions={[limit, limit * 2, limit * 3, limit * 4]}
-                  component="div"
-                  count={parseInt(counts)}
-                  rowsPerPage={limit}
-                  page={parseInt(offset / limit)}
-                  labelRowsPerPage={t('number per row:')}
-                  nexticonbuttontext={t('next page')}
-                  previousiconbuttontext={t('previous page')}
-                  labelDisplayedRows={({ from, to, count }) =>
-                    `${from} ${t('to')} ${to === -1 ? count : to} ${t(
-                      'from'
-                    )} ${counts} ${t('item')}`
-                  }
-                  onPageChange={(e, newPage) => handleChangePage(e, newPage)}
-                  onRowsPerPageChange={(e, newLimit) =>
-                    handleChangeRowsPerPage(e, newLimit)
-                  }
-                />
-              )}
-            </Row>
-          </Col>
-        )}
+        <Col
+          className="main-content iuytfghj pb-5 "
+          lg={{ size: 12 }}
+          md={{ size: 12 }}
+          sm="12"
+          tag="main">
+          {/*<Sort/>*/}
+          <Row className={' p-3 productsmobile'}>
+            {tracks.map((i, idxx) => (
+              <Col
+                key={idxx}
+                lg="3"
+                md="3"
+                sm="4"
+                xs="6"
+                className={'nbghjk  post-style-grid'}>
+                {entity === 'post' && <BlogCard item={i} method={'grid'} />}
+                {entity !== 'post' && (
+                  <PostCard item={i} method={'grid'} entity={entity} />
+                )}
+              </Col>
+            ))}
+          </Row>
+          <Row className={' p-3 productsmobile'}>
+            {counts > 0 && (
+              <TablePagination
+                rowsPerPageOptions={[limit, limit * 2, limit * 3, limit * 4]}
+                component="div"
+                count={parseInt(counts)}
+                rowsPerPage={limit}
+                page={parseInt(offset / limit)}
+                labelRowsPerPage={t('number per row:')}
+                nexticonbuttontext={t('next page')}
+                previousiconbuttontext={t('previous page')}
+                labelDisplayedRows={({ from, to, count }) =>
+                  `${from} ${t('to')} ${to === -1 ? count : to} ${t(
+                    'from'
+                  )} ${counts} ${t('item')}`
+                }
+                onPageChange={(e, newPage) => handleChangePage(e, newPage)}
+                onRowsPerPageChange={(e, newLimit) =>
+                  handleChangeRowsPerPage(e, newLimit)
+                }
+              />
+            )}
+          </Row>
+        </Col>
       </Row>
     </div>
+  ) : fetchError ? (
+    <></>
+  ) : tracks.length === 0 ? (
+    <div style={{ height: '70vh', textAlign: 'center' }}>
+      اطلاعات برای نمایش وجود ندارد
+    </div>
+  ) : (
+    <div style={{ height: '70vh', textAlign: 'center' }}>خطای غیر منتظره</div>
   );
 };
 export const HomeServer = [
