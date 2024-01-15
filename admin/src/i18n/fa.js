@@ -805,6 +805,7 @@ const customFarsiMessages = {
         cancel_order: 'سفارش لغو شد',
         post_order: 'سفارش ثبت شد',
         complete_order: 'سفارش تکمیل شد',
+        register: 'پیام خوشامد گویی',
       },
       supervisor: {
         url: 'آدرس',
