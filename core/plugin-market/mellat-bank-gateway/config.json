@@ -1,62 +1,76 @@
 {
-    "name": "Manual Bank Gateway",
+    "name": "Mellat Bank IPG Gateway",
     "version": "1.0.0",
     "description": {
-        "en": "for manual payment",
-        "fa": "برای پرداخت های دستی"
+        "en": "payment with behpardakht mellat",
+        "fa": "پرداخت بوسیله به پرداخت ملت"
     },
     "type": "bank-gateway",
     "author": "Nodeeweb",
     "main": "index",
-    "slug": "manual-bank-gateway",
+    "slug": "mellat-bank-gateway",
     "config": {
         "inputs": [
             {
-                "key": "redirect",
+                "key": "terminalId",
                 "title": {
-                    "en": "redirect",
-                    "fa": "ریدایرکت"
+                    "en": "terminal id",
+                    "fa": "شماره پایانه"
                 },
                 "type": "string"
             },
             {
-                "key": "lifeTime",
+                "key": "username",
                 "title": {
-                    "en": "life time days",
-                    "fa": "زمان مجاز برای تراکنش ( روز )"
+                    "en": "username",
+                    "fa": "نام کاربری"
                 },
-                "type": "number",
-                "required":false
+                "type": "string"
+            },
+            {
+                "key": "password",
+                "title": {
+                    "en": "password",
+                    "fa": "رمز عبور"
+                },
+                "type": "string"
             }
         ],
-        "dto": "dto/config",
+        "dto": "dto/index",
         "run": "config"
     },
-    "active":{
-        "dto":"dto/config",
-        "run":"active"
+    "active": {
+        "dto": "dto/config",
+        "run": "active"
     },
     "edit": {
         "inputs": [
             {
-                "key": "redirect",
+                "key": "terminalId",
                 "title": {
-                    "en": "redirect",
-                    "fa": "ریدایرکت"
+                    "en": "terminal id",
+                    "fa": "شماره پایانه"
                 },
                 "type": "string"
             },
             {
-                "key": "lifeTime",
+                "key": "username",
                 "title": {
-                    "en": "life time days",
-                    "fa": "زمان مجاز برای تراکنش ( روز )"
+                    "en": "username",
+                    "fa": "نام کاربری"
                 },
-                "type": "number",
-                "required":false
+                "type": "string"
+            },
+            {
+                "key": "password",
+                "title": {
+                    "en": "password",
+                    "fa": "رمز عبور"
+                },
+                "type": "string"
             }
         ],
-        "dto": "dto/edit",
+        "dto": "dto/index",
         "run": "edit"
     }
 }

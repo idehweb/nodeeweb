@@ -2,8 +2,9 @@
   "name": "mellat-bank-gateway",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {},
+  "main": "index.ts",
+  "scripts": {
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
