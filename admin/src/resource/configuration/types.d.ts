@@ -72,6 +72,7 @@ export interface SmsProps {
   cancel_order: string;
   post_order: string;
   complete_order: string;
+  register?: string;
 }
 
 export interface ManualPostProps {

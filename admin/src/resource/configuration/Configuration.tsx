@@ -112,20 +112,6 @@ export default function SystemConfigs() {
               }}>
               {translate('resources.settings.metaTags')}
             </p>
-            {/* <TextInput
-              multiline
-              fullWidth
-              minRows={3}
-              source={'meta_title'}
-              label={translate('resources.settings.meta_title')}
-            />
-            <TextInput
-              fullWidth
-              multiline
-              minRows={3}
-              source={'meta_description'}
-              label={translate('resources.settings.meta_description')}
-            /> */}
           </div>
           <TextInput
             multiline
@@ -150,21 +136,6 @@ export default function SystemConfigs() {
               }}>
               {translate('resources.settings.head.title')}
             </p>
-
-            {/* <TextInput
-              multiline
-              minRows={8}
-              fullWidth
-              source={'head_first'}
-              label={translate('resources.settings.head.head_first')}
-            />
-            <TextInput
-              multiline
-              minRows={8}
-              fullWidth
-              source={'head_last'}
-              label={translate('resources.settings.head.head_last')}
-            /> */}
           </div>
           <TextInput
             multiline
@@ -489,6 +460,13 @@ export default function SystemConfigs() {
               }}>
               {translate('resources.settings.sms_message_on.title')}
             </p>
+            <TextInput
+              fullWidth
+              multiline
+              minRows={3}
+              source={'sms_message_on.register'}
+              label={translate('resources.settings.sms_message_on.register')}
+            />
             <TextInput
               fullWidth
               multiline
