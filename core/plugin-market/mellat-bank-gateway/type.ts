@@ -30,7 +30,10 @@ export type BankGatewayCreateOut =
       authority: string;
       payment_link: string;
       expiredAt: Date;
-      message?: string;
+      payment_message?: string;
+      payment_method?: string;
+      payment_headers?: { [key: string]: string };
+      payment_body?: any;
     };
 
 export type BankGatewayVerifyArgs = {
