@@ -17,6 +17,10 @@ class TransactionUtils {
       status: transaction.status,
       provider: transaction.provider,
       payment_link: transaction.payment_link,
+      payment_body: transaction.payment_body,
+      payment_headers: transaction.payment_headers,
+      payment_method: transaction.payment_method,
+      payment_message: transaction.payment_message,
       createdAt: transaction.createdAt,
       expiredAt: transaction.expiredAt,
     };

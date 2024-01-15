@@ -137,7 +137,7 @@ class PaymentService {
       transaction,
       failedAction: true,
       successAction: true,
-      extraFields: req.query,
+      extraFields: { ...req.query, ...req.body },
     });
 
     // redirect
@@ -161,6 +161,10 @@ class PaymentService {
     authority: string;
     provider: string;
     payment_link?: string;
+    payment_method: string;
+    payment_headers?: { [key: string]: string };
+    payment_body?: any;
+    payment_message?: string;
     expiredAt?: Date;
   }> {
     const bankPlugin = store.plugins.get(
@@ -171,6 +175,7 @@ class PaymentService {
       return {
         authority: new Date().toISOString(),
         provider: TransactionProvider.Manual,
+        payment_method: 'get',
       };
 
     // env
@@ -197,6 +202,10 @@ class PaymentService {
       expiredAt: response.expiredAt,
       payment_link: response.payment_link,
       provider: bankPlugin.slug,
+      payment_method: (response.payment_method ?? 'get').toLowerCase(),
+      payment_headers: response.payment_headers,
+      payment_body: response.payment_body,
+      payment_message: response.payment_message || response.message,
     };
   }
 
