@@ -8,7 +8,7 @@
     "build:post": "copyfiles -F -e \"dist/**\" -e \"node_modules/**\" -e \"public/**\" \"**/*.sh\" \"**/*.bat\" \"**/*.json\" dist",
     "dev": "nodemon --config nodemon.json start.ts",
     "log": "nodemon src/core/log.ts",
-    "start:ts":"ts-node start.ts",
+    "start:ts": "ts-node start.ts",
     "start": "node dist/start.js",
     "publish": "./publish.sh"
   },
@@ -35,7 +35,6 @@
     "js2xmlparser": "^5.0.0",
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
-    "moment": "^2.29.4",
     "mongoose": "^7.3.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
