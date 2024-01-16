@@ -2,6 +2,7 @@ export default () => ({
   somethings_wrong: 'مشکلی پیش آمده دوباره تلاش کنید',
   'job-create': 'در حال آماده سازی',
   createdAt: 'تاریج ایجاد',
+  'enter captcha': 'رمز زیر را وارد کنید',
   'job-error': 'خطا در مرحله ساخت',
   up: 'فعال',
   down: 'خاموش',

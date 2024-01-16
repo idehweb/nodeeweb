@@ -29,6 +29,8 @@ import { fNum } from '#c/functions/utils';
 import { otpHandler, passHandler } from '@/functions/auth';
 import { SaveData } from '@/functions';
 
+import styles from '@/assets/styles/Login.module.css';
+
 import Loading from '../Loading';
 
 import SSO from './SSO';
@@ -114,6 +116,7 @@ class LoginForm extends React.Component {
   }
 
   async login(phone, code, password) {
+    console.log('hello im called');
     if (this.state.authenticatingProtocol === 'password') {
       try {
         const data = await passHandler.login({ phone, password });
@@ -349,7 +352,7 @@ class LoginForm extends React.Component {
       return <Navigate to={this.props.redirectTo} replace />;
     }
     return (
-      <>
+      <div className={styles.container}>
         <ListGroup flush>
           {authStatus === 'detect' && (
             <ListGroupItem className="p-3">
@@ -388,15 +391,15 @@ class LoginForm extends React.Component {
                         </InputGroup>
                         <Captcha onActionSubmit={this.captchaAction} />
                       </Col>
+                      <Button
+                        block
+                        type="submit"
+                        className="center"
+                        onClick={this.handleDetect}>
+                        {t('get enter code')}
+                      </Button>
                     </Row>
-                    <Row form></Row>
-                    <Button
-                      block
-                      type="submit"
-                      className="center"
-                      onClick={this.handleDetect}>
-                      {t('get enter code')}
-                    </Button>
+                    {/* <Row form></Row> */}
                   </Form>
                 </Col>
               </Row>
@@ -541,7 +544,13 @@ class LoginForm extends React.Component {
             </ListGroupItem>
           )}
           {authStatus === 'signup' && (
-            <ListGroupItem className="p-3">
+            <ListGroupItem
+              className="p-3"
+              style={{
+                minHeight: '70vh',
+                marginTop: '5rem',
+                marginBottom: '5rem',
+              }}>
               <Row>
                 <Col>
                   <Form onSubmit={this.handleSignup}>
@@ -628,6 +637,7 @@ class LoginForm extends React.Component {
                           </InputGroupAddon>
                           <FormInput
                             placeholder="**********"
+                            disabled
                             id="thepho"
                             className={'iuygfghuji'}
                             type="tel"
@@ -699,7 +709,7 @@ class LoginForm extends React.Component {
             <Loading size={50} />
           </Overlay>
         )}
-      </>
+      </div>
     );
   }
 }

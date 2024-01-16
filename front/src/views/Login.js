@@ -5,6 +5,7 @@ import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 
 import PageTitle from '#c/components/common/PageTitle';
 import LoginForm from '#c/components/components-overview/NewLoginForm';
+import AuthPortal from '@/components/components-overview/AuthProtocol/index';
 import { SaveData } from '../functions/index';
 import { getToken } from '../functions/utils';
 import { jwtHandler } from '#c/functions/auth';
@@ -73,7 +74,7 @@ const Login = ({ t }) => {
             {status === Status.NeedToCheck ? (
               <Loading />
             ) : status === Status.NeedAuth ? (
-              <LoginForm redirectTo={redirectTo} />
+              <AuthPortal redirectTo={redirectTo} />
             ) : null}
           </Card>
         </Col>

@@ -1,0 +1,11 @@
+.container {
+  min-height: 58vh;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  @media (max-width: 768px) {
+  }
+}
