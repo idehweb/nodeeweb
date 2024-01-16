@@ -16,7 +16,11 @@ import {
 
 import { Paper } from '@mui/material';
 
-import { useEffect } from 'react';
+import { Box } from '@mui/material';
+
+import { useEffect, useState } from 'react';
+
+import { ColorPicker } from '@/components';
 
 import useFetch from '@/hooks/useFetch';
 
@@ -32,6 +36,15 @@ export default function SystemConfigs() {
   const translate = useTranslate();
   const { isLoading, sendRequest, data } = useSubmit();
   const SingleImageUploader = useUploadImage();
+
+  const [colorsObj, setColorsObj] = useState({
+    background: '#fff',
+    footerBackground: '#fff',
+    primary: '#2D3488',
+    secondary: '#fff',
+    text: '#000',
+  });
+  const { background, footerBackground, primary, secondary, text } = colorsObj;
 
   // console.log(SingleImageUploader);
 
@@ -50,18 +63,28 @@ export default function SystemConfigs() {
     </p>
   ) : (
     WebAppConfigData.data && (
+      // console.log(WebAppConfigData.data),
       <Paper className={styles.container}>
         <SimpleForm
           defaultValues={
             (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null
           }
-          onSubmit={(values) =>
+          onSubmit={(values) => {
+            values.color.primary = colorsObj.primary;
+            values.color.secondary = colorsObj.secondary;
+            values.color.background = colorsObj.background;
+            values.color.footerBackground = colorsObj.footerBackground;
+            values.color.text = colorsObj.text;
+
             sendRequest(
               '/config/system',
-              { ...values, favicon_id: SingleImageUploader.fileData?._id },
+              {
+                ...values,
+                favicon_id: SingleImageUploader.fileData?._id,
+              },
               'put'
-            )
-          }>
+            );
+          }}>
           <div id="config-favicon" style={{ padding: '1rem' }}>
             <p
               style={{
@@ -103,6 +126,85 @@ export default function SystemConfigs() {
               </div>
             ))}
           </div>
+          <Box>
+            <div className={'row'}>
+              <div className={'col-md-2'}>
+                <label className={'the-label2'}>
+                  {translate('resources.settings.primaryColor')}
+                </label>
+                <ColorPicker
+                  className={'input-color'}
+                  source={'color.primary'}
+                  color={primary}
+                  onChangeComplete={(e) =>
+                    setColorsObj({ ...colorsObj, primary: e })
+                  }
+                  placement="right"
+                />
+              </div>
+              <div className={'col-md-2'}>
+                <label className={'the-label2'}>
+                  {translate('resources.settings.secondaryColor')}
+                </label>
+                <ColorPicker
+                  className={'input-color'}
+                  source={'color.secondary'}
+                  color={secondary}
+                  onChangeComplete={(e) =>
+                    setColorsObj({ ...colorsObj, secondary: e })
+                  }
+                  placement="right"
+                />
+              </div>
+              <div className={'col-md-2'}>
+                <label className={'the-label2'}>
+                  {translate('resources.settings.textColor')}
+                </label>
+                <ColorPicker
+                  className={'input-color'}
+                  source={'color.text'}
+                  color={text}
+                  onChangeComplete={(e) =>
+                    setColorsObj({ ...colorsObj, text: e })
+                  }
+                  placement="right"
+                />
+              </div>
+              <div className={'col-md-2'}>
+                <label className={'the-label2'}>
+                  {translate('resources.settings.bgColor')}
+                </label>
+                <ColorPicker
+                  className={'input-color'}
+                  source={'color.background'}
+                  color={background}
+                  onChangeComplete={(e) =>
+                    setColorsObj({ ...colorsObj, background: e })
+                  }
+                  placement="right"
+                />
+              </div>
+              <div className={'col-md-2'}>
+                <label className={'the-label2'}>
+                  {translate('resources.settings.footerBgColor')}
+                </label>
+                <ColorPicker
+                  className={'input-color'}
+                  source={'color.footerBackground'}
+                  color={footerBackground}
+                  // color={'color.footerBackground'}
+                  onChangeComplete={(e) =>
+                    setColorsObj({
+                      ...colorsObj,
+                      footerBackground: e,
+                    })
+                  }
+                  placement="right"
+                />
+              </div>
+              <div className={'col-md-2'}></div>
+            </div>
+          </Box>
           <div>
             <p
               style={{
