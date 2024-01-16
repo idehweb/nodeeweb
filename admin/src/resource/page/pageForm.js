@@ -289,10 +289,9 @@ const Form = ({ children, ...props }) => {
       <TextInput
         source={'title.' + translate('lan')}
         fullWidth
-        inputProps={{ maxLength: 20 }}
         label={translate('resources.page.title')}
         className={'width100 mb-20'}
-        validate={Val.reqMinLenn(6)}
+        validate={Val.reqMinLenn(2)}
       />
       <div className={'mb-20'}></div>
       <div className={'mb-20'}></div>
