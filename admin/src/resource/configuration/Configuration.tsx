@@ -170,7 +170,7 @@ export default function SystemConfigs(props) {
           <Box>
             <div className={'row'}>
               <div className={'col-md-2'}>
-                <label className={'the-label2'}>
+                <label className={'the-color-label'}>
                   {translate('resources.settings.primaryColor')}
                 </label>
                 <ColorPicker
@@ -187,7 +187,7 @@ export default function SystemConfigs(props) {
                 />
               </div>
               <div className={'col-md-2'}>
-                <label className={'the-label2'}>
+                <label className={'the-color-label'}>
                   {translate('resources.settings.secondaryColor')}
                 </label>
                 <ColorPicker
@@ -204,7 +204,7 @@ export default function SystemConfigs(props) {
                 />
               </div>
               <div className={'col-md-2'}>
-                <label className={'the-label2'}>
+                <label className={'the-color-label'}>
                   {translate('resources.settings.textColor')}
                 </label>
                 <ColorPicker
@@ -221,7 +221,7 @@ export default function SystemConfigs(props) {
                 />
               </div>
               <div className={'col-md-2'}>
-                <label className={'the-label2'}>
+                <label className={'the-color-label'}>
                   {translate('resources.settings.bgColor')}
                 </label>
                 <ColorPicker
@@ -238,7 +238,7 @@ export default function SystemConfigs(props) {
                 />
               </div>
               <div className={'col-md-2'}>
-                <label className={'the-label2'}>
+                <label className={'the-color-label'}>
                   {translate('resources.settings.footerBgColor')}
                 </label>
                 <ColorPicker
@@ -257,7 +257,6 @@ export default function SystemConfigs(props) {
                   placement="right"
                 />
               </div>
-              <div className={'col-md-2'}></div>
             </div>
           </Box>
           <div>

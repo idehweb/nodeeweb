@@ -163,6 +163,15 @@ body .layout.rtl .the-color-popover * {
 .col-md-2 {
   flex-basis: 20%;
   padding: 0 15px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.the-color-label {
+  display: block;
+  font-size: 0.9rem;
+  width: max-content;
+  padding: 10px 1px;
 }
 
 .bittons button {
@@ -172,6 +181,7 @@ body .layout.rtl .the-color-popover * {
   display: block;
   margin-bottom: 10px;
 }
+
 .the-label > p {
   margin-bottom: 10px !important;
 }
@@ -545,8 +555,16 @@ body
       #f9e5c7 calc(100% - 20px),
       transparent 0
     );
-  background-size: 100% 50px, 50px 10px, 60px 10px, auto 50px;
-  background-position: 0 0, 20px 80px, 20px 100px, left 0 bottom 20px;
+  background-size:
+    100% 50px,
+    50px 10px,
+    60px 10px,
+    auto 50px;
+  background-position:
+    0 0,
+    20px 80px,
+    20px 100px,
+    left 0 bottom 20px;
   background-repeat: no-repeat;
   border: 1px solid #836f31;
   box-shadow: 3px 2px 1px 2px #aa9450;
