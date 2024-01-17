@@ -18,6 +18,8 @@ import { Paper } from '@mui/material';
 
 import { Box } from '@mui/material';
 
+import { useForm, useFormState, useFormContext } from 'react-hook-form';
+
 import { useEffect, useState } from 'react';
 
 import { ColorPicker } from '@/components';
@@ -32,7 +34,9 @@ import useUploadImage from '@/hooks/useUploadImage';
 import { WebAppConfigProps } from './types';
 
 export default function SystemConfigs() {
-  const WebAppConfigData = useFetch({ requestQuery: '/config/system' });
+  const WebAppConfigData = useFetch({
+    requestQuery: '/config/system',
+  });
   const translate = useTranslate();
   const { isLoading, sendRequest, data } = useSubmit();
   const SingleImageUploader = useUploadImage();
@@ -63,18 +67,41 @@ export default function SystemConfigs() {
     </p>
   ) : (
     WebAppConfigData.data && (
-      // console.log(WebAppConfigData.data),
       <Paper className={styles.container}>
         <SimpleForm
           defaultValues={
             (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null
           }
           onSubmit={(values) => {
-            values.color.primary = colorsObj.primary;
-            values.color.secondary = colorsObj.secondary;
-            values.color.background = colorsObj.background;
-            values.color.footerBackground = colorsObj.footerBackground;
-            values.color.text = colorsObj.text;
+            values.color.primary =
+              colorsObj.primary !== '#2D3488'
+                ? colorsObj.primary
+                : (WebAppConfigData.data as { data: WebAppConfigProps })?.data
+                    .color.primary;
+
+            values.color.secondary =
+              colorsObj.secondary !== '#fff'
+                ? colorsObj.secondary
+                : (WebAppConfigData.data as { data: WebAppConfigProps })?.data
+                    .color.secondary;
+
+            values.color.background =
+              colorsObj.background !== '#fff'
+                ? colorsObj.background
+                : (WebAppConfigData.data as { data: WebAppConfigProps })?.data
+                    .color.background;
+
+            values.color.footerBackground =
+              colorsObj.footerBackground !== '#fff'
+                ? colorsObj.footerBackground
+                : (WebAppConfigData.data as { data: WebAppConfigProps })?.data
+                    .color.footerBackground;
+
+            values.color.text =
+              colorsObj.text !== '#000'
+                ? colorsObj.text
+                : (WebAppConfigData.data as { data: WebAppConfigProps })?.data
+                    .color.text;
 
             sendRequest(
               '/config/system',
@@ -135,7 +162,10 @@ export default function SystemConfigs() {
                 <ColorPicker
                   className={'input-color'}
                   source={'color.primary'}
-                  color={primary}
+                  color={
+                    // @ts-ignore
+                    WebAppConfigData.data.data.color.primary || primary
+                  }
                   onChangeComplete={(e) =>
                     setColorsObj({ ...colorsObj, primary: e })
                   }
@@ -149,7 +179,10 @@ export default function SystemConfigs() {
                 <ColorPicker
                   className={'input-color'}
                   source={'color.secondary'}
-                  color={secondary}
+                  color={
+                    // @ts-ignore
+                    WebAppConfigData.data.data.color.secondary || secondary
+                  }
                   onChangeComplete={(e) =>
                     setColorsObj({ ...colorsObj, secondary: e })
                   }
@@ -163,7 +196,10 @@ export default function SystemConfigs() {
                 <ColorPicker
                   className={'input-color'}
                   source={'color.text'}
-                  color={text}
+                  color={
+                    // @ts-ignore
+                    WebAppConfigData.data.data.color.text || text
+                  }
                   onChangeComplete={(e) =>
                     setColorsObj({ ...colorsObj, text: e })
                   }
@@ -177,7 +213,10 @@ export default function SystemConfigs() {
                 <ColorPicker
                   className={'input-color'}
                   source={'color.background'}
-                  color={background}
+                  color={
+                    // @ts-ignore
+                    WebAppConfigData.data.data.color.background || background
+                  }
                   onChangeComplete={(e) =>
                     setColorsObj({ ...colorsObj, background: e })
                   }
@@ -191,8 +230,11 @@ export default function SystemConfigs() {
                 <ColorPicker
                   className={'input-color'}
                   source={'color.footerBackground'}
-                  color={footerBackground}
-                  // color={'color.footerBackground'}
+                  color={
+                    // @ts-ignore
+                    WebAppConfigData.data.data.color.footerBackground ||
+                    footerBackground
+                  }
                   onChangeComplete={(e) =>
                     setColorsObj({
                       ...colorsObj,
