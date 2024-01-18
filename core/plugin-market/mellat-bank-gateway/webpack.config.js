@@ -42,7 +42,7 @@ module.exports = {
     extensions: ['.js', '.ts'],
   },
   optimization: {
-    minimize: false,
+    // minimize: false,
   },
   plugins: [
     new CopyWebpackPlugin({
