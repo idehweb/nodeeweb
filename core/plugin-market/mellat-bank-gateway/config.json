@@ -7,7 +7,7 @@
     },
     "type": "bank-gateway",
     "author": "Nodeeweb",
-    "main": "index",
+    "main": "dist/bundle.js",
     "slug": "mellat-bank-gateway",
     "config": {
         "inputs": [
@@ -40,7 +40,7 @@
         "run": "config"
     },
     "active": {
-        "dto": "dto/config",
+        "dto": "dto/index",
         "run": "active"
     },
     "edit": {

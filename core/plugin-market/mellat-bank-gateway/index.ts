@@ -1,10 +1,10 @@
+import crypto from 'crypto';
 import MellatCheckout from 'mellat-checkout';
 import {
   BankGatewayPluginContent,
   BankGatewayUnverified,
   PaymentVerifyStatus,
 } from './type';
-import { random } from 'lodash';
 
 const errorCodeMap = {
   11: 'ﺷﻤﺎره_ﻛﺎرت_ﻧﺎﻣﻌﺘﺒﺮ_اﺳﺖ',
@@ -79,7 +79,7 @@ const create: BankGatewayPluginContent['stack'][0] = async ({
   try {
     await config.mellat.initialize();
 
-    const generatedOrderId = random(0, Number.MAX_SAFE_INTEGER, false);
+    const generatedOrderId = crypto.randomInt(10 ** 4, 10 ** 6);
 
     const response = await config.mellat.paymentRequest({
       amount: currency === 'Toman' ? amount * 10 : amount,
