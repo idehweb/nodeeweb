@@ -24,5 +24,14 @@
     "resolveJsonModule": true
   },
   "include": ["**/*.ts","**/*.js"],
-  "exclude": ["node_modules", "**/node_modules/*", "dist","src/temp","shared","public","plugin-market/mellat-bank-gateway"]
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*",
+    "dist",
+    "src/temp",
+    "shared",
+    "public",
+    "plugin-market/mellat-bank-gateway/dist",
+    "plugin-market/mellat-bank-gateway/index.ts",
+]
 }
