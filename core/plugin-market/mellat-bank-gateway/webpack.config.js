@@ -11,6 +11,9 @@ module.exports = {
     filename: 'bundle.js',
     clean: true,
     path: distPath,
+    library: {
+      type: 'commonjs2',
+    },
   },
   module: {
     rules: [

@@ -40,7 +40,7 @@
         "run": "config"
     },
     "active": {
-        "dto": "dto/config",
+        "dto": "dto/index",
         "run": "active"
     },
     "edit": {
