@@ -1,13 +1,8 @@
 import {
-  ArrayField,
-  Datagrid,
-  Filter,
   FunctionField,
-  Pagination,
   Show,
   SimpleShowLayout,
   TextField,
-  TextInput,
   useTranslate,
 } from 'react-admin';
 
@@ -16,38 +11,16 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 
-import {
-  List,
-  Notifications,
-  Orders,
-  SimpleForm,
-  Tasks,
-  Transactions,
-  Notes,
-  Documents,
-  CustomerStatus,
-} from '@/components';
+// import {
+//   Notifications,
+//   Orders,
+//   Tasks,
+//   Transactions,
+//   Notes,
+//   Documents,
+//   CustomerStatus,
+// } from '@/components';  These all need complete refactor
 import { dateFormat } from '@/functions';
-
-// import ListActions from "./../components/ListActions"
-const PostFilter = (props) => (
-  <Filter {...props}>
-    <TextInput label="Search" source="q" alwaysOn />
-    <TextInput label="Title" source="title" defaultValue="Hello, World!" />
-  </Filter>
-);
-// export const postFilter = props => (
-//     <Filter {...props}>
-//         <TextInput label="Search" source="q" alwaysOn />
-//         <BooleanInput source="is_published" alwaysOn />
-//         <TextInput source="title" defaultValue="Hello, World!" />
-//     </Filter>
-// );
-/*<BooleanInput source="is_published" alwaysOn />*/
-/*<TextInput source="title" defaultValue="Hello, World!" />*/
-const PostPagination = (props) => (
-  <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />
-);
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -58,6 +31,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export const customerShow = (props) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   let translate = useTranslate();
   return (
     <Show {...props}>
@@ -90,6 +64,8 @@ export const customerShow = (props) => {
                 </Grid>
                 <Grid item lg={4} md={6} xs={12}>
                   <Item>
+                    {translate('resources.customers.firstName') + ': '}
+
                     <TextField
                       source="firstName"
                       label={translate('resources.customers.firstName')}
@@ -98,6 +74,8 @@ export const customerShow = (props) => {
                 </Grid>
                 <Grid item lg={4} md={6} xs={12}>
                   <Item>
+                    {translate('resources.customers.lastName') + ': '}
+
                     <TextField
                       source="lastName"
                       label={translate('resources.customers.lastName')}
@@ -115,28 +93,11 @@ export const customerShow = (props) => {
                 </Grid>
                 <Grid item lg={4} md={6} xs={12}>
                   <Item>
-                    <TextField
-                      source="phoneNumber"
-                      label={translate('resources.customers.phoneNumber')}
-                    />
-                  </Item>
-                </Grid>
-                <Grid item lg={4} md={6} xs={12}>
-                  <Item>
-                    {translate('resources.customers.countryCode') + ': '}
-                    <TextField
-                      source="countryCode"
-                      label={translate('resources.customers.countryCode')}
-                    />
-                  </Item>
-                </Grid>
+                    {translate('resources.customers.phone') + ': '}
 
-                <Grid item lg={4} md={6} xs={12}>
-                  <Item>
-                    {translate('resources.customers.activationCode') + ': '}
                     <TextField
-                      source="activationCode"
-                      label={translate('resources.customers.activationCode')}
+                      source="phone"
+                      label={translate('resources.customers.phone')}
                     />
                   </Item>
                 </Grid>
@@ -159,15 +120,7 @@ export const customerShow = (props) => {
                     />
                   </Item>
                 </Grid>
-                <Grid item lg={4} md={6} xs={12}>
-                  <Item>
-                    {translate('resources.customers.birthday') + ': '}
-                    <TextField
-                      source="birthday"
-                      label={translate('resources.customers.birthday')}
-                    />
-                  </Item>
-                </Grid>
+
                 <Grid item lg={4} md={6} xs={12}>
                   <Item>
                     {translate('resources.customers.companyName') + ': '}
@@ -188,40 +141,40 @@ export const customerShow = (props) => {
                 </Grid>
               </Grid>
             </Box>
-            <ArrayField
+            {/* <ArrayField
               source="address"
               label={translate('resources.customers.address')}>
               <Datagrid>
                 <TextField
-                  source="Title"
+                  source="title"
                   label={translate('resources.customers.title')}
                 />
                 <TextField
-                  source="State"
+                  source="state"
                   label={translate('resources.customers.state')}
                 />
                 <TextField
-                  source="City"
+                  source="city"
                   label={translate('resources.customers.city')}
                 />
                 <TextField
-                  source="PhoneNumber"
-                  label={translate('resources.customers.phoneNumber')}
+                  source="phone"
+                  label={translate('resources.customers.phone')}
                 />
                 <TextField
-                  source="PostalCode"
+                  source="postalCode"
                   label={translate('resources.customers.postalCode')}
                 />
                 <TextField
-                  source="StreetAddress"
+                  source="streetAddress"
                   label={translate('resources.customers.streetAddress')}
                 />
               </Datagrid>
-            </ArrayField>
+            </ArrayField> */}
 
             <div style={{ height: '50px' }}></div>
 
-            <FunctionField
+            {/* <FunctionField
               label={translate('resources.customers.orders')}
               render={(record) => <Orders record={record} />}
             />
@@ -234,9 +187,9 @@ export const customerShow = (props) => {
             <FunctionField
               label={translate('resources.customers.transactions')}
               render={(record) => <Transactions record={record} />}
-            />
+            /> */}
           </Grid>
-          <Grid item lg={3} md={4} xs={12}>
+          {/* <Grid item lg={3} md={4} xs={12}>
             <FunctionField
               label={translate('resources.customers.tasks')}
               render={(record) => <CustomerStatus record={record} />}
@@ -253,7 +206,7 @@ export const customerShow = (props) => {
               label={translate('resources.customers.documents')}
               render={(record) => <Documents record={record} />}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
       </SimpleShowLayout>
     </Show>
