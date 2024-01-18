@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   BooleanField,
   ChipField,
@@ -7,8 +8,9 @@ import {
   EmailField,
   ExportButton,
   Filter,
+  FilterList,
+  FilterListItem,
   FunctionField,
-  NumberField,
   Pagination,
   ReferenceArrayField,
   ShowButton,
@@ -21,12 +23,15 @@ import {
 } from 'react-admin';
 
 import { ImportButton } from 'react-admin-import-csv';
+import MailIcon from '@mui/icons-material/MailOutline';
 
 import jsonExport from 'jsonexport/dist';
+import { Card, CardContent } from '@mui/material';
 
 import { dateFormat } from '@/functions';
 import { List } from '@/components';
 import API from '@/functions/API';
+import useFetch from '@/hooks/useFetch';
 
 const PostFilter = (props) => {
   const translate = useTranslate();
@@ -202,109 +207,154 @@ const ListActions = (props) => {
     </TopToolbar>
   );
 };
+
+const PostFilterSidebar = ({ childs }) => {
+  return (
+    <Card sx={{ order: -1, mt: 9, ml: 1, minWidth: 200 }}>
+      <CardContent sx={{ p: 1 }}>
+        <FilterList
+          sx={{
+            '& > div > div': {
+              mr: 0,
+              ml: 1,
+              display: 'flex',
+              alignItems: 'center',
+            },
+          }}
+          label="status"
+          icon={<MailIcon />}>
+          {childs?.reverse().map((i, idx) => (
+            <FilterListItem
+              key={idx}
+              label={i.key}
+              value={{ status: i.value }}
+            />
+          ))}
+        </FilterList>
+      </CardContent>
+    </Card>
+  );
+};
 export const customerList = (props) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
+  const WebAppConfigData = useFetch({ requestQuery: '/config/system' });
+
+  console.log('web app config is ', WebAppConfigData);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const translate = useTranslate();
-  return (
-    <List
-      exporter={exporter}
-      {...props}
-      filters={<PostFilter />}
-      pagination={<PostPagination />}
-      actions={<ListActions />}>
-      <Datagrid>
-        <TextField
-          source="phone"
-          label={translate('resources.customers.phone')}
-        />
-        <TextField
-          source="activationCode"
-          label={translate('resources.customers.activationCode')}
-        />
-        <TextField
-          source="firstName"
-          label={translate('resources.customers.firstName')}
-        />
-        <TextField
-          source="lastName"
-          label={translate('resources.customers.lastName')}
-        />
-        <EmailField
-          source="email"
-          label={translate('resources.customers.email')}
-        />
-        <TextField
-          source="internationalCode"
-          label={translate('resources.customers.internationalCode')}
-        />
-        <TextField
-          source="source"
-          label={translate('resources.customers.source')}
-        />
-        <ReferenceArrayField
-          label={translate('resources.customers.customerGroup')}
-          reference="customerGroup"
-          source="customerGroup">
-          <SingleFieldList>
-            <ChipField source="slug" />
-          </SingleFieldList>
-        </ReferenceArrayField>
-        {/*<FunctionField label={translate("resources.customer.customerGroup")}*/}
-        {/*render={record => {*/}
 
-        {/*return (*/}
-        {/*<div className={"categories"}>*/}
-        {/*{record.customerGroup && record.customerGroup.map((item, it) => <div>*/}
-        {/*<ChipField source={"customerGroup[" + it + "].slug"} label={item.slug}*/}
-        {/*sortable={false}/>*/}
-        {/*</div>)}*/}
+  return WebAppConfigData.isLoading ? (
+    []
+  ) : WebAppConfigData.error ? (
+    <></>
+  ) : (
+    WebAppConfigData.data && (
+      <List
+        exporter={exporter}
+        {...props}
+        filters={<PostFilter />}
+        pagination={<PostPagination />}
+        aside={
+          <PostFilterSidebar
+            childs={WebAppConfigData.data.data.consumer_status}
+          />
+        }
+        actions={<ListActions />}>
+        <Datagrid>
+          <TextField
+            source="phone"
+            label={translate('resources.customers.phone')}
+          />
+          <TextField
+            source="activationCode"
+            label={translate('resources.customers.activationCode')}
+          />
+          <TextField
+            source="firstName"
+            label={translate('resources.customers.firstName')}
+          />
+          <TextField
+            source="lastName"
+            label={translate('resources.customers.lastName')}
+          />
+          <EmailField
+            source="email"
+            label={translate('resources.customers.email')}
+          />
+          <TextField
+            source="internationalCode"
+            label={translate('resources.customers.internationalCode')}
+          />
+          <TextField
+            source="source"
+            label={translate('resources.customers.source')}
+          />
+          <ReferenceArrayField
+            label={translate('resources.customers.customerGroup')}
+            reference="customerGroup"
+            source="customerGroup">
+            <SingleFieldList>
+              <ChipField source="slug" />
+            </SingleFieldList>
+          </ReferenceArrayField>
+          {/*<FunctionField label={translate("resources.customer.customerGroup")}*/}
+          {/*render={record => {*/}
 
-        {/*</div>*/}
-        {/*);*/}
-        {/*}}/>*/}
-        <FunctionField
-          label={translate('resources.customers.date')}
-          render={(record) => {
-            return (
-              <div className="theDate">
-                <div>
-                  {translate('resources.customers.createdAt') +
-                    ': ' +
-                    `${dateFormat(record.createdAt)}`}
-                </div>
-                <div>
-                  {translate('resources.customers.updatedAt') +
-                    ': ' +
-                    `${dateFormat(record.updatedAt)}`}
-                </div>
+          {/*return (*/}
+          {/*<div className={"categories"}>*/}
+          {/*{record.customerGroup && record.customerGroup.map((item, it) => <div>*/}
+          {/*<ChipField source={"customerGroup[" + it + "].slug"} label={item.slug}*/}
+          {/*sortable={false}/>*/}
+          {/*</div>)}*/}
 
-                {Boolean(record.orderCount) && (
+          {/*</div>*/}
+          {/*);*/}
+          {/*}}/>*/}
+          <FunctionField
+            label={translate('resources.customers.date')}
+            render={(record) => {
+              return (
+                <div className="theDate">
                   <div>
-                    {translate('resources.customers.orderCount') +
+                    {translate('resources.customers.createdAt') +
                       ': ' +
-                      `${record.orderCount}`}
+                      `${dateFormat(record.createdAt)}`}
                   </div>
-                )}
-              </div>
-            );
-          }}
-        />
+                  <div>
+                    {translate('resources.customers.updatedAt') +
+                      ': ' +
+                      `${dateFormat(record.updatedAt)}`}
+                  </div>
 
-        <BooleanField
-          source="active"
-          label={translate('resources.customers.active')}
-        />
-        <FunctionField
-          label={translate('resources.product.edit')}
-          render={(record) => (
-            <>
-              <EditButton />
-              <ShowButton />
-            </>
-          )}
-        />
-      </Datagrid>
-    </List>
+                  {Boolean(record.orderCount) && (
+                    <div>
+                      {translate('resources.customers.orderCount') +
+                        ': ' +
+                        `${record.orderCount}`}
+                    </div>
+                  )}
+                </div>
+              );
+            }}
+          />
+
+          <BooleanField
+            source="active"
+            label={translate('resources.customers.active')}
+          />
+          <FunctionField
+            label={translate('resources.product.edit')}
+            render={(record) => (
+              <>
+                <EditButton />
+                <ShowButton />
+              </>
+            )}
+          />
+        </Datagrid>
+      </List>
+    )
   );
 };
 
