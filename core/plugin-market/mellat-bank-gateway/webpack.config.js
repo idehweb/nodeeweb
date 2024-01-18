@@ -1,19 +1,40 @@
 const { join } = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const distPath = join(__dirname, 'dist');
 
 module.exports = {
   entry: './index.ts',
   mode: 'production',
   target: 'node',
+  devtool: 'source-map',
   output: {
     filename: 'bundle.js',
     clean: true,
-    path: join(__dirname, 'dist'),
+    path: distPath,
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
-        use: 'ts-loader',
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                [
+                  '@babel/preset-env',
+                  {
+                    targets: {
+                      node: 'current',
+                    },
+                  },
+                ],
+              ],
+            },
+          },
+          'ts-loader',
+        ],
       },
     ],
   },
@@ -23,4 +44,14 @@ module.exports = {
   optimization: {
     minimize: false,
   },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'node_modules/**/templates/*.ejs',
+          to: join(distPath, 'templates', '[name][ext]'),
+        },
+      ],
+    }),
+  ],
 };
