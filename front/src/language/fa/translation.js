@@ -10,6 +10,7 @@ export default () => ({
   rial: 'ریال',
   toman: 'تومان',
   languageDir: 'rtl',
+  'country-code': 'کد کشور',
   'passwords-do-not-match': 'عدم انطباق رمز عبور',
   Dashboard: 'پیشخوان',
   Attributes: 'ویژگی ها',
