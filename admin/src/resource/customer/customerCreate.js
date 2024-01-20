@@ -17,7 +17,6 @@ export const customerCreate = (props) => {
   return (
     <Create {...props}>
       <SimpleForm>
-        {' '}
         <TextInput
           fullWidth
           disabled
@@ -38,6 +37,11 @@ export const customerCreate = (props) => {
           fullWidth
           source="internationalCode"
           label={translate('resources.customers.internationalCode')}
+        />
+        <TextInput
+          fullWidth
+          source="phone"
+          label={translate('resources.customers.phone')}
         />
         <TextInput
           fullWidth
@@ -94,7 +98,7 @@ export const customerCreate = (props) => {
           <SelectArrayInput
             fullWidth
             label={translate('resources.customers.customerGroup')}
-            optionText="name.en"          
+            optionText="name.en"
           />
         </ReferenceArrayInput>
         <BooleanInput

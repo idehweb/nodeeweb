@@ -16,6 +16,7 @@ import {
   TextField,
   TextInput,
   TopToolbar,
+  useRefresh,
   useTranslate,
 } from 'react-admin';
 
@@ -24,14 +25,13 @@ import { ImportButton } from 'react-admin-import-csv';
 import jsonExport from 'jsonexport/dist';
 
 import { dateFormat } from '@/functions';
-import { List, SimpleForm } from '@/components';
-import API, { BASE_URL } from '@/functions/API';
-
+import { List } from '@/components';
+import API from '@/functions/API';
 
 const PostFilter = (props) => {
   const translate = useTranslate();
 
-  return [
+  return (
     <Filter {...props}>
       <TextInput
         label={translate('resources.customers.firstName')}
@@ -44,12 +44,12 @@ const PostFilter = (props) => {
         alwaysOn
       />
       <TextInput
-        label={translate('resources.customers.phoneNumber')}
-        source="phoneNumber"
+        label={translate('resources.customers.phone')}
+        source="phone"
         alwaysOn
       />
-    </Filter>,
-  ];
+    </Filter>
+  );
 };
 
 const PostPagination = (props) => (
@@ -92,6 +92,7 @@ const exporter = (customers) => {
         'orderCount',
         'active',
         'createdAt',
+        'phone',
       ], // order fields in the export
     },
     (err, csv) => {
@@ -102,6 +103,7 @@ const exporter = (customers) => {
 };
 
 const ListActions = (props) => {
+  const refresh = useRefresh();
   // All configuration options are optional
   const config = {
     // Enable logging
@@ -129,11 +131,11 @@ const ListActions = (props) => {
             array.push({
               _id: row._id,
             });
-          if (!row.phoneNumber) row.phoneNumber = row.phoneNumber2;
+          // if (!row.phone) row.phone = row.phoneNumber2; there is no such data as phoneNumber2 ?
 
-          if (row.phoneNumber && row.phoneNumber.toString().length < 12) {
-            if (row.phoneNumber.toString().length === 10) {
-              row.phoneNumber = '98' + row.phoneNumber.toString();
+          if (row.phone && row.phone.toString().length < 12) {
+            if (row.phone.toString().length === 10) {
+              row.phone = '98' + row.phone.toString();
             }
           }
           // else
@@ -163,7 +165,6 @@ const ListActions = (props) => {
       // console.log("ForImport", postsForExport);
       API.post('/customer/import', JSON.stringify(postsForExport))
         .then(({ data = {} }) => {
-          const refresh = useRefresh();
           refresh();
           alert('it is ok');
           // window.location.reload();
@@ -202,6 +203,7 @@ const ListActions = (props) => {
   );
 };
 export const customerList = (props) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const translate = useTranslate();
   return (
     <List
@@ -211,9 +213,9 @@ export const customerList = (props) => {
       pagination={<PostPagination />}
       actions={<ListActions />}>
       <Datagrid>
-        <NumberField
-          source="phoneNumber"
-          label={translate('resources.customers.phoneNumber')}
+        <TextField
+          source="phone"
+          label={translate('resources.customers.phone')}
         />
         <TextField
           source="activationCode"

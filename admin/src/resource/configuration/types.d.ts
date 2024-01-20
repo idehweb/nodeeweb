@@ -57,7 +57,11 @@ export interface LimitProps {
 }
 
 export interface ColorProps {
-  primary: string;
+  primary?: string;
+  secondary?: string;
+  background?: string;
+  footerBackground?: string;
+  text?: string;
 }
 
 export interface SupervisorProps {
