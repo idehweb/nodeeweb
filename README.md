@@ -29,18 +29,14 @@ Nodeeweb is a framework for building efficient, scalable <a href="https://nodejs
 
 You can find the Nodeeweb documentation [on the website](https://doc.nodeeweb.com/).  
 
-Check out the [Getting Started](https://doc.nodeeweb.com/) page for a quick overview.
+Check out the [Getting Started](https://docs.nodeeweb.com/docs/Get%20Started/Installation) page for a quick overview.
 
 The documentation is divided into several sections:
 
-* [Quick Start](https://doc.nodeeweb.com/)
-* [Tutorial](https://doc.nodeeweb.com/tutorial)
-* [Installation](https://doc.nodeeweb.com/installation)
-* [Advanced Guides](https://doc.nodeeweb.com/advance)
-* [Core API](https://doc.nodeeweb.com/core/api)
-* [Shop API](https://doc.nodeeweb.com/shop/api)
-<!-- * [Where to Get Support](https://doc.nodeeweb.com/community)
-* [Contributing Guide](https://legacy.Nodeewebjs.org/docs/how-to-contribute.html) -->
+* [Introduction](https://docs.nodeeweb.com/docs/)
+* [Installation](https://docs.nodeeweb.com/docs/Get%20Started/Installation)
+* [Fundamentals](https://docs.nodeeweb.com/docs/category/fundamentals)
+* [Advance](https://docs.nodeeweb.com/docs/category/advance)
 
 You can improve it by sending pull requests to [this repository](https://github.com/idehweb/nodeeweb).
 
