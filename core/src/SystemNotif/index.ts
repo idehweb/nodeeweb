@@ -11,7 +11,7 @@ export async function registerCoreSystemNotifs() {
     new UserRegisterNotif(),
 
     // log
-    new LogNotif(),
+    // new LogNotif(),
   ];
 
   // register
