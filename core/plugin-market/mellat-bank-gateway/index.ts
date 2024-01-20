@@ -70,7 +70,22 @@ function errorLog(from: string, err: any) {
   const parser = config.resolve('axiosError2String');
   logger.error(`${from} error:`, parser(err));
 }
-
+const mockCreate = async () => {
+  return {
+    isOk: true,
+    authority: `mock-create_${Date.now()}`,
+    expiredAt: new Date(Date.now() + 15 * 60 * 1000),
+    payment_link: 'https://bpm.shaparak.ir/pgwchannel/startpay.mellat',
+    payment_method: 'post',
+    payment_headers: {
+      'content-type': 'application/x-www-form-urlencoded',
+    },
+    payment_body: {
+      RefId: Date.now() + '',
+    },
+    payment_message: 'در حال هدایت به صفحه خرید...',
+  };
+};
 const create: BankGatewayPluginContent['stack'][0] = async ({
   callback_url,
   amount,
@@ -93,11 +108,11 @@ const create: BankGatewayPluginContent['stack'][0] = async ({
         authority: `${generatedOrderId}_${response.refId}`,
         expiredAt: new Date(Date.now() + 15 * 60 * 1000),
         payment_link: 'https://bpm.shaparak.ir/pgwchannel/startpay.mellat',
-        paymeny_method: 'post',
-        paymeny_headers: {
+        payment_method: 'post',
+        payment_headers: {
           'content-type': 'application/x-www-form-urlencoded',
         },
-        paymeny_body: {
+        payment_body: {
           RefId: response.refId,
         },
         payment_message: 'در حال هدایت به صفحه خرید...',
