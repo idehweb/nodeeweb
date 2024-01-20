@@ -12,7 +12,15 @@ export class PluginCore {
     this.byType.set(plugin.type, plugin);
   }
   delete(id: string) {
-    return this.bySlug.delete(id) || this.byType.delete(id);
+    const plugin = this.get(id);
+    if (!plugin) return false;
+
+    // slug
+    this.bySlug.delete(plugin.slug);
+    // type
+    this.byType.delete(plugin.type);
+
+    return true;
   }
 }
 
