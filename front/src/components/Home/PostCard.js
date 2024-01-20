@@ -85,7 +85,10 @@ function PostCard({ onClick, item, method, t, entity }) {
             </span>
             {/* add price to slidebar */}
             <span className="card-non-title-item">
-              {item.combinations[0].price &&
+              {item &&
+              item.combinations &&
+              item.combinations[0] &&
+              item.combinations[0].price &&
               typeof item.combinations[0].price === 'number' ? (
                 <Theprice price={item.combinations[0].price} />
               ) : (

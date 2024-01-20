@@ -5,7 +5,7 @@
   "main": "index",
   "scripts": {
     "build": "tsc --build",
-    "build:post": "copyfiles -F -e \"dist/**\" -e \"node_modules/**\" -e \"public/**\" \"**/*.sh\" \"**/*.bat\" \"**/*.json\" dist",
+    "build:post": "copyfiles -F -e \"dist/**\" -e \"node_modules/**\" -e \"public/**\" \"**/*.sh\" \"**/*.bat\" \"**/*.json\" \"plugin-market/**\" dist",
     "dev": "nodemon --config nodemon.json start.ts",
     "log": "nodemon src/core/log.ts",
     "start:ts": "ts-node start.ts",

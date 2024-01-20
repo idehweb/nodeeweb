@@ -83,8 +83,8 @@ export const customerEdit = (props) => {
         />
         <TextInput
           fullWidth
-          source="phoneNumber"
-          label={translate('resources.customers.phoneNumber')}
+          source="phone"
+          label={translate('resources.customers.phone')}
         />
         <TextInput
           fullWidth

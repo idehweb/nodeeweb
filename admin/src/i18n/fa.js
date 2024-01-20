@@ -406,6 +406,7 @@ const customFarsiMessages = {
       title: 'عنوان آدرس',
       address: 'آدرس',
       state: 'استان',
+      phone: 'شماره همراه',
       city: 'شهر',
       postalCode: 'کد پستی',
       streetAddress: 'آدرس',
