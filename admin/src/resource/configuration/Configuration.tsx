@@ -40,13 +40,15 @@ export default function SystemConfigs(props) {
   const translate = useTranslate();
   const { isLoading, sendRequest, data } = useSubmit();
   const SingleImageUploader = useUploadImage();
+  const configData =
+    (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null; // assign the type safe object to a new variable to avoid repeating.
 
   const [colorsObj, setColorsObj] = useState({
-    background: '#fff',
-    footerBackground: '#fff',
-    primary: '#2D3488',
-    secondary: '#fff',
-    text: '#000',
+    background: configData.color.background,
+    footerBackground: configData.color.footerBackground,
+    primary: configData.color.primary,
+    secondary: configData.color.secondary,
+    text: configData.color.text,
   });
   const { background, footerBackground, primary, secondary, text } = colorsObj;
 
@@ -67,34 +69,29 @@ export default function SystemConfigs(props) {
   //append colors to values object before sending data
   const appendColors = (val) => {
     val.color.primary =
-      colorsObj.primary !== '#2D3488'
+      colorsObj.primary !== configData.color.primary
         ? colorsObj.primary
-        : (WebAppConfigData.data as { data: WebAppConfigProps })?.data.color
-            .primary;
+        : configData?.color.primary;
 
     val.color.secondary =
-      colorsObj.secondary !== '#fff'
+      colorsObj.secondary !== configData.color.secondary
         ? colorsObj.secondary
-        : (WebAppConfigData.data as { data: WebAppConfigProps })?.data.color
-            .secondary;
+        : configData?.color.secondary;
 
     val.color.background =
-      colorsObj.background !== '#fff'
+      colorsObj.background !== configData.color.background
         ? colorsObj.background
-        : (WebAppConfigData.data as { data: WebAppConfigProps })?.data.color
-            .background;
+        : configData?.color.background;
 
     val.color.footerBackground =
-      colorsObj.footerBackground !== '#fff'
+      colorsObj.footerBackground !== configData.color.footerBackground
         ? colorsObj.footerBackground
-        : (WebAppConfigData.data as { data: WebAppConfigProps })?.data.color
-            .footerBackground;
+        : configData?.color.footerBackground;
 
     val.color.text =
-      colorsObj.text !== '#000'
+      colorsObj.text !== configData.color.text
         ? colorsObj.text
-        : (WebAppConfigData.data as { data: WebAppConfigProps })?.data.color
-            .text;
+        : configData?.color.text;
   };
 
   // console.log('image data is : ', SingleImageUploader.fileData);e
@@ -111,9 +108,7 @@ export default function SystemConfigs(props) {
         <SimpleForm
           {...props}
           toolbar={<CustomToolbar />}
-          defaultValues={
-            (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null
-          }
+          defaultValues={configData}
           onSubmit={(values) => {
             appendColors(values);
 
@@ -152,9 +147,7 @@ export default function SystemConfigs(props) {
             </ImageInput>
           </div>
           <div>
-            {(
-              WebAppConfigData.data as { data: WebAppConfigProps }
-            )?.data.favicons.map((item: any) => (
+            {configData.favicons.map((item: any) => (
               <div key={item._id} className={styles.faviconContainer}>
                 <img
                   src={
@@ -176,10 +169,7 @@ export default function SystemConfigs(props) {
                 <ColorPicker
                   className={'input-color'}
                   source={'color.primary'}
-                  color={
-                    (WebAppConfigData.data as { data: WebAppConfigProps })?.data
-                      .color.primary || primary
-                  }
+                  color={configData.color.primary || primary}
                   onChangeComplete={(e) =>
                     setColorsObj({ ...colorsObj, primary: e })
                   }
@@ -193,10 +183,7 @@ export default function SystemConfigs(props) {
                 <ColorPicker
                   className={'input-color'}
                   source={'color.secondary'}
-                  color={
-                    (WebAppConfigData.data as { data: WebAppConfigProps })?.data
-                      .color.secondary || secondary
-                  }
+                  color={configData.color.secondary || secondary}
                   onChangeComplete={(e) =>
                     setColorsObj({ ...colorsObj, secondary: e })
                   }
@@ -210,10 +197,7 @@ export default function SystemConfigs(props) {
                 <ColorPicker
                   className={'input-color'}
                   source={'color.text'}
-                  color={
-                    (WebAppConfigData.data as { data: WebAppConfigProps })?.data
-                      .color.text || text
-                  }
+                  color={configData.color.text || text}
                   onChangeComplete={(e) =>
                     setColorsObj({ ...colorsObj, text: e })
                   }
@@ -227,10 +211,7 @@ export default function SystemConfigs(props) {
                 <ColorPicker
                   className={'input-color'}
                   source={'color.background'}
-                  color={
-                    (WebAppConfigData.data as { data: WebAppConfigProps })?.data
-                      .color.background || background
-                  }
+                  color={configData.color.background || background}
                   onChangeComplete={(e) =>
                     setColorsObj({ ...colorsObj, background: e })
                   }
@@ -244,10 +225,7 @@ export default function SystemConfigs(props) {
                 <ColorPicker
                   className={'input-color'}
                   source={'color.footerBackground'}
-                  color={
-                    (WebAppConfigData.data as { data: WebAppConfigProps })?.data
-                      .color.footerBackground || footerBackground
-                  }
+                  color={configData.color.footerBackground || footerBackground}
                   onChangeComplete={(e) =>
                     setColorsObj({
                       ...colorsObj,
@@ -317,20 +295,6 @@ export default function SystemConfigs(props) {
               }}>
               {translate('resources.settings.body.title')}
             </p>
-            {/* <TextInput
-              multiline
-              minRows={8}
-              fullWidth
-              source={'body_first'}
-              label={translate('resources.settings.body.body_first')}
-            />
-            <TextInput
-              multiline
-              minRows={8}
-              fullWidth
-              source={'body_last'}
-              label={translate('resources.settings.body.body_last')}
-            /> */}
           </div>
           <TextInput
             multiline
