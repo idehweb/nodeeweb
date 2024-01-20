@@ -12,7 +12,7 @@
     "start": "node dist/src/start.js",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "publish:pre": "node prepublish.js",
-    "publish": "./public.sh"
+    "publish": "./publish.sh"
     
   },
   "author": "",
