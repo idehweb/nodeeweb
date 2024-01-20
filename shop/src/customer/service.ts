@@ -3,6 +3,7 @@ import store from '@nodeeweb/core/store';
 import { MiddleWare, Req, Res } from '@nodeeweb/core/types/global';
 import mongoose, { FilterQuery } from 'mongoose';
 import { CustomerSource } from '../../schema/customer.schema';
+import { transformBody } from './utils';
 
 export class Service {
   static getMe: MiddleWare = (req, res, next) => {
@@ -132,7 +133,7 @@ export class Service {
   static updateOneParseUpdate(req: Req) {
     let body: any;
     if (req.modelName === 'customer') body = { address: req.body.address };
-    else body = req.body;
+    else body = transformBody(req);
 
     return body;
   }
@@ -159,7 +160,7 @@ export class Service {
   };
 
   static createParseBody(req: Req) {
-    return { ...req.body, source: CustomerSource.Panel };
+    return { ...transformBody(req), source: CustomerSource.Panel };
   }
   static deleteParseUpdate() {
     return [
