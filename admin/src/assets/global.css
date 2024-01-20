@@ -163,15 +163,6 @@ body .layout.rtl .the-color-popover * {
 .col-md-2 {
   flex-basis: 20%;
   padding: 0 15px;
-  margin-left: 5px;
-  margin-right: 5px;
-}
-
-.the-color-label {
-  display: block;
-  font-size: 0.9rem;
-  width: max-content;
-  padding: 10px 1px;
 }
 
 .bittons button {

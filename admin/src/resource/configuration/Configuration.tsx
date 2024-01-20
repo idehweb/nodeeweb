@@ -40,24 +40,30 @@ export default function SystemConfigs(props) {
   const translate = useTranslate();
   const { isLoading, sendRequest, data } = useSubmit();
   const SingleImageUploader = useUploadImage();
-  const configData =
-    (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null; // assign the type safe object to a new variable to avoid repeating.
-
-  const [colorsObj, setColorsObj] = useState({
-    background: configData.color.background,
-    footerBackground: configData.color.footerBackground,
-    primary: configData.color.primary,
-    secondary: configData.color.secondary,
-    text: configData.color.text,
-  });
-  const { background, footerBackground, primary, secondary, text } = colorsObj;
-
-  // console.log(SingleImageUploader);
 
   useEffect(() => {
     WebAppConfigData.refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
+
+  const configData =
+    (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null; // assign the type safe object to a new variable to avoid repeating.
+
+  const [colorsObj, setColorsObj] = useState({
+    //@ts-nocheck
+    background: configData?.color.background,
+    //@ts-nocheck
+    footerBackground: configData?.color.footerBackground,
+    //@ts-nocheck
+    primary: configData?.color.primary,
+    //@ts-nocheck
+    secondary: configData?.color.secondary,
+    //@ts-nocheck
+    text: configData?.color.text,
+  });
+  const { background, footerBackground, primary, secondary, text } = colorsObj;
+
+  // console.log(SingleImageUploader);
 
   //customize <SaveButton/> in simpleForm
   const CustomToolbar = (props) => (
@@ -162,8 +168,8 @@ export default function SystemConfigs(props) {
           </div>
           <Box>
             <div className={'row'}>
-              <div className={'col-md-2'}>
-                <label className={'the-color-label'}>
+              <div className={styles.color}>
+                <label className={styles.colorLabel}>
                   {translate('resources.settings.primaryColor')}
                 </label>
                 <ColorPicker
@@ -176,8 +182,8 @@ export default function SystemConfigs(props) {
                   placement="right"
                 />
               </div>
-              <div className={'col-md-2'}>
-                <label className={'the-color-label'}>
+              <div className={styles.color}>
+                <label className={styles.colorLabel}>
                   {translate('resources.settings.secondaryColor')}
                 </label>
                 <ColorPicker
@@ -190,8 +196,8 @@ export default function SystemConfigs(props) {
                   placement="right"
                 />
               </div>
-              <div className={'col-md-2'}>
-                <label className={'the-color-label'}>
+              <div className={styles.color}>
+                <label className={styles.colorLabel}>
                   {translate('resources.settings.textColor')}
                 </label>
                 <ColorPicker
@@ -204,8 +210,8 @@ export default function SystemConfigs(props) {
                   placement="right"
                 />
               </div>
-              <div className={'col-md-2'}>
-                <label className={'the-color-label'}>
+              <div className={styles.color}>
+                <label className={styles.colorLabel}>
                   {translate('resources.settings.bgColor')}
                 </label>
                 <ColorPicker
@@ -218,8 +224,8 @@ export default function SystemConfigs(props) {
                   placement="right"
                 />
               </div>
-              <div className={'col-md-2'}>
-                <label className={'the-color-label'}>
+              <div className={styles.color}>
+                <label className={styles.colorLabel}>
                   {translate('resources.settings.footerBgColor')}
                 </label>
                 <ColorPicker
