@@ -27,7 +27,7 @@ Nodeeweb is a framework for building efficient, scalable <a href="https://nodejs
 
 ## Documentation
 
-You can find the Nodeeweb documentation [on the website](https://doc.nodeeweb.com/).  
+You can find the Nodeeweb documentation [on the website](https://docs.nodeeweb.com/).  
 
 Check out the [Getting Started](https://docs.nodeeweb.com/docs/Get%20Started/Installation) page for a quick overview.
 
