@@ -10,4 +10,8 @@ export default makeStyles(() => ({
     overflowY: 'auto',
     color: '#5a6169',
   },
+  textPreview: {
+    textAlign: 'center',
+    fontSize: 11,
+  },
 }));

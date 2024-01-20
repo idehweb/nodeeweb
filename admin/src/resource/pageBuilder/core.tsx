@@ -218,7 +218,7 @@ const Core = (props) => {
     },
     [components]
   );
-
+  //display text preview if there is
   const contentDisplay = (str) => {
     return str.settings.general.fields.text
       ? str.settings.general.fields.text.length > 50
@@ -247,8 +247,6 @@ const Core = (props) => {
         {tabValue === 0 && (
           <AnimatePresence presenceAffectsLayout>
             {components?.map((i, idx) => (
-              //@ts-nocheck
-              // console.log(i.settings.general.fields.text),
               <Fragment key={i.id}>
                 <AnimatedEmptyDropSlot
                   item={i}
@@ -265,13 +263,6 @@ const Core = (props) => {
                   onEdit={(v) => setEditItem(v)}
                   onDrop={handleDrop}
                   onDuplicate={handleDuplicate}
-                  // content={
-                  //   i.settings.general.fields.text
-                  //     ? i.settings.general.fields.text.length > 50
-                  //       ? i.settings.general.fields.text.slice(0, 50)
-                  //       : i.settings.general.fields.text
-                  //     : ''
-                  // }
                   content={contentDisplay(i)}
                 />
 

@@ -7,6 +7,7 @@ import {
   AddRounded,
 } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
+import useStyles from './styles';
 
 import { Actions, Header, Content } from './components';
 import DraggableCard from './DraggableCard';
@@ -26,6 +27,15 @@ export interface ComponentProps {
   content?: string;
 }
 
+//display text preview if there is
+const contentDisplay = (str) => {
+  return str.settings.general.fields.text
+    ? str.settings.general.fields.text.length > 50
+      ? str.settings.general.fields.text.slice(0, 50)
+      : str.settings.general.fields.text
+    : '';
+};
+
 const Component = ({
   index,
   item,
@@ -36,6 +46,8 @@ const Component = ({
   onDuplicate,
   content,
 }: ComponentProps) => {
+  const cls = useStyles();
+
   return (
     <DraggableCard
       className={`cp-${item.name}`}
@@ -76,9 +88,7 @@ const Component = ({
       </Header>
 
       <Content className="content">
-        {content && (
-          <h6 style={{ textAlign: 'center', fontSize: 15 }}>{content}</h6>
-        )}
+        {content && <h6 className={cls.textPreview}>{content}</h6>}
         {item.addable && (
           <AnimatePresence presenceAffectsLayout>
             {item.children?.map((i, idx) => (
@@ -98,6 +108,7 @@ const Component = ({
                   onAdd={onAdd}
                   onDrop={onDrop}
                   onDuplicate={onDuplicate}
+                  content={contentDisplay(i)}
                 />
 
                 {idx === item.children.length - 1 ? (

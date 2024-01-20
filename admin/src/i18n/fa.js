@@ -57,6 +57,7 @@ const customFarsiMessages = {
   margin: 'margin',
   kind: 'kind',
   colCount: 'colCount',
+  showPriceFilter: 'showPriceFilter',
 
   websiteName: 'arvandshop',
   _id: 'شناسه',
