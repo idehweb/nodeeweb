@@ -14,9 +14,11 @@ import {
   IsPhoneNumber,
   IsDate,
   ValidateNested,
+  IsArray,
 } from 'class-validator';
 import { Types } from 'mongoose';
 import { Address } from '.';
+import { ToAny } from '@nodeeweb/core/utils/transform';
 
 export class CreateCustomerBody {
   @Expose()
@@ -97,6 +99,12 @@ export class CreateCustomerBody {
   @ValidateNested({ each: true })
   @Type(() => Address)
   address?: Address[];
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  @IsArray()
+  status?: any[];
 }
 
 export class UpdateCustomerBody {
@@ -181,4 +189,10 @@ export class UpdateCustomerBody {
   @ValidateNested({ each: true })
   @Type(() => Address)
   address?: Address[];
+
+  @Expose()
+  @ToAny()
+  @IsOptional()
+  @IsArray()
+  status?: any[];
 }
