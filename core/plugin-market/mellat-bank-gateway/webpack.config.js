@@ -6,7 +6,7 @@ module.exports = {
   entry: './index.ts',
   mode: 'production',
   target: 'node',
-  devtool: 'source-map',
+  // devtool: 'source-map',
   output: {
     filename: 'bundle.js',
     clean: true,
