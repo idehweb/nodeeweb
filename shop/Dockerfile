@@ -129,7 +129,7 @@ COPY shop/docker/docker-entrypoint-pro.sh /usr/local/bin
 # USER node
 
 ENTRYPOINT ["docker-entrypoint-pro.sh" ]
-CMD ["node","index"]
+CMD ["node","src/start"]
 
 FROM base as pro
 ENV NODE_ENV "production"
@@ -147,4 +147,4 @@ COPY shop/docker/docker-entrypoint-pro.sh /usr/local/bin
 # USER node
 
 ENTRYPOINT ["docker-entrypoint-pro.sh" ]
-CMD ["node","index"]
+CMD ["node","src/start"]
