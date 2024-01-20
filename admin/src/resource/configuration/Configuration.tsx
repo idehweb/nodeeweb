@@ -50,15 +50,10 @@ export default function SystemConfigs(props) {
     (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null; // assign the type safe object to a new variable to avoid repeating.
 
   const [colorsObj, setColorsObj] = useState({
-    //@ts-nocheck
     background: configData?.color.background,
-    //@ts-nocheck
     footerBackground: configData?.color.footerBackground,
-    //@ts-nocheck
     primary: configData?.color.primary,
-    //@ts-nocheck
     secondary: configData?.color.secondary,
-    //@ts-nocheck
     text: configData?.color.text,
   });
   const { background, footerBackground, primary, secondary, text } = colorsObj;
