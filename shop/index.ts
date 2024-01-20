@@ -1,72 +1,47 @@
-import deployCore from '@nodeeweb/core/deploy';
-import './utils/log';
-import registerAdmin from './src/admin';
-import registerAttribute from './src/attributes';
-import registerCategory from './src/category';
-import registerCustomer from './src/customer';
-import registerDiscount from './src/discount';
-import registerDocument from './src/document';
-import registerEntry from './src/entry';
-import registerForm from './src/form';
-import registerGateway from './src/gateways';
-import registerFile from './src/file';
-import registerNotification from './src/notification';
-import registerOrder from './src/order';
-import registerActivity from './src/activity';
-import registerPage from './src/page';
-import registerPost from './src/post';
-import registerProduct from './src/product';
-import registerProductCategory from './src/productCategory';
-import registerSettings from './src/config';
-import logger from './utils/log';
-import { store } from '@nodeeweb/core';
-import { handlePlugins } from './src/common/handlePlugins';
-import registerCustomerGroup from './src/customerGroup';
-import { registerShopConfig } from './src/config/config';
-import registerTemplate from './src/template';
-import initSeo from './src/seo';
-import registerReport from './src/report';
-import registerTransaction from './src/transaction';
-import registerValidation from './src/validation';
-
-async function deployShop() {
-  await deployCore();
-  store.systemLogger = logger;
-
-  // register config
-  registerShopConfig();
-
-  // validation
-  registerValidation();
-
-  // seo
-  initSeo();
-
-  // register entity
-  registerAdmin();
-  registerAttribute();
-  registerCategory();
-  registerCustomer();
-  registerCustomerGroup();
-  registerDiscount();
-  registerDocument();
-  registerEntry();
-  registerForm();
-  registerGateway();
-  registerFile();
-  registerNotification();
-  registerOrder();
-  registerTransaction();
-  registerActivity();
-  registerPage();
-  registerPost();
-  registerProduct();
-  registerProductCategory();
-  registerSettings();
-  registerReport();
-  await registerTemplate();
-  // register plugins
-  handlePlugins();
-}
-
-deployShop();
+export * from './src/bootstrap';
+export * from './src/activity';
+export * from './src/admin';
+export * from './src/attributes';
+export * from './src/category';
+export * from './src/config';
+export * from './src/config/config';
+export * from './src/customer';
+export * from './src/customerGroup';
+export * from './src/discount';
+export * from './src/file';
+export * from './src/entry';
+export * from './src/notification';
+export * from './src/order';
+export * from './src/order/utils.service';
+export * from './src/page';
+export * from './src/post';
+export * from './src/product';
+export * from './src/productCategory';
+export * from './src/report';
+export * from './src/seo';
+export * from './src/seo/Seo';
+export * from './src/template';
+export * from './src/transaction';
+export * from './src/transaction/utils.service';
+export * from './src/validation';
+export * from './src/validation/ShopValidationPipe';
+export * from './constants/String';
+export * from './constants/color';
+export * from './constants/limit';
+export * from './dto/config';
+export * from './dto/in/activity';
+export * from './dto/in/attribute';
+export * from './dto/in/category';
+export * from './dto/in/form';
+export * from './dto/in/notification';
+export * from './dto/in/order';
+export * from './dto/in/page';
+export * from './dto/in/post';
+export * from './dto/in/productCategory';
+export * from './dto/in/report';
+export * from './dto/in/transaction';
+export * from './dto/in/user';
+export * from './schema/_base.schema';
+export * from './store';
+export * from './utils';
+export * from './types';
