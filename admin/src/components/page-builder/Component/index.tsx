@@ -12,6 +12,7 @@ import { Actions, Header, Content } from './components';
 import DraggableCard from './DraggableCard';
 import { ItemType, OnDropType } from './types';
 import { AnimatedComponent, AnimatedEmptyDropSlot } from './AnimationComponent';
+import { TextField } from 'react-admin';
 
 export interface ComponentProps {
   index: number;
@@ -22,6 +23,7 @@ export interface ComponentProps {
   onDuplicate: (item: ItemType) => void;
   onDrop: OnDropType;
   animationKey?: React.Key;
+  content?: string;
 }
 
 const Component = ({
@@ -32,6 +34,7 @@ const Component = ({
   onEdit,
   onDrop,
   onDuplicate,
+  content,
 }: ComponentProps) => {
   return (
     <DraggableCard
@@ -49,7 +52,6 @@ const Component = ({
           </IconButton>
 
           <p>{`${item.name} ${index + 1}: ${item.id}`}</p>
-
           <IconButton title="Edit" onClick={() => onEdit(item)}>
             <EditRounded />
           </IconButton>
@@ -74,6 +76,9 @@ const Component = ({
       </Header>
 
       <Content className="content">
+        {content && (
+          <h6 style={{ textAlign: 'center', fontSize: 15 }}>{content}</h6>
+        )}
         {item.addable && (
           <AnimatePresence presenceAffectsLayout>
             {item.children?.map((i, idx) => (
