@@ -7,11 +7,13 @@ import {
   AddRounded,
 } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
+import useStyles from './styles';
 
 import { Actions, Header, Content } from './components';
 import DraggableCard from './DraggableCard';
 import { ItemType, OnDropType } from './types';
 import { AnimatedComponent, AnimatedEmptyDropSlot } from './AnimationComponent';
+import { TextField } from 'react-admin';
 
 export interface ComponentProps {
   index: number;
@@ -22,7 +24,17 @@ export interface ComponentProps {
   onDuplicate: (item: ItemType) => void;
   onDrop: OnDropType;
   animationKey?: React.Key;
+  content?: string;
 }
+
+//display text preview if there is
+const contentDisplay = (str) => {
+  return str.settings.general.fields.text
+    ? str.settings.general.fields.text.length > 50
+      ? str.settings.general.fields.text.slice(0, 50)
+      : str.settings.general.fields.text
+    : '';
+};
 
 const Component = ({
   index,
@@ -32,7 +44,10 @@ const Component = ({
   onEdit,
   onDrop,
   onDuplicate,
+  content,
 }: ComponentProps) => {
+  const cls = useStyles();
+
   return (
     <DraggableCard
       className={`cp-${item.name}`}
@@ -49,7 +64,6 @@ const Component = ({
           </IconButton>
 
           <p>{`${item.name} ${index + 1}: ${item.id}`}</p>
-
           <IconButton title="Edit" onClick={() => onEdit(item)}>
             <EditRounded />
           </IconButton>
@@ -74,6 +88,7 @@ const Component = ({
       </Header>
 
       <Content className="content">
+        {content && <h6 className={cls.textPreview}>{content}</h6>}
         {item.addable && (
           <AnimatePresence presenceAffectsLayout>
             {item.children?.map((i, idx) => (
@@ -93,6 +108,7 @@ const Component = ({
                   onAdd={onAdd}
                   onDrop={onDrop}
                   onDuplicate={onDuplicate}
+                  content={contentDisplay(i)}
                 />
 
                 {idx === item.children.length - 1 ? (

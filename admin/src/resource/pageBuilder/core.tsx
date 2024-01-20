@@ -218,6 +218,14 @@ const Core = (props) => {
     },
     [components]
   );
+  //display text preview if there is
+  const contentDisplay = (str) => {
+    return str.settings.general.fields.text
+      ? str.settings.general.fields.text.length > 50
+        ? str.settings.general.fields.text.slice(0, 50)
+        : str.settings.general.fields.text
+      : '';
+  };
 
   return (
     <LoadingContainer loading={loading} className={translate('direction')}>
@@ -255,6 +263,7 @@ const Core = (props) => {
                   onEdit={(v) => setEditItem(v)}
                   onDrop={handleDrop}
                   onDuplicate={handleDuplicate}
+                  content={contentDisplay(i)}
                 />
 
                 {idx === components.length - 1 ? (

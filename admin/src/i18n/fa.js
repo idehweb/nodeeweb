@@ -56,6 +56,8 @@ const customFarsiMessages = {
   restarted: 'سیستم ری استارت شد.',
   margin: 'margin',
   kind: 'kind',
+  colCount: 'colCount',
+  showPriceFilter: 'showPriceFilter',
 
   websiteName: 'arvandshop',
   _id: 'شناسه',
