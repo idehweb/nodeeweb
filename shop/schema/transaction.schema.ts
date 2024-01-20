@@ -27,8 +27,8 @@ export interface ITransaction {
   order?: string;
   payment_link?: string;
   payment_method?: string;
-  payment_headers?: string;
-  payment_body?: string;
+  payment_headers?: { [key: string]: string };
+  payment_body?: { [key: string]: any };
   payment_message?: string;
   authority: string;
   amount: number;
@@ -46,8 +46,8 @@ export interface ITransactionGrid {
   provider: string | TransactionProvider;
   payment_link?: string;
   payment_method?: string;
-  payment_headers?: string;
-  payment_body?: string;
+  payment_headers?: { [key: string]: string };
+  payment_body?: { [key: string]: any };
   payment_message?: string;
   status: TransactionStatus;
   amount: number;
@@ -68,8 +68,8 @@ export const TransactionGridSchema = new mongoose.Schema({
   provider: { type: String, default: TransactionProvider.Manual },
   payment_link: String,
   payment_method: String,
-  payment_headers: String,
-  payment_body: String,
+  payment_headers: {},
+  payment_body: {},
   payment_message: String,
   status: { type: String, required: true },
   amount: { type: Number, required: true },
@@ -93,8 +93,8 @@ const schema = new mongoose.Schema(
     provider: { type: String, default: TransactionProvider.Manual },
     payment_link: String,
     payment_method: String,
-    payment_headers: String,
-    payment_body: String,
+    payment_headers: {},
+    payment_body: {},
     payment_message: String,
     authority: { type: String, unique: true, sparse: true },
     status: { type: String, default: TransactionStatus.NeedToPay },
