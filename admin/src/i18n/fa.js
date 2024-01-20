@@ -706,6 +706,8 @@ const customFarsiMessages = {
       meta_title: 'عنوان متا',
       meta_description: 'توضیحات متا',
       metaTags: 'تگ های متا',
+      colors: 'تنظیمات رنگ',
+      pickColors: 'رنگ های پیش فرض را انتخاب کنید',
       taxAmount: 'رقم مالیات',
       shop_name: 'اسم فروشگاه (فاکتور)',
       shop_site_address: 'آدرس سایت (فاکتور)',

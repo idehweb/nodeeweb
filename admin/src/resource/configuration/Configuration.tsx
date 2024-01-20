@@ -12,11 +12,17 @@ import {
   minValue,
   required,
   useTranslate,
+  SaveButton,
+  Toolbar,
 } from 'react-admin';
 
 import { Paper } from '@mui/material';
 
-import { useEffect } from 'react';
+import { Box } from '@mui/material';
+
+import { useEffect, useState } from 'react';
+
+import { ColorPicker } from '@/components';
 
 import useFetch from '@/hooks/useFetch';
 
@@ -27,18 +33,67 @@ import useUploadImage from '@/hooks/useUploadImage';
 
 import { WebAppConfigProps } from './types';
 
-export default function SystemConfigs() {
-  const WebAppConfigData = useFetch({ requestQuery: '/config/system' });
+export default function SystemConfigs(props) {
+  const WebAppConfigData = useFetch({
+    requestQuery: '/config/system',
+  });
   const translate = useTranslate();
   const { isLoading, sendRequest, data } = useSubmit();
   const SingleImageUploader = useUploadImage();
-
-  // console.log(SingleImageUploader);
 
   useEffect(() => {
     WebAppConfigData.refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
+
+  const configData =
+    (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null; // assign the type safe object to a new variable to avoid repeating.
+
+  const [colorsObj, setColorsObj] = useState({
+    background: configData?.color.background,
+    footerBackground: configData?.color.footerBackground,
+    primary: configData?.color.primary,
+    secondary: configData?.color.secondary,
+    text: configData?.color.text,
+  });
+  const { background, footerBackground, primary, secondary, text } = colorsObj;
+
+  // console.log(SingleImageUploader);
+
+  //customize <SaveButton/> in simpleForm
+  const CustomToolbar = (props) => (
+    <Toolbar {...props} className={'dfghjk'}>
+      <SaveButton alwaysEnable disabled={isLoading} />
+    </Toolbar>
+  );
+
+  //append colors to values object before sending data
+  const appendColors = (val) => {
+    val.color.primary =
+      colorsObj.primary !== configData.color.primary
+        ? colorsObj.primary
+        : configData?.color.primary;
+
+    val.color.secondary =
+      colorsObj.secondary !== configData.color.secondary
+        ? colorsObj.secondary
+        : configData?.color.secondary;
+
+    val.color.background =
+      colorsObj.background !== configData.color.background
+        ? colorsObj.background
+        : configData?.color.background;
+
+    val.color.footerBackground =
+      colorsObj.footerBackground !== configData.color.footerBackground
+        ? colorsObj.footerBackground
+        : configData?.color.footerBackground;
+
+    val.color.text =
+      colorsObj.text !== configData.color.text
+        ? colorsObj.text
+        : configData?.color.text;
+  };
 
   // console.log('image data is : ', SingleImageUploader.fileData);e
 
@@ -52,16 +107,21 @@ export default function SystemConfigs() {
     WebAppConfigData.data && (
       <Paper className={styles.container}>
         <SimpleForm
-          defaultValues={
-            (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null
-          }
-          onSubmit={(values) =>
+          {...props}
+          toolbar={<CustomToolbar />}
+          defaultValues={configData}
+          onSubmit={(values) => {
+            appendColors(values);
+
             sendRequest(
               '/config/system',
-              { ...values, favicon_id: SingleImageUploader.fileData?._id },
+              {
+                ...values,
+                favicon_id: SingleImageUploader.fileData?._id,
+              },
               'put'
-            )
-          }>
+            );
+          }}>
           <div id="config-favicon" style={{ padding: '1rem' }}>
             <p
               style={{
@@ -88,9 +148,7 @@ export default function SystemConfigs() {
             </ImageInput>
           </div>
           <div>
-            {(
-              WebAppConfigData.data as { data: WebAppConfigProps }
-            )?.data.favicons.map((item: any) => (
+            {configData.favicons.map((item: any) => (
               <div key={item._id} className={styles.faviconContainer}>
                 <img
                   src={
@@ -103,6 +161,83 @@ export default function SystemConfigs() {
               </div>
             ))}
           </div>
+          <Box>
+            <div className={'row'}>
+              <div className={styles.color}>
+                <label className={styles.colorLabel}>
+                  {translate('resources.settings.primaryColor')}
+                </label>
+                <ColorPicker
+                  className={'input-color'}
+                  source={'color.primary'}
+                  color={configData.color.primary || primary}
+                  onChangeComplete={(e) =>
+                    setColorsObj({ ...colorsObj, primary: e })
+                  }
+                  placement="right"
+                />
+              </div>
+              <div className={styles.color}>
+                <label className={styles.colorLabel}>
+                  {translate('resources.settings.secondaryColor')}
+                </label>
+                <ColorPicker
+                  className={'input-color'}
+                  source={'color.secondary'}
+                  color={configData.color.secondary || secondary}
+                  onChangeComplete={(e) =>
+                    setColorsObj({ ...colorsObj, secondary: e })
+                  }
+                  placement="right"
+                />
+              </div>
+              <div className={styles.color}>
+                <label className={styles.colorLabel}>
+                  {translate('resources.settings.textColor')}
+                </label>
+                <ColorPicker
+                  className={'input-color'}
+                  source={'color.text'}
+                  color={configData.color.text || text}
+                  onChangeComplete={(e) =>
+                    setColorsObj({ ...colorsObj, text: e })
+                  }
+                  placement="right"
+                />
+              </div>
+              <div className={styles.color}>
+                <label className={styles.colorLabel}>
+                  {translate('resources.settings.bgColor')}
+                </label>
+                <ColorPicker
+                  className={'input-color'}
+                  source={'color.background'}
+                  color={configData.color.background || background}
+                  onChangeComplete={(e) =>
+                    setColorsObj({ ...colorsObj, background: e })
+                  }
+                  placement="right"
+                />
+              </div>
+              <div className={styles.color}>
+                <label className={styles.colorLabel}>
+                  {translate('resources.settings.footerBgColor')}
+                </label>
+                <ColorPicker
+                  className={'input-color'}
+                  source={'color.footerBackground'}
+                  color={configData.color.footerBackground || footerBackground}
+                  onChangeComplete={(e) =>
+                    setColorsObj({
+                      ...colorsObj,
+                      footerBackground: e,
+                    })
+                  }
+                  placement="right"
+                />
+              </div>
+            </div>
+          </Box>
           <div>
             <p
               style={{
@@ -161,20 +296,6 @@ export default function SystemConfigs() {
               }}>
               {translate('resources.settings.body.title')}
             </p>
-            {/* <TextInput
-              multiline
-              minRows={8}
-              fullWidth
-              source={'body_first'}
-              label={translate('resources.settings.body.body_first')}
-            />
-            <TextInput
-              multiline
-              minRows={8}
-              fullWidth
-              source={'body_last'}
-              label={translate('resources.settings.body.body_last')}
-            /> */}
           </div>
           <TextInput
             multiline
