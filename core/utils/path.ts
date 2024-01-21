@@ -17,6 +17,9 @@ export function getPluginMarketPath(...path: string[]) {
 export function getPluginPath(...path: string[]) {
   return join(getStaticDir('plugins', true)[0], ...path);
 }
+export function getLocalMarketPluginPath() {
+  return getPluginPath('_market');
+}
 
 export function getSharedPath(...path: string[]) {
   return join(store.env.SHARED_PATH || './shared', ...path);
