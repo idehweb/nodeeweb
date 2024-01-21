@@ -16,6 +16,8 @@ import {
   Toolbar,
 } from 'react-admin';
 
+import { useForm } from 'react-hook-form';
+
 import { Paper } from '@mui/material';
 
 import { Box } from '@mui/material';
@@ -48,6 +50,17 @@ export default function SystemConfigs(props) {
 
   const configData =
     (WebAppConfigData.data as { data: WebAppConfigProps })?.data || null; // assign the type safe object to a new variable to avoid repeating.
+
+  const { setValue, getValues } = useForm({
+    defaultValues: {
+      client_id: '',
+      client_secret: '',
+    },
+  });
+
+  const handleChange = (t, value) => {
+    setValue(t, value);
+  };
 
   const [colorsObj, setColorsObj] = useState({
     background: configData?.color.background,
@@ -112,6 +125,10 @@ export default function SystemConfigs(props) {
           defaultValues={configData}
           onSubmit={(values) => {
             appendColors(values);
+            const { client_id, client_secret } = getValues();
+            if (client_id || client_secret) {
+              values.auth.google = { client_id, client_secret };
+            }
 
             sendRequest(
               '/config/system',
@@ -262,6 +279,62 @@ export default function SystemConfigs(props) {
             source={'meta_description'}
             label={translate('resources.settings.meta_description')}
           />
+
+          <div>
+            <p
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              {translate('resources.settings.authetication')}
+            </p>
+          </div>
+          <div>
+            <p
+              style={{
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              {translate('resources.settings.apiUrlAuth')}
+            </p>
+          </div>
+          <TextInput
+            multiline
+            fullWidth
+            source={'auth.nodeeweb.api_url'}
+            label={translate('resources.settings.urlAddress')}
+          />
+          <div>
+            <p
+              style={{
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              {translate('resources.settings.googleAuth')}
+            </p>
+            <TextInput
+              fullWidth
+              source={'auth.google.client_id' || getValues('client_id')}
+              placeholder="correct format"
+              onChange={(e) => {
+                handleChange('client_id', e.target.value);
+              }}
+              label={translate('resources.settings.client_id')}
+            />
+            <TextInput
+              fullWidth
+              source={'auth.google.client_secret' || getValues('client_secret')}
+              placeholder="correct format"
+              onChange={(e) => {
+                handleChange('client_secret', e.target.value);
+              }}
+              label={translate('resources.settings.client_secret')}
+            />
+          </div>
+
           <div id="config-head-inputs" style={{ padding: '1rem' }}>
             <p
               style={{
