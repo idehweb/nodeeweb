@@ -58,6 +58,8 @@ export default function SystemConfigs(props) {
   });
   const { background, footerBackground, primary, secondary, text } = colorsObj;
 
+  console.log(WebAppConfigData);
+
   // console.log(SingleImageUploader);
 
   //customize <SaveButton/> in simpleForm

@@ -1,4 +1,11 @@
 export interface WebAppConfigProps {
+  auth: {
+    nodeeweb: { api_url: string };
+    google?: {
+      id: string;
+      secret: string;
+    };
+  };
   app_name: string;
   meta_title: string;
   meta_description: string;
