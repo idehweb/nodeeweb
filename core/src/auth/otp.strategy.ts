@@ -202,8 +202,8 @@ export class OtpStrategy extends AuthStrategy {
     // create user
     const isExist = req.user?.active;
 
-    if (isExist && !login) throw new BadRequestError('user exists');
-    if (!isExist && !signup) throw new NotFound('user not exists');
+    if (isExist && !login && signup) throw new BadRequestError('user exists');
+    if (!isExist && !signup && login) throw new NotFound('user not exists');
 
     if (signup && !isExist) {
       if (req.modelName === 'admin')
