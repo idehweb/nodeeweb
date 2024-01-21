@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 
 import { isExist } from '../../utils/helpers';
-import { getLocalMarketPluginPath, getPluginPath } from '../../utils/path';
+import { getLocalPluginMarketPath, getPluginPath } from '../../utils/path';
 import { registerPluginControllers } from './controller';
 import localService from './local.service';
 import logger from '../handlers/log.handler';
@@ -18,7 +18,7 @@ export async function initPlugins() {
   }
 
   // create local market plugin path
-  const localMarketPath = getLocalMarketPluginPath();
+  const localMarketPath = getLocalPluginMarketPath();
   if (!(await isExist(localMarketPath)))
     await fs.promises.mkdir(localMarketPath);
 
