@@ -13,6 +13,7 @@ import {
   FunctionField,
   Pagination,
   ReferenceArrayField,
+  SelectInput,
   ShowButton,
   SingleFieldList,
   TextField,
@@ -35,25 +36,48 @@ import useFetch from '@/hooks/useFetch';
 
 const PostFilter = (props) => {
   const translate = useTranslate();
+  const WebAppConfigData = useFetch({ requestQuery: '/config/system' });
 
-  return (
-    <Filter {...props}>
-      <TextInput
-        label={translate('resources.customers.firstName')}
-        source="firstName"
-        alwaysOn
-      />
-      <TextInput
-        label={translate('resources.customers.lastName')}
-        source="lastName"
-        alwaysOn
-      />
-      <TextInput
-        label={translate('resources.customers.phone')}
-        source="phone"
-        alwaysOn
-      />
-    </Filter>
+  const consumerStatusChoices = WebAppConfigData.data
+    ? WebAppConfigData.data.data.consumer_status
+    : [];
+
+  return WebAppConfigData.isLoading ? (
+    []
+  ) : WebAppConfigData.error ? (
+    <></>
+  ) : (
+    WebAppConfigData.data && (
+      <Filter {...props}>
+        <TextInput
+          label={translate('resources.customers.firstName')}
+          source="firstName"
+          alwaysOn
+        />
+        <TextInput
+          label={translate('resources.customers.lastName')}
+          source="lastName"
+          alwaysOn
+        />
+        <TextInput
+          label={translate('resources.customers.phone')}
+          source="phone"
+          alwaysOn
+        />
+        <SelectInput
+          label={translate('resources.settings.consumerStatus')}
+          source="status"
+          alwaysOn
+          choices={consumerStatusChoices.map((obj) => {
+            return {
+              id: obj.key,
+              name: obj.value,
+              value: obj.key,
+            };
+          })}
+        />
+      </Filter>
+    )
   );
 };
 
@@ -244,117 +268,111 @@ export const customerList = (props) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const translate = useTranslate();
 
-  return WebAppConfigData.isLoading ? (
-    []
-  ) : WebAppConfigData.error ? (
-    <></>
-  ) : (
-    WebAppConfigData.data && (
-      <List
-        exporter={exporter}
-        {...props}
-        filters={<PostFilter />}
-        pagination={<PostPagination />}
-        aside={
-          <PostFilterSidebar
-            childs={WebAppConfigData.data.data.consumer_status}
-          />
-        }
-        actions={<ListActions />}>
-        <Datagrid>
-          <TextField
-            source="phone"
-            label={translate('resources.customers.phone')}
-          />
-          <TextField
-            source="activationCode"
-            label={translate('resources.customers.activationCode')}
-          />
-          <TextField
-            source="firstName"
-            label={translate('resources.customers.firstName')}
-          />
-          <TextField
-            source="lastName"
-            label={translate('resources.customers.lastName')}
-          />
-          <EmailField
-            source="email"
-            label={translate('resources.customers.email')}
-          />
-          <TextField
-            source="internationalCode"
-            label={translate('resources.customers.internationalCode')}
-          />
-          <TextField
-            source="source"
-            label={translate('resources.customers.source')}
-          />
-          <ReferenceArrayField
-            label={translate('resources.customers.customerGroup')}
-            reference="customerGroup"
-            source="customerGroup">
-            <SingleFieldList>
-              <ChipField source="slug" />
-            </SingleFieldList>
-          </ReferenceArrayField>
-          {/*<FunctionField label={translate("resources.customer.customerGroup")}*/}
-          {/*render={record => {*/}
+  return (
+    <List
+      exporter={exporter}
+      {...props}
+      filters={<PostFilter />}
+      pagination={<PostPagination />}
+      // aside={
+      //   <PostFilterSidebar
+      //     childs={WebAppConfigData.data.data.consumer_status}
+      //   />
+      // }
+      actions={<ListActions />}>
+      <Datagrid>
+        <TextField
+          source="phone"
+          label={translate('resources.customers.phone')}
+        />
+        <TextField
+          source="activationCode"
+          label={translate('resources.customers.activationCode')}
+        />
+        <TextField
+          source="firstName"
+          label={translate('resources.customers.firstName')}
+        />
+        <TextField
+          source="lastName"
+          label={translate('resources.customers.lastName')}
+        />
+        <EmailField
+          source="email"
+          label={translate('resources.customers.email')}
+        />
+        <TextField
+          source="internationalCode"
+          label={translate('resources.customers.internationalCode')}
+        />
+        <TextField
+          source="source"
+          label={translate('resources.customers.source')}
+        />
+        <ReferenceArrayField
+          label={translate('resources.customers.customerGroup')}
+          reference="customerGroup"
+          source="customerGroup">
+          <SingleFieldList>
+            <ChipField source="slug" />
+          </SingleFieldList>
+        </ReferenceArrayField>
+        {/*<FunctionField label={translate("resources.customer.customerGroup")}*/}
+        {/*render={record => {*/}
 
-          {/*return (*/}
-          {/*<div className={"categories"}>*/}
-          {/*{record.customerGroup && record.customerGroup.map((item, it) => <div>*/}
-          {/*<ChipField source={"customerGroup[" + it + "].slug"} label={item.slug}*/}
-          {/*sortable={false}/>*/}
-          {/*</div>)}*/}
+        {/*return (*/}
+        {/*<div className={"categories"}>*/}
+        {/*{record.customerGroup && record.customerGroup.map((item, it) => <div>*/}
+        {/*<ChipField source={"customerGroup[" + it + "].slug"} label={item.slug}*/}
+        {/*sortable={false}/>*/}
+        {/*</div>)}*/}
 
-          {/*</div>*/}
-          {/*);*/}
-          {/*}}/>*/}
-          <FunctionField
-            label={translate('resources.customers.date')}
-            render={(record) => {
-              return (
-                <div className="theDate">
-                  <div>
-                    {translate('resources.customers.createdAt') +
-                      ': ' +
-                      `${dateFormat(record.createdAt)}`}
-                  </div>
-                  <div>
-                    {translate('resources.customers.updatedAt') +
-                      ': ' +
-                      `${dateFormat(record.updatedAt)}`}
-                  </div>
-
-                  {Boolean(record.orderCount) && (
-                    <div>
-                      {translate('resources.customers.orderCount') +
-                        ': ' +
-                        `${record.orderCount}`}
-                    </div>
-                  )}
+        {/*</div>*/}
+        {/*);*/}
+        {/*}}/>*/}
+        <FunctionField
+          label={translate('resources.customers.date')}
+          render={(record) => {
+            return (
+              <div className="theDate">
+                <div>
+                  {translate('resources.customers.createdAt') +
+                    ': ' +
+                    `${dateFormat(record.createdAt)}`}
                 </div>
-              );
-            }}
-          />
+                <div>
+                  {translate('resources.customers.updatedAt') +
+                    ': ' +
+                    `${dateFormat(record.updatedAt)}`}
+                </div>
 
-          <BooleanField
-            source="active"
-            label={translate('resources.customers.active')}
-          />
-          <FunctionField
-            label={translate('resources.product.edit')}
-            render={(record) => (
-              <>
-                <EditButton />
-                <ShowButton />
-              </>
-            )}
-          />
-        </Datagrid>
-      </List>
-    )
+                {Boolean(record.orderCount) && (
+                  <div>
+                    {translate('resources.customers.orderCount') +
+                      ': ' +
+                      `${record.orderCount}`}
+                  </div>
+                )}
+              </div>
+            );
+          }}
+        />
+
+        <BooleanField
+          source="active"
+          label={translate('resources.customers.active')}
+        />
+        <FunctionField
+          label={translate('resources.product.edit')}
+          render={(record) => (
+            <>
+              <EditButton />
+              <ShowButton />
+            </>
+          )}
+        />
+      </Datagrid>
+    </List>
   );
 };
 
