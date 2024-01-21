@@ -1,16 +1,60 @@
 import * as fs from 'fs';
 import { MiddleWare } from '../../types/global';
 import { join } from 'path';
-import { getPluginMarketPath } from '../../utils/path';
+import {
+  getFilesPath,
+  getLocalPluginMarketPath,
+  getPluginMarketPath,
+  getPluginPath,
+} from '../../utils/path';
 import { isExist } from '../../utils/helpers';
 import { NotFound } from '../../types/error';
-import { plugin } from 'mongoose';
+import { PluginMarketAddBody } from '../../dto/in/plugin.dto';
+import store from '../../store';
+import { FileModel } from '../../schema/file.schema';
+import decompress from 'decompress';
+
+const LOCAL_MARKET_FORMATS = ['zip', 'x-tar', 'gzip', 'x-bzip2'];
 
 class MarketService {
-  async resolve(slug: string) {
-    const pluginConfPath = getPluginMarketPath(slug, 'config.json');
+  get fileModel(): FileModel {
+    return store.db.model('file');
+  }
 
-    if (!(await isExist(pluginConfPath)))
+  async getRealPath(...path: string[]) {
+    const fromMarketPath = getPluginMarketPath(...path);
+    const fromLocalPath = getLocalPluginMarketPath(...path);
+
+    for (const p of [fromMarketPath, fromLocalPath]) {
+      if (await isExist(p)) return p;
+    }
+
+    return null;
+  }
+
+  private async getAllPluginConfigPath({
+    offset = 0,
+    limit = Number.MAX_SAFE_INTEGER,
+  }: { offset?: number; limit?: number } = {}) {
+    const pluginsConfigPath = (
+      await Promise.all(
+        [getPluginMarketPath(), getLocalPluginMarketPath()].map(async (p) =>
+          (await fs.promises.readdir(p)).map((pm) => join(p, pm))
+        )
+      )
+    )
+      .flat()
+      .sort()
+      .slice(offset, offset + limit)
+      .map((p) => join(p, 'config.json'));
+
+    return pluginsConfigPath;
+  }
+
+  async resolve(slug: string) {
+    const pluginConfPath = await this.getRealPath(slug, 'config.json');
+
+    if (!pluginConfPath)
       throw new NotFound(`${slug} not found in plugin market`);
 
     // resolve
@@ -23,10 +67,10 @@ class MarketService {
     offset = +offset;
 
     // path
-    const pluginsConfigPath = (await fs.promises.readdir(getPluginMarketPath()))
-      .sort()
-      .slice(offset, offset + limit)
-      .map((slug) => getPluginMarketPath(slug, 'config.json'));
+    const pluginsConfigPath = await this.getAllPluginConfigPath({
+      offset,
+      limit,
+    });
 
     // resolve
     const configs = await Promise.all(
@@ -48,7 +92,7 @@ class MarketService {
   };
   getCount: MiddleWare = async (req, res) => {
     // path
-    const pluginsConfigPath = await fs.promises.readdir(getPluginMarketPath());
+    const pluginsConfigPath = await this.getAllPluginConfigPath();
 
     // serve
     return res.status(200).json({ data: pluginsConfigPath.length });
@@ -69,6 +113,30 @@ class MarketService {
         type: conf.type,
         config: { inputs: conf.config.inputs },
       },
+    });
+  };
+
+  add: MiddleWare = async (req, res) => {
+    const body = req.body as PluginMarketAddBody;
+
+    // file exists with correct format
+    const fileDoc = await this.fileModel.findOne({
+      _id: body.file,
+      format: { $in: LOCAL_MARKET_FORMATS },
+    });
+
+    if (!fileDoc)
+      throw new NotFound(
+        `not found any acceptable file which format is in ${LOCAL_MARKET_FORMATS.join(
+          ', '
+        )}`
+      );
+
+    //  decompress
+    await decompress(getFilesPath(fileDoc.url), getLocalPluginMarketPath());
+
+    return res.status(201).json({
+      message: 'add into local market plugin successfully',
     });
   };
 }

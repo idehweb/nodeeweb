@@ -17,6 +17,9 @@ export function getPluginMarketPath(...path: string[]) {
 export function getPluginPath(...path: string[]) {
   return join(getStaticDir('plugins', true)[0], ...path);
 }
+export function getLocalPluginMarketPath(...path: string[]) {
+  return getPluginPath('_market', ...path);
+}
 
 export function getSharedPath(...path: string[]) {
   return join(store.env.SHARED_PATH || './shared', ...path);
@@ -53,6 +56,11 @@ export function getStaticDir(dirName: string, only_app_dir = true) {
 export function getPublicDir(dirName: string, only_app_dir = true) {
   return getStaticDir(join('public', dirName), only_app_dir);
 }
+
+export function getFilesPath(...path: string[]) {
+  return join(getPublicDir('files')[0], ...path);
+}
+
 export function getBuildDir(name: string) {
   const buildName = Object.keys(info.dependencies).find((k) =>
     k.endsWith(`${name}-build`)

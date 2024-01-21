@@ -8,7 +8,7 @@ import {
   Req,
 } from '@nodeeweb/core';
 import { FileDocument, IFile } from '../../schema/file.schema';
-import { getPublicDir } from '@nodeeweb/core/utils/path';
+import { getFilesPath, getPublicDir } from '@nodeeweb/core/utils/path';
 import { FilterQuery, Query, UpdateQuery } from 'mongoose';
 import { join } from 'path';
 import store from '../../store';
@@ -83,10 +83,14 @@ export class Service {
 
     const files_path = getPublicDir('files', true)[0];
     const path = req.file_path.replace(files_path, '');
-
+    const [type, format] = req.file?.mimetype?.split('/') ?? [
+      'unknown',
+      'unknown',
+    ];
     const file: IFile = {
       title: req.body.title,
-      type: req.file?.mimetype?.split('/')?.[0] ?? 'unknown',
+      type,
+      format,
       url: path.replace(/\\/g, '/'),
       alt: req.body.alt,
     };
@@ -94,7 +98,7 @@ export class Service {
     return file;
   }
   updateBodyParser(req: Req) {
-    const files_path = getPublicDir('files', true)[0];
+    const files_path = getFilesPath();
     const url = req.file_path
       ? req.file_path.replace(files_path, '').replace(/\\/g, '/')
       : undefined;
