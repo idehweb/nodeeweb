@@ -66,7 +66,7 @@ const PostFilter = (props) => {
         />
         <SelectInput
           label={translate('resources.settings.consumerStatus')}
-          source="status"
+          source="status.status"
           alwaysOn
           choices={consumerStatusChoices.map((obj) => {
             return {
