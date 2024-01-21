@@ -845,6 +845,7 @@ const customFarsiMessages = {
       },
     },
     notification: {
+      'user-notifications': 'پیام ها کاربر',
       user: 'کاربر',
       message: 'پیام',
       status: 'وضعیت',
