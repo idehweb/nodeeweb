@@ -1,9 +1,10 @@
+import { EntityCreator } from '@nodeeweb/core';
 import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
-import store from '@nodeeweb/core/store';
 import { MiddleWare, Req, Res } from '@nodeeweb/core/types/global';
 import mongoose, { FilterQuery } from 'mongoose';
 import { CustomerSource } from '../../schema/customer.schema';
 import { transformBody } from './utils';
+import store from '../../store';
 
 export class Service {
   static getMe: MiddleWare = (req, res, next) => {
@@ -24,21 +25,15 @@ export class Service {
     });
   };
 
-  static parseFilterForAllCustomer(req: Req) {
+  static async parseFilterForAllCustomer(req: Req) {
     let search = {};
-    if (req.params.search) {
-      search['title.' + req.headers.lan] = {
-        $exists: true,
-        $regex: req.params.search,
-        $options: 'i',
-      };
-    }
     if (req.query.search) {
       search['title.' + req.headers.lan] = {
         $exists: true,
         $regex: req.query.search,
         $options: 'i',
       };
+      delete req.query.search;
     }
     if (req.query.Search) {
       search['title.' + req.headers.lan] = {
@@ -46,39 +41,27 @@ export class Service {
         $regex: req.query.Search,
         $options: 'i',
       };
+      delete req.query.Search;
     }
 
-    let thef = req.query;
-    if (
-      thef.firstName ||
-      thef.lastName ||
-      thef.phone ||
-      thef.internationalCode
-    ) {
-      search = { $or: [] };
-    }
-    if (thef.firstName) {
-      search['$or'].push({
-        firstName: { $regex: thef.firstName, $options: 'i' },
+    const orQueries = ['firstName', 'lastName', 'phone', 'internationalCode']
+      .filter((k) => req.query[k])
+      .map((k) => {
+        const q = {
+          [k]: { $regex: req.query[k], $options: 'i' },
+        };
+        delete req.query[k];
+        return q;
       });
-    }
-    if (thef.lastName) {
-      search['$or'].push({
-        lastName: { $regex: thef.lastName, $options: 'i' },
-      });
-    }
-    if (thef.phone) {
-      search['$or'].push({
-        phone: { $regex: thef.phone, $options: 'i' },
-      });
-    }
-    if (thef.internationalCode) {
-      search['$or'].push({
-        internationalCode: { $regex: thef.internationalCode, $options: 'i' },
-      });
-    }
 
-    return search;
+    if (orQueries.length) search['$or'] = orQueries;
+
+    const filterFromBase = await new EntityCreator('').parseFilterQuery(
+      {},
+      req
+    );
+
+    return { ...filterFromBase, ...search };
   }
 
   static getAll: MiddleWare = async (req, res) => {
