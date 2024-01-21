@@ -282,10 +282,12 @@ class LocalService {
 
     // copy files
     await exec(
-      `${getScriptFile('cp')} ${getPluginMarketPath(slug)} ${getPluginPath(
+      `${getScriptFile('cp')} ${await marketService.getRealPath(
         slug
-      )}`,
-      { logger }
+      )} ${getPluginPath(slug)}`,
+      {
+        logger,
+      }
     );
 
     // save to db

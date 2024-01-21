@@ -2,14 +2,26 @@ import * as fs from 'fs';
 import { MiddleWare } from '../../types/global';
 import { join } from 'path';
 import {
+  getFilesPath,
   getLocalPluginMarketPath,
   getPluginMarketPath,
+  getPluginPath,
 } from '../../utils/path';
 import { isExist } from '../../utils/helpers';
 import { NotFound } from '../../types/error';
+import { PluginMarketAddBody } from '../../dto/in/plugin.dto';
+import store from '../../store';
+import { FileModel } from '../../schema/file.schema';
+import decompress from 'decompress';
+
+const LOCAL_MARKET_FORMATS = ['zip', 'x-tar', 'gzip', 'x-bzip2'];
 
 class MarketService {
-  private async getRealPath(...path: string[]) {
+  get fileModel(): FileModel {
+    return store.db.model('file');
+  }
+
+  async getRealPath(...path: string[]) {
     const fromMarketPath = getPluginMarketPath(...path);
     const fromLocalPath = getLocalPluginMarketPath(...path);
 
@@ -101,6 +113,30 @@ class MarketService {
         type: conf.type,
         config: { inputs: conf.config.inputs },
       },
+    });
+  };
+
+  add: MiddleWare = async (req, res) => {
+    const body = req.body as PluginMarketAddBody;
+
+    // file exists with correct format
+    const fileDoc = await this.fileModel.findOne({
+      _id: body.file,
+      format: { $in: LOCAL_MARKET_FORMATS },
+    });
+
+    if (!fileDoc)
+      throw new NotFound(
+        `not found any acceptable file which format is in ${LOCAL_MARKET_FORMATS.join(
+          ', '
+        )}`
+      );
+
+    //  decompress
+    await decompress(getFilesPath(fileDoc.url), getLocalPluginMarketPath());
+
+    return res.status(201).json({
+      message: 'add into local market plugin successfully',
     });
   };
 }

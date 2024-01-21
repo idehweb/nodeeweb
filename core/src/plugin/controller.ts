@@ -1,6 +1,10 @@
 import { ArrayMaxSize } from 'class-validator';
 import { CrudParamDto } from '../../dto/in/crud.dto';
-import { PluginBodyAdd, PluginBodyUpdate } from '../../dto/in/plugin.dto';
+import {
+  PluginBodyAdd,
+  PluginBodyUpdate,
+  PluginMarketAddBody,
+} from '../../dto/in/plugin.dto';
 import { AdminAccess } from '../handlers/auth.handler';
 import {
   ControllerRegisterOptions,
@@ -101,6 +105,18 @@ export function registerPluginControllers() {
       },
     },
     { base_url: `${opt.base_url}/market` }
+  );
+
+  controllersBatchRegister(
+    [
+      {
+        method: 'post',
+        service: marketService.add,
+        access: AdminAccess,
+        validate: { dto: PluginMarketAddBody, reqPath: 'body' },
+      },
+    ],
+    { ...opt, base_url: `${opt.base_url}/market` }
   );
 
   //   plugin local crud
