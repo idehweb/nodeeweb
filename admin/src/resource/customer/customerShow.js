@@ -1,5 +1,6 @@
 import {
   FunctionField,
+  Loading,
   Show,
   SimpleShowLayout,
   TextField,
@@ -11,16 +12,10 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 
-// import {
-//   Notifications,
-//   Orders,
-//   Tasks,
-//   Transactions,
-//   Notes,
-//   Documents,
-//   CustomerStatus,
-// } from '@/components';  These all need complete refactor
+import { Suspense } from 'react';
+
 import { dateFormat } from '@/functions';
+import { UserNotifications, UserStatusHistory } from '@/components/common';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -30,9 +25,10 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export const customerShow = (props) => {
+export const CustomerShow = (props) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   let translate = useTranslate();
+
   return (
     <Show {...props}>
       <SimpleShowLayout>
@@ -141,76 +137,32 @@ export const customerShow = (props) => {
                 </Grid>
               </Grid>
             </Box>
-            {/* <ArrayField
-              source="address"
-              label={translate('resources.customers.address')}>
-              <Datagrid>
-                <TextField
-                  source="title"
-                  label={translate('resources.customers.title')}
+            <div>
+              <Suspense fallback={<Loading />}>
+                <FunctionField
+                  label={translate('resources.customers.updatedAt')}
+                  render={(record) => (
+                    <UserNotifications phoneNumber={record.phone} />
+                  )}
                 />
-                <TextField
-                  source="state"
-                  label={translate('resources.customers.state')}
-                />
-                <TextField
-                  source="city"
-                  label={translate('resources.customers.city')}
-                />
-                <TextField
-                  source="phone"
-                  label={translate('resources.customers.phone')}
-                />
-                <TextField
-                  source="postalCode"
-                  label={translate('resources.customers.postalCode')}
-                />
-                <TextField
-                  source="streetAddress"
-                  label={translate('resources.customers.streetAddress')}
-                />
-              </Datagrid>
-            </ArrayField> */}
-
-            <div style={{ height: '50px' }}></div>
-
-            {/* <FunctionField
-              label={translate('resources.customers.orders')}
-              render={(record) => <Orders record={record} />}
-            />
-            <div style={{ height: '50px' }}></div>
-            <FunctionField
-              label={translate('resources.customers.notifications')}
-              render={(record) => <Notifications record={record} />}
-            />
-            <div style={{ height: '50px' }}></div>
-            <FunctionField
-              label={translate('resources.customers.transactions')}
-              render={(record) => <Transactions record={record} />}
-            /> */}
+              </Suspense>
+            </div>
           </Grid>
-          {/* <Grid item lg={3} md={4} xs={12}>
-            <FunctionField
-              label={translate('resources.customers.tasks')}
-              render={(record) => <CustomerStatus record={record} />}
-            />
-            <FunctionField
-              label={translate('resources.customers.tasks')}
-              render={(record) => <Tasks record={record} />}
-            />
-            <FunctionField
-              label={translate('resources.customers.notes')}
-              render={(record) => <Notes record={record} />}
-            />
-            <FunctionField
-              label={translate('resources.customers.documents')}
-              render={(record) => <Documents record={record} />}
-            />
-          </Grid> */}
+
+          <Grid item lg={3} md={4} xs={12}>
+            <Suspense fallback={<Loading />}>
+              <FunctionField
+                label={translate('resources.customers.updatedAt')}
+                render={(record) => (
+                  <UserStatusHistory status={record.status} />
+                )}
+              />
+            </Suspense>
+          </Grid>
         </Grid>
       </SimpleShowLayout>
     </Show>
   );
 };
 
-export default customerShow;
+export default CustomerShow;

@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable react-hooks/rules-of-hooks */
 import {
   BooleanInput,
   Edit,
@@ -11,33 +13,45 @@ import {
 
 import { useTranslate } from 'react-admin';
 
-import { dateFormat } from '@/functions';
-import { List, ReactAdminJalaliDateInput, SimpleForm } from '@/components';
+import useFetch from '@/hooks/useFetch';
 
-const validateUserCreation = (values) => {
-  const errors = {};
-  if (!values.parent) {
-    values.parent = {};
-  }
-  if (values.parent == '') {
-    values.parent = {};
-  }
-  // if (!values.age) {
-  //   // You can return translation keys
-  //   errors.age = 'ra.validation.required';
-  // } else if (values.age < 18) {
-  //   // Or an object if the translation messages need parameters
-  //   errors.age = {
-  //     message: 'ra.validation.minValue',
-  //     args: { min: 18 }
-  //   };
-  // }
-  return errors;
-};
+import { ReactAdminJalaliDateInput, SimpleForm } from '@/components';
 
 export const customerEdit = (props) => {
   console.log('props', props);
   const translate = useTranslate();
+
+  const WebAppConfigData = useFetch({ requestQuery: '/config/system' });
+
+  const consumerStatusChoices = WebAppConfigData.data
+    ? WebAppConfigData.data.data.consumer_status
+    : [];
+
+  const EditCostumerStatus = () => {
+    return (
+      <ArrayInput source="status" label={'resources.settings.consumerStatus'}>
+        <SimpleFormIterator>
+          <SelectInput
+            disable={WebAppConfigData.isLoading}
+            source="status"
+            choices={consumerStatusChoices.map((obj) => {
+              return {
+                id: obj.key,
+                name: obj.value,
+                value: obj.key,
+              };
+            })}
+            label="Status Type"
+          />
+          <TextInput
+            label={translate('resources.settings.description')}
+            source="description"
+            disable={WebAppConfigData.isLoading}
+          />
+        </SimpleFormIterator>
+      </ArrayInput>
+    );
+  };
 
   return (
     <Edit {...props}>
@@ -58,6 +72,7 @@ export const customerEdit = (props) => {
           source="lastName"
           label={translate('resources.customers.lastName')}
         />
+        <EditCostumerStatus />
         <TextInput
           fullWidth
           source="internationalCode"
@@ -114,14 +129,10 @@ export const customerEdit = (props) => {
         />
         <ArrayInput source="address">
           <SimpleFormIterator {...props}>
-            <TextInput fullWidth source={'City'} label="City" />
-            <TextInput fullWidth source={'PostalCode'} label="PostalCode" />
-            <TextInput fullWidth source={'State'} label="State" />
-            <TextInput
-              fullWidth
-              source={'StreetAddress'}
-              label="StreetAddress"
-            />
+            <TextInput fullWidth source={'city'} label="City" />
+            <TextInput fullWidth source={'postalCode'} label="PostalCode" />
+            <TextInput fullWidth source={'state'} label="State" />
+            <TextInput fullWidth source={'street'} label="StreetAddress" />
           </SimpleFormIterator>
         </ArrayInput>
 

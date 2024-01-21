@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   BooleanField,
   ChipField,
@@ -7,10 +8,12 @@ import {
   EmailField,
   ExportButton,
   Filter,
+  FilterList,
+  FilterListItem,
   FunctionField,
-  NumberField,
   Pagination,
   ReferenceArrayField,
+  SelectInput,
   ShowButton,
   SingleFieldList,
   TextField,
@@ -21,34 +24,60 @@ import {
 } from 'react-admin';
 
 import { ImportButton } from 'react-admin-import-csv';
+import MailIcon from '@mui/icons-material/MailOutline';
 
 import jsonExport from 'jsonexport/dist';
+import { Card, CardContent } from '@mui/material';
 
 import { dateFormat } from '@/functions';
 import { List } from '@/components';
 import API from '@/functions/API';
+import useFetch from '@/hooks/useFetch';
 
 const PostFilter = (props) => {
   const translate = useTranslate();
+  const WebAppConfigData = useFetch({ requestQuery: '/config/system' });
 
-  return (
-    <Filter {...props}>
-      <TextInput
-        label={translate('resources.customers.firstName')}
-        source="firstName"
-        alwaysOn
-      />
-      <TextInput
-        label={translate('resources.customers.lastName')}
-        source="lastName"
-        alwaysOn
-      />
-      <TextInput
-        label={translate('resources.customers.phone')}
-        source="phone"
-        alwaysOn
-      />
-    </Filter>
+  const consumerStatusChoices = WebAppConfigData.data
+    ? WebAppConfigData.data.data.consumer_status
+    : [];
+
+  return WebAppConfigData.isLoading ? (
+    []
+  ) : WebAppConfigData.error ? (
+    <></>
+  ) : (
+    WebAppConfigData.data && (
+      <Filter {...props}>
+        <TextInput
+          label={translate('resources.customers.firstName')}
+          source="firstName"
+          alwaysOn
+        />
+        <TextInput
+          label={translate('resources.customers.lastName')}
+          source="lastName"
+          alwaysOn
+        />
+        <TextInput
+          label={translate('resources.customers.phone')}
+          source="phone"
+          alwaysOn
+        />
+        <SelectInput
+          label={translate('resources.settings.consumerStatus')}
+          source="status.status"
+          alwaysOn
+          choices={consumerStatusChoices.map((obj) => {
+            return {
+              id: obj.key,
+              name: obj.value,
+              value: obj.key,
+            };
+          })}
+        />
+      </Filter>
+    )
   );
 };
 
@@ -202,15 +231,54 @@ const ListActions = (props) => {
     </TopToolbar>
   );
 };
+
+const PostFilterSidebar = ({ childs }) => {
+  return (
+    <Card sx={{ order: -1, mt: 9, ml: 1, minWidth: 200 }}>
+      <CardContent sx={{ p: 1 }}>
+        <FilterList
+          sx={{
+            '& > div > div': {
+              mr: 0,
+              ml: 1,
+              display: 'flex',
+              alignItems: 'center',
+            },
+          }}
+          label="status"
+          icon={<MailIcon />}>
+          {childs?.reverse().map((i, idx) => (
+            <FilterListItem
+              key={idx}
+              label={i.key}
+              value={{ status: i.value }}
+            />
+          ))}
+        </FilterList>
+      </CardContent>
+    </Card>
+  );
+};
 export const customerList = (props) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
+  const WebAppConfigData = useFetch({ requestQuery: '/config/system' });
+
+  console.log('web app config is ', WebAppConfigData);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const translate = useTranslate();
+
   return (
     <List
       exporter={exporter}
       {...props}
       filters={<PostFilter />}
       pagination={<PostPagination />}
+      // aside={
+      //   <PostFilterSidebar
+      //     childs={WebAppConfigData.data.data.consumer_status}
+      //   />
+      // }
       actions={<ListActions />}>
       <Datagrid>
         <TextField
