@@ -7,20 +7,25 @@ import { FormControl, Input, Select } from '@mui/material';
 
 import Captcha from '#c/components/captcha';
 import styles from '@/assets/styles/Login.module.css';
+import API from '@/functions/API';
+
+import SignupForm from './SignupForm';
+import SigninForm from './SigninForm';
+import OtpCodePortal from './OtpCodePortal';
+
+export interface otpResponseDataProps {
+  data: {
+    userExists: boolean;
+    leftTime: { milliseconds: number; seconds: number };
+  };
+}
 
 export interface UserProps {
-  authStatus:
-    | 'detect'
-    | 'success'
-    | 'login:active'
-    | 'signup:active'
-    | 'signup';
-  captcha?: boolean;
+  authStatus: 'detect' | 'success' | 'login' | 'signup' | 'signup:active';
+  captcha: boolean;
   countryCode?: string;
   phoneNumber?: string;
   activationCode?: string;
-  firstName?: string;
-  lastName?: string;
   authenticatingProtocol: 'otp' | 'password';
 }
 
@@ -31,10 +36,13 @@ export default function AuthPortal() {
     useState<UserProps>({
       authStatus: 'detect',
       authenticatingProtocol: 'otp',
+      captcha: false,
     });
-  const { register } = useForm(); // Remove unused variables
+  const { register, handleSubmit } = useForm();
+  const [otpData, setOtpData] = useState<otpResponseDataProps>();
 
-  async function detectUserState(event) {
+  // Remove unused variables
+  const detectUserState = async (event) => {
     console.log('event data is : ', event);
     if (!userAuthenticationInfo.captcha) {
       toast.error('Wrong Captcha!');
@@ -45,9 +53,51 @@ export default function AuthPortal() {
         userAuthenticationInfo.phoneNumber === '0'
       ) {
         toast.error('Phone Number Field is Empty');
+      } else {
+        try {
+          setLoading(true);
+
+          const response = await API.post('/auth/otp', {
+            userType: 'customer',
+            login: false,
+            signup: false,
+            user: {
+              phone: userAuthenticationInfo.phoneNumber,
+            },
+          });
+          if (response.data.data.userExists) {
+            setUserAuthenticationInfo((prevState) => ({
+              ...prevState,
+              authStatus: 'login',
+            }));
+          } else {
+            const sendOtpToken = await API.post('/auth/otp', {
+              userType: 'customer',
+              login: false,
+              signup: true,
+              user: {
+                phone: userAuthenticationInfo.phoneNumber,
+              },
+            });
+            setOtpData(sendOtpToken.data);
+            console.log('sending otp token to phoneNumber ', sendOtpToken);
+            setUserAuthenticationInfo((prevState) => ({
+              ...prevState,
+              authStatus: 'signup:active',
+            }));
+          }
+          console.log('detection result is : ', response);
+          setLoading(true);
+        } catch (err: any) {
+          console.log(err);
+        } finally {
+          setLoading(false);
+        }
       }
     }
-  }
+  };
+
+  console.log('otpData State is ', otpData);
 
   function captchaAction(e: boolean) {
     if (e) {
@@ -59,12 +109,10 @@ export default function AuthPortal() {
     }
   }
 
-  return loading ? (
-    <></>
-  ) : (
+  return userAuthenticationInfo.authStatus === 'detect' ? (
     <div>
       <form
-        onSubmit={(values) => detectUserState(values)}
+        onSubmit={handleSubmit(detectUserState)}
         className={`${styles.container} form-group ltr`}>
         <FormControl
           margin="normal"
@@ -123,7 +171,6 @@ export default function AuthPortal() {
             required // Add required attribute
           />
         </FormControl>
-
         <>
           <p>{t('enter captcha')}</p>
           <Captcha onActionSubmit={captchaAction} />
@@ -133,5 +180,25 @@ export default function AuthPortal() {
         </button>
       </form>
     </div>
+  ) : userAuthenticationInfo.authStatus === 'signup:active' ? (
+    <OtpCodePortal
+      timer={otpData.data.leftTime.seconds}
+      changes={userAuthenticationInfo}
+      setChanges={setUserAuthenticationInfo}
+    />
+  ) : userAuthenticationInfo.authStatus === 'signup' ? (
+    <SignupForm
+      changes={userAuthenticationInfo}
+      setChanges={setUserAuthenticationInfo}
+    />
+  ) : userAuthenticationInfo.authStatus === 'login' ? (
+    <SigninForm
+      changes={userAuthenticationInfo}
+      setChanges={setUserAuthenticationInfo}
+    />
+  ) : userAuthenticationInfo.authStatus === 'success' ? (
+    <div>ur logged in</div>
+  ) : (
+    <div>unexpected error</div>
   );
 }
