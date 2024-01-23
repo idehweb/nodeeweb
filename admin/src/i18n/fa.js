@@ -393,6 +393,9 @@ const customFarsiMessages = {
       excludeProductCategory: 'بجز دسته محصولات',
       excludeProduct: 'بجز محصولات',
       price: 'هزینه',
+      code: 'کد تخفیف',
+      amount: 'مبلغ تخفیف',
+      usageLimit: 'دفعات قابل استفاده',
     },
 
     customers: {
