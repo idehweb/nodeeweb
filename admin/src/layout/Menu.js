@@ -456,7 +456,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
         isOpen={state.menuPlugin}
         name="plugin"
         label={translate(`pos.menu.plugin`)}
-        // icon={<SettingsInputHdmiIcon />} no such icon
+        icon={<SettingsInputHdmiIcon />}
         dense={dense}>
         <MenuItemLink
           to={{
