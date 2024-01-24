@@ -102,7 +102,6 @@ export default function SignupForm({
           gap: '1rem',
           padding: '2rem',
         }}>
-        {' '}
         <Box display="flex" justifyContent={'space-between'}>
           <label
             className="center my-2"

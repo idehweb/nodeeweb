@@ -14,6 +14,7 @@ import API from '@/functions/API';
 import SignupForm from './SignupForm';
 import SigninForm from './SigninForm';
 import OtpCodePortal from './OtpCodePortal';
+import ForgotPasswordForm from './ForgotPasswordForm';
 
 export interface otpResponseDataProps {
   data: {
@@ -55,7 +56,13 @@ export interface userInfoProps {
 }
 
 export interface UserProps {
-  authStatus: 'detect' | 'success' | 'login' | 'signup' | 'signup:active';
+  authStatus:
+    | 'detect'
+    | 'success'
+    | 'login'
+    | 'signup'
+    | 'signup:active'
+    | 'change-password';
   captcha: boolean;
   countryCode?: string;
   phoneNumber?: string;
@@ -233,6 +240,11 @@ export default function AuthPortal(props) {
     />
   ) : userAuthenticationInfo.authStatus === 'success' ? (
     <Navigate to={'/'} replace />
+  ) : userAuthenticationInfo.authStatus === 'change-password' ? (
+    <ForgotPasswordForm
+      changes={userAuthenticationInfo}
+      setChanges={setUserAuthenticationInfo}
+    />
   ) : (
     <div>unexpected error</div>
   );

@@ -70,37 +70,94 @@ export default function SigninForm({
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (
+      !changes.phoneNumber ||
+      changes.phoneNumber.trim() === '' ||
+      changes.phoneNumber === '0'
+    ) {
+      toast.error('Phone Number Field is Empty');
+    } else {
+      console.log('trace #s1');
+      try {
+        setLoading(true);
+
+        const response = await API.post('/auth/otp', {
+          userType: 'customer',
+          login: false,
+          signup: false,
+          user: {
+            phone: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
+          },
+        });
+        if (response.data.data.userExists) {
+          console.log('trace #s2');
+
+          await API.post('/auth/otp', {
+            userType: 'customer',
+            login: false,
+            signup: true,
+            user: {
+              phone:
+                changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
+            },
+          });
+          // setOtpData(sendOtpToken.data);
+          setChanges((prevState) => ({
+            ...prevState,
+            authStatus: 'change-password',
+          }));
+        }
+      } catch (err: any) {
+        console.log('error trace code signing-2 ', err);
+        toast.error('خطا');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Box
-        display={'flex'}
-        flexDirection={'column'}
-        gap={'2rem'}
-        padding={'2rem'}>
-        <TextField
-          name="username"
-          label="Username"
-          defaultValue={
-            changes.countryCode + changes.phoneNumber.replace(/^0/, '')
-          }
-          disabled
-        />
-        <TextField
-          {...register('password', { required: true })}
-          name="password"
-          label="Password"
-          type="text"
-        />
-        <Button
-          disabled={loading}
-          type="submit"
-          variant="contained"
-          sx={{ fontWeight: 700, fontSize: '1rem' }}
-          color="success">
-          ورود
-        </Button>
-        {error && <p>{error}</p>}
-      </Box>
-    </form>
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Box
+          display={'flex'}
+          flexDirection={'column'}
+          gap={'2rem'}
+          padding={'2rem'}>
+          <TextField
+            name="username"
+            label="Username"
+            defaultValue={
+              changes.countryCode + changes.phoneNumber.replace(/^0/, '')
+            }
+            disabled
+          />
+          <TextField
+            {...register('password', { required: true })}
+            name="password"
+            label="Password"
+            type="text"
+          />
+          <Button
+            disabled={loading}
+            type="submit"
+            variant="contained"
+            sx={{ fontWeight: 700, fontSize: '1rem' }}
+            color="success">
+            ورود
+          </Button>
+          <Button
+            disabled={loading}
+            onClick={handleForgotPassword}
+            variant="contained"
+            sx={{ fontWeight: 700, fontSize: '1rem' }}
+            color="success">
+            فراموشی رمز عبور
+          </Button>
+          {error && <p>{error}</p>}
+        </Box>
+      </form>
+    </>
   );
 }

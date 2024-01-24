@@ -105,7 +105,7 @@ export default function OtpCodePortal({
             handleClearInterval();
             setChanges((prev) => ({
               ...prev,
-              authStatus: 'signup',
+              authStatus: 'change-password',
             }));
           }}
           variant="outlined"
