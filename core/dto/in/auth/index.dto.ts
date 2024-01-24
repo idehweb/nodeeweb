@@ -115,3 +115,21 @@ export class OtpUserSignup {
   @IsString()
   lastName?: string;
 }
+
+export class OtpPassStrategyDetect {
+  @Expose()
+  @IsOptional()
+  @IsString()
+  username?: string;
+
+  @Expose()
+  @IsOptional()
+  @Transform(({ value }) => normalizePhone(value))
+  @IsMobilePhone('fa-IR')
+  phone?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+}
