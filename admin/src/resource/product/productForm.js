@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import {
   ArrayInput,
   BooleanInput,
@@ -16,12 +18,15 @@ import {
   useRedirect,
   useTranslate,
   useGetList,
+  Button,
 } from 'react-admin';
 import { useFormContext } from 'react-hook-form';
 
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { RichTextInput } from 'ra-input-rich-text';
+
+import axios from 'axios';
 
 import API from '@/functions/API';
 import { dateFormat } from '@/functions';
@@ -103,6 +108,7 @@ function onCreateCombinations(options) {
   // (id, path, rowRecord) => form.change('combinations', combinations)
 
   combs = combinations;
+
   return combinations;
 }
 
@@ -238,6 +244,8 @@ const Form = ({ children, ...props }) => {
       delete values.catChoosed;
       delete values.files;
 
+      console.log(values);
+
       const product = Transform.updateProduct(values);
       API.put('/product/' + _The_ID, JSON.stringify(product))
         .then(({ data = {} }) => {
@@ -274,6 +282,47 @@ const Form = ({ children, ...props }) => {
 
   const totals = 0;
 
+  const [mainWord, setMainWord] = useState('');
+  const [answer, setAnswer] = useState({
+    id: '',
+    answer: '',
+    alreadyAnswerd: false,
+  });
+  console.log(props);
+
+  setAnswer({
+    id: props.record._id,
+    answer: props.record.chatGPT.answer,
+    alreadyAnswerd: props.record.chatGPT.alreadyAnswer,
+  });
+
+  const chatGptHandler = () => {
+    //to do - check if already asked (add answer to schema and check if already answerd)
+
+    const question = mainWord
+      ? `tell me about ${mainWord} in 40 words`
+      : `tell me about ${props.record.title.fa} in 40 words`;
+    // axios.get()
+    console.log(question);
+
+    if (props.record.alreadyAnswerd) {
+      notify('already answerd');
+      return;
+    }
+
+    fetch('https://jsonplaceholder.typicode.com/posts/1')
+      .then((response) => response.json())
+      .then((data) => {
+        const title = data.title;
+        // console.log(title);
+        setAnswer(title);
+      })
+      .catch((err) => {
+        console.log(err);
+        setAnswer('');
+      });
+  };
+
   return (
     <SimpleForm
       {...props}
@@ -286,6 +335,7 @@ const Form = ({ children, ...props }) => {
         source={'title.' + translate('lan')}
         label={translate('resources.product.title')}
         className={'width100 mb-20'}
+        onChange={(e) => setMainWord(e.target.value)}
         validate={Val.req}
         fullWidth
       />
@@ -314,6 +364,13 @@ const Form = ({ children, ...props }) => {
         fullWidth
         source={'excerpt.' + translate('lan')}
         label={translate('resources.product.excerpt')}
+      />
+      {/* --------------------------------------------------------------------------------------------->> */}
+      <Button
+        label="Ask chatGPT"
+        type="button"
+        onClick={chatGptHandler}
+        style={{ border: '1px solid', borderRadius: 10, margin: 2 }}
       />
       <RichTextInput
         fullWidth
