@@ -40,7 +40,7 @@ const Form = ({ children, ...props }) => {
         <AutocompleteInput
           fullWidth
           label={translate('resources.order.customer')}
-          optionText={'phoneNumber'}
+          optionText={'phone'}
           optionValue={'_id'}
         />
       </ReferenceInput>
