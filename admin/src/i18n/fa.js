@@ -209,6 +209,8 @@ const customFarsiMessages = {
       notpaid: 'پرداخت نشده',
       unsuccessful: 'پرداخت ناموفق',
       paid: 'پرداخت شده',
+      expired: 'منقضی شده',
+      'need-to-pay': 'در انتظار پرداخت',
     },
     OrderStatus: {
       cart: 'سبد خرید',
