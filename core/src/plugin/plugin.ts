@@ -1,11 +1,13 @@
 import { PluginContent } from '../../types/plugin';
-
+const DEFAULT_PLUGIN_INDEX = 0;
 export class PluginCore {
   private byType = new Map<string, PluginContent[]>();
   private bySlug = new Map<string, PluginContent>();
 
-  get(slug: string) {
-    return this.bySlug.get(slug);
+  get(id: string) {
+    const bySlug = this.bySlug.get(id);
+    if (bySlug) return bySlug;
+    return this.getByType(id)[DEFAULT_PLUGIN_INDEX];
   }
   getByType(type: string) {
     return this.byType.get(type) ?? [];

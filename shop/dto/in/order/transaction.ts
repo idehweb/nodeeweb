@@ -1,6 +1,7 @@
 import { Expose, Type } from 'class-transformer';
 import { IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Address } from '../user';
+import { IsSlug } from '@nodeeweb/core/utils/validation';
 
 class Post {
   @Expose()
@@ -28,4 +29,9 @@ export class CreateTransactionBody {
   @ValidateNested()
   @Type(() => Address)
   address: Address;
+
+  @Expose()
+  @IsOptional()
+  @IsSlug()
+  pluginSlug?: string;
 }
