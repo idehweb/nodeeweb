@@ -229,7 +229,7 @@ export const orderList = (props) => {
         <SelectInput
           source="paymentStatus"
           label={translate('resources.order.paymentStatus')}
-          emptyValue={null}
+          // emptyValue={null}
           choices={OrderPaymentStatus()}
           alwaysOn
         />,
@@ -272,7 +272,7 @@ export const orderList = (props) => {
         />,
         <TextInput
           fullWidth
-          source="orderNumber"
+          source="_id"
           label={translate('resources.order.orderNumber')}
         />,
         <ReferenceInput
@@ -334,6 +334,8 @@ const TabbedDatagrid = (props) => {
         case 'complete':
           setComplete(ids);
           break;
+        default:
+          break;
       }
     }
   }, [ids, filterValues.status]);
@@ -345,8 +347,6 @@ const TabbedDatagrid = (props) => {
     },
     [displayedFilters, filterValues, setFilters]
   );
-  // console.clear();
-  // console.log('filterValues.status',filterValues.status);
   console.log('props', props);
   return (
     <Fragment>
@@ -374,7 +374,7 @@ const TabbedDatagrid = (props) => {
         <ListContextProvider value={{ ...listContext, ids: cart }}>
           <Datagrid {...props} optimized rowClick="edit">
             <TextField
-              source="orderNumber"
+              source="_id"
               label={translate('resources.order.orderNumber')}
             />
             <FunctionField
@@ -390,13 +390,13 @@ const TabbedDatagrid = (props) => {
                       {record.customer.lastName && (
                         <div>{record.customer.lastName}</div>
                       )}
-                      {record.customer.phoneNumber && (
+                      {record.customer.phone && (
                         <a href={'/admin/#/customer/' + record.customer._id}>
-                          {record.customer.phoneNumber}
+                          {record.customer.phone}
                         </a>
                       )}
                       {(record.customer.orderCount ||
-                        record.customer.orderCount == 0) && (
+                        record.customer.orderCount === 0) && (
                         <div>
                           <span>
                             {translate('resources.order.orderCount') + ':'}
@@ -420,25 +420,26 @@ const TabbedDatagrid = (props) => {
                 </div>
               )}
             />
+
             <FunctionField
               label={translate('resources.order.sum')}
               render={(record) => {
+                let totalOrderPrice = 0;
+                if (record && record.products) {
+                  record.products.forEach((product) => {
+                    if (product.combinations) {
+                      product.combinations.forEach((combination) => {
+                        const price =
+                          combination.salePrice || combination.price;
+                        totalOrderPrice += price;
+                      });
+                    }
+                  });
+                }
                 return (
                   record &&
-                  record.sum &&
-                  record.sum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
-                    ' ' +
-                    translate(themeData.currency)
-                );
-              }}
-            />
-            <FunctionField
-              label={translate('resources.order.amount')}
-              render={(record) => {
-                return (
-                  record &&
-                  record.amount &&
-                  record.amount
+                  record.products &&
+                  totalOrderPrice
                     .toString()
                     .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
                     ' ' +
@@ -460,28 +461,6 @@ const TabbedDatagrid = (props) => {
                 );
               }}
             />
-
-            <FunctionField
-              label={translate('resources.order.paymentStatus')}
-              render={(record) => {
-                console.log('record', record);
-                return (
-                  <Chip
-                    source="paymentStatus"
-                    className={record.paymentStatus}
-                    label={translate(
-                      'pos.OrderPaymentStatus.' + record.paymentStatus
-                    )}
-                  />
-                );
-              }}
-            />
-            {/*<SelectField source="status" choices={OrderStatus()}*/}
-            {/*label={translate("resources.order.status")} optionText={<StatusField/>}*/}
-            {/*/>*/}
-            {/*<SelectField source="paymentStatus" choices={OrderPaymentStatus()}*/}
-            {/*label={translate("resources.order.paymentStatus")} optionText={<PaymentStatusField/>}*/}
-            {/*/>*/}
 
             <FunctionField
               label={translate('resources.order.date')}
