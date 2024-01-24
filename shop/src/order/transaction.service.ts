@@ -105,6 +105,7 @@ class TransactionService {
       amount: totalPrice,
       order,
       user: req.user,
+      pluginSlug: body.gatewaySlug,
     });
 
     // 7. fill post, post if not payment issue

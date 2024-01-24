@@ -40,9 +40,9 @@ export function getEntityEventName(
   return `${pre ? 'pre' : 'post'}-${type}-${name.toLocaleLowerCase()}`;
 }
 export class EntityCreator {
-  constructor(private modelName: string) {}
+  constructor(private crudName: string, private dbModel = crudName) {}
   private get model() {
-    return store.db.model(this.modelName);
+    return store.db.model(this.dbModel);
   }
 
   private specQueryParams(
@@ -155,7 +155,7 @@ export class EntityCreator {
       httpCode: number;
     } & CRUDCreatorOpt
   ) {
-    if (isNil(result)) throw new NotFound(`${this.modelName} not found`);
+    if (isNil(result)) throw new NotFound(`${this.crudName} not found`);
     const { sendResponse, saveToReq } = opt;
 
     if (sendResponse && !saveToReq) {
@@ -232,7 +232,7 @@ export class EntityCreator {
   preEntityCreator(opt: CRUDCreatorOpt): MiddleWare {
     return (req, res, next) => {
       store.event.emit(
-        getEntityEventName(this.modelName, { pre: true, type: opt.type }),
+        getEntityEventName(this.crudName, { pre: true, type: opt.type }),
         opt,
         req
       );
@@ -242,7 +242,7 @@ export class EntityCreator {
 
   postEntity(data: any, opt: CRUDCreatorOpt, req: Req) {
     store.event.emit(
-      getEntityEventName(this.modelName, { post: true, type: opt.type }),
+      getEntityEventName(this.crudName, { post: true, type: opt.type }),
       data,
       opt,
       req
@@ -400,10 +400,10 @@ export function normalizeCrudOpt(
 export function registerEntityCRUD(
   modelName: string,
   opts: EntityOpts,
-  registerOpt: ControllerRegisterOptions & { order?: boolean }
+  registerOpt: ControllerRegisterOptions & { order?: boolean; dbModel?: string }
 ) {
   const schemas: ControllerSchema[] = [];
-  const creator = new EntityCreator(modelName);
+  const creator = new EntityCreator(modelName, registerOpt.dbModel);
   const ordered =
     registerOpt.order || registerOpt.order == undefined ? order(opts) : opts;
   const base_url =

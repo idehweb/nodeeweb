@@ -67,10 +67,12 @@ class PaymentService {
     order,
     user,
     amount,
+    pluginSlug,
   }: {
     order: OrderDocument;
     user: UserDocument;
     amount: number;
+    pluginSlug?: string;
   }) => {
     // 0. check shop available
     if (!store.config.shop_active)
@@ -100,7 +102,8 @@ class PaymentService {
       transactionId.toString(),
       amount,
       order.products,
-      user.phone
+      user.phone,
+      pluginSlug
     );
 
     // 3. create transaction doc
@@ -156,7 +159,8 @@ class PaymentService {
     transactionId: string,
     amount: number,
     products: ProductDocument[] | OrderDocument['products'],
-    userPhone: string
+    userPhone: string,
+    pluginSlug?: string
   ): Promise<{
     authority: string;
     provider: string;
@@ -167,8 +171,10 @@ class PaymentService {
     payment_message?: string;
     expiredAt?: Date;
   }> {
-    const bankPlugin = store.plugins.get(
-      ShopPluginType.BANK_GATEWAY
+    const bankPlugin = (
+      pluginSlug
+        ? store.plugins.get(pluginSlug)
+        : store.plugins.getByType(ShopPluginType.BANK_GATEWAY)[0]
     ) as BankGatewayPluginContent;
 
     if (!bankPlugin)

@@ -1,60 +1,51 @@
 import { PUBLIC_ACCESS } from '@nodeeweb/core/src/constants/String';
 import { ControllerAccess } from '@nodeeweb/core/types/controller';
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
+import { AuthUserAccess, OptUserAccess } from '@nodeeweb/core';
+import Service from './service';
+import { GatewayQuery } from '../../dto/in/gateway';
 
 export default function registerController() {
-  const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
-
+  const access: ControllerAccess[] = OptUserAccess;
+  const service = new Service();
   // crud
   registerEntityCRUD(
     'gateway',
     {
-      create: {
-        controller: {
-          access,
-        },
-      },
       getCount: {
         controller: {
           access,
+          validate: { reqPath: 'query', dto: GatewayQuery },
+        },
+        crud: {
+          parseFilter: service.getParseFilter,
         },
       },
       getOne: {
         controller: {
           access,
+          validate: { reqPath: 'query', dto: GatewayQuery },
+        },
+        crud: {
+          parseFilter: service.getParseFilter,
+          project: service.getProject(),
         },
       },
       getAll: {
         controller: {
           access,
+          validate: { reqPath: 'query', dto: GatewayQuery },
         },
         crud: {
-          parseFilter(req) {
-            if (req.query.filter && typeof req.query.filter === 'string') {
-              return JSON.parse(req.query.filter);
-            }
-          },
-          autoSetCount: true,
           paramFields: {
             limit: 'limit',
             offset: 'offset',
           },
-        },
-      },
-      updateOne: {
-        controller: {
-          access,
-        },
-      },
-      deleteOne: {
-        controller: {
-          access,
-        },
-        crud: {
-          forceDelete: true,
+          parseFilter: service.getParseFilter,
+          project: service.getProject(),
         },
       },
     },
-    { from: 'ShopEntity' }
+    { from: 'ShopEntity', dbModel: 'plugin' }
   );
 }
