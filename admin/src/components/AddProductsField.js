@@ -5,6 +5,8 @@ import {
   AutocompleteInput,
   FormDataConsumer,
   NumberInput,
+  ReferenceInput,
+  SelectInput,
   SimpleFormIterator,
   TextInput,
   useInput,
@@ -89,6 +91,7 @@ export default (props) => {
                   <div className={'col-md-3'}>
                     {scopedFormData.product_id && (
                       <TextInput
+                        disabled
                         source={getSource('_id')}
                         defaultValue={
                           scopedFormData
@@ -105,6 +108,7 @@ export default (props) => {
                     )}
                     {scopedFormData.product_id && (
                       <TextInput
+                        disabled
                         source={getSource('title')}
                         defaultValue={
                           scopedFormData
@@ -130,6 +134,23 @@ export default (props) => {
                       />
                     )}
                   </div>
+                  {/* <div className={'col-md-3'}>
+                    {scopedFormData.product_id && (
+                      <ReferenceInput
+                        source="combinations"
+                        reference={getSource('combinations')}
+                        children={
+                          <SelectInput
+                            // defaultValue={1}
+                            label={translate('resources.order.combinations')}
+                            className={'width100 mb-20 ltr'}
+                            fullWidth
+                            optionText={'price'}
+                          />
+                        }
+                      />
+                    )}
+                  </div> */}
                   <div className={'col-md-3'}>
                     {scopedFormData.product_id && (
                       <NumberInput
@@ -146,7 +167,6 @@ export default (props) => {
                       <TextInput
                         fullWidth
                         // record={scopedFormData}
-
                         source={getSource('price')}
                         className={'ltr'}
                         defaultValue={
