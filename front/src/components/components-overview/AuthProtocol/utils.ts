@@ -1,22 +1,19 @@
-import { toast } from 'react-toastify';
+import { SaveData } from '@/functions';
 
-import { UserProps } from './index';
+import { userInfoProps } from '.';
 
-export async function detectUserState({ userState }: { userState: UserProps }) {
-  if (!userState.captcha) {
-    toast.error('Wrong Captcha!');
-    return;
-  } else {
-    // update user state with the given values
-    if (userState.phoneNumber.trim() === '' || userState.phoneNumber === '0') {
-      toast.error('Phone Number Field is Empty');
-      return;
-    }
-  }
-}
-
-export function captchaAction(e: boolean) {
-  if (e) {
-    //set user captcha pass to true
-  }
+export function afterAuth({
+  user,
+  token,
+}: {
+  user: userInfoProps;
+  token: string;
+}) {
+  console.log('im in save data ', user, token);
+  // user.token = token;
+  // user.user.phoneNumber = user.user.phone;
+  if (!user) return;
+  const userData = { ...user, token };
+  SaveData({ user: userData, token });
+  // return { isOk: true };
 }

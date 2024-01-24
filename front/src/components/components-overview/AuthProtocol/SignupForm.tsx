@@ -1,10 +1,12 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
-import { Box, Button, FormControl, TextField } from '@mui/material';
+import { Box, Button, TextField } from '@mui/material';
 
 import { toast } from 'react-toastify';
 
 import API from '@/functions/API';
+
+import { afterAuth } from './utils';
 
 import { UserProps } from '.';
 
@@ -37,8 +39,8 @@ export default function SignupForm({
       firstName: '',
       lastName: '',
       password: '',
-      phone: changes.phoneNumber,
-      username: '',
+      phone: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
+      username: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
     },
   });
   const [loading, setLoading] = React.useState(false);
@@ -51,28 +53,41 @@ export default function SignupForm({
     }
     setLoading(true);
     setError('');
-    console.log('im called', e);
     try {
       // Make API call
-      const singupResponse = await API.post('/auth/user-pass/signup', {
+      const signupResponse = await API.post('/auth/user-pass/signup', {
         userType: 'customer',
         user: {
-          username:
-            changes.countryCode.replace(/\+/g, '') + changes.phoneNumber,
-          phone: changes.countryCode.replace(/\+/g, '') + changes.phoneNumber,
+          username: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
+          phone: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
           password: e.password,
           firstName: e.firstName,
           lastName: e.lastName,
           email: e.email,
         },
       });
-      console.log('singupResponse is ', singupResponse);
+
+      console.log('signup response is --- >');
+      localStorage.setItem('user', signupResponse.data.user);
+      toast.success('ورود موفقیت آمیز');
+      const token = signupResponse.data.token;
+      const user = signupResponse.data.user;
+      afterAuth({ user, token });
+
+      setChanges((prev) => ({
+        ...prev,
+        authStatus: 'success',
+        userInfo: signupResponse.data,
+      }));
+
       // Reset form
       reset();
 
       // Handle success or redirect
     } catch (error) {
+      console.log(error);
       setError('An error occurred. Please try again.');
+      toast.error('trace code #2 خطا');
     } finally {
       setLoading(false);
     }
@@ -80,13 +95,14 @@ export default function SignupForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <FormControl
+      <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
           gap: '1rem',
           padding: '2rem',
         }}>
+        {' '}
         <Box display="flex" justifyContent={'space-between'}>
           <label
             className="center my-2"
@@ -180,9 +196,8 @@ export default function SignupForm({
           color="success">
           {loading ? 'Loading...' : 'Submit'}
         </Button>
-      </FormControl>
-
-      {error && <p>{error}</p>}
+        {error && <p>{error}</p>}
+      </Box>
     </form>
   );
 }

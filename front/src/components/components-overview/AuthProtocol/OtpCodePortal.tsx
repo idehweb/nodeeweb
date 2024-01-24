@@ -44,7 +44,10 @@ export default function OtpCodePortal({
         <div className={'flex-item '}>
           <Box display={'flex'} justifyContent={'space-between'} gap={'3rem'}>
             <p>شماره موبایل شما:</p>
-            <p className="ltr">{changes.countryCode + changes.phoneNumber}</p>
+            <p className="ltr">
+              {changes.countryCode.replace(/\+/g, '') +
+                changes.phoneNumber.replace(/^0/, '')}
+            </p>
           </Box>
           {Boolean(timer) ? (
             <div className={'flex-item-relative center '}>

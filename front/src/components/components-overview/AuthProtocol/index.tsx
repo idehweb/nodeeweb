@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { FormControl, Input, Select } from '@mui/material';
+import { Box, Input, Select } from '@mui/material';
+
+import { Navigate } from 'react-router-dom';
 
 import Captcha from '#c/components/captcha';
 import styles from '@/assets/styles/Login.module.css';
@@ -20,16 +22,49 @@ export interface otpResponseDataProps {
   };
 }
 
+export interface userInfoProps {
+  token: string;
+  user?: {
+    phone?: string;
+    phoneNumber?: string;
+    _id: string;
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    username: string;
+    source: string;
+    type: string;
+    customerGroup: unknown[];
+    whatsapp: boolean;
+    credit: number;
+    score: number;
+    role: string;
+    active: boolean;
+    contacts: unknown[];
+    wishlist: unknown[];
+    notificationTokens: unknown[];
+    invitation_list: unknown[];
+    status: unknown[];
+    photos: unknown[];
+    address: unknown[];
+    createdAt: string;
+    updatedAt: string;
+    _V: number;
+  };
+}
+
 export interface UserProps {
   authStatus: 'detect' | 'success' | 'login' | 'signup' | 'signup:active';
   captcha: boolean;
   countryCode?: string;
   phoneNumber?: string;
   activationCode?: string;
+  userInfo?: userInfoProps;
   authenticatingProtocol: 'otp' | 'password';
 }
 
-export default function AuthPortal() {
+export default function AuthPortal(props) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [userAuthenticationInfo, setUserAuthenticationInfo] =
@@ -43,7 +78,6 @@ export default function AuthPortal() {
 
   // Remove unused variables
   const detectUserState = async (event) => {
-    console.log('event data is : ', event);
     if (!userAuthenticationInfo.captcha) {
       toast.error('Wrong Captcha!');
     } else {
@@ -62,7 +96,9 @@ export default function AuthPortal() {
             login: false,
             signup: false,
             user: {
-              phone: userAuthenticationInfo.phoneNumber,
+              phone:
+                userAuthenticationInfo.countryCode +
+                userAuthenticationInfo.phoneNumber.replace(/^0/, ''),
             },
           });
           if (response.data.data.userExists) {
@@ -76,28 +112,26 @@ export default function AuthPortal() {
               login: false,
               signup: true,
               user: {
-                phone: userAuthenticationInfo.phoneNumber,
+                phone:
+                  userAuthenticationInfo.countryCode +
+                  userAuthenticationInfo.phoneNumber.replace(/^0/, ''),
               },
             });
             setOtpData(sendOtpToken.data);
-            console.log('sending otp token to phoneNumber ', sendOtpToken);
             setUserAuthenticationInfo((prevState) => ({
               ...prevState,
               authStatus: 'signup:active',
             }));
           }
-          console.log('detection result is : ', response);
           setLoading(true);
         } catch (err: any) {
-          console.log(err);
+          toast.error('خطا');
         } finally {
           setLoading(false);
         }
       }
     }
   };
-
-  console.log('otpData State is ', otpData);
 
   function captchaAction(e: boolean) {
     if (e) {
@@ -109,14 +143,15 @@ export default function AuthPortal() {
     }
   }
 
+  // if (JSON.parse(localStorage.getItem('user'))) navigate('/profile');
+
   return userAuthenticationInfo.authStatus === 'detect' ? (
     <div>
       <form
         onSubmit={handleSubmit(detectUserState)}
         className={`${styles.container} form-group ltr`}>
-        <FormControl
-          margin="normal"
-          fullWidth
+        <Box
+          sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}
           className={styles.formPhoneFieldContainer}>
           <label
             className="center my-2"
@@ -136,7 +171,7 @@ export default function AuthPortal() {
             }
             required // Add required attribute
           >
-            {[{ value: '+98', label: 'IR ( +98 )' }].map((country) => (
+            {[{ value: '98', label: 'IR ( +98 )' }].map((country) => (
               <option
                 key={country.value}
                 value={country.value}
@@ -170,7 +205,7 @@ export default function AuthPortal() {
             }
             required // Add required attribute
           />
-        </FormControl>
+        </Box>
         <>
           <p>{t('enter captcha')}</p>
           <Captcha onActionSubmit={captchaAction} />
@@ -197,7 +232,7 @@ export default function AuthPortal() {
       setChanges={setUserAuthenticationInfo}
     />
   ) : userAuthenticationInfo.authStatus === 'success' ? (
-    <div>ur logged in</div>
+    <Navigate to={'/'} replace />
   ) : (
     <div>unexpected error</div>
   );
