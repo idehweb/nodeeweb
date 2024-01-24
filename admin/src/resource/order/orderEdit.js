@@ -33,7 +33,7 @@ import {
 import { dateFormat } from '@/functions';
 import { BASE_URL } from '@/functions/API';
 import TransactionCreate from '@/components/TransactionCreate';
-
+import { useSelector } from 'react-redux';
 
 export const orderEdit = (props) => {
   console.log('props', props);
@@ -66,6 +66,8 @@ export const orderEdit = (props) => {
       </Button>
     </CardActions>
   );
+  const themeData = useSelector((st) => st.themeData);
+
   return [
     <Show actions={<PostEditActions />} {...props}>
       {/*<div id={'theprintdiv'}>*/}
@@ -74,22 +76,19 @@ export const orderEdit = (props) => {
         {state == 'start' && [
           <Box>
             <TextField source="orderNumber" label={'شماره سفارش'} />
-            ,
             <FunctionField
               label="نام"
               render={(record) =>
-                `${record.customer_data && record.customer_data.firstName}`
+                `${record.customer && record.customer.firstName}`
               }
-            />
-            ,
+            />{' '}
             <FunctionField
               label="نام خانوادگی"
               render={(record) =>
-                `${record.customer_data && record.customer_data.firstName}`
+                `${record.customer && record.customer.lastName}`
               }
             />
-            ,
-            <ArrayField source="card" label={'محتوای سبد خرید'}>
+            <ArrayField source="products" label={'محتوای سبد خرید'}>
               <Datagrid optimized>
                 <FunctionField
                   label="عنوان محصول"
@@ -102,7 +101,8 @@ export const orderEdit = (props) => {
                     return (
                       <a
                         target={'_blank'}
-                        href={'/#/product/' + link + '/show'} rel="noreferrer">
+                        href={'/#/product/' + link + '/show'}
+                        rel="noreferrer">
                         {record.title &&
                           (record.title.fa ? record.title.fa : record.title)}
                       </a>
@@ -118,7 +118,7 @@ export const orderEdit = (props) => {
                         ? record.price
                             .toString()
                             .replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',')
-                        : ''
+                        : record.combinations[0].price.toLocaleString()
                     }`
                   }
                 />
@@ -130,7 +130,7 @@ export const orderEdit = (props) => {
                         ? record.salePrice
                             .toString()
                             .replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',')
-                        : ''
+                        : record.combinations[0].salePrice.toLocaleString()
                     }`
                   }
                 />
@@ -144,57 +144,29 @@ export const orderEdit = (props) => {
     </Show>,
     <Edit {...props}>
       <SimpleForm>
-        {state == 'start' && [
-          ,
+        {state === 'start' && [
           <TextInput
             source="customer_data.internationalCode"
             label={'کد ملی'}
           />,
           <FunctionField
             label="شماره تماس مشتری"
-            render={(record) =>
-              `${record.customer_data && record.customer_data.phoneNumber}`
-            }
+            render={(record) => `${record.customer && record.customer.phone}`}
           />,
 
-          // <FunctionField label="پرداختی کل"
-          //                render={record => record.amount.toString().replace(/\\B(?=(\\d{3})+(?!\\d))/g, ",")}/>
-          // ,
-          <TextField
-            source="billingAddress.Title"
-            label={'عنوان آدرس'}
-            fullWidth
-          />,
+          <TextInput source="address.state" label={'استان'} fullWidth />,
+          <TextInput source="address.city" label={'شهر'} fullWidth />,
+          <TextInput source="address.street" label={'آدرس'} fullWidth />,
+          <TextInput source="address.postalCode" label={'کد پستی'} fullWidth />,
           <TextInput
-            source="billingAddress.PhoneNumber"
-            label={'شماره تماس ارسال'}
-            fullWidth
-          />,
-          <TextInput source="billingAddress.State" label={'استان'} fullWidth />,
-          <TextInput source="billingAddress.City" label={'شهر'} fullWidth />,
-          <TextInput
-            source="billingAddress.StreetAddress"
-            label={'آدرس'}
-            fullWidth
-          />,
-          <TextInput
-            source="billingAddress.PostalCode"
-            label={'کد پستی'}
-            fullWidth
-          />,
-          <TextInput
-            source="customer_data.phoneNumber"
+            source="customer.phone"
             label={'شماره موبایل مشتری'}
             fullWidth
           />,
+          <TextInput source="post.provider" label={'نحوه ارسال'} fullWidth />,
           <TextInput
-            source="deliveryDay.description"
+            source="post.description"
             label={'توضیحات ارسال'}
-            fullWidth
-          />,
-          <TextInput
-            source="deliveryDay.title"
-            label={'نحوه ارسال'}
             fullWidth
           />,
           <FunctionField
@@ -202,11 +174,9 @@ export const orderEdit = (props) => {
             render={(record) => {
               return (
                 <Chip
-                  source="paymentStatus"
-                  className={record.paymentStatus}
-                  label={translate(
-                    'pos.OrderPaymentStatus.' + record.paymentStatus
-                  )}
+                  source="status"
+                  className={record.status}
+                  label={translate('pos.OrderPaymentStatus.' + record.status)}
                 />
               );
             }}
@@ -214,21 +184,34 @@ export const orderEdit = (props) => {
         ]}
         {/*<TextInput disabled source="id"/>*/}
         <SelectInput
-          label={translate('resources.order.paymentStatus')}
-          fullWidth
-          className={'mb-20'}
-          source="paymentStatus"
-          optionValue="id"
-          optionText="name"
-          choices={OrderPaymentStatus()}
-          translateChoice={true}
-        />
-        <SelectInput
           label={translate('resources.order.status')}
           fullWidth
           className={'mb-20'}
           source="status"
           choices={OrderStatus()}
+        />
+        <FunctionField
+          label={translate('resources.order.sum')}
+          render={(record) => {
+            let totalOrderPrice = 0;
+            if (record && record.products) {
+              record.products.forEach((product) => {
+                if (product.combinations) {
+                  product.combinations.forEach((combination) => {
+                    const price = combination.salePrice || combination.price;
+                    totalOrderPrice += price;
+                  });
+                }
+              });
+            }
+            return (
+              record &&
+              record.products &&
+              totalOrderPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+                ' ' +
+                translate(themeData.currency)
+            );
+          }}
         />
         <TextInput
           fullWidth
