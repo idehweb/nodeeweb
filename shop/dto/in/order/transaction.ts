@@ -32,6 +32,7 @@ export class CreateTransactionBody {
 
   @Expose()
   @IsOptional()
+  @IsString()
   @IsSlug()
-  pluginSlug?: string;
+  gatewaySlug?: string;
 }
