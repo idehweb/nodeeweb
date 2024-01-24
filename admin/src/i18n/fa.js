@@ -221,6 +221,8 @@ const customFarsiMessages = {
       complete: 'تکمیل شده',
       cancel: 'لغو شده',
       paid: 'پرداخت شده',
+      expired: 'منقضی شده',
+      'need-to-pay': 'در انتظار پرداخت',
     },
   },
   components: {
