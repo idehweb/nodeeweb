@@ -133,3 +133,52 @@ export class OtpPassStrategyDetect {
   @IsEmail()
   email?: string;
 }
+
+export class OtpPassSignup {
+  @Expose()
+  @Transform(({ value }) => normalizePhone(value))
+  @IsMobilePhone('fa-IR')
+  phone: string;
+
+  @Expose()
+  @IsString()
+  code: string;
+
+  @Expose()
+  @IsString()
+  @Length(8, 20)
+  password: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  username?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  firstName?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  lastName?: string;
+}
+
+export class OtpPassLogin {
+  @Expose()
+  @Transform(({ value }) => normalizePhone(value))
+  @IsMobilePhone('fa-IR')
+  phone: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  @Length(8, 20)
+  password?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  code?: string;
+}

@@ -4,13 +4,18 @@ import { Req, Res } from '../../types/global';
 import store from '../../store';
 import {
   AuthStrategyBody,
+  OtpPassLogin,
+  OtpPassSignup,
   OtpPassStrategyDetect,
 } from '../../dto/in/auth/index.dto';
 import { IUser, UserDocument, UserModel, UserStatus } from '../../types/user';
 import { CoreValidationPipe } from '../core/validate';
 import { isUndefined } from 'lodash';
 import { BadRequestError, ForbiddenError, NotFound } from '../../types/error';
-import { sendCode } from './otp.utils';
+import { codeRevert, sendCode, verifyCode } from './otp.utils';
+import { ClassConstructor } from 'class-transformer';
+import { setToCookie, signToken } from '../handlers/auth.handler';
+import { AuthEvents } from './authGateway.strategy';
 
 export const OTP_PASS_STRATEGY = 'otp-pass';
 export class OtpPassStrategy extends AuthStrategy {
@@ -19,14 +24,20 @@ export class OtpPassStrategy extends AuthStrategy {
       new CoreValidationPipe()) as CoreValidationPipe;
   }
 
-  private async transformDetect(data: any) {
-    const transformed = await this.validation.transform(
-      data,
-      OtpPassStrategyDetect
-    );
+  private async transform<C>(data: any, metatype: ClassConstructor<C>) {
+    const transformed = await this.validation.transform(data, metatype);
     return Object.fromEntries(
       Object.entries(transformed).filter(([k, v]) => !isUndefined(v))
-    ) as OtpPassStrategyDetect;
+    ) as C;
+  }
+  private transformDetect(data: any) {
+    return this.transform(data, OtpPassStrategyDetect);
+  }
+  private transformSignup(data: any) {
+    return this.transform(data, OtpPassSignup);
+  }
+  private transformLogin(data: any) {
+    return this.transform(data, OtpPassLogin);
   }
 
   getUserModel(req: Req): UserModel {
@@ -35,8 +46,15 @@ export class OtpPassStrategy extends AuthStrategy {
   async exportUser(req: Req) {
     if (req.user !== undefined) return req.user;
 
+    const q = ['phone', 'username']
+      .filter((k) => req.body.user[k])
+      .reduce((prev, k) => {
+        prev[k] = req.body.user[k];
+        return prev;
+      }, {});
+
     const model = this.getUserModel(req);
-    const user: UserDocument = await model.findOne(req.body.user, '+password');
+    const user: UserDocument = await model.findOne(q, '+password');
     req.user = user;
 
     return user;
@@ -83,6 +101,10 @@ export class OtpPassStrategy extends AuthStrategy {
     }
 
     // not set password
+    console.log('cond', (login || signup) && !isPasswordSet, {
+      isPasswordSet,
+      login,
+    });
     if ((login || signup) && !isPasswordSet) {
       // progress
       return await sendCode(req, res);
@@ -92,11 +114,108 @@ export class OtpPassStrategy extends AuthStrategy {
   }
 
   async login(req: Req, res: Res, next: NextFunction) {
-    return next();
+    const userBody = await this.transformLogin(req.body.user);
+    const { password, code } = userBody;
+
+    const user = await this.exportUser(req);
+
+    if (!password && !code)
+      throw new BadRequestError('code or password must be set');
+
+    const data = await (password
+      ? this.loginWithPass(user, password)
+      : this.loginWithCode(user, code, req.modelName));
+
+    // cookie
+    setToCookie(res, data.token);
+
+    return res.status(200).json({
+      data,
+    });
+  }
+  private async loginWithPass(user: UserDocument, password: string) {
+    if (!user || !(await user.passwordVerify(password)))
+      throw new BadRequestError('phone or password is wrong');
+
+    const outUser: IUser = { ...user.toObject(), password: undefined };
+
+    // sign token
+    const token = signToken(outUser);
+
+    // present
+    return {
+      user: outUser,
+      token,
+    };
+  }
+
+  private async loginWithCode(
+    user: UserDocument,
+    code: string,
+    modelName: string
+  ) {
+    // verify code
+    const [codeDoc, newUser] = await verifyCode(user, code, modelName);
+
+    try {
+      // token
+      const token = signToken(newUser);
+
+      return {
+        user: newUser,
+        token,
+      };
+    } catch (err) {
+      await codeRevert(codeDoc);
+      throw err;
+    }
   }
 
   async signup(req: Req, res: Res, next: NextFunction) {
-    return next();
+    if (req.modelName === 'admin')
+      throw new ForbiddenError('can not register admin');
+
+    const user = await this.exportUser(req);
+    const safeUser = user?.toObject() ?? {};
+
+    if (user && user.active) throw new BadRequestError('user exists');
+
+    req.body.user = await this.transformSignup(req.body.user);
+
+    const [codeDoc] = await verifyCode(
+      { ...safeUser, ...req.body.user },
+      req.body.user.code,
+      req.modelName
+    );
+
+    delete req.body.user.code;
+
+    // create
+    const userModel = store.db.model(req.modelName) as UserModel;
+    try {
+      const newUserDoc = user
+        ? await userModel.findByIdAndUpdate(user._id, req.body.user, {
+            new: true,
+          })
+        : await userModel.create(req.body.user);
+      const newUser = { ...newUserDoc.toObject(), password: undefined };
+
+      const token = signToken(newUser);
+      setToCookie(res, token, 'authToken');
+
+      // emit
+      store.event?.emit(AuthEvents.AfterRegister, newUser);
+
+      return res.status(201).json({
+        data: {
+          user: newUser,
+          token,
+        },
+      });
+    } catch (err) {
+      await codeRevert(codeDoc);
+      throw err;
+    }
   }
   strategyId = OTP_PASS_STRATEGY;
 }
