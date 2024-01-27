@@ -1,4 +1,6 @@
 import { Req } from '@nodeeweb/core';
+import { plainToInstance } from 'class-transformer';
+import { UpdateCustomerByOwn } from '../../dto/in/user/customer';
 
 export function transformBody(req: Req, body = req.body) {
   //   transform status, add user if not set
@@ -9,4 +11,13 @@ export function transformBody(req: Req, body = req.body) {
   }
 
   return body;
+}
+
+export function customerTransformBody(req: Req, body = req.body) {
+  const newBody = plainToInstance(UpdateCustomerByOwn, body, {
+    enableCircularCheck: true,
+    enableImplicitConversion: true,
+    excludeExtraneousValues: true,
+  });
+  return newBody;
 }

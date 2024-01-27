@@ -3,28 +3,10 @@ import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
 import { MiddleWare, Req, Res } from '@nodeeweb/core/types/global';
 import mongoose, { FilterQuery } from 'mongoose';
 import { CustomerSource } from '../../schema/customer.schema';
-import { transformBody } from './utils';
+import { customerTransformBody, transformBody } from './utils';
 import store from '../../store';
 
 export class Service {
-  static getMe: MiddleWare = (req, res, next) => {
-    const customer = req.user;
-    const fields = [
-      '_id',
-      'email',
-      'nickname',
-      'firstName',
-      'lastName',
-      'data',
-      'phone',
-      'internationalCode',
-      'address',
-    ];
-    return res.status(200).json({
-      customer: Object.fromEntries(fields.map((f) => [f, customer[f]])),
-    });
-  };
-
   static async parseFilterForAllCustomer(req: Req) {
     let search = {};
     if (req.query.search) {
@@ -115,7 +97,7 @@ export class Service {
   }
   static updateOneParseUpdate(req: Req) {
     let body: any;
-    if (req.modelName === 'customer') body = { address: req.body.address };
+    if (req.modelName === 'customer') body = customerTransformBody(req);
     else body = transformBody(req);
 
     return body;

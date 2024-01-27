@@ -196,3 +196,38 @@ export class UpdateCustomerBody {
   @IsArray()
   status?: any[];
 }
+
+export class UpdateCustomerByOwn {
+  @Expose()
+  firstName?: string;
+
+  @Expose()
+  lastName?: string;
+
+  @Expose()
+  username?: string;
+
+  @Expose()
+  password?: string;
+
+  @Expose()
+  email?: string;
+
+  @Expose()
+  sex?: UserSex;
+
+  @Expose()
+  internationalCode?: string;
+
+  @Expose()
+  companyName?: string;
+
+  @Expose()
+  companyTelNumber?: string;
+
+  @Expose()
+  birthday?: Date;
+
+  @Expose()
+  address?: Address[];
+}
