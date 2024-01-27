@@ -31,7 +31,7 @@ import { IUser, UserDocument, UserModel, UserStatus } from '../../types/user';
 import { normalizePhone, replaceValue } from '../../utils/helpers';
 import { AuthEvents } from './authGateway.strategy';
 import { SmsSubType } from '../../types/config';
-import { sendCode } from './otp.utils';
+import { codeRevert, sendCode, verifyCode } from './otp.utils';
 
 export const OTP_STRATEGY = 'otp';
 export class OtpStrategy extends AuthStrategy {
@@ -77,33 +77,10 @@ export class OtpStrategy extends AuthStrategy {
   }
 
   private async verify(user: IUser, code: string, userType: string) {
-    let outUser = user;
-    const otpModel = store.db.model('otp');
-    const codeDoc = await otpModel.findOneAndUpdate(
-      {
-        phone: user.phone,
-        type: userType,
-        code,
-        updatedAt: { $gt: new Date(Date.now() - 120 * 1000) },
-      },
-      { $unset: { code: '' } }
-    );
-
-    if (!codeDoc) throw new UnauthorizedError();
-    if (user.status?.find(({ status }) => status == UserStatus.NeedVerify)) {
-      outUser = await store.db.model(userType).findOneAndUpdate(
-        { _id: user._id },
-        {
-          $pull: { status: { status: UserStatus.NeedVerify } },
-          active: true,
-        },
-        { new: true }
-      );
-    }
-    return [codeDoc, outUser];
+    return await verifyCode(user, code, userType);
   }
   private async codeRevert(codeDoc: Document) {
-    await codeDoc.updateOne({ ...codeDoc.toObject() }, { timestamps: false });
+    await codeRevert(codeDoc);
   }
 
   private async sendCode(req: Req, res: Res) {
@@ -187,11 +164,10 @@ export class OtpStrategy extends AuthStrategy {
     if (req.modelName === 'admin')
       throw new ForbiddenError('can not register admin');
 
+    req.body.user = await this.transformSignup(req.body.user);
     const user = await this.exportUser(req, false, false);
     const safeUser = user?.toObject() ?? {};
     if (user && user.active) throw new BadRequestError('user exists');
-
-    req.body.user = await this.transformSignup(req.body.user);
 
     const [codeDoc] = await this.verify(
       { ...safeUser, ...req.body.user },
