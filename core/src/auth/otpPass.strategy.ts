@@ -52,11 +52,9 @@ export class OtpPassStrategy extends AuthStrategy {
         prev[k] = req.body.user[k];
         return prev;
       }, {});
-
     const model = this.getUserModel(req);
     const user: UserDocument = await model.findOne(q, '+password');
     req.user = user;
-
     return user;
   }
 
@@ -101,10 +99,6 @@ export class OtpPassStrategy extends AuthStrategy {
     }
 
     // not set password
-    console.log('cond', (login || signup) && !isPasswordSet, {
-      isPasswordSet,
-      login,
-    });
     if ((login || signup) && !isPasswordSet) {
       // progress
       return await sendCode(req, res);
@@ -114,10 +108,13 @@ export class OtpPassStrategy extends AuthStrategy {
   }
 
   async login(req: Req, res: Res, next: NextFunction) {
-    const userBody = await this.transformLogin(req.body.user);
-    const { password, code } = userBody;
+    req.body.user = await this.transformLogin(req.body.user);
+    const { password, code } = req.body.user;
 
     const user = await this.exportUser(req);
+    const isExist = Boolean(user?.active);
+
+    if (!isExist) throw new NotFound('user is not exists');
 
     if (!password && !code)
       throw new BadRequestError('code or password must be set');
@@ -175,12 +172,11 @@ export class OtpPassStrategy extends AuthStrategy {
     if (req.modelName === 'admin')
       throw new ForbiddenError('can not register admin');
 
+    req.body.user = await this.transformSignup(req.body.user);
+
     const user = await this.exportUser(req);
     const safeUser = user?.toObject() ?? {};
-
     if (user && user.active) throw new BadRequestError('user exists');
-
-    req.body.user = await this.transformSignup(req.body.user);
 
     const [codeDoc] = await verifyCode(
       { ...safeUser, ...req.body.user },

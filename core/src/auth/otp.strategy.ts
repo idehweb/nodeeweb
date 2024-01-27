@@ -164,11 +164,10 @@ export class OtpStrategy extends AuthStrategy {
     if (req.modelName === 'admin')
       throw new ForbiddenError('can not register admin');
 
+    req.body.user = await this.transformSignup(req.body.user);
     const user = await this.exportUser(req, false, false);
     const safeUser = user?.toObject() ?? {};
     if (user && user.active) throw new BadRequestError('user exists');
-
-    req.body.user = await this.transformSignup(req.body.user);
 
     const [codeDoc] = await this.verify(
       { ...safeUser, ...req.body.user },
