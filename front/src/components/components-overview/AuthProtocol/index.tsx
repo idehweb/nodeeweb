@@ -14,7 +14,7 @@ import API from '@/functions/API';
 import SignupForm from './SignupForm';
 import SigninForm from './SigninForm';
 import OtpCodePortal from './OtpCodePortal';
-import ForgotPasswordForm from './ForgotPasswordForm';
+// import ForgotPasswordForm from './ForgotPasswordForm';
 
 export interface otpResponseDataProps {
   data: {
@@ -61,7 +61,7 @@ export interface UserProps {
     | 'success'
     | 'login'
     | 'signup'
-    | 'signup:active'
+    // | 'signup:active'
     | 'change-password';
   captcha: boolean;
   countryCode?: string;
@@ -79,6 +79,8 @@ export default function AuthPortal(props) {
       authStatus: 'detect',
       authenticatingProtocol: 'otp',
       captcha: false,
+      // phoneNumber: '09335244826',
+      // countryCode: '98',
     });
   const { register, handleSubmit } = useForm();
   const [otpData, setOtpData] = useState<otpResponseDataProps>();
@@ -98,36 +100,59 @@ export default function AuthPortal(props) {
         try {
           setLoading(true);
 
-          const response = await API.post('/auth/otp', {
+          const response = await API.post('/auth/otp-pass', {
             userType: 'customer',
             login: false,
             signup: false,
             user: {
-              phone:
-                userAuthenticationInfo.countryCode +
-                userAuthenticationInfo.phoneNumber.replace(/^0/, ''),
+              phone: userAuthenticationInfo.phoneNumber,
             },
           });
-          if (response.data.data.userExists) {
+          if (
+            response.data.data.userExists &&
+            response.data.data.isPasswordSet &&
+            response.data.data.isPhoneSet
+          ) {
             setUserAuthenticationInfo((prevState) => ({
               ...prevState,
               authStatus: 'login',
             }));
-          } else {
-            const sendOtpToken = await API.post('/auth/otp', {
+          }
+          if (
+            response.data.data.userExists &&
+            !response.data.data.isPasswordSet &&
+            response.data.data.isPhoneSet
+          ) {
+            const sendOtpToken = await API.post('/auth/otp-pass', {
               userType: 'customer',
-              login: false,
-              signup: true,
+              login: true,
+              signup: false,
               user: {
-                phone:
-                  userAuthenticationInfo.countryCode +
-                  userAuthenticationInfo.phoneNumber.replace(/^0/, ''),
+                phone: userAuthenticationInfo.phoneNumber,
               },
             });
             setOtpData(sendOtpToken.data);
             setUserAuthenticationInfo((prevState) => ({
               ...prevState,
-              authStatus: 'signup:active',
+              authStatus: 'change-password',
+            }));
+          } else if (
+            !response.data.data.userExists &&
+            !response.data.data.isPasswordSet &&
+            !response.data.data.isPhoneSet
+          ) {
+            const sendOtpToken = await API.post('/auth/otp-pass', {
+              userType: 'customer',
+              login: false,
+              signup: true,
+              user: {
+                phone: userAuthenticationInfo.phoneNumber,
+              },
+            });
+            setOtpData(sendOtpToken.data);
+            setUserAuthenticationInfo((prevState) => ({
+              ...prevState,
+              authStatus: 'signup',
             }));
           }
           setLoading(true);
@@ -222,12 +247,6 @@ export default function AuthPortal(props) {
         </button>
       </form>
     </div>
-  ) : userAuthenticationInfo.authStatus === 'signup:active' ? (
-    <OtpCodePortal
-      timer={otpData.data.leftTime.seconds}
-      changes={userAuthenticationInfo}
-      setChanges={setUserAuthenticationInfo}
-    />
   ) : userAuthenticationInfo.authStatus === 'signup' ? (
     <SignupForm
       changes={userAuthenticationInfo}
@@ -241,7 +260,8 @@ export default function AuthPortal(props) {
   ) : userAuthenticationInfo.authStatus === 'success' ? (
     <Navigate to={'/'} replace />
   ) : userAuthenticationInfo.authStatus === 'change-password' ? (
-    <ForgotPasswordForm
+    <OtpCodePortal
+      timer={otpData.data.leftTime.seconds}
       changes={userAuthenticationInfo}
       setChanges={setUserAuthenticationInfo}
     />

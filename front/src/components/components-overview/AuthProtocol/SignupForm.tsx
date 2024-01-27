@@ -14,8 +14,6 @@ type FormData = {
   firstName: string;
   lastName: string;
   phone: string;
-  email: string; // Added email field
-  username: string;
   password: string;
   confirmPassword: string;
 };
@@ -35,12 +33,10 @@ export default function SignupForm({
   } = useForm({
     defaultValues: {
       confirmPassword: '',
-      email: '',
       firstName: '',
       lastName: '',
       password: '',
-      phone: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
-      username: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
+      phone: changes.phoneNumber,
     },
   });
   const [loading, setLoading] = React.useState(false);
@@ -55,23 +51,22 @@ export default function SignupForm({
     setError('');
     try {
       // Make API call
-      const signupResponse = await API.post('/auth/user-pass/signup', {
+      const signupResponse = await API.post('/auth/otp-pass/signup', {
         userType: 'customer',
         user: {
-          username: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
-          phone: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
+          code: changes.activationCode,
+          phone: changes.phoneNumber,
           password: e.password,
           firstName: e.firstName,
           lastName: e.lastName,
-          email: e.email,
         },
       });
 
       console.log('signup response is --- >');
       localStorage.setItem('user', signupResponse.data.user);
       toast.success('ورود موفقیت آمیز');
-      const token = signupResponse.data.token;
-      const user = signupResponse.data.user;
+      const token = signupResponse.data.data.token;
+      const user = signupResponse.data.data.user;
       afterAuth({ user, token });
 
       setChanges((prev) => ({
@@ -88,6 +83,25 @@ export default function SignupForm({
       console.log(error);
       setError('An error occurred. Please try again.');
       toast.error('trace code #2 خطا');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOtpCodeForSignup = async () => {
+    setLoading(true);
+    try {
+      await API.post('/auth/otp-pass', {
+        userType: 'customer',
+        login: false,
+        signup: true,
+        user: {
+          phone: changes.phoneNumber,
+        },
+      });
+      toast.success('ارسال شد');
+    } catch (err) {
+      toast.error('خطا');
     } finally {
       setLoading(false);
     }
@@ -115,25 +129,12 @@ export default function SignupForm({
             disabled
           />
         </Box>
+
         <Box display="flex" justifyContent={'space-between'}>
           <label
             className="center my-2"
             style={{ textAlign: 'center', width: '30%' }}
-            htmlFor="email">
-            ایمیل
-          </label>
-          <TextField
-            type="email"
-            {...register('email', { required: true })}
-            error={!!errors.email}
-            helperText={errors.email ? 'Email is required' : ''}
-          />
-        </Box>
-        <Box display="flex" justifyContent={'space-between'}>
-          <label
-            className="center my-2"
-            style={{ textAlign: 'center', width: '30%' }}
-            htmlFor="email">
+            htmlFor="firstName">
             نام
           </label>
 
@@ -148,7 +149,7 @@ export default function SignupForm({
           <label
             className="center my-2"
             style={{ textAlign: 'center', width: '30%' }}
-            htmlFor="email">
+            htmlFor="lastName">
             نام خانوادگی
           </label>
           <TextField
@@ -162,7 +163,7 @@ export default function SignupForm({
           <label
             className="center my-2"
             style={{ textAlign: 'center', width: '30%' }}
-            htmlFor="email">
+            htmlFor="pass">
             رمز عبور
           </label>
           <TextField
@@ -176,7 +177,7 @@ export default function SignupForm({
           <label
             className="center my-2"
             style={{ textAlign: 'center', width: '30%' }}
-            htmlFor="email">
+            htmlFor="confirmPass">
             تکرار رمز عبور
           </label>
           <TextField
@@ -188,12 +189,44 @@ export default function SignupForm({
             }
           />
         </Box>
+        <Box display="flex" justifyContent={'space-between'}>
+          <label
+            className="center my-2"
+            style={{ textAlign: 'center', width: '30%' }}
+            htmlFor="otpCode">
+            کد یکبار مصرف
+          </label>
+
+          <TextField
+            sx={{ width: '20%' }}
+            type="text"
+            value={changes.activationCode}
+            onChange={(e) =>
+              setChanges((prev) => ({
+                ...prev,
+                activationCode: e.target.value,
+              }))
+            }
+            error={!!errors.firstName}
+            helperText={errors.firstName ? 'First Name is required' : ''}
+          />
+          <Button
+            onClick={handleOtpCodeForSignup}
+            disabled={loading}
+            variant="contained"
+            color="info"
+            sx={{ fontWeight: 800 }}
+            size="small">
+            دریافت کد
+          </Button>
+        </Box>
         <Button
           type="submit"
           disabled={loading}
           variant="outlined"
+          sx={{ fontWeight: 700 }}
           color="success">
-          {loading ? 'Loading...' : 'Submit'}
+          ثبت نام
         </Button>
         {error && <p>{error}</p>}
       </Box>

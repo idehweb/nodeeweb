@@ -2,7 +2,11 @@ import { CircularProgress, Input, Button, Box } from '@mui/material';
 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
+import { toast } from 'react-toastify';
+
 import { UserProps } from '.';
+import API from '@/functions/API';
+import { afterAuth } from './utils';
 
 export default function OtpCodePortal({
   timer,
@@ -19,6 +23,8 @@ export default function OtpCodePortal({
     return 0;
   };
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setIntervalTimer((prevTimer) =>
@@ -29,6 +35,43 @@ export default function OtpCodePortal({
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onSubmit = async () => {
+    try {
+      const signinResponse = await API.post('/auth/otp-pass/login', {
+        userType: 'customer',
+        user: {
+          phone: changes.phoneNumber,
+          code: changes.activationCode,
+        },
+      });
+      console.log('otpcodeportal tracecod #12 ', signinResponse);
+      setLoading(true);
+      localStorage.setItem('user', signinResponse.data.data.user);
+      toast.success('ورود موفقیت آمیز');
+      console.log('sign in respones is -----> ', signinResponse.data.data);
+      const token = signinResponse.data.data.token;
+      const user = signinResponse.data.data.user;
+      afterAuth({
+        user,
+        token,
+      });
+
+      setChanges((prev) => ({
+        ...prev,
+        authStatus: 'success',
+        userInfo: signinResponse.data.data,
+      }));
+
+      // Save authToken to cookie
+      // document.cookie = `authToken=${signinResponse.data.data.token}`;
+    } catch (err) {
+      toast.error('خطا در ورود با حساب کاربری');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -44,10 +87,7 @@ export default function OtpCodePortal({
         <div className={'flex-item '}>
           <Box display={'flex'} justifyContent={'space-between'} gap={'3rem'}>
             <p>شماره موبایل شما:</p>
-            <p className="ltr">
-              {changes.countryCode.replace(/\+/g, '') +
-                changes.phoneNumber.replace(/^0/, '')}
-            </p>
+            <p className="ltr">{changes.phoneNumber}</p>
           </Box>
           {Boolean(timer) ? (
             <div className={'flex-item-relative center '}>
@@ -103,17 +143,16 @@ export default function OtpCodePortal({
         <Button
           onClick={() => {
             handleClearInterval();
-            setChanges((prev) => ({
-              ...prev,
-              authStatus: 'change-password',
-            }));
+            onSubmit();
           }}
           variant="outlined"
           color="success"
+          disabled={loading}
           fullWidth>
           ثبت
         </Button>
         <Button
+          disabled={loading}
           onClick={() => {
             handleClearInterval();
             setChanges((prev) => ({
@@ -130,7 +169,11 @@ export default function OtpCodePortal({
       </Box>
 
       {intervalTimer === 0 && (
-        <Button variant="contained" color="inherit" fullWidth>
+        <Button
+          disabled={loading}
+          variant="contained"
+          color="inherit"
+          fullWidth>
           ارسال مجدد کد؟
         </Button>
       )}

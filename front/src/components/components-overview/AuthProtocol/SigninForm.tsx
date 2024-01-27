@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { TextField, Button, Box } from '@mui/material';
 
@@ -30,10 +30,10 @@ export default function SigninForm({
     try {
       setLoading(true);
       // Make API call
-      const signinResponse = await API.post('/auth/user-pass/login', {
+      const signinResponse = await API.post('/auth/otp-pass/login', {
         userType: 'customer',
         user: {
-          username: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
+          phone: changes.phoneNumber,
           password: e.password,
         },
       });
@@ -70,53 +70,6 @@ export default function SigninForm({
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (
-      !changes.phoneNumber ||
-      changes.phoneNumber.trim() === '' ||
-      changes.phoneNumber === '0'
-    ) {
-      toast.error('Phone Number Field is Empty');
-    } else {
-      console.log('trace #s1');
-      try {
-        setLoading(true);
-
-        const response = await API.post('/auth/otp', {
-          userType: 'customer',
-          login: false,
-          signup: false,
-          user: {
-            phone: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
-          },
-        });
-        if (response.data.data.userExists) {
-          console.log('trace #s2');
-
-          await API.post('/auth/otp', {
-            userType: 'customer',
-            login: false,
-            signup: true,
-            user: {
-              phone:
-                changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
-            },
-          });
-          // setOtpData(sendOtpToken.data);
-          setChanges((prevState) => ({
-            ...prevState,
-            authStatus: 'change-password',
-          }));
-        }
-      } catch (err: any) {
-        console.log('error trace code signing-2 ', err);
-        toast.error('خطا');
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -126,11 +79,9 @@ export default function SigninForm({
           gap={'2rem'}
           padding={'2rem'}>
           <TextField
-            name="username"
-            label="Username"
-            defaultValue={
-              changes.countryCode + changes.phoneNumber.replace(/^0/, '')
-            }
+            name="Phone Number"
+            label="Phone Number"
+            defaultValue={changes.phoneNumber}
             disabled
           />
           <TextField
@@ -149,7 +100,12 @@ export default function SigninForm({
           </Button>
           <Button
             disabled={loading}
-            onClick={handleForgotPassword}
+            onClick={() =>
+              setChanges((prevState) => ({
+                ...prevState,
+                authStatus: 'change-password',
+              }))
+            }
             variant="contained"
             sx={{ fontWeight: 700, fontSize: '1rem' }}
             color="success">
