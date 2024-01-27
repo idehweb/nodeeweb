@@ -82,7 +82,8 @@ export class OtpPassStrategy extends AuthStrategy {
         });
     }
 
-    if (login || signup) {
+    // not set password
+    if ((login || signup) && !isPasswordSet) {
       // progress
       return await sendCode(req, res);
     }
