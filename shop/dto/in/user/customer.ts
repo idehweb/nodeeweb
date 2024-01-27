@@ -208,9 +208,6 @@ export class UpdateCustomerByOwn {
   username?: string;
 
   @Expose()
-  password?: string;
-
-  @Expose()
   email?: string;
 
   @Expose()
@@ -230,4 +227,11 @@ export class UpdateCustomerByOwn {
 
   @Expose()
   address?: Address[];
+}
+
+export class UpdatePasswordByOwn {
+  @Expose()
+  @IsString()
+  @Length(8, 20)
+  password: string;
 }

@@ -52,6 +52,10 @@ export const AdminAccess: ControllerAccess = {
   modelName: 'admin',
   role: PUBLIC_ACCESS,
 };
+export const CustomerAccess: ControllerAccess = {
+  modelName: 'customer',
+  role: PUBLIC_ACCESS,
+};
 
 export type UserPassStrategyOpt = {
   model: string;

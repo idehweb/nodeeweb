@@ -29,7 +29,6 @@ export async function sendCode(req: Req, res: Res) {
     type: req.modelName,
     updatedAt: { $gt: new Date(Date.now() - 120 * 1000) },
   });
-  console.log({ res_body: req.res_body });
   if (prevCode) {
     const leftTimeMs = prevCode.updatedAt.getTime() + 120 * 1000 - Date.now();
     return res.json(
