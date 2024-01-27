@@ -1,9 +1,15 @@
 import { registerEntityCRUD } from '@nodeeweb/core/src/handlers/entity.handler';
 import Service from './service';
-import { AdminAccess, AuthUserAccess } from '@nodeeweb/core';
+import {
+  AdminAccess,
+  AuthUserAccess,
+  CustomerAccess,
+  controllersBatchRegister,
+} from '@nodeeweb/core';
 import {
   CreateCustomerBody,
   UpdateCustomerBody,
+  UpdatePasswordByOwn,
 } from '../../dto/in/user/customer';
 import { UserParamVal } from '../../dto/in/user';
 
@@ -75,5 +81,19 @@ export default function registerController() {
       },
     },
     { from: 'ShopEntity' }
+  );
+
+  // update password
+  controllersBatchRegister(
+    [
+      {
+        method: 'patch',
+        access: CustomerAccess,
+        service: Service.updatePassword,
+        validate: { dto: UpdatePasswordByOwn, reqPath: 'body' },
+        url: 'updatePassword',
+      },
+    ],
+    { base_url: '/api/v1/customer', from: 'ShopEntity' }
   );
 }

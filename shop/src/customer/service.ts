@@ -1,12 +1,21 @@
-import { EntityCreator } from '@nodeeweb/core';
+import {
+  EntityCreator,
+  setToCookie,
+  signToken,
+  tokenSetToCookie,
+} from '@nodeeweb/core';
 import { CRUD_DEFAULT_REQ_KEY } from '@nodeeweb/core/src/constants/String';
 import { MiddleWare, Req, Res } from '@nodeeweb/core/types/global';
 import mongoose, { FilterQuery } from 'mongoose';
-import { CustomerSource } from '../../schema/customer.schema';
+import { CustomerModel, CustomerSource } from '../../schema/customer.schema';
 import { customerTransformBody, transformBody } from './utils';
 import store from '../../store';
 
 export class Service {
+  static get customerModel(): CustomerModel {
+    return store.db.model('customer');
+  }
+
   static async parseFilterForAllCustomer(req: Req) {
     let search = {};
     if (req.query.search) {
@@ -121,6 +130,25 @@ export class Service {
     res.json({
       success: true,
       post: customer,
+    });
+  };
+
+  static updatePassword: MiddleWare = async (req, res) => {
+    // update db
+    const newUser = await Service.customerModel.findByIdAndUpdate(
+      req.user._id,
+      req.body
+    );
+
+    // sign token
+    const token = signToken(newUser);
+    setToCookie(res, token, 'authToken');
+
+    return res.json({
+      data: {
+        user: newUser,
+        token,
+      },
     });
   };
 
