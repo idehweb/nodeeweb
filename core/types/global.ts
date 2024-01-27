@@ -30,6 +30,7 @@ export type Req = Request & {
   filter_query?: mongoose.FilterQuery<any>;
   update_query?: mongoose.UpdateQuery<any>;
   create_query?: any;
+  res_body?: any;
 };
 
 export type Res = Response;

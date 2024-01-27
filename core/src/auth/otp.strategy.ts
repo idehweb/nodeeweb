@@ -31,6 +31,7 @@ import { IUser, UserDocument, UserModel, UserStatus } from '../../types/user';
 import { normalizePhone, replaceValue } from '../../utils/helpers';
 import { AuthEvents } from './authGateway.strategy';
 import { SmsSubType } from '../../types/config';
+import { sendCode } from './otp.utils';
 
 export const OTP_STRATEGY = 'otp';
 export class OtpStrategy extends AuthStrategy {
@@ -107,82 +108,7 @@ export class OtpStrategy extends AuthStrategy {
 
   private async sendCode(req: Req, res: Res) {
     // generate and send code
-
-    const phone = req.user?.phone ?? req.body.user?.phone,
-      userExists = Boolean(req.user);
-
-    // send code
-    const smsPlugin = store.plugins.get(CorePluginType.SMS) as SMSPluginContent;
-    if (!smsPlugin) throw new NotImplement('sms plugin not found');
-
-    // save to db
-    const otpModel = store.db.model('otp');
-    //check if sms send before :
-    const prevCode = await otpModel.findOne({
-      phone,
-      type: req.modelName,
-      updatedAt: { $gt: new Date(Date.now() - 120 * 1000) },
-    });
-    if (prevCode) {
-      const leftTimeMs = prevCode.updatedAt.getTime() + 120 * 1000 - Date.now();
-      return res.json({
-        type: SmsSendStatus.Send_Before,
-        message: `sms send at ${prevCode.updatedAt}`,
-        data: {
-          userExists,
-          leftTime: {
-            milliseconds: leftTimeMs,
-            seconds: Math.ceil(leftTimeMs / 1000),
-          },
-        },
-      });
-    }
-
-    const code = (
-      await Promise.all(new Array(5).fill(0).map(() => randomNumber(0, 9)))
-    ).join('');
-
-    // create
-    await otpModel.findOneAndUpdate(
-      { phone, type: req.modelName },
-      { code },
-      { new: true, upsert: true }
-    );
-
-    // send code
-    let codeResult: string | boolean;
-    try {
-      const response = await smsPlugin.stack[0]({
-        to: phone,
-        type: SMSPluginType.Automatic,
-        subType: SmsSubType.OTP,
-        text: replaceValue({
-          data: [store.config.toObject(), { code }],
-          text: store.config.sms_message_on.otp,
-        }),
-      });
-      if (response.status === SmsSendStatus.Send_Success) codeResult = true;
-    } catch (err) {
-      codeResult = err.message;
-    }
-
-    if (codeResult !== true) {
-      // revert changes
-      await otpModel.findOneAndDelete({ phone, type: req.modelName });
-      throw new SendSMSError(codeResult);
-    }
-
-    return res.json({
-      type: SmsSendStatus.Send_Success,
-      message: `sms send at ${new Date().toISOString()}`,
-      data: {
-        userExists,
-        leftTime: {
-          milliseconds: 120_000,
-          seconds: 120,
-        },
-      },
-    });
+    return await sendCode(req, res);
   }
 
   private async createUser(modelName: string, iuser: Partial<IUser>) {
@@ -199,9 +125,13 @@ export class OtpStrategy extends AuthStrategy {
     // export user
     req.user = await this.exportUser(req, !signup && login, false);
 
-    // create user
-    const isExist = req.user?.active;
+    // init attrs
+    const isExist = Boolean(req.user?.active);
 
+    // res body
+    req.res_body = { data: { userExists: isExist } };
+
+    // create user
     if (isExist && !login && signup) throw new BadRequestError('user exists');
     if (!isExist && !signup && login) throw new NotFound('user not exists');
 
@@ -222,7 +152,7 @@ export class OtpStrategy extends AuthStrategy {
       return await this.sendCode(req, res);
     }
 
-    return res.json({ data: { userExists: Boolean(req.user) } });
+    return res.json(req.res_body);
   }
   async login(req: Req, res: Res) {
     req.body.user = await this.transformLogin(req.body.user);
