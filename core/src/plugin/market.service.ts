@@ -18,6 +18,21 @@ import { randomUUID } from 'crypto';
 const LOCAL_MARKET_FORMATS = ['zip', 'x-tar', 'gzip', 'x-bzip2'];
 
 class MarketService {
+  private transformOut(pluginConfig: any, exclude: string[] = []) {
+    const out = {
+      name: pluginConfig.name,
+      description: pluginConfig.description,
+      author: pluginConfig.author,
+      version: pluginConfig.version,
+      slug: pluginConfig.slug,
+      icon: pluginConfig.icon,
+      type: pluginConfig.type,
+      config: { inputs: pluginConfig.config.inputs },
+    };
+
+    exclude.forEach((k) => delete out[k]);
+    return out;
+  }
   get fileModel(): FileModel {
     return store.db.model('file');
   }
@@ -80,15 +95,7 @@ class MarketService {
 
     // present
     return res.json({
-      data: configs.map((conf) => ({
-        name: conf.name,
-        description: conf.description,
-        author: conf.author,
-        version: conf.version,
-        slug: conf.slug,
-        icon: conf.icon,
-        type: conf.type,
-      })),
+      data: configs.map((conf) => this.transformOut(conf, ['config'])),
     });
   };
   getCount: MiddleWare = async (req, res) => {
@@ -104,16 +111,7 @@ class MarketService {
 
     // present
     return res.json({
-      data: {
-        name: conf.name,
-        description: conf.description,
-        author: conf.author,
-        version: conf.version,
-        slug: conf.slug,
-        icon: conf.icon,
-        type: conf.type,
-        config: { inputs: conf.config.inputs },
-      },
+      data: this.transformOut(conf),
     });
   };
 
@@ -130,7 +128,7 @@ class MarketService {
       await fs.promises.rm(rootPath, { recursive: true });
 
     await fs.promises.rename(tmpRootPath, rootPath);
-    return slug;
+    return configObj;
   }
 
   add: MiddleWare = async (req, res) => {
@@ -150,10 +148,11 @@ class MarketService {
       );
 
     //  process
-    const slug = await this.processFile(fileDoc);
+    const plugin = await this.processFile(fileDoc);
 
     return res.status(201).json({
-      message: `add ${slug} into local market plugin successfully`,
+      data: this.transformOut(plugin),
+      message: `add ${plugin.slug} into local market plugin successfully`,
     });
   };
 }
