@@ -11,8 +11,9 @@ import { isExist } from '../../utils/helpers';
 import { NotFound } from '../../types/error';
 import { PluginMarketAddBody } from '../../dto/in/plugin.dto';
 import store from '../../store';
-import { FileModel } from '../../schema/file.schema';
+import { FileDocument, FileModel } from '../../schema/file.schema';
 import decompress from 'decompress';
+import { randomUUID } from 'crypto';
 
 const LOCAL_MARKET_FORMATS = ['zip', 'x-tar', 'gzip', 'x-bzip2'];
 
@@ -116,6 +117,22 @@ class MarketService {
     });
   };
 
+  private async processFile(fileDoc: FileDocument) {
+    const tmpRootPath = getLocalPluginMarketPath(randomUUID());
+    await decompress(getFilesPath(fileDoc.url), tmpRootPath);
+    const configObj = JSON.parse(
+      await fs.promises.readFile(join(tmpRootPath, 'config.json'), 'utf8')
+    );
+    const slug = configObj.slug;
+    const rootPath = getLocalPluginMarketPath(slug);
+    if (await isExist(rootPath))
+      // remove dest
+      await fs.promises.rm(rootPath, { recursive: true });
+
+    await fs.promises.rename(tmpRootPath, rootPath);
+    return slug;
+  }
+
   add: MiddleWare = async (req, res) => {
     const body = req.body as PluginMarketAddBody;
 
@@ -132,11 +149,11 @@ class MarketService {
         )}`
       );
 
-    //  decompress
-    await decompress(getFilesPath(fileDoc.url), getLocalPluginMarketPath());
+    //  process
+    const slug = await this.processFile(fileDoc);
 
     return res.status(201).json({
-      message: 'add into local market plugin successfully',
+      message: `add ${slug} into local market plugin successfully`,
     });
   };
 }
