@@ -1,53 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import { FormRadio, ListGroupItem } from 'shards-react';
+import { useState } from 'react';
+import { FormRadio } from 'shards-react';
 import { withTranslation } from 'react-i18next';
-import { getEntities } from '#c/functions/index';
+
+import useFetch from '@/hooks/useFetch';
+import Loading from '../Loading';
 
 // import State from "#c/data/state";
 
-function GetGateways(prop) {
-  const [gateways, setGateways] = useState(null);
+function GetGateways({ setPaymentMethod }) {
   const [choosed, setChoosed] = useState(0);
 
-  useEffect(() => {
-    if (!gateways)
-      getEntities(
-        'gateway',
-        0,
-        10,
-        false,
-        JSON.stringify({ type: 'bank' })
-      ).then((r) => {
-        // if (r && r.tables) {
-        //     console.log('r.tables', r.tables)
-        prop.setPaymentMethod(r[0].slug);
-
-        setGateways(r);
-        // }
-      });
-  }, []);
-  if (!gateways) {
-    return null;
-  }
-  return gateways.map((gt, k) => {
-    if (k == 0) {
-    }
-    return (
-      <div className={'d-flex ' + gt.slug} key={k}>
-        {' '}
-        <FormRadio
-          checked={k === choosed}
-          onChange={(event) => {
-            console.log('prop', prop);
-            setChoosed(k);
-            prop.setPaymentMethod(gt.slug);
-          }}
-          className="mb-0 ">
-          {gt.title['fa']}
-        </FormRadio>
-      </div>
-    );
+  const { data, isLoading, error } = useFetch({
+    requestQuery: '/gateway?type=bank-gateway',
   });
+
+  console.log('tracecode#22 ', data);
+
+  return isLoading ? (
+    <Loading />
+  ) : error ? (
+    <p>خطا</p>
+  ) : (
+    data.length !== 0 &&
+    data.data.map((gateway, index) => {
+      return (
+        <div className={'d-flex ' + gateway.slug} key={index}>
+          <FormRadio
+            checked={index === choosed}
+            onChange={(event) => {
+              setChoosed(index);
+              setPaymentMethod(gateway.slug);
+            }}
+            className="mb-0 ">
+            {gateway.description['fa']}
+          </FormRadio>
+        </div>
+      );
+    })
+  );
 }
 
 export default withTranslation()(GetGateways);

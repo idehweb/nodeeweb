@@ -341,7 +341,9 @@ const LastPart = (props) => {
             </ListGroupItem>
             <ListGroupItem className={'d-flex px-3 border-0 '}></ListGroupItem>
           </ListGroup>
-          <Col className={'empty ' + 'height50'} sm={12} lg={12}></Col>
+          <GetGateways setPaymentMethod={theParams.setPaymentMethod} />
+
+          <Col className={'empty height50'} sm={12} lg={12}></Col>
           <ListGroup>
             <ListGroupItem className={'d-flex px-3 border-0 '}>
               <RadioGroup></RadioGroup>
