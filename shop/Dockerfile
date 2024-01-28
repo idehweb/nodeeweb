@@ -24,7 +24,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Health check
-HEALTHCHECK --interval=1m --timeout=15s --retries=3 --start-period=2m \
+HEALTHCHECK --interval=15s --timeout=15s --retries=3 --start-period=15s \
     CMD curl -fk http://localhost:${PORT}/health || exit 1
 
 # Change Work directory
