@@ -20,7 +20,7 @@ import {
   useGetList,
   Button,
 } from 'react-admin';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useForm } from 'react-hook-form';
 
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -51,6 +51,10 @@ import {
 import { Val } from '@/Utils';
 import Transform from '@/functions/transform';
 import { convertError } from '@/functions/utils';
+
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // import { RichTextInput } from 'ra-input-rich-text';
 // import {ImportButton} from "react-admin-import-csv";
@@ -283,44 +287,72 @@ const Form = ({ children, ...props }) => {
   const totals = 0;
 
   const [mainWord, setMainWord] = useState('');
-  const [answer, setAnswer] = useState({
-    id: '',
-    answer: '',
-    alreadyAnswerd: false,
-  });
+  const [answer, setAnswer] = useState('');
+
+  const [waitings, setWaitings] = useState(false);
+
   console.log(props);
 
-  setAnswer({
-    id: props.record._id,
-    answer: props.record.chatGPT.answer,
-    alreadyAnswerd: props.record.chatGPT.alreadyAnswer,
-  });
-
-  const chatGptHandler = () => {
-    //to do - check if already asked (add answer to schema and check if already answerd)
-
-    const question = mainWord
-      ? `tell me about ${mainWord} in 40 words`
-      : `tell me about ${props.record.title.fa} in 40 words`;
-    // axios.get()
-    console.log(question);
-
-    if (props.record.alreadyAnswerd) {
-      notify('already answerd');
-      return;
+  //check if props is empty or not
+  const isEmpty = (props) => {
+    for (const prop in props) {
+      if (Object.hasOwn(props, prop)) {
+        return false;
+      }
     }
 
-    fetch('https://jsonplaceholder.typicode.com/posts/1')
-      .then((response) => response.json())
-      .then((data) => {
-        const title = data.title;
-        // console.log(title);
-        setAnswer(title);
-      })
-      .catch((err) => {
-        console.log(err);
-        setAnswer('');
-      });
+    return true;
+  };
+
+  // if (!isEmpty) {
+  //   setAnswer({
+  //     id: props.record._id,
+  //     answer: props.record.chatGPT.answer,
+  //   });
+  // }
+
+  const chatGptHandler = async () => {
+    try {
+      const question = mainWord
+        ? `tell me about ${mainWord.trim()} in 40 words`
+        : props.record?.title.fa
+        ? `tell me about ${props.record.title.fa} in 40 words`
+        : null;
+
+      console.log(question);
+
+      if (!question) {
+        notify('Please enter a title');
+        return;
+      }
+
+      var myHeaders = new Headers();
+
+      myHeaders.append(
+        'content-type',
+        'application/x-www-form-urlencoded; charset=UTF-8'
+      );
+      var raw = `content=${question}`;
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow',
+      };
+      setWaitings(true);
+      const data = await fetch(
+        'https://idehweb.com/chatgpt/gpt.php',
+        requestOptions
+      );
+
+      const response = await data.json();
+      const formatedData = await response.choices[0].message.content;
+      setWaitings(false);
+      setAnswer(formatedData);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -335,7 +367,9 @@ const Form = ({ children, ...props }) => {
         source={'title.' + translate('lan')}
         label={translate('resources.product.title')}
         className={'width100 mb-20'}
-        onChange={(e) => setMainWord(e.target.value)}
+        onChange={(e) => {
+          setMainWord(e.target.value);
+        }}
         validate={Val.req}
         fullWidth
       />
@@ -372,6 +406,25 @@ const Form = ({ children, ...props }) => {
         onClick={chatGptHandler}
         style={{ border: '1px solid', borderRadius: 10, margin: 2 }}
       />
+      {waitings && (
+        <Box
+          sx={{
+            display: 'flex',
+            padding: '10px',
+            margin: '10px',
+          }}>
+          <CircularProgress />
+        </Box>
+      )}
+      {answer != '' && !waitings && (
+        <TextField
+          label="chatGPT answer"
+          color="secondary"
+          style={{ width: '100%', padding: '5px', margin: '5px' }}
+          multiline
+          value={answer}
+        />
+      )}
       <RichTextInput
         fullWidth
         source={'description.' + translate('lan')}
