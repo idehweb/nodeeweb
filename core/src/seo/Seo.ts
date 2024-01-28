@@ -322,7 +322,7 @@ export class SeoCore implements Seo {
     }
   }
 
-  private async effectPage(root: HTMLElement, path: string) {
+  private async getPageDoc(path: string) {
     let slug: string;
 
     if (path === '/') slug = 'home';
@@ -338,20 +338,23 @@ export class SeoCore implements Seo {
         { metadescription: 1, metatitle: 1, title: 1, keywords: 1 }
       );
 
-      if (!page) return;
-      const title = Object.values({
-        ...page.title,
-        ...page.metatitle,
-      }).filter((d) => d)[0] as string;
-      if (title) this.effectMeta(root, { key: 'title', value: title });
-
-      const des = Object.values(page.metadescription ?? {}).filter((d) => d)[0];
-      if (des) this.effectMeta(root, { key: 'description', value: des });
-
-      // keywords
-      const keywords = page.keywords?.join(',');
-      if (keywords) this.effectMeta(root, { key: 'keywords', value: keywords });
+      if (page) return page as PageDocument;
     }
+    return null;
+  }
+  private effectPage(root: HTMLElement, page: PageDocument) {
+    const title = Object.values({
+      ...page.title,
+      ...page.metatitle,
+    }).filter((d) => d)[0] as string;
+    if (title) this.effectMeta(root, { key: 'title', value: title });
+
+    const des = Object.values(page.metadescription ?? {}).filter((d) => d)[0];
+    if (des) this.effectMeta(root, { key: 'description', value: des });
+
+    // keywords
+    const keywords = page.keywords?.join(',');
+    if (keywords) this.effectMeta(root, { key: 'keywords', value: keywords });
   }
 
   getPage: MiddleWare = async (req, res, next) => {
@@ -366,8 +369,12 @@ export class SeoCore implements Seo {
     );
     const html = parse(htmlStr, { comment: false });
 
+    const pageDoc = await this.getPageDoc(req.path);
+
+    if (!pageDoc) return next();
+
     this.effectPreConfig(html);
-    await this.effectPage(html, req.path);
+    this.effectPage(html, pageDoc);
     this.effectPostConfig(html);
 
     res.setHeader('content-type', 'text/html');
