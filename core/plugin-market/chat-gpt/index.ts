@@ -29,6 +29,12 @@ const prompt: ChatGptPluginContent['stack'][0] = async ({ q, model }) => {
   }
 };
 
+const promptController = async (req: any, res: any) => {
+  const body = req.body;
+  const response = await prompt(body);
+  return res.status(200).json({ data: response });
+};
+
 function register(arg: any): ChatGptPluginContent['stack'] {
   config = arg;
   config.provider = ProviderBuilder.build(
@@ -36,6 +42,18 @@ function register(arg: any): ChatGptPluginContent['stack'] {
     config.apiKey,
     config.model
   );
+
+  // register controller
+  const controllerRegister = config.resolve('controllerRegister');
+  controllerRegister(
+    {
+      method: 'post',
+      service: promptController,
+      url: '/prompt',
+    },
+    { from: 'ChatGptPlugin' }
+  );
+
   return [prompt];
 }
 
