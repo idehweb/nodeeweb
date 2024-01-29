@@ -2,7 +2,7 @@
     "name": "Chat-GPT gateway",
     "version": "1.0.0",
     "description": {
-        "en": "gateway for connect OpenAI or nodeeweb chat service into your nodeeweb service",
+        "en": "gateway for connect OpenAI or nodeeweb chat service into your nodeeweb service\ncan use prompt api on /api/v1/chat-gpt/prompt",
         "fa": "واسطه بین OpenAI یا Nodeeweb Chat به سرویس شما"
     },
     "type": "general",

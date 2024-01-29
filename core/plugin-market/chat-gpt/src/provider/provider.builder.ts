@@ -13,6 +13,8 @@ export class ProviderBuilder {
         return new NodeewebIrProvider(apiKey, model);
       case ProviderType.OpenAI:
         return new OpenAIProvider(apiKey, model);
+      default:
+        throw new Error(`invalid provider type, received: ${type}`);
     }
   }
 }

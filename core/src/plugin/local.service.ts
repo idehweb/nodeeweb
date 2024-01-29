@@ -55,7 +55,7 @@ class LocalService {
     getEnv: (key: string) => {
       return store.env[key];
     },
-    controllerRegister: (
+    restrictedControllerRegister: (
       schema: ControllerSchema,
       opts?: Partial<ControllerRegisterOptions>
     ) => {
@@ -65,6 +65,7 @@ class LocalService {
         from: `${opts.from ? `Plugin:${opts.from}` : plugin.slug}`,
       });
     },
+    controllerRegister,
   });
 
   private insideResolveCreator = (plugin: PluginConfig) => {
