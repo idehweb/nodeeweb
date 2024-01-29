@@ -17,7 +17,8 @@
                     "en": "Chat Provider",
                     "fa": "سرویس دهنده چت"
                 },
-                "type": "string"
+                "type": "string",
+                "in":["nodeeweb-com","nodeeweb-ir","openai"]
             },
             {
                 "key": "apiKey",

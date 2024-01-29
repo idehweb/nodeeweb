@@ -6,7 +6,8 @@ export interface PluginContent {
 }
 
 export enum Provider {
-  Nodeeweb = 'nodeeweb',
+  NodeewebCom = 'nodeeweb-com',
+  NodeewebIr = 'nodeeweb-ir',
   OpenAI = 'openai',
 }
 
