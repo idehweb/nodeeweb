@@ -88,7 +88,7 @@ export default function SigninForm({
             {...register('password', { required: true })}
             name="password"
             label="Password"
-            type="text"
+            type="password"
           />
           <Button
             disabled={loading}
