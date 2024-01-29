@@ -1,5 +1,6 @@
 export enum CorePluginType {
   SMS = 'sms-gateway',
+  General = 'general',
 }
 export enum SMSPluginType {
   Automatic = 'automatic',
