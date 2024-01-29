@@ -5,8 +5,7 @@ abstract class NodeewebProvider extends Provider {
   constructor(apiKey: string, model?: string) {
     super(apiKey, model);
     this.api = axios.create({
-      //   baseURL: 'https://chat.nodeeweb.com',
-      baseURL: 'http://185.110.190.242:2730',
+      baseURL: 'https://chat.nodeeweb.com',
       headers: {
         'X-Auth-From': this.getAuthProvider(),
         Authorization: `Bearer ${this.apiKey}`,
