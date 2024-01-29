@@ -4,9 +4,11 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 import { toast } from 'react-toastify';
 
-import { UserProps } from '.';
 import API from '@/functions/API';
+
 import { afterAuth } from './utils';
+
+import { UserProps } from '.';
 
 export default function OtpCodePortal({
   timer,
@@ -38,7 +40,7 @@ export default function OtpCodePortal({
 
   const onSubmit = async () => {
     try {
-      const signinResponse = await API.post('/auth/otp-pass/login', {
+      const signinResponse = await API.post('/auth/otp/login', {
         userType: 'customer',
         user: {
           phone: changes.phoneNumber,
@@ -63,6 +65,26 @@ export default function OtpCodePortal({
         userInfo: signinResponse.data.data,
       }));
 
+      const changePasswordResponse = await API.patch(
+        '/customer/updatePassword',
+        { password: changes.tempPassword }
+      );
+
+      console.log(
+        'password is changed traceback logs #ocp1 ',
+        changePasswordResponse
+      );
+      toast.success('پسورد با موفقیت تغییر یافت');
+      afterAuth({
+        user: changePasswordResponse.data.data.user,
+        token: changePasswordResponse.data.data.token,
+      });
+
+      setChanges((prev) => ({
+        ...prev,
+        authStatus: 'success',
+        userInfo: changePasswordResponse.data.data,
+      }));
       // Save authToken to cookie
       // document.cookie = `authToken=${signinResponse.data.data.token}`;
     } catch (err) {

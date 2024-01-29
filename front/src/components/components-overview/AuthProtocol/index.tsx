@@ -14,6 +14,7 @@ import API from '@/functions/API';
 import SignupForm from './SignupForm';
 import SigninForm from './SigninForm';
 import OtpCodePortal from './OtpCodePortal';
+import ForgotPasswordForm from './ForgotPasswordForm';
 // import ForgotPasswordForm from './ForgotPasswordForm';
 
 export interface otpResponseDataProps {
@@ -33,6 +34,7 @@ export interface userInfoProps {
     firstName: string;
     lastName: string;
     email: string;
+    // password: string;
     username: string;
     source: string;
     type: string;
@@ -61,12 +63,14 @@ export interface UserProps {
     | 'success'
     | 'login'
     | 'signup'
-    // | 'signup:active'
+    | 'change-password:active'
     | 'change-password';
   captcha: boolean;
   countryCode?: string;
   phoneNumber?: string;
   activationCode?: string;
+  tempPassword?: string;
+  timer?: number;
   userInfo?: userInfoProps;
   authenticatingProtocol: 'otp' | 'password';
 }
@@ -83,7 +87,7 @@ export default function AuthPortal(props) {
       // countryCode: '98',
     });
   const { register, handleSubmit } = useForm();
-  const [otpData, setOtpData] = useState<otpResponseDataProps>();
+  // const [otpData, setOtpData] = useState<otpResponseDataProps>();
 
   // Remove unused variables
   const detectUserState = async (event) => {
@@ -131,7 +135,8 @@ export default function AuthPortal(props) {
                 phone: userAuthenticationInfo.phoneNumber,
               },
             });
-            setOtpData(sendOtpToken.data);
+            // setOtpData(sendOtpToken.data);
+            console.log('send otp to login traceback #iap1 ', sendOtpToken);
             setUserAuthenticationInfo((prevState) => ({
               ...prevState,
               authStatus: 'change-password',
@@ -149,7 +154,11 @@ export default function AuthPortal(props) {
                 phone: userAuthenticationInfo.phoneNumber,
               },
             });
-            setOtpData(sendOtpToken.data);
+            console.log(
+              'send otp for signup traceback #index-auth-portal-l-158 ',
+              sendOtpToken
+            );
+            // setOtpData(sendOtpToken.data);
             setUserAuthenticationInfo((prevState) => ({
               ...prevState,
               authStatus: 'signup',
@@ -252,6 +261,12 @@ export default function AuthPortal(props) {
       changes={userAuthenticationInfo}
       setChanges={setUserAuthenticationInfo}
     />
+  ) : userAuthenticationInfo.authStatus === 'change-password:active' ? (
+    <OtpCodePortal
+      timer={userAuthenticationInfo.timer || 120}
+      changes={userAuthenticationInfo}
+      setChanges={setUserAuthenticationInfo}
+    />
   ) : userAuthenticationInfo.authStatus === 'login' ? (
     <SigninForm
       changes={userAuthenticationInfo}
@@ -260,8 +275,7 @@ export default function AuthPortal(props) {
   ) : userAuthenticationInfo.authStatus === 'success' ? (
     <Navigate to={'/'} replace />
   ) : userAuthenticationInfo.authStatus === 'change-password' ? (
-    <OtpCodePortal
-      timer={otpData.data.leftTime.seconds}
+    <ForgotPasswordForm
       changes={userAuthenticationInfo}
       setChanges={setUserAuthenticationInfo}
     />

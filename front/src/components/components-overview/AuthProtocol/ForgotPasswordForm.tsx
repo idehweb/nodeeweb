@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 import API from '@/functions/API';
 
-import { afterAuth } from './utils';
+// import { afterAuth } from './utils';
 
 import { UserProps } from '.';
 
@@ -27,7 +27,7 @@ export default function ForgotPasswordForm({
     },
   });
 
-  const onSubmit = async (data: {
+  const onChangePasswordSubmit = async (data: {
     confirmPassword: string;
     password: string;
     verificationCode: string;
@@ -36,27 +36,25 @@ export default function ForgotPasswordForm({
       toast.error('عدم تطابق رمز عبور');
       return;
     }
-    // Handle form submission here
-    console.log(data);
-    const updateUserResponse = await API.post('/auth/otp/signup', {
-      userType: 'customer',
-      user: {
-        username: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
-        phone: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
-        password: data.password,
-        code: data.verificationCode,
-      },
-    });
-    console.log('update user response is #fgf2 ', updateUserResponse);
-    localStorage.setItem('user', updateUserResponse.data.user);
-    toast.success('ورود موفقیت آمیز');
-    const token = updateUserResponse.data.token;
-    const user = updateUserResponse.data.user;
-    afterAuth({ user, token });
-
     try {
-    } catch (error) {
-      console.log('error trace code #fpf1');
+      setLoading(true);
+      const sendOtpToken = await API.post('/auth/otp', {
+        userType: 'customer',
+        login: true,
+        signup: false,
+        user: {
+          phone: changes.phoneNumber,
+        },
+      });
+      setChanges((prev) => ({
+        ...prev,
+        authStatus: 'change-password:active',
+        tempPassword: data.password,
+      }));
+      console.log('otp token for reset pass traceback #fpf1 ', sendOtpToken);
+      toast.success('کد با موفقیت ارسال شد');
+    } catch (err) {
+      console.log('error trace back code #ocps1');
       toast.error('خطا');
     } finally {
       setLoading(false);
@@ -64,7 +62,7 @@ export default function ForgotPasswordForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onChangePasswordSubmit)}>
       <Box
         sx={{
           display: 'flex',
@@ -73,8 +71,9 @@ export default function ForgotPasswordForm({
           padding: '2rem',
         }}>
         <TextField
+          sx={{ fontFamily: 'inherit' }}
           name="phoneNumber"
-          label="Phone Number"
+          label="شماره همراه"
           type="number"
           defaultValue={
             changes.countryCode + changes.phoneNumber.replace(/^0/, '')
@@ -83,22 +82,18 @@ export default function ForgotPasswordForm({
           // {...register('phone', { required: true })}
         />
         <TextField
+          sx={{ fontFamily: 'inherit' }}
           name="newPassword"
-          label="New Password"
+          label="رمز عبور جدید"
           type="password"
           {...register('password', { required: true })}
         />
         <TextField
+          sx={{ fontFamily: 'inherit' }}
           name="confirmPassword"
-          label="Confirm Password"
+          label="تایید رمز عبور"
           type="password"
           {...register('confirmPassword', { required: true })}
-        />
-        <TextField
-          name="verificationCode"
-          label="Verification Code"
-          type="text"
-          {...register('verificationCode', { required: true })}
         />
         <Button
           disabled={loading}
