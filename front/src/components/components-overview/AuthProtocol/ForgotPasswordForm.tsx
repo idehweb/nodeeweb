@@ -102,6 +102,20 @@ export default function ForgotPasswordForm({
           color="primary">
           ثبت
         </Button>
+        <Button
+          disabled={loading}
+          onClick={() => {
+            setChanges((prev) => ({
+              ...prev,
+              authStatus: 'detect',
+              captcha: false,
+            }));
+          }}
+          variant="outlined"
+          color="warning"
+          fullWidth>
+          تغییر شماره موبایل
+        </Button>
       </Box>
     </form>
   );

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import API_Conf, { ApiUrl } from '.';
+import { ApiUrl } from './constants';
 import { getToken } from './utils';
 
 const API = axios.create({
