@@ -228,6 +228,7 @@ export class UpdateCustomerByOwn {
   birthday?: Date;
 
   @Expose()
+  @ToAny()
   address?: Address[];
 }
 
