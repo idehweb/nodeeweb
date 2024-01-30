@@ -48,8 +48,8 @@ const Pagination = (props) => {
   let { fields = {} } = general;
   let { entity = '', customQuery, populateQuery } = fields;
   let mainParams = useParams();
-  offset = url.searchParams.get('offset');
-  limit = url.searchParams.get('limit');
+  let offset = url.searchParams.get('offset');
+  let limit = url.searchParams.get('limit');
   if (!offset) {
     offset = 0;
   }
@@ -64,7 +64,7 @@ const Pagination = (props) => {
     ? url.searchParams.get('productCategory') || ''
     : '';
   offset = isClient ? url.searchParams.get('offset') || '' : '';
-  let limit = isClient ? url.searchParams.get('limit') || '' : '';
+  limit = isClient ? url.searchParams.get('limit') || '' : '';
   const loadProductItems = async (page, filter = {}) => {
     // return
     offset = url.searchParams.get('offset');

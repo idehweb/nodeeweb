@@ -2,6 +2,7 @@ import { merge } from 'lodash';
 import {
   BadRequestError,
   CRUD_DEFAULT_REQ_KEY,
+  EntityCreator,
   MiddleWare,
   NotFound,
   Req,
@@ -23,10 +24,12 @@ class OrderService {
     return store.db.model('order');
   }
   getAllFilterParser(req: Req) {
+    const baseFilter = new EntityCreator('').parseFilterQuery({}, req);
     if (req.modelName === 'admin') {
-      return {};
+      return baseFilter;
     }
     return {
+      ...baseFilter,
       'customer._id': req.user._id,
       status: { $ne: OrderStatus.Cart },
       active: true,
