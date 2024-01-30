@@ -86,14 +86,28 @@ export class EntityCreator {
 
     const _internalFilter = () => {
       const extraFilter = safeJsonParse(req.query._filter || req.query.filter);
+      const specialSigns = ['_gt', '_gte', '_lt', '_lte', '_ne'];
+      const hasSpecialSign = (k: string) =>
+        specialSigns.some((s) => k.includes(s));
+      const specialFilter = Object.entries(req.query)
+        .filter(([k, v]) => hasSpecialSign(k))
+        .reduce((filter, [k, v]) => {
+          const split = k.split('_');
+          const sign = split.pop();
+          const key = split.join('_');
+          _.set(filter, `${key}.$${sign}`, v);
+          return filter;
+        }, {});
       const directFilters = Object.fromEntries(
         Object.entries(req.query).filter(
           ([k, v]) =>
             !['sort', 'filter', 'limit', 'offset', 'skip'].includes(k) &&
-            !k.startsWith('_')
+            !k.startsWith('_') &&
+            !hasSpecialSign(k)
         )
       );
       return {
+        ...specialFilter,
         ...directFilters,
         ...extraFilter,
         _id:
