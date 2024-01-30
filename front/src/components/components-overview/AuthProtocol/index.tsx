@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { Box, Input, Select } from '@mui/material';
+import { Box, Input, MenuItem, Select } from '@mui/material';
 
 import { Navigate } from 'react-router-dom';
 
@@ -83,7 +83,6 @@ export default function AuthPortal(props) {
       authStatus: 'detect',
       authenticatingProtocol: 'otp',
       captcha: false,
-      // phoneNumber: '09335244826',
       // countryCode: '98',
     });
   const { register, handleSubmit } = useForm();
@@ -184,6 +183,11 @@ export default function AuthPortal(props) {
     }
   }
 
+  const countryCodes = [
+    { value: '98', label: 'IR ( +98 )' },
+    // { value: '33', label: 'IDK ( +33 )' },
+  ];
+
   // if (JSON.parse(localStorage.getItem('user'))) navigate('/profile');
 
   return userAuthenticationInfo.authStatus === 'detect' ? (
@@ -192,47 +196,56 @@ export default function AuthPortal(props) {
         onSubmit={handleSubmit(detectUserState)}
         className={`${styles.container} form-group ltr`}>
         <Box
-          sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}
+          sx={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-evenly',
+          }}
           className={styles.formPhoneFieldContainer}>
-          <label
-            className="center my-2"
-            style={{ textAlign: 'center' }}
-            htmlFor="countryCode">
-            {t('country-code')}
-          </label>
-
-          <Select
-            id="countryCode"
-            value={userAuthenticationInfo.countryCode}
-            onChange={(event) =>
-              setUserAuthenticationInfo((prevState) => ({
-                ...prevState,
-                countryCode: event.target.value,
-              }))
-            }
-            required // Add required attribute
-          >
-            {[{ value: '98', label: 'IR ( +98 )' }].map((country) => (
-              <option
-                key={country.value}
-                value={country.value}
-                style={{ textAlign: 'center' }}>
-                {country.label}
-              </option>
-            ))}
-          </Select>
-          <label
-            className="my-2"
-            style={{ textAlign: 'center' }}
-            htmlFor="phoneNumber">
-            {t('phone number')}
-          </label>
+          {countryCodes.length === 1 ? (
+            <Input
+              sx={{ textAlign: 'center' }}
+              type="text"
+              defaultValue={countryCodes[0].label}
+              disabled
+              style={{ width: '25%' }}
+            />
+          ) : (
+            <Select
+              style={{ minWidth: '25%' }}
+              id="countryCode"
+              // type="text"
+              value={
+                userAuthenticationInfo.countryCode || countryCodes[0].value
+              }
+              onChange={(event) => {
+                console.log('tracecode #ia-l-222', event.target.value);
+                setUserAuthenticationInfo((prevState) => ({
+                  ...prevState,
+                  countryCode: event.target.value as string,
+                }));
+              }}
+              required // Add required attribute
+            >
+              {countryCodes.map((country) => (
+                <MenuItem
+                  key={country.value}
+                  value={country.value}
+                  style={{ textAlign: 'center' }}>
+                  {country.label}
+                </MenuItem>
+              ))}
+            </Select>
+          )}
 
           <Input
+            sx={{ direction: 'rtl' }}
             type="tel"
             id="phoneNumber"
-            name="phoneNumber"
-            placeholder="Phone Number"
+            name="شماره تماس"
+            placeholder="شماره تماس"
             {...register('phoneNumber', {
               required: true,
               minLength: 10,

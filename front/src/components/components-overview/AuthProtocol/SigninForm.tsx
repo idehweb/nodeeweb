@@ -63,7 +63,7 @@ export default function SigninForm({
       // Handle success or redirect
     } catch (error) {
       console.log('trace code #1', error);
-      toast.error('trace code #1 خطا');
+      toast.error('خطا');
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -79,15 +79,15 @@ export default function SigninForm({
           gap={'2rem'}
           padding={'2rem'}>
           <TextField
-            name="Phone Number"
-            label="Phone Number"
+            name="شماره موبایل"
+            label="شماره موبایل"
             defaultValue={changes.phoneNumber}
             disabled
           />
           <TextField
             {...register('password', { required: true })}
-            name="password"
-            label="Password"
+            name="رمز عبور"
+            label="رمز عبور"
             type="password"
           />
           <Button
