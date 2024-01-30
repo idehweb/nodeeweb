@@ -33,5 +33,8 @@
     "public",
     "plugin-market/mellat-bank-gateway/dist",
     "plugin-market/mellat-bank-gateway/index.ts",
+    "plugin-market/chat-gpt/dist",
+    "plugin-market/chat-gpt/src",
+    "plugin-market/chat-gpt/index.ts",
 ]
 }

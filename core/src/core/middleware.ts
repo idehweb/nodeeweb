@@ -7,7 +7,6 @@ import store from '../../store';
 import logger, { expressLogger } from '../handlers/log.handler';
 import rateLimit from 'express-rate-limit';
 import { getPublicDir } from '../../utils/path';
-import { getViewHandler } from './view';
 import { color } from '../../utils/color';
 import { getName } from '../../utils/helpers';
 import { join } from 'path';

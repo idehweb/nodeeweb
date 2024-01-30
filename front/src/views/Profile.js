@@ -56,7 +56,6 @@ const Profile = ({ t }) => {
         </Col>
         <Col lg="12" className="m-auto"></Col>
       </div>
-      <div style={{ height: '100px' }}></div>
     </Container>
   );
 };

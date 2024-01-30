@@ -1,6 +1,10 @@
 import randomNumber from 'random-number-csprng';
 import store from '../../store';
-import { NotImplement, SendSMSError } from '../../types/error';
+import {
+  NotImplement,
+  SendSMSError,
+  UnauthorizedError,
+} from '../../types/error';
 import { Req, Res } from '../../types/global';
 import {
   CorePluginType,
@@ -11,6 +15,8 @@ import {
 import { SmsSubType } from '../../types/config';
 import { replaceValue } from '../../utils/helpers';
 import _ from 'lodash';
+import { IUser, UserStatus } from '../../types/user';
+import { Document } from 'mongoose';
 
 export async function sendCode(req: Req, res: Res) {
   // generate and send code
@@ -91,4 +97,35 @@ export async function sendCode(req: Req, res: Res) {
       },
     })
   );
+}
+
+export async function verifyCode(user: IUser, code: string, userType: string) {
+  let outUser = user;
+  const otpModel = store.db.model('otp');
+  const codeDoc = await otpModel.findOneAndUpdate(
+    {
+      phone: user.phone,
+      type: userType,
+      code,
+      updatedAt: { $gt: new Date(Date.now() - 120 * 1000) },
+    },
+    { $unset: { code: '' } }
+  );
+
+  if (!codeDoc) throw new UnauthorizedError();
+  if (user.status?.find(({ status }) => status == UserStatus.NeedVerify)) {
+    outUser = await store.db.model(userType).findOneAndUpdate(
+      { _id: user._id },
+      {
+        $pull: { status: { status: UserStatus.NeedVerify } },
+        active: true,
+      },
+      { new: true }
+    );
+  }
+  return [codeDoc, outUser];
+}
+
+export async function codeRevert(codeDoc: Document) {
+  await codeDoc.updateOne({ ...codeDoc.toObject() }, { timestamps: false });
 }

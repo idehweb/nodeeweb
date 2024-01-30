@@ -35,6 +35,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 const globalTimerSet = 60;
 
+/**
+ * @deprecated This component is no longer in use.
+ */
 class LoginForm extends React.Component {
   constructor(props) {
     super(props);

@@ -1,0 +1,79 @@
+{
+    "name": "Chat-GPT gateway",
+    "version": "1.0.0",
+    "description": {
+        "en": "gateway for connect OpenAI or nodeeweb chat service into your nodeeweb service\ncan use prompt api on /api/v1/chat-gpt/prompt",
+        "fa": "واسطه بین OpenAI یا Nodeeweb Chat به سرویس شما"
+    },
+    "type": "general",
+    "author": "Nodeeweb",
+    "main": "dist/bundle.js",
+    "slug": "chat-gpt",
+    "config": {
+        "inputs": [
+            {
+                "key": "provider",
+                "title": {
+                    "en": "Chat Provider",
+                    "fa": "سرویس دهنده چت"
+                },
+                "type": "string",
+                "in":["nodeeweb-com","nodeeweb-ir","openai"]
+            },
+            {
+                "key": "apiKey",
+                "title": {
+                    "en": "API Key",
+                    "fa": "کلید  API"
+                },
+                "type": "string"
+            },
+            {
+                "key": "model",
+                "title": {
+                    "en": "Chat gpt model",
+                    "fa": "مدل زبانی چت"
+                },
+                "type": "string",
+                "required": false
+            }
+        ],
+        "dto": "dto/index",
+        "run": "config"
+    },
+    "active": {
+        "dto": "dto/index",
+        "run": "active"
+    },
+    "edit": {
+        "inputs": [
+            {
+                "key": "provider",
+                "title": {
+                    "en": "Chat Provider",
+                    "fa": "سرویس دهنده چت"
+                },
+                "type": "string"
+            },
+            {
+                "key": "apiKey",
+                "title": {
+                    "en": "API Key",
+                    "fa": "کلید  API"
+                },
+                "type": "string"
+            },
+            {
+                "key": "model",
+                "title": {
+                    "en": "Chat gpt model",
+                    "fa": "مدل زبانی چت"
+                },
+                "type": "string",
+                "required": false
+            }
+        ],
+        "dto": "dto/index",
+        "run": "edit"
+    }
+}

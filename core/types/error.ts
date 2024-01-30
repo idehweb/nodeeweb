@@ -74,8 +74,15 @@ export class DuplicateError extends BadRequestError {
 
 export class ValidationError extends BadRequestError {
   isValidation = true;
-  constructor(message: string, additionalType?: ErrorType, stack?: string) {
+  constraints?: any;
+  constructor(
+    message: string,
+    additionalType?: ErrorType,
+    stack?: string,
+    constraints?: any
+  ) {
     super(message, additionalType, stack);
+    this.constraints = constraints;
   }
 }
 
