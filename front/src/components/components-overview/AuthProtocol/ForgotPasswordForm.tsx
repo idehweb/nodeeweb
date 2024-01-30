@@ -75,9 +75,7 @@ export default function ForgotPasswordForm({
           name="phoneNumber"
           label="شماره همراه"
           type="number"
-          defaultValue={
-            changes.countryCode + changes.phoneNumber.replace(/^0/, '')
-          }
+          defaultValue={changes.phoneNumber}
           disabled
           // {...register('phone', { required: true })}
         />
