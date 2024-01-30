@@ -12,10 +12,13 @@ import {
   Row,
 } from 'shards-react';
 import { withTranslation } from 'react-i18next';
+
+import { toast } from 'react-toastify';
+
+import ChangePasswordSection from '@/components/profile/ChangePasswordSection';
+
 import store from '#c/functions/store';
 import { Logout, submitProfile } from '#c/functions/index';
-import { Navigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 // const UserAccountDetails  = ({ title }) => (
 class LoginForm extends React.PureComponent {
@@ -172,6 +175,9 @@ class LoginForm extends React.PureComponent {
                         onClick={Logout}>
                         {t('logout')}
                       </Button>
+                    </Col>
+                    <Col>
+                      <ChangePasswordSection />
                     </Col>
                   </Row>
                 </Form>

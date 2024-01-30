@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import useCaptcha from 'use-offline-captcha';
 import Grid from '@mui/material/Grid';
-const Captcha = ({ onActionSubmit, onActionValue }) => {
+
+const Captcha = ({ onActionSubmit, onActionValue = undefined }) => {
   const captchaRef = useRef();
   const [value, setValue] = useState();
   const userOpt = {
@@ -19,13 +20,6 @@ const Captcha = ({ onActionSubmit, onActionValue }) => {
   useEffect(() => {
     if (gen) gen();
   }, [gen]);
-
-  const handleValidate = () => {
-    const isValid = validate(value);
-    console.log('captchaAction-->', isValid);
-  };
-
-  const handleRefresh = () => gen();
 
   return (
     <>
