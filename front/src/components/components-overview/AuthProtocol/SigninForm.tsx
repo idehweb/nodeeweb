@@ -108,6 +108,20 @@ export default function SigninForm({
           color="success">
           فراموشی رمز عبور
         </Button>
+        <Button
+          disabled={loading}
+          onClick={() => {
+            setChanges((prev) => ({
+              ...prev,
+              authStatus: 'detect',
+              captcha: false,
+            }));
+          }}
+          variant="outlined"
+          color="warning"
+          fullWidth>
+          تغییر شماره موبایل
+        </Button>
         {error && <p>{error}</p>}
       </Box>
       {/* </form> */}
