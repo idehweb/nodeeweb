@@ -18,7 +18,7 @@ import {
 } from 'class-validator';
 import { Types } from 'mongoose';
 import { Address } from '.';
-import { ToAny } from '@nodeeweb/core/utils/transform';
+import { ExcludeFullish, ToAny } from '@nodeeweb/core/utils/transform';
 
 export class CreateCustomerBody {
   @Expose()
@@ -59,6 +59,7 @@ export class CreateCustomerBody {
   data?: any;
 
   @Expose()
+  @ExcludeFullish()
   @IsOptional()
   @IsEnum(UserSex)
   sex?: UserSex;
@@ -148,6 +149,7 @@ export class UpdateCustomerBody {
   data?: any;
 
   @Expose()
+  @ExcludeFullish()
   @IsOptional()
   @IsEnum(UserSex)
   sex?: UserSex;

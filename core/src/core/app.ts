@@ -16,6 +16,7 @@ import { initRoutes } from './view';
 import initSupervisor from '../supervisor';
 import initSeo from '../seo';
 import { registerCoreSystemNotifs } from '../SystemNotif';
+import registerFile from '../file';
 
 const app = express();
 
@@ -58,6 +59,9 @@ export default async function buildApp() {
 
   // auth controllers
   activeAuthControllers();
+
+  // file
+  registerFile();
 
   // seo
   initSeo();

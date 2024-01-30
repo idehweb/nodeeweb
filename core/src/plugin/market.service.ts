@@ -11,12 +11,28 @@ import { isExist } from '../../utils/helpers';
 import { NotFound } from '../../types/error';
 import { PluginMarketAddBody } from '../../dto/in/plugin.dto';
 import store from '../../store';
-import { FileModel } from '../../schema/file.schema';
+import { FileDocument, FileModel } from '../../schema/file.schema';
 import decompress from 'decompress';
+import { randomUUID } from 'crypto';
 
 const LOCAL_MARKET_FORMATS = ['zip', 'x-tar', 'gzip', 'x-bzip2'];
 
 class MarketService {
+  private transformOut(pluginConfig: any, exclude: string[] = []) {
+    const out = {
+      name: pluginConfig.name,
+      description: pluginConfig.description,
+      author: pluginConfig.author,
+      version: pluginConfig.version,
+      slug: pluginConfig.slug,
+      icon: pluginConfig.icon,
+      type: pluginConfig.type,
+      config: { inputs: pluginConfig.config.inputs },
+    };
+
+    exclude.forEach((k) => delete out[k]);
+    return out;
+  }
   get fileModel(): FileModel {
     return store.db.model('file');
   }
@@ -79,15 +95,7 @@ class MarketService {
 
     // present
     return res.json({
-      data: configs.map((conf) => ({
-        name: conf.name,
-        description: conf.description,
-        author: conf.author,
-        version: conf.version,
-        slug: conf.slug,
-        icon: conf.icon,
-        type: conf.type,
-      })),
+      data: configs.map((conf) => this.transformOut(conf, ['config'])),
     });
   };
   getCount: MiddleWare = async (req, res) => {
@@ -103,18 +111,25 @@ class MarketService {
 
     // present
     return res.json({
-      data: {
-        name: conf.name,
-        description: conf.description,
-        author: conf.author,
-        version: conf.version,
-        slug: conf.slug,
-        icon: conf.icon,
-        type: conf.type,
-        config: { inputs: conf.config.inputs },
-      },
+      data: this.transformOut(conf),
     });
   };
+
+  private async processFile(fileDoc: FileDocument) {
+    const tmpRootPath = getLocalPluginMarketPath(randomUUID());
+    await decompress(getFilesPath(fileDoc.url), tmpRootPath);
+    const configObj = JSON.parse(
+      await fs.promises.readFile(join(tmpRootPath, 'config.json'), 'utf8')
+    );
+    const slug = configObj.slug;
+    const rootPath = getLocalPluginMarketPath(slug);
+    if (await isExist(rootPath))
+      // remove dest
+      await fs.promises.rm(rootPath, { recursive: true });
+
+    await fs.promises.rename(tmpRootPath, rootPath);
+    return configObj;
+  }
 
   add: MiddleWare = async (req, res) => {
     const body = req.body as PluginMarketAddBody;
@@ -132,11 +147,12 @@ class MarketService {
         )}`
       );
 
-    //  decompress
-    await decompress(getFilesPath(fileDoc.url), getLocalPluginMarketPath());
+    //  process
+    const plugin = await this.processFile(fileDoc);
 
     return res.status(201).json({
-      message: 'add into local market plugin successfully',
+      data: this.transformOut(plugin),
+      message: `add ${plugin.slug} into local market plugin successfully`,
     });
   };
 }

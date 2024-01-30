@@ -95,7 +95,21 @@ export class ShopConfig extends Config<ShopConfigDto> {
         name: app_name ?? 'Nodeeweb Shop',
         url: host,
       },
-      manual_post: [],
+      manual_post: [
+        {
+          id: 'template-of-manual-post',
+          active: true,
+          title: 'Template of manual Post',
+          description:
+            'this is a template for manual post please fill this part with correct contents',
+          provider: 'nodeeweb-shop',
+          products_max_price: Number.MAX_SAFE_INTEGER,
+          products_max_weight: Number.MAX_SAFE_INTEGER,
+          products_min_price: 0,
+          products_min_weight: 0,
+          price: 0,
+        },
+      ],
       entry_submit_message: DEFAULT_ENTRY_SUBMIT_MSG,
       sms_message_on: {
         otp: DEFAULT_SMS_ON_OTP,

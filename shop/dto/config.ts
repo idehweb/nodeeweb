@@ -22,6 +22,7 @@ import {
   IsPositive,
   IsPostalCode,
   IsString,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { Types } from 'mongoose';
@@ -181,7 +182,7 @@ export class ShopPost {
   @Expose()
   @IsOptional()
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   price?: number;
 
   @Expose()
@@ -192,19 +193,19 @@ export class ShopPost {
   @Expose()
   @IsOptional()
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   base_price?: number;
 
   @Expose()
   @IsOptional()
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   min_price?: number;
 
   @Expose()
   @IsOptional()
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   max_price?: number;
 
   @Expose()
@@ -220,25 +221,25 @@ export class ShopPost {
   @Expose()
   @IsOptional()
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   products_min_price: number;
 
   @Expose()
   @IsOptional()
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   products_max_price: number;
 
   @Expose()
   @IsOptional()
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   products_min_weight: number;
 
   @Expose()
   @IsOptional()
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   products_max_weight: number;
 }
 

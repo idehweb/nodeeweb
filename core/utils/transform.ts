@@ -67,3 +67,13 @@ export function ToUnset({
 export function ToAny(opt?: TransformOptions) {
   return Transform(({ obj, key }) => obj[key], opt);
 }
+
+export function ExcludeFullish({
+  fullish = [false, undefined, null, ''],
+  ...opts
+}: TransformOptions & { fullish?: any[] } = {}) {
+  return Transform(
+    ({ obj, key, value }) => (fullish.includes(obj[key]) ? undefined : value),
+    opts
+  );
+}

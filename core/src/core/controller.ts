@@ -45,13 +45,13 @@ export function registerDefaultControllers() {
   registerSupervisorController();
 
   // view
-  const [viewPath, viewService] = getViewHandler();
-  controllerRegister(
-    {
-      method: 'get',
-      service: viewService,
-      url: viewPath,
-    },
-    { base_url: '/', from: 'CoreController', logger, strategy: 'insertAfter' }
-  );
+  // const [viewPath, viewService] = getViewHandler();
+  // controllerRegister(
+  //   {
+  //     method: 'get',
+  //     service: viewService,
+  //     url: viewPath,
+  //   },
+  //   { base_url: '/', from: 'CoreController', logger, strategy: 'insertAfter' }
+  // );
 }

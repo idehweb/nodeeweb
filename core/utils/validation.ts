@@ -12,7 +12,7 @@ import {
   validate,
 } from 'class-validator';
 import { ValidationError as VE } from '../types/error';
-import _ from 'lodash';
+import _, { property } from 'lodash';
 import { Types } from 'mongoose';
 import parse from 'node-html-parser';
 
@@ -55,28 +55,39 @@ export function IsMongoID(validationOptions?: ValidationOptions) {
 export function detectVE(errors: ValidationError[], depth = 10) {
   let errs = errors,
     i = 1;
-  const filteredErrors = {};
+  const parseErrors: { [key: string]: string[] } = {};
+  const propertyChain = (err: any) => {
+    const chain: string[] = [];
+    while (err._parent) {
+      if (err._parent.property) chain.push(err._parent.property);
+      err = err._parent;
+    }
+    return chain.reverse().join('.');
+  };
   while (errs && i <= depth) {
     errs = errs.flatMap((err) => {
-      Object.entries(err?.constraints ?? {}).forEach(
-        ([k, v]) =>
-          (filteredErrors[k] = `${
-            filteredErrors[k] ? `${filteredErrors[k]} , ` : ''
-          }${v}`)
-      );
-      return err?.children ?? [];
+      Object.entries(err?.constraints ?? {}).forEach(([k, v]) => {
+        if (!k) return;
+        if (!parseErrors[k]) parseErrors[k] = [];
+        const chain = propertyChain(err);
+        parseErrors[k].push(chain ? `${v} in ${chain}` : v);
+      });
+      const children = err?.children ?? [];
+      children.forEach((child) => (child['_parent'] = err));
+      return children;
     });
     i++;
   }
 
-  filteredErrors.toString = () => {
-    return Object.entries(filteredErrors)
-      .filter(([k]) => k !== 'toString')
-      .map(([k, v]) => `${k}: ${v}`)
+  parseErrors.toString = () => {
+    return Object.entries(parseErrors)
+      .filter(([k, v]) => k !== 'toString')
+      .map(([k, v]) => v)
+      .flat()
       .join(', ');
   };
 
-  return filteredErrors;
+  return parseErrors;
 }
 
 export async function validatePlain<C>(
@@ -96,7 +107,8 @@ export async function validatePlain<C>(
   });
 
   if (errors.length) {
-    throw new VE(detectVE(errors).toString());
+    const err = detectVE(errors);
+    throw new VE(err.toString(), undefined, undefined, err);
   }
 
   return instance as C;

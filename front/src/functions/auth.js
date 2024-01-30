@@ -1,5 +1,6 @@
-import { ApiUrl } from '.';
 import API from './API';
+
+import { ApiUrl } from '.';
 
 const defaultConfig = { login: true, signup: false };
 export class AuthHandler {
@@ -63,6 +64,7 @@ export class AuthHandler {
   };
 }
 
+export const passHandler = new AuthHandler('user-pass');
 export const otpHandler = new AuthHandler('otp');
 export const jwtHandler = new AuthHandler('jwt');
 export const googleHandler = new AuthHandler('google', {

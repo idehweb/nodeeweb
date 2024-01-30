@@ -12,7 +12,7 @@ import {
   SimpleError,
 } from '../../types/error';
 import { MiddleWare, Req } from '../../types/global';
-import { PluginContent } from '../../types/plugin';
+import { Plugin, PluginContent } from '../../types/plugin';
 import { catchFn } from '../../utils/catchAsync';
 import exec from '../../utils/exec';
 import { axiosError2String, call, isExist } from '../../utils/helpers';
@@ -27,6 +27,11 @@ import { registerPlugin, unregisterPlugin } from '../handlers/plugin.handler';
 import marketService from './market.service';
 import { merge } from 'lodash';
 import { PluginConfig } from './plugin';
+import {
+  ControllerRegisterOptions,
+  controllerRegister,
+} from '../handlers/controller.handler';
+import { ControllerSchema } from '../../types/controller';
 
 enum PluginStep {
   CopyContent = 'copy-content',
@@ -42,7 +47,7 @@ class LocalService {
     return 'CoreLocalPlugin';
   }
 
-  private insidePluginLib = {
+  private insidePluginLibCreator = (plugin: PluginConfig) => ({
     logger,
     systemLogger: store.systemLogger,
     SimpleError,
@@ -50,10 +55,22 @@ class LocalService {
     getEnv: (key: string) => {
       return store.env[key];
     },
-  };
+    restrictedControllerRegister: (
+      schema: ControllerSchema,
+      opts?: Partial<ControllerRegisterOptions>
+    ) => {
+      controllerRegister(schema, {
+        ...opts,
+        base_url: `/api/v1/plugin/_/${plugin.slug}`,
+        from: `${opts.from ? `Plugin:${opts.from}` : plugin.slug}`,
+      });
+    },
+    controllerRegister,
+  });
 
-  private insideResolve = (key: string) => {
-    return this.insidePluginLib[key];
+  private insideResolveCreator = (plugin: PluginConfig) => {
+    const libs = this.insidePluginLibCreator(plugin);
+    return (key: string) => libs[key];
   };
 
   private get pluginModel(): PluginModel {
@@ -101,7 +118,7 @@ class LocalService {
     const plugin = await import(getPluginPath(config.slug, config.main));
     const pluginStack: PluginContent['stack'] = await call(
       plugin[config[action].run],
-      { ...arg, resolve: this.insideResolve }
+      { ...arg, resolve: this.insideResolveCreator(config) }
     );
 
     return pluginStack;
