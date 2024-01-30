@@ -70,17 +70,13 @@ const config = {
         filename: 'static/css/bundle.css?h=[chunkhash]',
         chunkFilename: 'static/css/[name].chunk.css?h=[chunkhash]',
       });
-      // webpackConfig.plugins.push(
-      //   new webpack.optimize.LimitChunkCountPlugin({
-      //     maxChunks: 1,
-      //   })
-      // );
       if (process.env.ANALYZE) {
         const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
         const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
 
         // @ts-ignore
         webpackConfig.plugins.push(
+          // @ts-ignore
           new BundleAnalyzerPlugin({
             analyzerMode: 'server',
             openAnalyzer: true,
