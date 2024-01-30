@@ -4,10 +4,11 @@
 
   <p align="center">Fast and efficient open-source <a href="https://nodejs.org" 
   ref="nofollow" target="_blank">Node.js</a> library for building efficient and scalable applications</p>
-    
+ <p align="center">
 <a href="https://www.npmjs.com/~nodeeweb" target="_blank" rel="nofollow"><img src="https://img.shields.io/npm/v/@nodeeweb/shop" alt="NPM Version" /></a>
 <a href="https://www.npmjs.com/~nodeeweb" target="_blank" rel="nofollow"><img src="https://img.shields.io/npm/l/@nodeeweb/shop" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nodeeweb" target="_blank" rel="nofollow"><img src="https://img.shields.io/npm/dm/@nodeeweb/shop" alt="NPM Downloads" /></a>
+<a href="https://www.npmjs.com/~nodeeweb" target="_blank" rel="nofollow"><img src="https://img.shields.io/npm/dm/@nodeeweb/shop" alt="NPM Downloads" /></a>   
+ </p>   
 
 ## Description
 
