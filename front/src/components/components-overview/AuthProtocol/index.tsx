@@ -126,16 +126,16 @@ export default function AuthPortal(props) {
             !response.data.data.isPasswordSet &&
             response.data.data.isPhoneSet
           ) {
-            const sendOtpToken = await API.post('/auth/otp-pass', {
-              userType: 'customer',
-              login: true,
-              signup: false,
-              user: {
-                phone: userAuthenticationInfo.phoneNumber,
-              },
-            });
+            // const sendOtpToken = await API.post('/auth/otp-pass', {
+            //   userType: 'customer',
+            //   login: true,
+            //   signup: false,
+            //   user: {
+            //     phone: userAuthenticationInfo.phoneNumber,
+            //   },
+            // });
             // setOtpData(sendOtpToken.data);
-            console.log('send otp to login traceback #iap1 ', sendOtpToken);
+            // console.log('send otp to login traceback #iap1 ', sendOtpToken);
             setUserAuthenticationInfo((prevState) => ({
               ...prevState,
               authStatus: 'change-password',
