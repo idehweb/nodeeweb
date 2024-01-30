@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useState } from 'react';
-import { useForm } from 'react-hook-form';
+// import { useForm } from 'react-hook-form';
 import { TextField, Button, Box } from '@mui/material';
 
 import { toast } from 'react-toastify';
@@ -19,14 +19,10 @@ export default function SigninForm({
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
-  const { handleSubmit, register, reset } = useForm({
-    defaultValues: {
-      username: changes.countryCode + changes.phoneNumber.replace(/^0/, ''),
-      password: null,
-    },
-  });
+  const [password, setPassword] = useState('');
 
-  const onSubmit = async (e) => {
+  const onSubmit = async () => {
+    // console.log('login#23', e);
     try {
       setLoading(true);
       // Make API call
@@ -34,7 +30,7 @@ export default function SigninForm({
         userType: 'customer',
         user: {
           phone: changes.phoneNumber,
-          password: e.password,
+          password: password,
         },
       });
       // Reset form
@@ -58,7 +54,7 @@ export default function SigninForm({
       // Save authToken to cookie
       // document.cookie = `authToken=${signinResponse.data.data.token}`;
 
-      reset();
+      // reset();
 
       // Handle success or redirect
     } catch (error) {
@@ -72,48 +68,49 @@ export default function SigninForm({
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Box
-          display={'flex'}
-          flexDirection={'column'}
-          gap={'2rem'}
-          padding={'2rem'}>
-          <TextField
-            name="شماره موبایل"
-            label="شماره موبایل"
-            defaultValue={changes.phoneNumber}
-            disabled
-          />
-          <TextField
-            {...register('password', { required: true })}
-            name="رمز عبور"
-            label="رمز عبور"
-            type="password"
-          />
-          <Button
-            disabled={loading}
-            type="submit"
-            variant="contained"
-            sx={{ fontWeight: 700, fontSize: '1rem' }}
-            color="success">
-            ورود
-          </Button>
-          <Button
-            disabled={loading}
-            onClick={() =>
-              setChanges((prevState) => ({
-                ...prevState,
-                authStatus: 'change-password',
-              }))
-            }
-            variant="contained"
-            sx={{ fontWeight: 700, fontSize: '1rem' }}
-            color="success">
-            فراموشی رمز عبور
-          </Button>
-          {error && <p>{error}</p>}
-        </Box>
-      </form>
+      {/* <form onSubmit={handleSubmit(onSubmit)}> */}
+      <Box
+        display={'flex'}
+        flexDirection={'column'}
+        gap={'2rem'}
+        padding={'2rem'}>
+        <TextField
+          name="Phone Number"
+          label="شماره موبایل"
+          defaultValue={changes.phoneNumber}
+          disabled
+        />
+        <TextField
+          // {...register('password', { required: true })}
+          onChange={(e) => setPassword(e.target.value)}
+          name="password"
+          label="رمز عبور"
+          type="password"
+        />
+        <Button
+          disabled={loading}
+          onClick={onSubmit}
+          variant="contained"
+          sx={{ fontWeight: 700, fontSize: '1rem' }}
+          color="success">
+          ورود
+        </Button>
+        <Button
+          disabled={loading}
+          onClick={() =>
+            setChanges((prevState) => ({
+              ...prevState,
+              authStatus: 'change-password',
+            }))
+          }
+          variant="contained"
+          sx={{ fontWeight: 700, fontSize: '1rem' }}
+          color="success">
+          فراموشی رمز عبور
+        </Button>
+        {error && <p>{error}</p>}
+      </Box>
+      {/* </form> */}
     </>
   );
 }
