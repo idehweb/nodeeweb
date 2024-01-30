@@ -1,6 +1,6 @@
 // @ts-check
 const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const gitHash = require('child_process')
   .execSync('git rev-parse HEAD')
@@ -64,12 +64,12 @@ const config = {
       };
 
       // @ts-ignore
-      webpackConfig.plugins[5] = new MiniCssExtractPlugin({
-        // Options similar to the same options in webpackOptions.output
-        // both options are optional
-        filename: 'static/css/bundle.css?h=[chunkhash]',
-        chunkFilename: 'static/css/[name].chunk.css?h=[chunkhash]',
-      });
+      // webpackConfig.plugins[5] = new MiniCssExtractPlugin({
+      //   // Options similar to the same options in webpackOptions.output
+      //   // both options are optional
+      //   filename: 'static/css/bundle.css?h=[chunkhash]',
+      //   chunkFilename: 'static/css/[name].chunk.css?h=[chunkhash]',
+      // });
       if (process.env.ANALYZE) {
         const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
         const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
