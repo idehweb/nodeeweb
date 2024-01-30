@@ -26,22 +26,16 @@ import API from './API';
 import UserService from './User';
 import { jwtHandler } from './auth';
 
-const DataContext = createContext(null);
-export const isClient = typeof window !== 'undefined';
-// clearState
-export const ServerUrl = process.env.REACT_APP_SERVER_URL;
-export const MainUrl = ServerUrl;
-if (isClient) {
-  // import { createContext } from "react";
-}
-// export const MainUrl = "http://localhost:3003";
-export const ApiUrl = process.env.REACT_APP_API_URL;
-export const AdminRoute = ServerUrl + '/admin';
-export const InstanceManagerUrl = 'https://instancemanager.nodeeweb.com/api/v1';
-export const THEME_URL = ApiUrl + '/theme';
-export const CONFIG_URL = ApiUrl + '/config/website';
-const token = getToken();
+export * from './constants';
+import {
+  ApiUrl,
+  MainUrl,
+  AdminRoute,
+  THEME_URL,
+  CONFIG_URL,
+} from './constants';
 
+export const isClient = typeof window !== 'undefined';
 export const admin_token = getToken();
 export const setStyles = (fields = {}) => {
   if (!fields) {
