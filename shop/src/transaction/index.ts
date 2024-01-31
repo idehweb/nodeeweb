@@ -6,5 +6,5 @@ import paymentService from './payment.service';
 export default async function registerTransaction() {
   registerTransactionController();
   await paymentService.synchronize();
-  logger.log(green('[ShopPayment] successfully synchronize payments'));
+  logger.log(green('[ShopPayment] successfully synchronize payments.'));
 }
