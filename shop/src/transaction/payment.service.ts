@@ -507,7 +507,7 @@ class PaymentService {
       // execute parallel
       await Promise.all(promises);
     } catch (err) {
-      logger.error('order sync job error\n', axiosError2String(err));
+      logger.error('payments sync job error\n', axiosError2String(err));
     }
   }
 }
