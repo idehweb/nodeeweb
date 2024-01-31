@@ -49,6 +49,7 @@ export type BankGatewayVerifyArgs = {
   authority: string;
   amount?: number;
   status?: string;
+  currency?: string;
 } & { [key: string]: any };
 
 export type BankGatewayVerify = (

@@ -195,7 +195,7 @@ class PaymentService {
 
     const response = await bankPlugin.stack[0]({
       amount,
-      callback_url: `${store.env.BASE_URL}/api/v1/transaction/payment_callback/${transactionId}?amount=${amount}`,
+      callback_url: `${store.env.BASE_URL}/api/v1/transaction/payment_callback/${transactionId}?amount=${amount}&currency=${store.config.currency}`,
       currency: store.config.currency,
       description,
       userPhone,

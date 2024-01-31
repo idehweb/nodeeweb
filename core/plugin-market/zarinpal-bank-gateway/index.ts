@@ -3,7 +3,7 @@ import {
   BankGatewayUnverified,
   PaymentVerifyStatus,
 } from './type';
-import Zibal from './zibal';
+import Zarinpal from './zarinpal';
 
 let config: { merchant: string; resolve: (key: string) => any };
 
@@ -20,27 +20,27 @@ const create: BankGatewayPluginContent['stack'][0] = async ({
   description,
   userPhone,
 }) => {
-  const zibal = new Zibal({
+  const zarinpal = new Zarinpal({
     merchant: config.merchant,
     callbackUrl: callback_url,
   });
+  amount = +amount;
 
   if (currency === 'Toman') amount *= 10;
 
   try {
-    const response = await zibal.request(amount, {
+    const response = await zarinpal.request(amount, {
       description,
-      feeMode: 0,
       mobile: userPhone,
     });
     const expD = new Date();
     expD.setMinutes(expD.getMinutes() + 20);
     return {
       isOk: response.isOk,
-      authority: response.trackId ? response.trackId + '' : undefined,
+      authority: response.authority,
       expiredAt: expD,
-      payment_link: response.trackId
-        ? zibal.startURL(response.trackId)
+      payment_link: response.authority
+        ? zarinpal.startURL(response.authority)
         : undefined,
       message: response.message,
     };
@@ -56,12 +56,14 @@ const create: BankGatewayPluginContent['stack'][0] = async ({
 const verify: BankGatewayPluginContent['stack'][1] = async ({
   amount,
   authority,
-  status,
+  currency,
 }) => {
-  const zibal = new Zibal({ merchant: config.merchant });
+  amount = +amount;
+  if (currency === 'Toman') amount *= 10;
+  const zarinpal = new Zarinpal({ merchant: config.merchant });
   try {
-    const resonse = await zibal.verify(authority);
-    return resonse;
+    const response = await zarinpal.verify(authority, amount);
+    return response;
   } catch (err) {
     errorLog('verify', err);
     return {
@@ -72,7 +74,11 @@ const verify: BankGatewayPluginContent['stack'][1] = async ({
 };
 
 const unverified: BankGatewayUnverified = async () => {
-  return [];
+  const zarinpal = new Zarinpal({
+    merchant: config.merchant,
+  });
+
+  return await zarinpal.unverified();
 };
 
 function add(arg: any): BankGatewayPluginContent['stack'] {
