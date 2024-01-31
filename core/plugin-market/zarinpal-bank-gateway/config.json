@@ -1,0 +1,44 @@
+{
+    "name": "Zarinpal Bank Gateway",
+    "version": "1.0.0",
+    "description": {
+        "en": "for handle payment",
+        "fa": "برای هندل کردن پرداخت ها"
+    },
+    "type": "bank-gateway",
+    "author": "Nodeeweb",
+    "main": "index",
+    "slug": "zarinpal-bank-gateway",
+    "config": {
+        "inputs": [
+            {
+                "key": "merchant",
+                "title": {
+                    "en": "merchant",
+                    "fa": "شناسه درگاه"
+                },
+                "type": "string"
+            }
+        ],
+        "dto": "dto/config",
+        "run": "config"
+    },
+    "active":{
+        "dto":"dto/config",
+        "run":"active"
+    },
+    "edit": {
+        "inputs": [
+            {
+                "key": "merchant",
+                "title": {
+                    "en": "merchant",
+                    "fa": "شناسه درگاه"
+                },
+                "type": "string"
+            }
+        ],
+        "dto": "dto/edit",
+        "run": "edit"
+    }
+}
