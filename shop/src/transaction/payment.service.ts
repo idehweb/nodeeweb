@@ -135,8 +135,6 @@ class PaymentService {
       _id: req.params.transactionId,
       active: true,
     });
-    console.log('query', req.query);
-    console.log('body', req.body);
 
     const { status } = await this.handlePayment({
       transaction,
@@ -300,12 +298,12 @@ class PaymentService {
 
       let status = statusWithoutVerify;
       if (!statusWithoutVerify) {
-        console.log('call verify with extra fields', extraFields);
         status = (
           await this.verifyPayment({
             ...extraFields,
             authority: transaction.authority,
             amount: transaction.amount,
+            transaction,
           })
         ).status;
       }
