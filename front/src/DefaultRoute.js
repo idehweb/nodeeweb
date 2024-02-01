@@ -121,6 +121,11 @@ export default function createRoutes(themeRoutes) {
       element: MyOrders,
     },
     {
+      path: '/order/payment',
+      layout: DefaultLayout,
+      element: Transaction,
+    },
+    {
       path: '/order-details/:_id',
       layout: DefaultLayout,
       element: OrderDetails,

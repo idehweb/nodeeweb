@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Button,
   ButtonGroup,
@@ -12,21 +12,27 @@ import {
   ListGroupItem,
 } from 'shards-react';
 import { RadioGroup } from '@mui/material';
+
+import { withTranslation } from 'react-i18next';
+
+import { Link, useNavigate } from 'react-router-dom';
+
+import { FormCheckbox } from 'shards-react';
+
+import { toast } from 'react-toastify';
+
 import style from '#c/assets/styles/Checkout.module.css';
 
 import store from '#c/functions/store';
-import PriceChunker from './PriceChunker';
-import { withTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
 
-import GetDiscount from './GetDiscount';
-import GetGateways from './GetGateways';
-import { FormCheckbox } from 'shards-react';
 import { OrderService } from '@/functions/order';
-import { toast } from 'react-toastify';
+
 import { OrderUtils } from '@/functions/order/utils';
 import Loading from '../Loading';
 import { CartService } from '@/functions/order/cart';
+
+import GetGateways from './GetGateways';
+import GetDiscount from './GetDiscount';
 
 const LastPart = (props) => {
   const { t, theParams } = props;
@@ -37,6 +43,14 @@ const LastPart = (props) => {
   let [lan, setLan] = useState(store.getState().store.lan || 'fa');
   let [rules, setRules] = useState(store.getState().store.lan || 'fa');
   let [card, setCard] = useState({ data: [], state: 'none' });
+  const [paymentRequestSend, setPaymentRequestSend] = useState(false);
+  const [transactionDetails, setTransactionDetails] = useState();
+  const formRef = useRef(null);
+  const gatewayRef = useRef(null);
+
+  // const choosenGateway = gatewayRef.getGateway();
+
+  // console.log('gateway choosed is #tracecode lp-l-42', choosenGateway);
 
   let [themeData, setThemeData] = useState(
     store.getState().store.themeData || []
@@ -78,6 +92,7 @@ const LastPart = (props) => {
         post: { id: post.id },
         address,
         discount: discountCode ?? undefined,
+        gatewaySlug: gatewayRef.current.getGateway() ?? '',
       });
 
       // clear cart
@@ -86,12 +101,15 @@ const LastPart = (props) => {
       toast.success(t('Place Order'), {
         autoClose: 1000,
       });
-      setTimeout(() => {
-        const transaction = transactions.pop();
+      const transaction = transactions.pop();
+      setTransactionDetails(transaction);
+
+      if (transaction.payment_method.toLowerCase() === 'get') {
         if (transaction.payment_link)
           return navigate(transaction.payment_link, { replace: true });
-        return navigate('/profile', { replace: true });
-      }, 1000);
+      } else {
+        setPaymentRequestSend(true);
+      }
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -169,9 +187,36 @@ const LastPart = (props) => {
   }, []);
 
   useEffect(() => {
+    if (paymentRequestSend) {
+      formRef.current.submit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paymentRequestSend]);
+
+  useEffect(() => {
     updatePrice(discountCode);
   }, [discountCode]);
-  return (
+
+  return paymentRequestSend ? (
+    <>
+      <form
+        ref={formRef}
+        onSubmit={onCreateTransaction}
+        method={transactionDetails.payment_method}
+        name="formBank"
+        id="formBank"
+        action={transactionDetails.payment_link}>
+        <input
+          type="hidden"
+          value={transactionDetails.payment_body.RefId}
+          id="RefId"
+          name="RefId"
+        />
+        <div class="TextDescription">در حال انتقال به درگاه بانک ملت ...</div>
+        <input type="submit" value="پرداخت" class="hide" />
+      </form>
+    </>
+  ) : (
     <Card className="mb-3 pd-1">
       {price.state === 'loading' ||
         (card.state === 'loading' && (
@@ -341,7 +386,7 @@ const LastPart = (props) => {
             </ListGroupItem>
             <ListGroupItem className={'d-flex px-3 border-0 '}></ListGroupItem>
           </ListGroup>
-          <GetGateways setPaymentMethod={theParams.setPaymentMethod} />
+          <GetGateways ref={gatewayRef} />
 
           <Col className={'empty height50'} sm={12} lg={12}></Col>
           <ListGroup>
@@ -379,7 +424,10 @@ const LastPart = (props) => {
           <Button
             className={'place-order '}
             left={'true'}
-            onClick={() => onCreateTransaction()}>
+            onClick={() => {
+              onCreateTransaction();
+              // console.log(gatewayRef.current.getGateway());
+            }}>
             {t('Place Order')}
           </Button>
         </ButtonGroup>

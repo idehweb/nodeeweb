@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Nav, NavItem, NavLink } from 'shards-react';
 import { withTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import EditAttributesIcon from '@mui/icons-material/EditAttributes';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ReviewsIcon from '@mui/icons-material/Reviews';
+
 import UserAccountDetails from '#c/components/profile/UserAccountDetails';
+import UserTransactions from '#c/components/profile/UserTransactions';
+
+// import Transactions from './Transactions';
 
 const Profile = ({ t }) => {
   const [tab, setTab] = useState('profile');
@@ -41,7 +45,6 @@ const Profile = ({ t }) => {
                 href="#transactions"
                 onClick={() => setTab('transactions')}>
                 <ReviewsIcon className={'ml-2'} />
-
                 <span className={''}>{t('transactions')}</span>
               </NavLink>
             </NavItem>
@@ -52,6 +55,8 @@ const Profile = ({ t }) => {
             <div className={'pt-5'} id={'description'}>
               <UserAccountDetails title={t('account details')} />
             </div>
+          ) : tab === 'transactions' ? (
+            <UserTransactions />
           ) : null}
         </Col>
         <Col lg="12" className="m-auto"></Col>

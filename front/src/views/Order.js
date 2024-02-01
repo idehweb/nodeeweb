@@ -18,13 +18,23 @@ import PageTitle from '../components/common/PageTitle';
 import { withTranslation } from 'react-i18next';
 import { buy, getOrder } from '../functions/index';
 import { Navigate } from 'react-router-dom';
+import { getToken } from '@/functions/utils';
 
 class Order extends React.Component {
   constructor(props) {
     super(props);
     const { match } = props;
+    const order_id =
+      new URLSearchParams(window.location.search).get('order_id') ||
+      match.params.order_id;
+    const transaction_id =
+      new URLSearchParams(window.location.search).get('transaction_id') ||
+      match.params.transaction_id;
+    const order_status =
+      new URLSearchParams(window.location.search).get('status') ||
+      match.params.status;
     this.state = {
-      _id: match.params._id,
+      _id: order_id || match.params._id,
       sum: 0,
       redirect_url: '/login',
       lan: store.getState().store.lan || 'fa',
@@ -36,11 +46,11 @@ class Order extends React.Component {
       card: [],
       deliveryDay: {},
       orderNumber: '',
-      status: '',
+      status: order_status || '',
       paymentStatus: '',
       billingAddress: {},
       customer_data: {},
-
+      transaction_id: transaction_id || '',
       // settings: store.getState().store.settings || []
     };
     // this.getSettings();
@@ -72,7 +82,7 @@ class Order extends React.Component {
       this.props.match.params &&
       this.props.match.params._id
     ) {
-      if (!token) {
+      if (getToken()) {
         this.cameFromProduct(this.props.match.params._id);
         this.setState({ redirect: '/login' });
       } else {
