@@ -429,7 +429,7 @@ class PaymentService {
 
   private verifyPayment(query: BankGatewayVerifyArgs) {
     const bankPlugin = store.plugins.get(
-      ShopPluginType.BANK_GATEWAY
+      query.transaction.provider
     ) as BankGatewayPluginContent;
     if (!bankPlugin) throw new NotImplement('bank gateway plugin not exist');
 
