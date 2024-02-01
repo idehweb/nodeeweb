@@ -128,7 +128,7 @@ const create: BankGatewayPluginContent['stack'][0] = async ({
 const verify: BankGatewayPluginContent['stack'][1] = async ({
   authority,
   SaleOrderId,
-  RefId,
+  SaleReferenceId,
 }) => {
   try {
     await config.mellat.initialize();
@@ -137,7 +137,7 @@ const verify: BankGatewayPluginContent['stack'][1] = async ({
     const response = await config.mellat.verifyPayment({
       orderId,
       saleOrderId: SaleOrderId,
-      saleReferenceId: RefId,
+      saleReferenceId: SaleReferenceId,
     });
     if (response.resCode === 0) return { status: PaymentVerifyStatus.Paid };
     throw new Error(errorCodeMap[response.resCode] || 'Gateway has error');
