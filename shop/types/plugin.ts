@@ -2,6 +2,7 @@ import { PluginContent } from '@nodeeweb/core/types/plugin';
 import { IOrder } from '../schema/order.schema';
 import { PaymentVerifyStatus } from './order';
 import { ShopPost } from '../dto/config';
+import { ITransaction } from '../schema/transaction.schema';
 
 export enum ShopPluginType {
   BANK_GATEWAY = 'bank-gateway',
@@ -49,7 +50,7 @@ export type BankGatewayVerifyArgs = {
   authority: string;
   amount?: number;
   status?: string;
-  currency?: string;
+  transaction: ITransaction;
 } & { [key: string]: any };
 
 export type BankGatewayVerify = (

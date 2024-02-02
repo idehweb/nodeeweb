@@ -297,14 +297,16 @@ class PaymentService {
         );
 
       let status = statusWithoutVerify;
-      if (!statusWithoutVerify)
+      if (!statusWithoutVerify) {
         status = (
           await this.verifyPayment({
             ...extraFields,
             authority: transaction.authority,
             amount: transaction.amount,
+            transaction,
           })
         ).status;
+      }
 
       // convert status
       const transactionStatus = utilsService.combineStatuses(
@@ -427,7 +429,7 @@ class PaymentService {
 
   private verifyPayment(query: BankGatewayVerifyArgs) {
     const bankPlugin = store.plugins.get(
-      ShopPluginType.BANK_GATEWAY
+      query.transaction.provider
     ) as BankGatewayPluginContent;
     if (!bankPlugin) throw new NotImplement('bank gateway plugin not exist');
 
@@ -507,7 +509,7 @@ class PaymentService {
       // execute parallel
       await Promise.all(promises);
     } catch (err) {
-      logger.error('order sync job error\n', axiosError2String(err));
+      logger.error('payments sync job error\n', axiosError2String(err));
     }
   }
 }
