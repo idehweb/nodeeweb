@@ -146,8 +146,8 @@ class PaymentService {
     // redirect
     return res.redirect(
       `${store.config.payment_redirect}?${[
-        transaction.order && `order_id=${transaction.order.toString()}`,
-        `transaction_id=${transaction._id.toString()}`,
+        transaction?.order && `order_id=${transaction.order.toString()}`,
+        transaction?._id && `transaction_id=${transaction._id.toString()}`,
         `status=${status}`,
       ]
         .filter((k) => k)
@@ -195,7 +195,7 @@ class PaymentService {
 
     const response = await bankPlugin.stack[0]({
       amount,
-      callback_url: `${store.env.BASE_URL}/api/v1/transaction/payment_callback/${transactionId}?amount=${amount}`,
+      callback_url: `${store.env.BASE_URL}/api/v1/transaction/payment_callback/${transactionId}?amount=${amount}&currency=${store.config.currency}`,
       currency: store.config.currency,
       description,
       userPhone,
