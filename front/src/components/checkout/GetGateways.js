@@ -6,6 +6,7 @@ import { getEntities } from '#c/functions/index';
 // import State from "#c/data/state";
 
 function GetGateways(prop) {
+  let {setPaymentMethod}=prop;
   const [gateways, setGateways] = useState(null);
   const [choosed, setChoosed] = useState(0);
 
@@ -16,11 +17,14 @@ function GetGateways(prop) {
         0,
         10,
         false,
-        JSON.stringify({ type: 'bank' })
+        JSON.stringify({ type: 'bank-gateway' })
       ).then((r) => {
+        r=r.data;
+        console.log('r',r);
+
         // if (r && r.tables) {
         //     console.log('r.tables', r.tables)
-        prop.setPaymentMethod(r[0].slug);
+        // setPaymentMethod(r[0].slug);
 
         setGateways(r);
         // }
@@ -32,6 +36,7 @@ function GetGateways(prop) {
   return gateways.map((gt, k) => {
     if (k == 0) {
     }
+    if(gt.type=='bank-gateway')
     return (
       <div className={'d-flex ' + gt.slug} key={k}>
         {' '}
@@ -40,13 +45,17 @@ function GetGateways(prop) {
           onChange={(event) => {
             console.log('prop', prop);
             setChoosed(k);
-            prop.setPaymentMethod(gt.slug);
+            // prop.setPaymentMethod(gt.slug);
           }}
           className="mb-0 ">
-          {gt.title['fa']}
+          {gt?.title?.fa}
+          {gt?.name}
         </FormRadio>
       </div>
     );
+    else{
+      return <></>
+    }
   });
 }
 

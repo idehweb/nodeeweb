@@ -17,10 +17,17 @@ import { SaveData, getTheSettings } from '#c/functions/index';
 import { OrderService } from '@/functions/order';
 import { toast } from 'react-toastify';
 
-function GetDelivery({ ...props }) {
+function GetDelivery(props) { 
+  console.log('props',props)
+  let {card,setdeliveryPrice,setTotal,setSum,onChooseDelivery}=props;
+
+  console.log('card',card)
+  console.log('setdeliveryPrice',setdeliveryPrice)
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
+
+
   const [postProviders, setPostProviders] = useState([]);
   const [hoverD, setHoverD] = useState(0);
   useEffect(() => {
@@ -99,7 +106,7 @@ function GetDelivery({ ...props }) {
   const hoverThisD = (ad, postProviders) => {
     countSum(card).then((sum) => {
       countDelivery(sum, postProviders, ad).then((obj) => {
-        setDeliveryPrice(obj.deliveryPrice);
+        setdeliveryPrice(obj.deliveryPrice);
         setTotal(obj.total);
         setSum(sum);
         setHoverD(ad);
