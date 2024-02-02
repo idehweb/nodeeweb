@@ -56,9 +56,10 @@ const create: BankGatewayPluginContent['stack'][0] = async ({
 const verify: BankGatewayPluginContent['stack'][1] = async ({
   amount,
   authority,
-  currency,
+  transaction,
 }) => {
   amount = +amount;
+  const currency = transaction.currency;
   if (currency === 'Toman') amount *= 10;
   const zarinpal = new Zarinpal({ merchant: config.merchant });
   try {

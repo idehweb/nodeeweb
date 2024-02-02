@@ -56,7 +56,7 @@ export default class Zarinpal {
   async request(
     amount: number,
     extras: ExtraProperties = {}
-  ): Promise<{ isOk: boolean; message: string; authority: string }> {
+  ): Promise<{ isOk: boolean; message: string; authority?: string }> {
     const config = this.config;
     const { merchant, callbackUrl } = config;
     const data = {
@@ -69,23 +69,28 @@ export default class Zarinpal {
         mobile: extras.mobile,
       },
     };
-    const {
-      data: { data: response },
-    } = await Zarinpal.post('request.json', data);
+    try {
+      const {
+        data: { data: response },
+      } = await Zarinpal.post('request.json', data);
 
-    let message = errors[String(response.code)] ?? 'با خطا مواجه شده است',
-      isOk = false;
-    switch (+response?.code) {
-      case 100:
-        message = 'با موفقیت تایید شد.';
-        isOk = true;
-        break;
+      let message = errors[String(response.code)] ?? 'با خطا مواجه شده است',
+        isOk = false;
+      switch (+response?.code) {
+        case 100:
+          message = 'با موفقیت تایید شد.';
+          isOk = true;
+          break;
+      }
+      return {
+        ...response,
+        isOk,
+        message,
+      };
+    } catch (err) {
+      const code = String(err.response?.data?.errors?.code);
+      return { isOk: false, message: errors[code] ?? err.message };
     }
-    return {
-      ...response,
-      isOk,
-      message,
-    };
   }
 
   startURL(authority: string) {
@@ -103,26 +108,39 @@ export default class Zarinpal {
       merchant_id: config.merchant,
       amount,
     };
-    const {
-      data: { data: response },
-    } = await post('verify.json', data);
-    let message = errors[String(response.code)] ?? 'با خطا مواجه شده است',
-      status = PaymentVerifyStatus.Failed;
-    switch (+response?.code) {
-      case 100:
-        message = `با موفقیت تایید شد.`;
-        status = PaymentVerifyStatus.Paid;
-        break;
-      case 101:
-        message = `قبلا تایید شده.`;
-        status = PaymentVerifyStatus.CheckBefore;
-        break;
+    try {
+      const {
+        data: { data: response },
+      } = await post('verify.json', data);
+      let message = errors[String(response.code)] ?? 'با خطا مواجه شده است',
+        status = PaymentVerifyStatus.Failed;
+      switch (+response?.code) {
+        case 100:
+          message = `با موفقیت تایید شد.`;
+          status = PaymentVerifyStatus.Paid;
+          break;
+        case 101:
+          message = `قبلا تایید شده.`;
+          status = PaymentVerifyStatus.CheckBefore;
+          break;
+      }
+      return {
+        ...response,
+        message,
+        status,
+      };
+    } catch (err) {
+      const code = String(err.response?.data?.errors?.code);
+      if (code === '101')
+        return {
+          status: PaymentVerifyStatus.CheckBefore,
+          message: errors[code],
+        };
+      return {
+        status: PaymentVerifyStatus.Failed,
+        message: errors[code] ?? err.message,
+      };
     }
-    return {
-      ...response,
-      message,
-      status,
-    };
   }
 
   async unverified() {

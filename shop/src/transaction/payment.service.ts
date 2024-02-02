@@ -146,8 +146,8 @@ class PaymentService {
     // redirect
     return res.redirect(
       `${store.config.payment_redirect}?${[
-        transaction.order && `order_id=${transaction.order.toString()}`,
-        `transaction_id=${transaction._id.toString()}`,
+        transaction?.order && `order_id=${transaction.order.toString()}`,
+        transaction?._id && `transaction_id=${transaction._id.toString()}`,
         `status=${status}`,
       ]
         .filter((k) => k)
