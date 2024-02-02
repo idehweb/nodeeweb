@@ -231,14 +231,20 @@ function Checkout(props) {
       )}
       {page == '3' && (
         <Row>
+          {page}
           <Col lg="2"></Col>
           <Col lg="8">
             <GetDelivery
               onNext={() => goNext('4')}
               onChooseDelivery={(params) => {
+                console.log('params',params);
                 onChooseDelivery(params);
               }}
-              addressChoosed={the_address}
+              // addressChoosed={the_address}
+              // setTotal={setTotal}
+              // setSum={setSum}
+              // card={card}
+              setDeliveryPrice={(e)=>{console.log(e);}}
               onPrev={() => goNext('2')}
             />
           </Col>

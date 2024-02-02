@@ -30,6 +30,7 @@ import { CartService } from '@/functions/order/cart';
 
 const LastPart = (props) => {
   const { t, theParams } = props;
+  const {setPaymentMethod}=theParams;
   const navigate = useNavigate();
   const address = OrderUtils.getAddressChose();
   const post = OrderUtils.getPostChose();
@@ -340,6 +341,7 @@ const LastPart = (props) => {
               ]}
             </ListGroupItem>
             <ListGroupItem className={'d-flex px-3 border-0 '}></ListGroupItem>
+            <GetGateways setPaymentMethod={setPaymentMethod}/>
           </ListGroup>
           <Col className={'empty ' + 'height50'} sm={12} lg={12}></Col>
           <ListGroup>
