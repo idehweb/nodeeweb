@@ -84,7 +84,7 @@ const LastPart = (props) => {
         gatewaySlug:gatewaySlug,
         discount: discountCode ?? undefined,
       };
-      console.log('obj',obj)
+      console.log('obj',obj )
       // return;
 
       const { transactions } = await OrderService.createTransaction(obj);
