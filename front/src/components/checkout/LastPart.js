@@ -78,12 +78,16 @@ const LastPart = (props) => {
   const onCreateTransaction = useCallback(async () => {
     setCard((data) => ({ ...data, state: 'loading' }));
     try {
-      const { transactions } = await OrderService.createTransaction({
+      let obj={
         post: { id: post.id },
         address,
-        gatewaySlug:"mellat-bank-gateway",
+        gatewaySlug:gatewaySlug,
         discount: discountCode ?? undefined,
-      });
+      };
+      console.log('obj',obj)
+      // return;
+
+      const { transactions } = await OrderService.createTransaction(obj);
 
       // clear cart
       CartService.clear();
@@ -242,6 +246,10 @@ return;
             <ListGroupItem className={'d-flex px-3 border-0 '}>
               {'روش ارسال: '}
               {post && post.title}
+            </ListGroupItem>
+            <ListGroupItem className={'d-flex px-3 border-0 '}>
+              {'درگاه پرداخت: '}
+              {gatewaySlug}
             </ListGroupItem>
             {
               <ListGroupItem className={'d-flex px-3 border-0 '}>

@@ -25,7 +25,12 @@ function GetGateways(prop) {
         // if (r && r.tables) {
         //     console.log('r.tables', r.tables)
         // setPaymentMethod(r[0].slug);
-
+        r.forEach((gt, k) => {
+          if (k == 0) {
+            console.log('setGatewaySlug', gt.slug)
+            setGatewaySlug(gt.slug);
+          }
+        });
         setGateways(r);
         // }
       });
@@ -34,8 +39,10 @@ function GetGateways(prop) {
     return null;
   }
   return gateways.map((gt, k) => {
-    if (k == 0) {
-    }
+    // if (k == 0) {
+    //   console.log('setGatewaySlug',gt.slug)
+    //   setGatewaySlug(gt.slug);
+    // }
     if(gt.type=='bank-gateway')
     return (
       <div className={'d-flex ' + gt.slug} key={k}>
