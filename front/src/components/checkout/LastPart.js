@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState,useRef } from 'react';
 import {
   Button,
   ButtonGroup,
@@ -34,9 +34,12 @@ const LastPart = (props) => {
   const navigate = useNavigate();
   const address = OrderUtils.getAddressChose();
   const post = OrderUtils.getPostChose();
-
+  const formRef = useRef(null);
   let [lan, setLan] = useState(store.getState().store.lan || 'fa');
   let [rules, setRules] = useState(store.getState().store.lan || 'fa');
+  let [isFormEnable, setFormEnable] = useState(false);
+  let [gatewaySlug, setGatewaySlug] = useState("");
+  let [Transaction, setTransaction] = useState({});
   let [card, setCard] = useState({ data: [], state: 'none' });
 
   let [themeData, setThemeData] = useState(
@@ -78,6 +81,7 @@ const LastPart = (props) => {
       const { transactions } = await OrderService.createTransaction({
         post: { id: post.id },
         address,
+        gatewaySlug:"mellat-bank-gateway",
         discount: discountCode ?? undefined,
       });
 
@@ -89,7 +93,13 @@ const LastPart = (props) => {
       });
       setTimeout(() => {
         const transaction = transactions.pop();
-        if (transaction.payment_link)
+        if (transaction.payment_method=='post'){
+          setTransaction(transaction);
+          setFormEnable(true);
+return;
+        }
+        if ((!transaction.payment_method || (transaction.payment_method && transaction.payment_method!='post'))
+          && transaction.payment_link)
           return navigate(transaction.payment_link, { replace: true });
         return navigate('/profile', { replace: true });
       }, 1000);
@@ -168,10 +178,22 @@ const LastPart = (props) => {
   useEffect(() => {
     getCart();
   }, []);
+  useEffect(() => {
+    if(isFormEnable && Transaction)
+    formRef.current.submit();
+  }, [isFormEnable,Transaction]);
 
   useEffect(() => {
     updatePrice(discountCode);
   }, [discountCode]);
+  if(isFormEnable){
+    return <><div style={{textAlign:"center"}}>{Transaction.payment_message}</div><form style={{display:'none'}} ref={formRef}  method={'post'} action={Transaction.payment_link}>
+      <input name={"RefId"} value={Transaction.payment_body.RefId}/>
+      <input name={"amount"} value={Transaction.amount}/>
+      <input type={"submit"}/>
+
+    </form></>
+  }
   return (
     <Card className="mb-3 pd-1">
       {price.state === 'loading' ||
@@ -341,7 +363,7 @@ const LastPart = (props) => {
               ]}
             </ListGroupItem>
             <ListGroupItem className={'d-flex px-3 border-0 '}></ListGroupItem>
-            <GetGateways setPaymentMethod={setPaymentMethod}/>
+            <GetGateways setGatewaySlug={setGatewaySlug} setPaymentMethod={setPaymentMethod}/>
           </ListGroup>
           <Col className={'empty ' + 'height50'} sm={12} lg={12}></Col>
           <ListGroup>

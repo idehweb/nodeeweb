@@ -5,7 +5,7 @@ function CheckoutPost({ onNext, onPrev, onSetData,setdeliveryPrice,setTotal,setS
   console.log('setdeliveryPrice setdeliveryPrice',setdeliveryPrice,setTotal,setSum)
   return (
     <Row>
-      ddddd
+
       <Col lg="2"></Col>
       <Col lg="8">
         <GetDelivery

@@ -6,7 +6,7 @@ import { getEntities } from '#c/functions/index';
 // import State from "#c/data/state";
 
 function GetGateways(prop) {
-  let {setPaymentMethod}=prop;
+  let {setPaymentMethod,setGatewaySlug}=prop;
   const [gateways, setGateways] = useState(null);
   const [choosed, setChoosed] = useState(0);
 
@@ -45,6 +45,7 @@ function GetGateways(prop) {
           onChange={(event) => {
             console.log('prop', prop);
             setChoosed(k);
+            setGatewaySlug(gt.slug);
             // prop.setPaymentMethod(gt.slug);
           }}
           className="mb-0 ">
