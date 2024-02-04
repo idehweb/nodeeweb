@@ -1,5 +1,6 @@
 import { Transform, TransformOptions } from 'class-transformer';
 import _ from 'lodash';
+import { safeJsonParse } from './helpers';
 
 export function ToArray(opt?: TransformOptions) {
   return Transform(({ obj, key }) => {
@@ -7,17 +8,19 @@ export function ToArray(opt?: TransformOptions) {
     // null or undefine
     if (_.isNil(value)) return value;
 
+    const parsedValue = safeJsonParse(value);
+
     // not object
-    if (typeof value !== 'object') return [];
+    if (typeof parsedValue !== 'object') return [];
 
     // empty object
-    if (_.isEmpty(value)) return [];
+    if (_.isEmpty(parsedValue)) return [];
 
     // not array
-    if (!Array.isArray(value)) return [value];
+    if (!Array.isArray(parsedValue)) return [parsedValue];
 
     // array
-    return value;
+    return parsedValue;
   }, opt);
 }
 
@@ -27,6 +30,9 @@ export function ToObject(opt?: TransformOptions) {
 
     // null or undefine
     if (_.isNil(value)) return value;
+
+    // json
+    if (typeof value === 'string') return safeJsonParse(value);
 
     // not object
     if (typeof value !== 'object') return {};

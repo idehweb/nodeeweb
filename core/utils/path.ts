@@ -75,3 +75,10 @@ export function getBuildDir(name: string) {
     );
   return join(NODE_MODULE_PATH, buildName);
 }
+
+export function getModulePath(path: string) {
+  const exts = ['ts', 'js', 'mjs', 'cjs'];
+  const extTest = /.+\..+$/;
+  if (extTest.test(path)) return [path];
+  return exts.map((ext) => `${path}.${ext}`);
+}
