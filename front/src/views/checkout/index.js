@@ -25,6 +25,9 @@ function Checkout({ t }) {
   const [query] = useSearchParams();
   const [state, setState] = useState(params?.state || CheckoutState.Address);
   const [data, setData] = useState({});
+  let [deliveryPrice, setdeliveryPrice] = useState('');
+  let [total, setTotal] = useState('');
+  let [sum, setSum] = useState('');
 
   const onNext = useCallback(() => {
     switch (state) {
@@ -55,7 +58,14 @@ function Checkout({ t }) {
     },
     [state]
   );
-
+  const onChooseDelivery = (params) => {
+    setdeliveryPrice(params.deliveryPrice);
+    // setHoverD(params.hoverD);
+    // setSetting(params.setting);
+    setSum(params.sum);
+    setTotal(params.total);
+    // setState(params);
+  };
   useEffect(() => {
     const user = UserService.getMeLocal(null);
     if (!user?._id)
@@ -113,7 +123,7 @@ function Checkout({ t }) {
       case CheckoutState.Address:
         return <CheckoutAddress onNext={onNext} onPrev={onPrev} />;
       case CheckoutState.Post:
-        return <CheckoutPost onNext={onNext} onPrev={onPrev} />;
+        return <CheckoutPost       onSetData={onSetData} onNext={onNext} onPrev={onPrev} setSum={setSum} setdeliveryPrice={(e)=>setdeliveryPrice(e)} setTotal={setTotal}/>;
       case CheckoutState.Factor:
         return (
           <CheckoutFactor

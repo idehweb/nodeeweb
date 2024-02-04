@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState,useRef } from 'react';
 import {
   Button,
   ButtonGroup,
@@ -30,12 +30,16 @@ import { CartService } from '@/functions/order/cart';
 
 const LastPart = (props) => {
   const { t, theParams } = props;
+  const {setPaymentMethod}=theParams;
   const navigate = useNavigate();
   const address = OrderUtils.getAddressChose();
   const post = OrderUtils.getPostChose();
-
+  const formRef = useRef(null);
   let [lan, setLan] = useState(store.getState().store.lan || 'fa');
   let [rules, setRules] = useState(store.getState().store.lan || 'fa');
+  let [isFormEnable, setFormEnable] = useState(false);
+  const [gatewaySlug, setGatewaySlug] = useState(null);
+  let [Transaction, setTransaction] = useState({});
   let [card, setCard] = useState({ data: [], state: 'none' });
 
   let [themeData, setThemeData] = useState(
@@ -71,14 +75,23 @@ const LastPart = (props) => {
     }
   }, []);
 
-  const onCreateTransaction = useCallback(async () => {
+  const setGateway = useCallback(async (g) => {
+    console.log('setGateway',g)
+ setGatewaySlug(g);
+  }, [setGatewaySlug]);
+
+  const onCreateTransaction = useCallback(async (theGatewaySlug) => {
     setCard((data) => ({ ...data, state: 'loading' }));
+ 
     try {
-      const { transactions } = await OrderService.createTransaction({
+      let obj={
         post: { id: post.id },
         address,
+        gatewaySlug:theGatewaySlug || gatewaySlug,
         discount: discountCode ?? undefined,
-      });
+      };
+      console.log('obj',obj )
+      const { transactions } = await OrderService.createTransaction(obj);
 
       // clear cart
       CartService.clear();
@@ -88,9 +101,21 @@ const LastPart = (props) => {
       });
       setTimeout(() => {
         const transaction = transactions.pop();
-        if (transaction.payment_link)
-          return navigate(transaction.payment_link, { replace: true });
-        return navigate('/profile', { replace: true });
+        if (transaction.payment_method=='post'){
+          setTransaction(transaction);
+          setFormEnable(true);
+return;
+        }
+        if ((!transaction.payment_method || (transaction.payment_method && transaction.payment_method!='post'))
+          && transaction.payment_link){
+            if (transaction.payment_link.indexOf("http://") == 0 || transaction.payment_link.indexOf("https://") == 0) {
+              // do something here
+              window.location.replace(transaction.payment_link);
+            }else{
+              return navigate(transaction.payment_link, { replace: true });
+            }
+              return navigate('/profile', { replace: true });
+          }
       }, 1000);
     } catch (err) {
       toast.error(err.message);
@@ -168,9 +193,26 @@ const LastPart = (props) => {
     getCart();
   }, []);
 
+//   useEffect(() => {
+//     console.log('gatewaySlug',gatewaySlug);
+// setGatewaySlug(gatewaySlug);
+//   }, [gatewaySlug]);
+  useEffect(() => {
+    if(isFormEnable && Transaction)
+    formRef.current.submit();
+  }, [isFormEnable,Transaction]);
+
   useEffect(() => {
     updatePrice(discountCode);
   }, [discountCode]);
+  if(isFormEnable){
+    return <><div style={{textAlign:"center"}}>{Transaction.payment_message}</div><form style={{display:'none'}} ref={formRef}  method={'post'} action={Transaction.payment_link}>
+      <input name={"RefId"} value={Transaction.payment_body.RefId}/>
+      <input name={"amount"} value={Transaction.amount}/>
+      <input type={"submit"}/>
+
+    </form></>
+  }
   return (
     <Card className="mb-3 pd-1">
       {price.state === 'loading' ||
@@ -219,6 +261,10 @@ const LastPart = (props) => {
             <ListGroupItem className={'d-flex px-3 border-0 '}>
               {'روش ارسال: '}
               {post && post.title}
+            </ListGroupItem>
+            <ListGroupItem className={'d-flex px-3 border-0 '}>
+              {'درگاه پرداخت: '}
+              {gatewaySlug}
             </ListGroupItem>
             {
               <ListGroupItem className={'d-flex px-3 border-0 '}>
@@ -340,6 +386,7 @@ const LastPart = (props) => {
               ]}
             </ListGroupItem>
             <ListGroupItem className={'d-flex px-3 border-0 '}></ListGroupItem>
+            <GetGateways setGateway={(e)=>setGateway(e)} />
           </ListGroup>
           <Col className={'empty ' + 'height50'} sm={12} lg={12}></Col>
           <ListGroup>
@@ -377,7 +424,7 @@ const LastPart = (props) => {
           <Button
             className={'place-order '}
             left={'true'}
-            onClick={() => onCreateTransaction()}>
+            onClick={() => onCreateTransaction(gatewaySlug)}>
             {t('Place Order')}
           </Button>
         </ButtonGroup>
