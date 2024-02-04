@@ -151,7 +151,9 @@ class CoreConfig extends Config<CoreConfigDto> {
     const nodeewebApiUrl = getEnv<string>('nodeewebhub_api_base_url', {
       format: 'string',
     });
-    const host = getEnv<string>('server-host', { format: 'string' });
+    const host =
+      getEnv<string>('server-host', { format: 'string' }) ||
+      getEnv<string>('base-url', { format: 'string' });
     const supervisor_url = getEnv<string>('supervisor-url', {
       format: 'string',
     });
