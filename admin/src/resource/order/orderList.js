@@ -226,13 +226,6 @@ export const orderList = (props) => {
     <List
       actions={<ListActions />}
       filters={[
-        <SelectInput
-          source="paymentStatus"
-          label={translate('resources.order.paymentStatus')}
-          emptyValue={null}
-          choices={OrderPaymentStatus()}
-          alwaysOn
-        />,
         <ReactAdminJalaliDateInput
           fullWidth
           source="date_gte"

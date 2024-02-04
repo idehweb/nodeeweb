@@ -21,6 +21,7 @@ import {
   Button,
 } from 'react-admin';
 import { useFormContext, useForm } from 'react-hook-form';
+import Input from '@mui/material/Input';
 
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -51,6 +52,7 @@ import {
 import { Val } from '@/Utils';
 import Transform from '@/functions/transform';
 import { convertError } from '@/functions/utils';
+import { FunctionField } from 'react-admin';
 
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -79,6 +81,7 @@ function returnToHome(values) {
 }
 
 function onCreateCombinations(options) {
+  console.log('options....', options);
   let combCount = 1;
   let combinationsTemp = [];
   let combinations = [];
@@ -90,10 +93,11 @@ function onCreateCombinations(options) {
       theVals.push({ [opt.name]: val.name });
     });
     combinationsTemp.push(theVals);
+    console.log('combinationTemp......', combinationsTemp);
   });
 
   let ttt = cartesian(combinationsTemp);
-
+  console.log('ttt.........', ttt);
   ttt.forEach((tt, key) => {
     let obj = {};
     tt.forEach((ther, key) => {
@@ -108,6 +112,8 @@ function onCreateCombinations(options) {
       salePrice: null,
       quantity: 0,
     });
+    console.log('obj...........', obj);
+    console.log('combinations.......', combinations);
   });
   // (id, path, rowRecord) => form.change('combinations', combinations)
 
@@ -196,6 +202,7 @@ const CustomToolbar = (props) => {
 };
 const Form = ({ children, ...props }) => {
   const { record } = props;
+
   const [photos, setPhotos] = useState(record?.photos ?? []);
   const [thumbnail, setThumbnail] = useState(record?.thumbnail);
   const [checkPrice, setCheckPrice] = useState('');
@@ -248,8 +255,6 @@ const Form = ({ children, ...props }) => {
       delete values.catChoosed;
       delete values.files;
 
-      console.log(values);
-
       const product = Transform.updateProduct(values);
       API.put('/product/' + _The_ID, JSON.stringify(product))
         .then(({ data = {} }) => {
@@ -293,6 +298,21 @@ const Form = ({ children, ...props }) => {
 
   console.log(props);
 
+  // --------------------------------------------------------------------------------->>>>>>>>>>>>>>>>>>>>>
+  // const { setValue } = useFormContext();
+  const { setValue, getValues } = useForm({
+    defaultValues: {
+      chatGPTanswer: '',
+      chatGPTmain: '',
+    },
+  });
+
+  const handleChange = (t, value) => {
+    setValue(t, value);
+  };
+
+  // ----------------------------------------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>
+
   //check if props is empty or not
   const isEmpty = (props) => {
     for (const prop in props) {
@@ -311,7 +331,8 @@ const Form = ({ children, ...props }) => {
   //   });
   // }
 
-  const chatGptHandler = async () => {
+  const chatGptHandler = async (e) => {
+    // e.preventDefault();
     try {
       const question = mainWord
         ? `tell me about ${mainWord.trim()} in 40 words`
@@ -319,7 +340,7 @@ const Form = ({ children, ...props }) => {
         ? `tell me about ${props.record.title.fa} in 40 words`
         : null;
 
-      console.log(question);
+      // console.log(question);
 
       if (!question) {
         notify('Please enter a title');
@@ -349,7 +370,21 @@ const Form = ({ children, ...props }) => {
       const response = await data.json();
       const formatedData = await response.choices[0].message.content;
       setWaitings(false);
-      setAnswer(formatedData);
+
+      // console.log('propsbefore....', props);
+      // props.record.excerpt.fa = formatedData;
+      // setValue('slug', formatedData);
+      // console.log('kkkkkkkkkkkkk', props);
+      props.record.excerpt.fa = formatedData;
+      // console.log('propsafter....', props);
+
+      // props = { ...props, record: { excerpt.fa : formatedData};
+      // Object.assign(props.record.excerpt, { fa: formatedData });
+      // props = { ...props.record, ...{ excerpt: { fa: formatedData } } };
+
+      // props = { ...props.record, ...(record.excerpt.fa = formatedData) };
+
+      // setAnswer(formatedData);
     } catch (error) {
       console.log(error);
     }
@@ -362,7 +397,7 @@ const Form = ({ children, ...props }) => {
       onSubmit={(v) => save(v)}
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
-
+      {/* ------------------------------------------------------------------------------------>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */}
       <TextInput
         source={'title.' + translate('lan')}
         label={translate('resources.product.title')}
@@ -373,7 +408,6 @@ const Form = ({ children, ...props }) => {
         validate={Val.req}
         fullWidth
       />
-
       <TextInput
         source="slug"
         label={translate('resources.product.slug')}
@@ -392,6 +426,26 @@ const Form = ({ children, ...props }) => {
         source={'metadescription.' + translate('lan')}
         label={translate('resources.product.metadescription')}
       />
+      {/* --------------------------------------------------------------------------------------------->> */}
+      {/* <FormDataConsumer>
+        {({ formData, getSource, scopedFormData }) => {
+          console.log('formData', formData);
+          // console.log('scopedFormData', rest);
+          return (
+            <div> */}
+      {/* <TextInput
+                fullWidth
+                multiline
+                record={formData}
+                // record={scopedFormData}
+                // value={getValues('chatGPTanswer')}
+                // value={'fdsssssssssss'}
+                // source=""
+                // source={getValues('chatGPTanswer')}
+                source={getSource('excerpt')}
+                // source={getSource('excerpt.' + translate('lan'))}
+                label="test"
+              /> */}
 
       <TextInput
         multiline
@@ -399,11 +453,13 @@ const Form = ({ children, ...props }) => {
         source={'excerpt.' + translate('lan')}
         label={translate('resources.product.excerpt')}
       />
-      {/* --------------------------------------------------------------------------------------------->> */}
+
       <Button
         label="Ask chatGPT"
         type="button"
-        onClick={chatGptHandler}
+        onClick={(e) => {
+          chatGptHandler(e);
+        }}
         style={{ border: '1px solid', borderRadius: 10, margin: 2 }}
       />
       {waitings && (
@@ -416,21 +472,24 @@ const Form = ({ children, ...props }) => {
           <CircularProgress />
         </Box>
       )}
-      {answer != '' && !waitings && (
-        <TextField
-          label="chatGPT answer"
-          color="secondary"
-          style={{ width: '100%', padding: '5px', margin: '5px' }}
-          multiline
-          value={answer}
-        />
-      )}
+      {/* {answer != '' && !waitings && (
+                <TextField
+                  label="chatGPT answer"
+                  color="secondary"
+                  style={{ width: '100%', padding: '5px', margin: '5px' }}
+                  multiline
+                  value={answer}
+                />
+              )} */}
+      {/* </div>
+          );
+        }}
+      </FormDataConsumer> */}
       <RichTextInput
         fullWidth
         source={'description.' + translate('lan')}
         label={translate('resources.product.description')}
       />
-
       <div className={'mb-20'} />
       {/* <BooleanInput
         source="story"
@@ -448,7 +507,6 @@ const Form = ({ children, ...props }) => {
         source={'extra_button'}
         label={translate('resources.product.extra_button')}
       /> */}
-
       <ReferenceArrayInput
         label={translate('resources.product.productCategory')}
         perPage={100}
@@ -456,7 +514,6 @@ const Form = ({ children, ...props }) => {
         reference="productCategory">
         <SelectArrayInput optionText="name.fa" />
       </ReferenceArrayInput>
-
       <AtrRefField
         label={translate('resources.product.attributes')}
         source="attributes"
@@ -464,9 +521,7 @@ const Form = ({ children, ...props }) => {
         url={'/attributes/0/1000'}
         surl={'/attributes'}
       />
-
       <div className={'mb-20'} />
-
       <SelectInput
         label={translate('resources.product.type')}
         fullWidth
@@ -474,9 +529,7 @@ const Form = ({ children, ...props }) => {
         source="type"
         choices={ProductType()}
       />
-
       <div className={'mb-20'} />
-
       <FormDataConsumer>
         {({ formData = {}, ...rest }) => {
           if (formData.type === 'variable')
@@ -647,13 +700,10 @@ const Form = ({ children, ...props }) => {
             ];
         }}
       </FormDataConsumer>
-
       {/*<EditOptions*/}
       {/*// record={record}*/}
       {/*onCreateCombinations={onCreateCombinations} updater={OptsUpdater}/>*/}
-
       {/*<ShowPictu  <EditOptions ros" thep={theP} setPhotos={setPhotos}/>*/}
-
       <UploaderField
         label={translate('resources.product.photo')}
         accept="image/*"
@@ -665,9 +715,7 @@ const Form = ({ children, ...props }) => {
         onRemove={onRemovePhoto}
         changeThumbnail={changeThumbnail}
       />
-
       <div className={'mb-20'} />
-
       <ArrayInput
         source="extra_attr"
         label={translate('resources.product.extra_attr')}>
@@ -706,7 +754,6 @@ const Form = ({ children, ...props }) => {
           </FormDataConsumer>
         </SimpleFormIterator>
       </ArrayInput>
-
       <SelectInput
         label={translate('resources.product.status')}
         source="status"

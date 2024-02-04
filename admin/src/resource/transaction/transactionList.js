@@ -27,7 +27,7 @@ export const transactionList = (props) => {
   const translate = useTranslate();
   const PaymentStatuses = PaymentStatus();
   console.log('PaymentStatus', PaymentStatuses);
-  const themeData = useSelector((st) => st.themeData);
+  const themeData = useSelector((st = {}) => st.themeData);
 
   return (
     <List
@@ -77,7 +77,8 @@ export const transactionList = (props) => {
               <div className="theDate">
                 <a
                   href={'/admin/#/order/' + record.order._id}
-                  target={'_blank'} rel="noreferrer">
+                  target={'_blank'}
+                  rel="noreferrer">
                   {record.order.orderNumber ? record.order.orderNumber : ''}
                 </a>
               </div>
