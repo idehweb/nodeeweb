@@ -10,19 +10,6 @@ import { CreateProductBody, UpdateProductBody } from '../../dto/in/product';
 
 export default function registerController() {
   const access: ControllerAccess = { modelName: 'admin', role: PUBLIC_ACCESS };
-
-  // custom simple controllers
-  controllersBatchRegister(
-    [
-      {
-        url: '/torob/:offset/:limit',
-        method: 'get',
-        service: Service.torob,
-      },
-    ],
-    { base_url: '/product', from: 'ShopEntity' }
-  );
-
   // crud
   registerEntityCRUD(
     'product',
