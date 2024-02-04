@@ -1,9 +1,10 @@
-import { Expose } from 'class-transformer';
-import { IsIn, IsOptional } from 'class-validator';
+import { Expose, Type } from 'class-transformer';
+import { IsIn, IsOptional, ValidateNested } from 'class-validator';
 import { ShopPluginType } from '../../../types';
 import { CorePluginType } from '@nodeeweb/core/types/plugin';
+import { ToObject } from '@nodeeweb/core/utils/transform';
 
-export class GatewayQuery {
+export class GatewayFilter {
   @Expose()
   @IsOptional()
   @IsIn([
@@ -12,4 +13,13 @@ export class GatewayQuery {
     CorePluginType.SMS,
   ])
   type?: string;
+}
+
+export class GatewayQuery extends GatewayFilter {
+  @Expose()
+  @ToObject()
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => GatewayFilter)
+  filter?: GatewayFilter;
 }

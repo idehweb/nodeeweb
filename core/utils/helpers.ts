@@ -363,6 +363,7 @@ export async function satisfyExistence(rootPath: string, condFiles: string[]) {
   return true;
 }
 export function safeJsonParse(obj: any) {
+  if (typeof obj === 'object') return obj;
   try {
     return JSON.parse(obj);
   } catch (err) {
