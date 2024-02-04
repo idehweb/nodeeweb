@@ -5,9 +5,13 @@ import { getEntities } from '#c/functions/index';
 
 // import State from "#c/data/state";
 
-function GetGateways(prop) {
-  let {setPaymentMethod,setGatewaySlug}=prop;
+function GetGateways(props) {
+  let {setGateway}=props;
   const [gateways, setGateways] = useState(null);
+
+  const [theGateway, setTheGateway] = useState(null);
+
+
   const [choosed, setChoosed] = useState(0);
 
   useEffect(() => {
@@ -21,20 +25,23 @@ function GetGateways(prop) {
       ).then((r) => {
         r=r.data;
         console.log('r',r);
-
-        // if (r && r.tables) {
-        //     console.log('r.tables', r.tables)
-        // setPaymentMethod(r[0].slug);
         r.forEach((gt, k) => {
           if (k == 0) {
             console.log('setGatewaySlug', gt.slug)
-            setGatewaySlug(gt.slug);
+            setGateway(gt.slug);
+          //  setTheGateway(gt.slug);
           }
         });
         setGateways(r);
         // }
       });
   }, []);
+
+
+  // useEffect(() => {
+  //   console.log('useEffect:',theGateway);
+  //   setGateway(theGateway);
+  // }, [setGateway, theGateway]);
   if (!gateways) {
     return null;
   }
@@ -50,9 +57,11 @@ function GetGateways(prop) {
         <FormRadio
           checked={k === choosed}
           onChange={(event) => {
-            console.log('prop', prop);
+            console.log('props', props);
             setChoosed(k);
-            setGatewaySlug(gt.slug);
+            setGateway(gt.slug);
+          //  setTheGateway(gt.slug);
+          //  setGatewaySlug(gt.slug);
             // prop.setPaymentMethod(gt.slug);
           }}
           className="mb-0 ">

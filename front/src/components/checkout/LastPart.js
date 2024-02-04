@@ -38,7 +38,7 @@ const LastPart = (props) => {
   let [lan, setLan] = useState(store.getState().store.lan || 'fa');
   let [rules, setRules] = useState(store.getState().store.lan || 'fa');
   let [isFormEnable, setFormEnable] = useState(false);
-  let [gatewaySlug, setGatewaySlug] = useState("");
+  const [gatewaySlug, setGatewaySlug] = useState(null);
   let [Transaction, setTransaction] = useState({});
   let [card, setCard] = useState({ data: [], state: 'none' });
 
@@ -75,18 +75,22 @@ const LastPart = (props) => {
     }
   }, []);
 
-  const onCreateTransaction = useCallback(async () => {
+  const setGateway = useCallback(async (g) => {
+    console.log('setGateway',g)
+ setGatewaySlug(g);
+  }, [setGatewaySlug]);
+
+  const onCreateTransaction = useCallback(async (theGatewaySlug) => {
     setCard((data) => ({ ...data, state: 'loading' }));
+ 
     try {
       let obj={
         post: { id: post.id },
         address,
-        gatewaySlug:gatewaySlug,
+        gatewaySlug:theGatewaySlug || gatewaySlug,
         discount: discountCode ?? undefined,
       };
       console.log('obj',obj )
-      // return;
-
       const { transactions } = await OrderService.createTransaction(obj);
 
       // clear cart
@@ -103,9 +107,15 @@ const LastPart = (props) => {
 return;
         }
         if ((!transaction.payment_method || (transaction.payment_method && transaction.payment_method!='post'))
-          && transaction.payment_link)
-          return navigate(transaction.payment_link, { replace: true });
-        return navigate('/profile', { replace: true });
+          && transaction.payment_link){
+            if (transaction.payment_link.indexOf("http://") == 0 || transaction.payment_link.indexOf("https://") == 0) {
+              // do something here
+              window.location.replace(transaction.payment_link);
+            }else{
+              return navigate(transaction.payment_link, { replace: true });
+            }
+              return navigate('/profile', { replace: true });
+          }
       }, 1000);
     } catch (err) {
       toast.error(err.message);
@@ -182,6 +192,11 @@ return;
   useEffect(() => {
     getCart();
   }, []);
+
+//   useEffect(() => {
+//     console.log('gatewaySlug',gatewaySlug);
+// setGatewaySlug(gatewaySlug);
+//   }, [gatewaySlug]);
   useEffect(() => {
     if(isFormEnable && Transaction)
     formRef.current.submit();
@@ -371,7 +386,7 @@ return;
               ]}
             </ListGroupItem>
             <ListGroupItem className={'d-flex px-3 border-0 '}></ListGroupItem>
-            <GetGateways setGatewaySlug={setGatewaySlug} setPaymentMethod={setPaymentMethod}/>
+            <GetGateways setGateway={(e)=>setGateway(e)} />
           </ListGroup>
           <Col className={'empty ' + 'height50'} sm={12} lg={12}></Col>
           <ListGroup>
@@ -409,7 +424,7 @@ return;
           <Button
             className={'place-order '}
             left={'true'}
-            onClick={() => onCreateTransaction()}>
+            onClick={() => onCreateTransaction(gatewaySlug)}>
             {t('Place Order')}
           </Button>
         </ButtonGroup>
