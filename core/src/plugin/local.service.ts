@@ -15,7 +15,12 @@ import { MiddleWare, Req } from '../../types/global';
 import { Plugin, PluginContent } from '../../types/plugin';
 import { catchFn } from '../../utils/catchAsync';
 import exec from '../../utils/exec';
-import { axiosError2String, call, isExist } from '../../utils/helpers';
+import {
+  axiosError2String,
+  call,
+  importFresh,
+  isExist,
+} from '../../utils/helpers';
 import {
   getPluginMarketPath,
   getPluginPath,
@@ -32,6 +37,7 @@ import {
   controllerRegister,
 } from '../handlers/controller.handler';
 import { ControllerSchema } from '../../types/controller';
+import path from 'path';
 
 enum PluginStep {
   CopyContent = 'copy-content',
@@ -83,7 +89,7 @@ class LocalService {
       throw new NotFound(`${slug} not found in local plugins`);
 
     // resolve
-    return await import(pluginConfPath);
+    return await importFresh(path.resolve(pluginConfPath));
   }
 
   private async validate(
@@ -95,8 +101,8 @@ class LocalService {
     if (!config[action]?.dto && action === 'active') action = 'config';
 
     if (config[action]?.dto) {
-      const { default: dto } = await import(
-        getPluginMarketPath(config.slug, config[action].dto)
+      const { default: dto } = await importFresh(
+        path.resolve(getPluginMarketPath(config.slug, config[action].dto))
       );
       arg = await validatePlain(arg, dto, true);
     }
@@ -115,7 +121,9 @@ class LocalService {
     if (action === 'active' && !config[action]?.run) action = 'config';
 
     // execute
-    const plugin = await import(getPluginPath(config.slug, config.main));
+    const plugin = await importFresh(
+      path.resolve(getPluginPath(config.slug, config.main))
+    );
     const pluginStack: PluginContent['stack'] = await call(
       plugin[config[action].run],
       { ...arg, resolve: this.insideResolveCreator(config) }

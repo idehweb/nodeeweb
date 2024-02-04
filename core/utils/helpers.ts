@@ -7,8 +7,8 @@ import bfs from './bfs';
 import { StoreRoute } from '../types/route';
 import { Req } from '../types/global';
 import { networkInterfaces } from 'os';
-import path, { join } from 'path';
-import { getScriptFile } from './path';
+import path, { join, resolve } from 'path';
+import { getModulePath, getScriptFile } from './path';
 import exec from './exec';
 
 export function page2Route(page: any): StoreRoute {
@@ -378,4 +378,17 @@ export async function relativeLink(src: string, dist: string) {
 
   const script = getScriptFile('ln-relative');
   await exec(`${script} "${root}" "${relativeSrc}" "${relativeDist}"`);
+}
+
+export function importFresh(path: string) {
+  const newPath = resolve(path);
+
+  // add extensions
+  const modulePaths = getModulePath(newPath);
+
+  // clear cache
+  modulePaths.forEach((p) => delete require.cache[p]);
+
+  // import
+  return import(newPath);
 }
