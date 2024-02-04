@@ -72,6 +72,7 @@ class LocalService {
       });
     },
     controllerRegister,
+    store,
   });
 
   private insideResolveCreator = (plugin: PluginConfig) => {
