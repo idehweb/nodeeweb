@@ -1,0 +1,26 @@
+{
+  "name": "Torob",
+  "version": "1.0.0",
+  "description": {
+    "en": "connect shop store into torob servers",
+    "fa": "متصل کردن سایت به ترب"
+  },
+  "type": "general",
+  "author": "Nodeeweb",
+  "main": "index",
+  "slug": "torob",
+  "config": {
+    "inputs": [],
+    "dto": "dto/index",
+    "run": "register"
+  },
+  "active": {
+    "dto": "dto/index",
+    "run": "register"
+  },
+  "edit": {
+    "inputs": [],
+    "dto": "dto/index",
+    "run": "register"
+  }
+}

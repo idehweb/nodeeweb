@@ -21,7 +21,7 @@ import {
   ShopPluginType,
 } from '../../types/plugin';
 import logger from '../../utils/log';
-import { axiosError2String } from '@nodeeweb/core/utils/helpers';
+import { axiosError2String, combineUrl } from '@nodeeweb/core/utils/helpers';
 import store from '../../store';
 import {
   ITransaction,
@@ -195,7 +195,10 @@ class PaymentService {
 
     const response = await bankPlugin.stack[0]({
       amount,
-      callback_url: `${store.env.BASE_URL}/api/v1/transaction/payment_callback/${transactionId}?amount=${amount}&currency=${store.config.currency}`,
+      callback_url: combineUrl({
+        host: store.config.host,
+        url: `api/v1/transaction/payment_callback/${transactionId}?amount=${amount}&currency=${store.config.currency}`,
+      }),
       currency: store.config.currency,
       description,
       userPhone,
