@@ -64,7 +64,7 @@ export default class Zarinpal {
       amount,
       callback_url: callbackUrl,
       description: extras.description,
-      currency: 'IRT',
+      currency: 'IRR',
       metadata: {
         mobile: extras.mobile,
       },
@@ -153,7 +153,7 @@ export default class Zarinpal {
     return authorities.map((data) => ({
       authority: data.authority,
       amount: data.amout,
-      currency: data.currency || 'IRT',
+      currency: data.currency || 'IRR',
     }));
   }
 
