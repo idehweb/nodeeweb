@@ -506,13 +506,13 @@ class PaymentService {
         });
       };
       const promises = [
-        ...(await _unverified_authorities()),
-        ...(await _expired_transactions()),
-        ...(await _watcher_transactions()),
+        _unverified_authorities,
+        _expired_transactions,
+        _watcher_transactions,
       ]
         // catch
-        .map((p) =>
-          catchFn(async () => await p, {
+        .map((f) =>
+          catchFn(async () => await Promise.all(await f()), {
             self: this,
             onError(err) {
               logger.error('synchronize payment error', err);
