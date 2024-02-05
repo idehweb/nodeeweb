@@ -23,8 +23,8 @@ class OrderService {
   get orderModel(): OrderModel {
     return store.db.model('order');
   }
-  getAllFilterParser(req: Req) {
-    const baseFilter = new EntityCreator('').parseFilterQuery({}, req);
+  async getAllFilterParser(req: Req) {
+    const baseFilter = await new EntityCreator('').parseFilterQuery({}, req);
     if (req.modelName === 'admin') {
       return baseFilter;
     }
