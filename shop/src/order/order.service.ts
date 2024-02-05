@@ -38,12 +38,12 @@ class OrderService {
   getOneFilterParser(req: Req) {
     const base = {
       _id: req.params.order,
-      status: { $ne: OrderStatus.Cart },
     };
 
     if (req.modelName === 'customer') {
       base['active'] = true;
       base['customer._id'] = req.user._id;
+      base['status'] = { $ne: OrderStatus.Cart };
     }
     return base;
   }
