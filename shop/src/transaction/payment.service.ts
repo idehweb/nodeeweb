@@ -35,6 +35,7 @@ import { UserDocument } from '@nodeeweb/core/types/user';
 import orderUtils from '../order/utils.service';
 import utilsService from './utils.service';
 import { HandlePaymentArgs } from '../../types/transaction';
+import { catchFn } from '@nodeeweb/core/utils/catchAsync';
 
 class PaymentService {
   transactionSupervisors = new Map<string, NodeJS.Timer>();
@@ -508,7 +509,18 @@ class PaymentService {
         ...(await _unverified_authorities()),
         ...(await _expired_transactions()),
         ...(await _watcher_transactions()),
-      ];
+      ]
+        // catch
+        .map((p) =>
+          catchFn(async () => await p, {
+            self: this,
+            onError(err) {
+              logger.error('synchronize payment error', err);
+            },
+          })
+        )
+        // call
+        .map((f) => f());
       // execute parallel
       await Promise.all(promises);
     } catch (err) {

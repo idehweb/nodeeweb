@@ -103,6 +103,7 @@ export class Utils {
           ORDER_ID: order._id,
           CUSTOMER_FIRST_NAME: order.customer.firstName,
           CUSTOMER_LAST_NAME: order.customer.lastName,
+          BASE_URL: store.config.host,
         },
       ],
       text: msg,
