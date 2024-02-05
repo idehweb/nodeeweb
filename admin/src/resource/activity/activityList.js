@@ -21,8 +21,8 @@ const PostPagination = (props) => (
 );
 
 const list = (props) => {
+  console.log('kkkk................................', props);
   const translate = useTranslate();
-
   return (
     <List
       {...props}
@@ -31,7 +31,7 @@ const list = (props) => {
           <ReferenceInput
             label={translate('resources.action.user')}
             source="user"
-            reference="user"
+            reference="admin"
             sort={{ field: '_id', order: 'ASC' }}
             filterToQuery={(searchText) => ({ _id: searchText })}
             alwaysOn>
@@ -53,7 +53,7 @@ const list = (props) => {
             sort={{ field: '_id', order: 'ASC' }}
             filterToQuery={(searchText) => ({ q: searchText })}
             alwaysOn>
-            <AutocompleteInput optionText="phoneNumber" />
+            <AutocompleteInput optionText="firstName" />
           </ReferenceInput>
         </Filter>
       }

@@ -10,7 +10,7 @@ import { dateFormat } from '@/functions';
 import { JsonDiffer, List, SimpleForm, UploaderField } from '@/components';
 import { Val } from '@/Utils';
 
-export const actionShow = (props) => {
+export const activityShow = (props) => {
   const translate = useTranslate();
 
   return (
@@ -57,4 +57,4 @@ export const actionShow = (props) => {
     </Show>
   );
 };
-export default actionShow;
+export default activityShow;
