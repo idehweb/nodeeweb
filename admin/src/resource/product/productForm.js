@@ -81,7 +81,6 @@ function returnToHome(values) {
 }
 
 function onCreateCombinations(options) {
-  console.log('options....', options);
   let combCount = 1;
   let combinationsTemp = [];
   let combinations = [];
@@ -97,7 +96,6 @@ function onCreateCombinations(options) {
   });
 
   let ttt = cartesian(combinationsTemp);
-  console.log('ttt.........', ttt);
   ttt.forEach((tt, key) => {
     let obj = {};
     tt.forEach((ther, key) => {
@@ -112,8 +110,6 @@ function onCreateCombinations(options) {
       salePrice: null,
       quantity: 0,
     });
-    console.log('obj...........', obj);
-    console.log('combinations.......', combinations);
   });
   // (id, path, rowRecord) => form.change('combinations', combinations)
 
@@ -201,8 +197,10 @@ const CustomToolbar = (props) => {
   );
 };
 const Form = ({ children, ...props }) => {
-  const { record } = props;
+  // console.log('child.........', children);
+  // console.log('props.........', props);
 
+  const { record } = props;
   const [photos, setPhotos] = useState(record?.photos ?? []);
   const [thumbnail, setThumbnail] = useState(record?.thumbnail);
   const [checkPrice, setCheckPrice] = useState('');
@@ -331,7 +329,7 @@ const Form = ({ children, ...props }) => {
   //   });
   // }
 
-  const chatGptHandler = async (e) => {
+  const chatGptHandler = async (f) => {
     // e.preventDefault();
     try {
       const question = mainWord
@@ -370,21 +368,13 @@ const Form = ({ children, ...props }) => {
       const response = await data.json();
       const formatedData = await response.choices[0].message.content;
       setWaitings(false);
+      // console.log('formDataBefore.......', f);
+      // f.excerpt.fa = formatedData;
+      // console.log('formDataAfter.......', f);
 
-      // console.log('propsbefore....', props);
       // props.record.excerpt.fa = formatedData;
-      // setValue('slug', formatedData);
-      // console.log('kkkkkkkkkkkkk', props);
-      props.record.excerpt.fa = formatedData;
-      // console.log('propsafter....', props);
-
-      // props = { ...props, record: { excerpt.fa : formatedData};
-      // Object.assign(props.record.excerpt, { fa: formatedData });
-      // props = { ...props.record, ...{ excerpt: { fa: formatedData } } };
-
-      // props = { ...props.record, ...(record.excerpt.fa = formatedData) };
-
-      // setAnswer(formatedData);
+      setAnswer(formatedData);
+      return formatedData;
     } catch (error) {
       console.log(error);
     }
@@ -397,6 +387,7 @@ const Form = ({ children, ...props }) => {
       onSubmit={(v) => save(v)}
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
+
       {/* ------------------------------------------------------------------------------------>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */}
       <TextInput
         source={'title.' + translate('lan')}
@@ -427,41 +418,62 @@ const Form = ({ children, ...props }) => {
         label={translate('resources.product.metadescription')}
       />
       {/* --------------------------------------------------------------------------------------------->> */}
-      {/* <FormDataConsumer>
-        {({ formData, getSource, scopedFormData }) => {
-          console.log('formData', formData);
-          // console.log('scopedFormData', rest);
-          return (
-            <div> */}
-      {/* <TextInput
-                fullWidth
-                multiline
-                record={formData}
-                // record={scopedFormData}
-                // value={getValues('chatGPTanswer')}
-                // value={'fdsssssssssss'}
-                // source=""
-                // source={getValues('chatGPTanswer')}
-                source={getSource('excerpt')}
-                // source={getSource('excerpt.' + translate('lan'))}
-                label="test"
-              /> */}
 
-      <TextInput
+      <ArrayInput source="excerpt" label="excerpt test 2">
+        <SimpleFormIterator>
+          <FormDataConsumer>
+            {({ formData, getSource, scopedFormData }) => [
+              <div className={'mb-20'} />,
+              console.log('scopedFormData..................', scopedFormData),
+              // console.log('formData..................', formData),
+              // console.log('get..................', getSource),
+
+              <TextInput
+                multiline
+                fullWidth
+                source={getSource('excerpt')}
+                record={scopedFormData}
+                label={translate('resources.product.excerpt')}
+              />,
+              <TextInput
+                multiline
+                fullWidth
+                render={formData.excerpt.fa}
+                source={'excerpt.' + translate('lan')}
+                label={translate('resources.product.excerpt')}
+              />,
+              <Button
+                label="Ask chatGPT"
+                type="button"
+                onClick={async () => {
+                  const q = await chatGptHandler();
+                  console.log('q............', q);
+                  console.log('before ........', formData);
+                  formData.excerpt.fa = q;
+                  scopedFormData.excerpt = q;
+                  // console.log('after ........', scopedFormData.excerpt);
+                }}
+                style={{ border: '1px solid', borderRadius: 10, margin: 2 }}
+              />,
+            ]}
+          </FormDataConsumer>
+        </SimpleFormIterator>
+      </ArrayInput>
+      {/* <TextInput
         multiline
         fullWidth
         source={'excerpt.' + translate('lan')}
         label={translate('resources.product.excerpt')}
-      />
+      /> */}
 
-      <Button
+      {/* <Button
         label="Ask chatGPT"
         type="button"
         onClick={(e) => {
           chatGptHandler(e);
         }}
         style={{ border: '1px solid', borderRadius: 10, margin: 2 }}
-      />
+      /> */}
       {waitings && (
         <Box
           sx={{
@@ -723,7 +735,7 @@ const Form = ({ children, ...props }) => {
           <FormDataConsumer>
             {({ getSource, scopedFormData }) => [
               <div className={'mb-20'} />,
-
+              // console.log('scoped..................', scopedFormData),
               <TextInput
                 fullWidth
                 source={getSource('title')}
