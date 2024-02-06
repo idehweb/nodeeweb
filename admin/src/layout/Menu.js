@@ -585,7 +585,8 @@ const Menu = ({ onMenuClick, dense = false }) => {
         />
         <MenuItemLink
           to={{
-            pathname: '/action',
+            pathname: '/activity',
+            // pathname: '/action',
             state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.siteActions`)}
