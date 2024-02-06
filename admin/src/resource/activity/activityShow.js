@@ -14,13 +14,14 @@ export const activityShow = (props) => {
   const translate = useTranslate();
   return (
     <Show {...props}>
-      {console.log('props.....................................', props)}{' '}
+      {/* todo ------> data coming from back are not complete - no user or customer data  */}
       <SimpleShowLayout>
-        <TextField source="title" label={translate('resources.action.title')} />
+        <TextField source="type" label={translate('resources.action.title')} />
         <TextField
           source="customer.phoneNumber"
           label={translate('resources.action.phoneNumber')}
         />
+
         <TextField
           source="customer.firstName"
           label={translate('resources.action.customerFirstName')}
