@@ -51,8 +51,6 @@ const {
 const Menu = ({ onMenuClick, dense = false }) => {
   const themeData = useSelector((st) => st.themeData);
 
-  console.log('MenusThemeData', themeData);
-
   const [state, setState] = useState({
     menuProduct: false,
     menuSection: false,
