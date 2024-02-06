@@ -12,9 +12,9 @@ import { Val } from '@/Utils';
 
 export const activityShow = (props) => {
   const translate = useTranslate();
-
   return (
     <Show {...props}>
+      {console.log('props.....................................', props)}{' '}
       <SimpleShowLayout>
         <TextField source="title" label={translate('resources.action.title')} />
         <TextField
@@ -23,19 +23,19 @@ export const activityShow = (props) => {
         />
         <TextField
           source="customer.firstName"
-          label={translate('resources.action.firstName')}
+          label={translate('resources.action.customerFirstName')}
         />
         <TextField
           source="customer.lastName"
-          label={translate('resources.action.lastName')}
+          label={translate('resources.action.customerLastName')}
         />
         <TextField
           source="user.firstName"
-          label={translate('resources.action.firstName')}
+          label={translate('resources.action.userFirstName')}
         />
         <TextField
           source="user.lastName"
-          label={translate('resources.action.lastName')}
+          label={translate('resources.action.userLastName')}
         />
         <TextField
           source="user.username"

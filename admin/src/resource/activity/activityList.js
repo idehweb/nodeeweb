@@ -21,7 +21,6 @@ const PostPagination = (props) => (
 );
 
 const list = (props) => {
-  console.log('kkkk................................', props);
   const translate = useTranslate();
   return (
     <List
@@ -65,27 +64,27 @@ const list = (props) => {
           render={(record) => {
             return (
               <div className={'categories'}>
-                {record.user && (
+                {record.doer && (
                   <div>
                     <ChipField
-                      source="user.username"
+                      source="doer.firstName"
                       label={translate('resources.action.username')}
                       sortable={false}
                     />
-                    {record.user.firstName && (
+                    {/* {record.doer.firstName && (
                       <ChipField
-                        source="user.firstName"
+                        source="doer.firstName"
                         label={translate('resources.action.firstName')}
                         sortable={false}
                       />
                     )}
-                    {record.user.lastName && (
+                    {record.doer.lastName && (
                       <ChipField
-                        source="user.lastName"
+                        source="doer.lastName"
                         label={translate('resources.action.lastName')}
                         sortable={false}
                       />
-                    )}
+                    )} */}
                   </div>
                 )}
               </div>
@@ -97,20 +96,21 @@ const list = (props) => {
           render={(record) => {
             return (
               <div className={'categories'}>
-                {record.customer && (
+                {/* {record.customer && ( */}
+                {record.doer && (
                   <div>
-                    <ChipField
-                      source="customer.phoneNumber"
+                    {/* <ChipField
+                      source="doer.phoneNumber"
                       label={translate('resources.action.phoneNumber')}
                       sortable={false}
-                    />
+                    /> */}
                     <ChipField
-                      source="customer.firstName"
+                      source="doer.firstName"
                       label={translate('resources.action.firstName')}
                       sortable={false}
                     />
                     <ChipField
-                      source="customer.lastName"
+                      source="doer.lastName"
                       label={translate('resources.action.lastName')}
                       sortable={false}
                     />
@@ -120,7 +120,10 @@ const list = (props) => {
             );
           }}
         />
-        <TextField source="title" label={translate('resources.action.title')} />
+        <TextField
+          source="target.model"
+          label={translate('resources.action.title')}
+        />
 
         <FunctionField
           label={translate('resources.action.createdAt')}
