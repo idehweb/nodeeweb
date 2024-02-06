@@ -189,7 +189,8 @@ const Menu = ({ onMenuClick, dense = false }) => {
         />
         <MenuItemLink
           to={{
-            pathname: '/entry',
+            pathname: '/post',
+            // pathname: '/entry',
             state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allEntries`)}
