@@ -202,9 +202,6 @@ const CustomToolbar = (props) => {
   );
 };
 const Form = ({ children, ...props }) => {
-  // console.log('child.........', children);
-  // console.log('props.........', props);
-
   const { record } = props;
   const [photos, setPhotos] = useState(record?.photos ?? []);
   const [thumbnail, setThumbnail] = useState(record?.thumbnail);
@@ -310,16 +307,15 @@ const Form = ({ children, ...props }) => {
     setValue(t, value);
   };
 
-  //check if props is empty or not
-  const isEmpty = (props) => {
-    for (const prop in props) {
-      if (Object.hasOwn(props, prop)) {
-        return false;
-      }
-    }
+  // const isEmpty = (props) => {
+  //   for (const prop in props) {
+  //     if (Object.hasOwn(props, prop)) {
+  //       return false;
+  //     }
+  //   }
 
-    return true;
-  };
+  //   return true;
+  // };
 
   // if (!isEmpty) {
   //   setAnswer({
