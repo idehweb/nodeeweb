@@ -304,12 +304,13 @@ const Form = ({ children, ...props }) => {
       <TextInput
         multiline
         fullWidth
+        validate={Val.reqMaxLenn(200)}
         source={'excerpt.' + translate('lan')}
         label={translate('resources.post.excerpt')}
       />
       <RichTextInput
-        multiline
         fullWidth
+        validate={Val.reqMaxLenn(200)}
         source={'description.' + translate('lan')}
         label={translate('resources.post.description')}
       />
