@@ -8,6 +8,8 @@ export default () => ({
   down: 'خاموش',
   error: 'خطا',
   rial: 'ریال',
+  "first name": 'نام',
+  "confirm password": 'تایید رمز عبور',
   toman: 'تومان',
   languageDir: 'rtl',
   'country-code': 'کد کشور',

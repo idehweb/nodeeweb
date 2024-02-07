@@ -9,6 +9,7 @@ import API from '@/functions/API';
 import { afterAuth } from './utils';
 
 import { UserProps } from '.';
+import { useTranslation } from 'react-i18next';
 
 type FormData = {
   firstName: string;
@@ -25,6 +26,7 @@ export default function SignupForm({
   setChanges: Dispatch<SetStateAction<UserProps>>;
   changes: UserProps;
 }) {
+  const { t } = useTranslation();
   const {
     register,
     formState: { errors },
@@ -40,6 +42,7 @@ export default function SignupForm({
     },
   });
   const [loading, setLoading] = React.useState(false);
+  const [otp, setOtp] = React.useState(true);
   const [error, setError] = React.useState('');
 
   const onSubmit = async (e: FormData) => {
@@ -108,80 +111,69 @@ export default function SignupForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className={'login-container'}>
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
           gap: '1rem',
-          padding: '2rem',
+          padding: '1rem',
         }}>
         <Box display="flex" justifyContent={'space-between'}>
-          <label
-            className="center my-2"
-            style={{ textAlign: 'center', width: '30%' }}
-            htmlFor="phone">
-            شماره همراه
-          </label>
+
           <TextField
             type="tel"
+            className={'signup-field'}
+            label={t('phone number')}
+            variant="standard"
             {...register('phone', { required: true })}
             disabled
           />
         </Box>
 
         <Box display="flex" justifyContent={'space-between'}>
-          <label
-            className="center my-2"
-            style={{ textAlign: 'center', width: '30%' }}
-            htmlFor="firstName">
-            نام
-          </label>
-
           <TextField
             type="text"
+            className={'signup-field'}
+
+            label={t('first name')}
+            variant="standard"
             {...register('firstName', { required: true })}
             error={!!errors.firstName}
             helperText={errors.firstName ? 'First Name is required' : ''}
           />
         </Box>
         <Box display="flex" justifyContent={'space-between'}>
-          <label
-            className="center my-2"
-            style={{ textAlign: 'center', width: '30%' }}
-            htmlFor="lastName">
-            نام خانوادگی
-          </label>
           <TextField
             type="text"
+            className={'signup-field'}
+
+            label={t('last name')}
+            variant="standard"
             {...register('lastName', { required: true })}
             error={!!errors.lastName}
             helperText={errors.lastName ? 'Last Name is required' : ''}
           />
         </Box>
         <Box display="flex" justifyContent={'space-between'}>
-          <label
-            className="center my-2"
-            style={{ textAlign: 'center', width: '30%' }}
-            htmlFor="pass">
-            رمز عبور
-          </label>
           <TextField
             type="password"
+            className={'signup-field ltr-value'}
+
+            label={t('password')}
+            variant="standard"
             {...register('password', { required: true })}
             error={!!errors.password}
             helperText={errors.password ? 'Password is required' : ''}
           />
         </Box>
         <Box display="flex" justifyContent={'space-between'}>
-          <label
-            className="center my-2"
-            style={{ textAlign: 'center', width: '30%' }}
-            htmlFor="confirmPass">
-            تکرار رمز عبور
-          </label>
           <TextField
             type="password"
+            className={'signup-field ltr-value'}
+
+            label={t('confirm password')}
+            variant="standard"
             {...register('confirmPassword', { required: true })}
             error={!!errors.confirmPassword}
             helperText={
@@ -189,17 +181,22 @@ export default function SignupForm({
             }
           />
         </Box>
+
+      </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1rem',
+          padding: '1rem',
+        }}>
         <Box display="flex" justifyContent={'space-between'}>
-          <label
-            className="center my-2"
-            style={{ textAlign: 'center', width: '30%' }}
-            htmlFor="otpCode">
-            کد یکبار مصرف
-          </label>
 
           <TextField
-            sx={{ width: '20%' }}
+            sx={{ width: '100%' }}
             type="text"
+            label={t('one time password')}
+            variant="standard"
             value={changes.activationCode}
             onChange={(e) =>
               setChanges((prev) => ({
@@ -207,8 +204,8 @@ export default function SignupForm({
                 activationCode: e.target.value,
               }))
             }
-            error={!!errors.firstName}
-            helperText={errors.firstName ? 'First Name is required' : ''}
+            // error={!!errors.firstName}
+            // helperText={errors.firstName ? 'First Name is required' : ''}
           />
           <Button
             onClick={handleOtpCodeForSignup}
@@ -216,10 +213,11 @@ export default function SignupForm({
             variant="contained"
             color="info"
             sx={{ fontWeight: 800 }}
-            size="small">
+          >
             دریافت کد
           </Button>
         </Box>
+
         <Button
           type="submit"
           disabled={loading}
@@ -228,6 +226,7 @@ export default function SignupForm({
           color="success">
           ثبت نام
         </Button>
+
         <Button
           disabled={loading}
           onClick={() => {
@@ -242,8 +241,9 @@ export default function SignupForm({
           fullWidth>
           تغییر شماره موبایل
         </Button>
-        {error && <p>{error}</p>}
+
       </Box>
+      {error && <p>{error}</p>}
     </form>
   );
 }

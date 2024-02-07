@@ -12,7 +12,7 @@ const APP = (props) => {
   // const themeData = useSelector((st) => st.store.themeData, _isEqual);
   const configData = useSelector((st) => st.store.configData, _isEqual);
   if (configData && configData.routes) {
-    console.log('configData.routes', configData);
+    // console.log('configData.routes', configData);
 
     const newRoutes = [];
     for (const slug in configData.routes) {
@@ -35,7 +35,7 @@ const APP = (props) => {
         });
       }
     }
-    console.log(newRoutes);
+    // console.log(newRoutes);
     routes = createRoutes(newRoutes);
   }
   // if (!themeData || (themeData && !themeData.models)) {

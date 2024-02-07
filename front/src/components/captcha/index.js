@@ -2,15 +2,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import useCaptcha from 'use-offline-captcha';
 import Grid from '@mui/material/Grid';
 
-const Captcha = ({ onActionSubmit, onActionValue = undefined }) => {
+const Captcha = ({ onActionSubmit, onActionValue = undefined,t }) => {
   const captchaRef = useRef();
   const [value, setValue] = useState();
   const userOpt = {
     type: 'numeric', // "mixed"(default) | "numeric" | "alpha"
     length: 6, // 4 to 8 number. default is 5
     sensitive: false, // Case sensitivity. default is false
-    width: 180, // Canvas width. default is 200
-    height: 40, // Canvas height. default is 50
+    width: 110, // Canvas width. default is 200
+    height: 35, // Canvas height. default is 50
     fontColor: '#000',
     background: 'rgba(255, 255, 255, .2)',
     borderColor: '#ddd',
@@ -22,27 +22,31 @@ const Captcha = ({ onActionSubmit, onActionValue = undefined }) => {
   }, [gen]);
 
   return (
-    <>
-      <Grid container spacing={2} columns={16}>
-        <Grid item md={8} xs={16}>
+    <div className={'captcha-wrapper rtl'}>
+      <label>{t('enter captcha')}</label>
+      <div  className={'captcha-area'}>
+        <div className={'captcha-image'}>
+          <div ref={captchaRef}/>
+        </div>
+        <div className={'captcha-input'}>
           <input
-            style={{ height: '42px', width: '100%' }}
+
             onChange={(e) => {
               setValue(e.target.value);
               onActionSubmit(validate(e.target.value));
               if (onActionValue) onActionValue(e.target.value);
             }}
+            className={'ltr'}
             value={value}
           />
-        </Grid>
-        <Grid item md={8} xs={16}>
-          <div ref={captchaRef} />
-        </Grid>
-      </Grid>
+        </div>
+
+      </div>
       {/* <button onClick={handleValidate}>Validate</button> */}
       {/* <button onClick={handleRefresh}>Refresh</button> */}
-    </>
+    </div>
   );
 };
 
 export default React.memo(Captcha);
+

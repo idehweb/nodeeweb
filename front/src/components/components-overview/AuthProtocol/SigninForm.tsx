@@ -68,20 +68,26 @@ export default function SigninForm({
 
   return (
     <>
-      {/* <form onSubmit={handleSubmit(onSubmit)}> */}
+       <form
+         // onSubmit={handleSubmit(onSubmit)}
+             className={'login-container'}>
       <Box
         display={'flex'}
         flexDirection={'column'}
-        gap={'2rem'}
-        padding={'2rem'}>
+        gap={'1rem'}
+        padding={'1rem'}>
         <TextField
+          variant="standard"
           name="Phone Number"
           label="شماره موبایل"
+          className={'ltr-value'}
           defaultValue={changes.phoneNumber}
           disabled
         />
         <TextField
-          // {...register('password', { required: true })}
+          variant="standard"
+          className={'ltr-value'}
+
           onChange={(e) => setPassword(e.target.value)}
           name="password"
           label="رمز عبور"
@@ -90,6 +96,7 @@ export default function SigninForm({
         <Button
           disabled={loading}
           onClick={onSubmit}
+
           variant="contained"
           sx={{ fontWeight: 700, fontSize: '1rem' }}
           color="success">
@@ -124,7 +131,7 @@ export default function SigninForm({
         </Button>
         {error && <p>{error}</p>}
       </Box>
-      {/* </form> */}
+       </form>
     </>
   );
 }

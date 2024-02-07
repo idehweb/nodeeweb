@@ -5,7 +5,7 @@ import { TextField, Button, Box } from '@mui/material';
 import { toast } from 'react-toastify';
 
 import API from '@/functions/API';
-
+import { afterAuth } from './utils';
 // import { afterAuth } from './utils';
 
 import { UserProps } from '.';
@@ -37,22 +37,45 @@ export default function ForgotPasswordForm({
       return;
     }
     try {
+      console.log('password',data?.password)
       setLoading(true);
-      const sendOtpToken = await API.post('/auth/otp', {
-        userType: 'customer',
-        login: true,
-        signup: false,
-        user: {
-          phone: changes.phoneNumber,
-        },
+      // const sendOtpToken = await API.post('/auth/otp', {
+      //   userType: 'customer',
+      //   login: true,
+      //   signup: false,
+      //   user: {
+      //     phone: changes.phoneNumber,
+      //   },
+      // });
+      // setChanges((prev) => ({
+      //   ...prev,
+      //   authStatus: 'change-password:active',
+      //   tempPassword: data.password,
+      // }));
+      // console.log('otp token for reset pass traceback #fpf1 ', sendOtpToken);
+      // toast.success('کد با موفقیت ارسال شد');
+
+
+      const changePasswordResponse = await API.patch(
+        '/customer/updatePassword',
+        { password: data?.password }
+      );
+
+      console.log(
+        'password is changed traceback logs #ocp1 ',
+        changePasswordResponse
+      );
+      toast.success('پسورد با موفقیت تغییر یافت');
+      afterAuth({
+        user: changePasswordResponse?.data?.data?.user,
+        token: changePasswordResponse?.data?.data?.token,
       });
+
       setChanges((prev) => ({
         ...prev,
-        authStatus: 'change-password:active',
-        tempPassword: data.password,
+        authStatus: 'success',
+        userInfo: changePasswordResponse.data.data,
       }));
-      console.log('otp token for reset pass traceback #fpf1 ', sendOtpToken);
-      toast.success('کد با موفقیت ارسال شد');
     } catch (err) {
       console.log('error trace back code #ocps1');
       toast.error('خطا');
@@ -62,7 +85,7 @@ export default function ForgotPasswordForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onChangePasswordSubmit)}>
+    <form onSubmit={handleSubmit(onChangePasswordSubmit)} className={'login-container'}>
       <Box
         sx={{
           display: 'flex',
@@ -73,6 +96,8 @@ export default function ForgotPasswordForm({
         <TextField
           sx={{ fontFamily: 'inherit' }}
           name="phoneNumber"
+          className={'ltr-value'}
+          variant="standard"
           label="شماره همراه"
           type="number"
           defaultValue={changes.phoneNumber}
@@ -82,6 +107,8 @@ export default function ForgotPasswordForm({
         <TextField
           sx={{ fontFamily: 'inherit' }}
           name="newPassword"
+          className={'ltr-value'}
+          variant="standard"
           label="رمز عبور جدید"
           type="password"
           {...register('password', { required: true })}
@@ -89,6 +116,8 @@ export default function ForgotPasswordForm({
         <TextField
           sx={{ fontFamily: 'inherit' }}
           name="confirmPassword"
+          className={'ltr-value'}
+          variant="standard"
           label="تایید رمز عبور"
           type="password"
           {...register('confirmPassword', { required: true })}

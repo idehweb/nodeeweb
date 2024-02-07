@@ -26,7 +26,26 @@ export default function OtpCodePortal({
   };
 
   const [loading, setLoading] = useState(false);
-
+  const sendCode = async () => {
+    console.log('changes.phoneNumber',changes.phoneNumber);
+    try {
+      const sendOtpToken = await API.post('/auth/otp', {
+        userType: 'customer',
+        login: true,
+        signup: false,
+        user: {
+          phone: changes.phoneNumber,
+        },
+      });
+    } catch (err) {
+      toast.error('خطا در ورود با حساب کاربری');
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    sendCode();
+  },[]);
   useEffect(() => {
     const interval = setInterval(() => {
       setIntervalTimer((prevTimer) =>
@@ -39,6 +58,61 @@ export default function OtpCodePortal({
   }, []);
 
   const onSubmit = async () => {
+    try {
+      const signinResponse = await API.post('/auth/otp/login', {
+        userType: 'customer',
+        user: {
+          phone: changes.phoneNumber,
+          code: changes.activationCode,
+        },
+      });
+      console.log('otpcodeportal tracecod #12 ', signinResponse);
+      setLoading(true);
+      localStorage.setItem('user', signinResponse.data.data.user);
+      toast.success('ورود موفقیت آمیز');
+      console.log('sign in respones is -----> ', signinResponse.data.data);
+      const token = signinResponse.data.data.token;
+      const user = signinResponse.data.data.user;
+      afterAuth({
+        user,
+        token,
+      });
+
+      setChanges((prev) => ({
+        ...prev,
+        authStatus: 'change-password:active',
+        userInfo: signinResponse.data.data,
+      }));
+
+      // const changePasswordResponse = await API.patch(
+      //   '/customer/updatePassword',
+      //   { password: changes.tempPassword }
+      // );
+      //
+      // console.log(
+      //   'password is changed traceback logs #ocp1 ',
+      //   changePasswordResponse
+      // );
+      // toast.success('پسورد با موفقیت تغییر یافت');
+      // afterAuth({
+      //   user: changePasswordResponse.data.data.user,
+      //   token: changePasswordResponse.data.data.token,
+      // });
+      //
+      // setChanges((prev) => ({
+      //   ...prev,
+      //   authStatus: 'success',
+      //   userInfo: changePasswordResponse.data.data,
+      // }));
+      // Save authToken to cookie
+      // document.cookie = `authToken=${signinResponse.data.data.token}`;
+    } catch (err) {
+      toast.error('خطا در ورود با حساب کاربری');
+    } finally {
+      setLoading(false);
+    }
+  }
+  const onSubmit2 = async () => {
     try {
       const signinResponse = await API.post('/auth/otp/login', {
         userType: 'customer',
@@ -105,6 +179,7 @@ export default function OtpCodePortal({
         padding: '2rem',
         minHeight: '50vh',
       }}>
+      <div className={'login-container'}>
       <div className={'your-timer'}>
         <div className={'flex-item '}>
           <Box display={'flex'} justifyContent={'space-between'} gap={'3rem'}>
@@ -143,6 +218,7 @@ export default function OtpCodePortal({
           type="number"
           id="otpCode"
           name="OTP Code"
+          className={'ltr-value width-100'}
           placeholder="OTP"
           value={changes.activationCode}
           onChange={(event) =>
@@ -199,6 +275,7 @@ export default function OtpCodePortal({
           ارسال مجدد کد؟
         </Button>
       )}
+      </div>
     </Box>
   );
 }

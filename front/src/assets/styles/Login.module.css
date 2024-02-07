@@ -1,14 +1,17 @@
 .container {
-  min-height: 58vh;
-  padding: 3rem;
+  /*min-height: 58vh;*/
+  width:290px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
+  margin: auto;
   @media (max-width: 768px) {
   }
 }
+
 
 .button {
   padding: 0.2rem;
