@@ -20,7 +20,12 @@ import {
   useGetList,
   Button,
 } from 'react-admin';
-import { useFormContext, useForm } from 'react-hook-form';
+import {
+  useFormContext,
+  useForm,
+  useController,
+  useFormState,
+} from 'react-hook-form';
 import Input from '@mui/material/Input';
 
 import React, { useCallback, useEffect, useState } from 'react';
@@ -242,6 +247,7 @@ const Form = ({ children, ...props }) => {
   };
 
   function save(values) {
+    // setAnswer('');
     values.photos = photos;
     values.thumbnail = thumbnail;
 
@@ -301,7 +307,7 @@ const Form = ({ children, ...props }) => {
   const { setValue, getValues } = useForm({
     defaultValues: {
       chatGPTanswer: '',
-      chatGPTmain: '',
+      // chatGPTmain: '',
     },
   });
 
@@ -368,17 +374,30 @@ const Form = ({ children, ...props }) => {
       const response = await data.json();
       const formatedData = await response.choices[0].message.content;
       setWaitings(false);
-      // console.log('formDataBefore.......', f);
-      // f.excerpt.fa = formatedData;
-      // console.log('formDataAfter.......', f);
-
       // props.record.excerpt.fa = formatedData;
+      handleChange('chatGPTanswer', formatedData);
+      console.log('chatGPTanswerbyGetValue....', getValues('chatGPTanswer'));
       setAnswer(formatedData);
-      return formatedData;
     } catch (error) {
       console.log(error);
     }
   };
+
+  const ControlledTextInput = ({ value, ...props }) => {
+    const { setValue } = useFormContext();
+
+    React.useEffect(() => {
+      setValue(props.source, value);
+    }, [value]);
+
+    return <TextInput {...props} />;
+  };
+  // <SimpleForm>
+  //   <ControlledTextInput
+  //     source="title"
+  //     value="this value was provide by API response"
+  //   />
+  // </SimpleForm>;
 
   return (
     <SimpleForm
@@ -419,14 +438,13 @@ const Form = ({ children, ...props }) => {
       />
       {/* --------------------------------------------------------------------------------------------->> */}
 
-      <ArrayInput source="excerpt" label="excerpt test 2">
+      {/* <ArrayInput source="excerpt" label="excerpt test 2">
         <SimpleFormIterator>
           <FormDataConsumer>
             {({ formData, getSource, scopedFormData }) => [
               <div className={'mb-20'} />,
               console.log('scopedFormData..................', scopedFormData),
-              // console.log('formData..................', formData),
-              // console.log('get..................', getSource),
+             
 
               <TextInput
                 multiline
@@ -447,33 +465,38 @@ const Form = ({ children, ...props }) => {
                 type="button"
                 onClick={async () => {
                   const q = await chatGptHandler();
-                  console.log('q............', q);
-                  console.log('before ........', formData);
-                  formData.excerpt.fa = q;
+                                    formData.excerpt.fa = q;
                   scopedFormData.excerpt = q;
-                  // console.log('after ........', scopedFormData.excerpt);
                 }}
                 style={{ border: '1px solid', borderRadius: 10, margin: 2 }}
               />,
             ]}
           </FormDataConsumer>
         </SimpleFormIterator>
-      </ArrayInput>
+      </ArrayInput> */}
+
       {/* <TextInput
         multiline
         fullWidth
         source={'excerpt.' + translate('lan')}
         label={translate('resources.product.excerpt')}
       /> */}
+      <ControlledTextInput
+        fullWidth
+        multiline
+        source={'excerpt.' + translate('lan')}
+        value={getValues('chatGPTanswer')}
+        label={translate('resources.product.excerpt')}
+      />
 
-      {/* <Button
+      <Button
         label="Ask chatGPT"
         type="button"
         onClick={(e) => {
           chatGptHandler(e);
         }}
         style={{ border: '1px solid', borderRadius: 10, margin: 2 }}
-      /> */}
+      />
       {waitings && (
         <Box
           sx={{
