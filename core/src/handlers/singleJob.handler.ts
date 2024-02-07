@@ -86,7 +86,7 @@ export async function waitForLockFiles(timer = 10) {
   const timerPromise = () => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        reject(new Error('time come to end'));
+        reject(new Error('wait for lock files timeout reached'));
       }, timer * 1000);
     });
   };

@@ -118,7 +118,8 @@ export const orderEdit = (props) => {
                         ? record.price
                             .toString()
                             .replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',')
-                        : record.combinations[0].price.toLocaleString()
+                        : record.combinations[0].price
+                      // : record.combinations[0].price.toLocaleString()
                     }`
                   }
                 />
@@ -130,7 +131,8 @@ export const orderEdit = (props) => {
                         ? record.salePrice
                             .toString()
                             .replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',')
-                        : record.combinations[0].salePrice.toLocaleString()
+                        : record.combinations[0].salePrice
+                      // : record.combinations[0].salePrice.toLocaleString()
                     }`
                   }
                 />

@@ -23,8 +23,8 @@ class OrderService {
   get orderModel(): OrderModel {
     return store.db.model('order');
   }
-  getAllFilterParser(req: Req) {
-    const baseFilter = new EntityCreator('').parseFilterQuery({}, req);
+  async getAllFilterParser(req: Req) {
+    const baseFilter = await new EntityCreator('').parseFilterQuery({}, req);
     if (req.modelName === 'admin') {
       return baseFilter;
     }
@@ -38,12 +38,12 @@ class OrderService {
   getOneFilterParser(req: Req) {
     const base = {
       _id: req.params.order,
-      status: { $ne: OrderStatus.Cart },
     };
 
     if (req.modelName === 'customer') {
       base['active'] = true;
       base['customer._id'] = req.user._id;
+      base['status'] = { $ne: OrderStatus.Cart };
     }
     return base;
   }
