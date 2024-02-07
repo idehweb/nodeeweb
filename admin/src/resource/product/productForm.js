@@ -247,7 +247,6 @@ const Form = ({ children, ...props }) => {
   };
 
   function save(values) {
-    // setAnswer('');
     values.photos = photos;
     values.thumbnail = thumbnail;
 
@@ -296,26 +295,20 @@ const Form = ({ children, ...props }) => {
   const totals = 0;
 
   const [mainWord, setMainWord] = useState('');
-  const [answer, setAnswer] = useState('');
+  // const [answer, setAnswer] = useState('');
 
   const [waitings, setWaitings] = useState(false);
 
-  console.log(props);
-
-  // --------------------------------------------------------------------------------->>>>>>>>>>>>>>>>>>>>>
-  // const { setValue } = useFormContext();
   const { setValue, getValues } = useForm({
     defaultValues: {
-      chatGPTanswer: '',
-      // chatGPTmain: '',
+      chatGPTanswer: props?.record?.excerpt?.fa,
+      // chatGPTanswer: '',
     },
   });
 
   const handleChange = (t, value) => {
     setValue(t, value);
   };
-
-  // ----------------------------------------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>
 
   //check if props is empty or not
   const isEmpty = (props) => {
@@ -335,7 +328,7 @@ const Form = ({ children, ...props }) => {
   //   });
   // }
 
-  const chatGptHandler = async (f) => {
+  const chatGptHandler = async (e) => {
     // e.preventDefault();
     try {
       const question = mainWord
@@ -374,12 +367,11 @@ const Form = ({ children, ...props }) => {
       const response = await data.json();
       const formatedData = await response.choices[0].message.content;
       setWaitings(false);
-      // props.record.excerpt.fa = formatedData;
       handleChange('chatGPTanswer', formatedData);
-      console.log('chatGPTanswerbyGetValue....', getValues('chatGPTanswer'));
-      setAnswer(formatedData);
-    } catch (error) {
-      console.log(error);
+      // console.log('chatGPTanswerbyGetValue....', getValues('chatGPTanswer'));
+      // setAnswer(formatedData);
+    } catch (err) {
+      console.log('err', err);
     }
   };
 
@@ -388,16 +380,11 @@ const Form = ({ children, ...props }) => {
 
     React.useEffect(() => {
       setValue(props.source, value);
+      //eslint-disable-next-line
     }, [value]);
 
     return <TextInput {...props} />;
   };
-  // <SimpleForm>
-  //   <ControlledTextInput
-  //     source="title"
-  //     value="this value was provide by API response"
-  //   />
-  // </SimpleForm>;
 
   return (
     <SimpleForm
@@ -407,7 +394,6 @@ const Form = ({ children, ...props }) => {
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
 
-      {/* ------------------------------------------------------------------------------------>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */}
       <TextInput
         source={'title.' + translate('lan')}
         label={translate('resources.product.title')}
@@ -436,51 +422,7 @@ const Form = ({ children, ...props }) => {
         source={'metadescription.' + translate('lan')}
         label={translate('resources.product.metadescription')}
       />
-      {/* --------------------------------------------------------------------------------------------->> */}
 
-      {/* <ArrayInput source="excerpt" label="excerpt test 2">
-        <SimpleFormIterator>
-          <FormDataConsumer>
-            {({ formData, getSource, scopedFormData }) => [
-              <div className={'mb-20'} />,
-              console.log('scopedFormData..................', scopedFormData),
-             
-
-              <TextInput
-                multiline
-                fullWidth
-                source={getSource('excerpt')}
-                record={scopedFormData}
-                label={translate('resources.product.excerpt')}
-              />,
-              <TextInput
-                multiline
-                fullWidth
-                render={formData.excerpt.fa}
-                source={'excerpt.' + translate('lan')}
-                label={translate('resources.product.excerpt')}
-              />,
-              <Button
-                label="Ask chatGPT"
-                type="button"
-                onClick={async () => {
-                  const q = await chatGptHandler();
-                                    formData.excerpt.fa = q;
-                  scopedFormData.excerpt = q;
-                }}
-                style={{ border: '1px solid', borderRadius: 10, margin: 2 }}
-              />,
-            ]}
-          </FormDataConsumer>
-        </SimpleFormIterator>
-      </ArrayInput> */}
-
-      {/* <TextInput
-        multiline
-        fullWidth
-        source={'excerpt.' + translate('lan')}
-        label={translate('resources.product.excerpt')}
-      /> */}
       <ControlledTextInput
         fullWidth
         multiline
@@ -516,10 +458,7 @@ const Form = ({ children, ...props }) => {
                   value={answer}
                 />
               )} */}
-      {/* </div>
-          );
-        }}
-      </FormDataConsumer> */}
+
       <RichTextInput
         fullWidth
         source={'description.' + translate('lan')}
