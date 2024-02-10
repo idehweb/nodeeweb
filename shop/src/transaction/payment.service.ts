@@ -134,7 +134,6 @@ class PaymentService {
     // handle payment
     const transaction = await this.transactionModel.findOne({
       _id: req.params.transactionId,
-      active: true,
     });
 
     const { status } = await this.handlePayment({
@@ -179,11 +178,12 @@ class PaymentService {
     ) as BankGatewayPluginContent;
 
     if (!bankPlugin)
-      return {
-        authority: new Date().toISOString(),
-        provider: TransactionProvider.Manual,
-        payment_method: 'get',
-      };
+      // return {
+      //   authority: new Date().toISOString(),
+      //   provider: TransactionProvider.Manual,
+      //   payment_method: 'get',
+      // };
+      throw new BadRequestError('there is not any active bank plugin');
 
     // env
     // if (envAllowed([Environment.Local])) {
@@ -252,7 +252,7 @@ class PaymentService {
       };
 
       const newT = await this.transactionModel.findOneAndUpdate(
-        { _id: transaction._id },
+        { _id: transaction._id, active: true },
         update,
         { new: true }
       );
@@ -389,6 +389,7 @@ class PaymentService {
           const td = await this.transactionModel.findOne({
             _id: transaction._id,
             status: TransactionStatus.NeedToPay,
+            active: true,
           });
           if (!td) return;
           await this.handlePayment({

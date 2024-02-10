@@ -1,6 +1,7 @@
 import { merge } from 'lodash';
 import {
   BadRequestError,
+  CRUD,
   CRUD_DEFAULT_REQ_KEY,
   EntityCreator,
   MiddleWare,
@@ -13,11 +14,12 @@ import {
   OrderModel,
   OrderStatus,
 } from '../../schema/order.schema';
-import utils from './utils.service';
+import utils, { Utils } from './utils.service';
 import store from '../../store';
 import transactionUtils from '../transaction/utils.service';
 import { UpdateQuery } from 'mongoose';
 import { isIn } from 'class-validator';
+import { getEntityEventName } from '@nodeeweb/core/src/handlers/entity.handler';
 
 class OrderService {
   get orderModel(): OrderModel {
@@ -49,6 +51,13 @@ class OrderService {
   }
 
   update: MiddleWare = async (req, res) => {
+    // emit event
+    store.event.emit(
+      getEntityEventName('order', { pre: true, type: CRUD.UPDATE_ONE }),
+      { type: CRUD.UPDATE_ONE, model: 'order' },
+      req
+    );
+
     const body = req.body;
     const order = await this.orderModel.findOne({
       _id: req.params.order,
@@ -93,6 +102,14 @@ class OrderService {
     // sms
     body.status && utils.sendOnStateChange(newOrder);
 
+    // emit event
+    store.event.emit(
+      getEntityEventName('order', { post: true, type: CRUD.UPDATE_ONE }),
+      newOrder,
+      { type: CRUD.UPDATE_ONE, model: 'order' },
+      req
+    );
+
     return res.json({ data: newOrder });
   };
 
@@ -119,6 +136,23 @@ class OrderService {
       utils.sendOnStateChange(order).then();
     }
     res.json({ data: order });
+  }
+
+  delete = async (order: OrderDocument, req: Req) => {
+    if (!order) throw new NotFound('order not found');
+
+    // cancel order
+    await utils.cancelOrder(order);
+
+    return;
+  };
+  deleteFilter(req: Req) {
+    return {
+      _id: Object.values(req.params).filter(
+        (p) => typeof p === 'string' && p
+      )[0],
+      active: true,
+    };
   }
 }
 

@@ -130,6 +130,15 @@ export default function registerController() {
           },
         },
       },
+      deleteOne: {
+        controller: {
+          access: AdminAccess,
+        },
+        crud: {
+          sendResponse: orderService.delete,
+          parseFilter: orderService.deleteFilter,
+        },
+      },
     },
     {
       from: 'ShopEntity',
