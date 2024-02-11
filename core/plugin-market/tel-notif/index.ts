@@ -1,6 +1,8 @@
+import Provider from './src/provider/provider.abstract';
+import ProviderBuilder from './src/provider/provider.builder';
 import { IConfig, PluginContent } from './type';
 
-let config: IConfig;
+let config: IConfig & { provider: Provider };
 
 function errorLog(from: string, err: any) {
   const logger = config.resolve('logger');
@@ -10,6 +12,12 @@ function errorLog(from: string, err: any) {
 
 function register(arg: any): PluginContent['stack'] {
   config = arg;
+  config.provider = ProviderBuilder.build(config.providerType, {
+    botToken: config.botToken,
+    channelId: config.channelId,
+    providerName: config.providerType,
+    providerApiKey: config.apiKey,
+  });
   return [];
 }
 

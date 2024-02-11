@@ -1,8 +1,13 @@
+export enum ProviderType {
+  Local = 'local',
+  Nodeeweb = 'nodeeweb',
+}
+
 export interface IConfig {
   botToken: string;
   channelId: string;
   resolve: (key: string) => any;
-  provider: 'local' | 'nodeeweb';
+  providerType: ProviderType;
   apiKey?: string;
 }
 

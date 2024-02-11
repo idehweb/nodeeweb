@@ -28,7 +28,7 @@
         "type": "number"
       },
       {
-        "key": "provider",
+        "key": "providerType",
         "title": {
           "en": "network provider",
           "fa": "سرور ارسال کننده پیام"
@@ -72,7 +72,7 @@
         "type": "number"
       },
       {
-        "key": "provider",
+        "key": "providerType",
         "title": {
           "en": "network provider",
           "fa": "سرور ارسال کننده پیام"
