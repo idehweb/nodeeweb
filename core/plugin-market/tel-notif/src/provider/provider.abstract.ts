@@ -6,5 +6,5 @@ export type ProviderOptions = {
 };
 export default abstract class Provider {
   constructor(protected opts: ProviderOptions) {}
-  protected abstract send(message: string): Promise<boolean> | boolean;
+  abstract send(message: string): Promise<boolean> | boolean;
 }
