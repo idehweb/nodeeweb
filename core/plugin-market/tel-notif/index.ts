@@ -13,7 +13,7 @@ function errorLog(from: string, err: any) {
 }
 
 function register(arg: any): PluginContent['stack'] {
-  const subscribers = config.subscribers;
+  const subscribers = config?.subscribers;
 
   // unsubscribe
   if (subscribers) subscribers.forEach((sub) => sub.unSubscribe());
@@ -26,15 +26,19 @@ function register(arg: any): PluginContent['stack'] {
     channelId: config.channelId,
     providerName: config.providerType,
     providerApiKey: config.apiKey,
+    resolve: config.resolve,
   });
 
   // init subscribers
   if (subscribers) {
     config.subscribers = subscribers;
   } else {
-    config.subscribers = SubscriberBuilder.build({ provider: config.provider });
+    config.subscribers = SubscriberBuilder.build({
+      provider: config.provider,
+      resolve: config.resolve,
+    });
   }
-  subscribers.forEach((sub) => sub.subscribe());
+  config.subscribers.forEach((sub) => sub.subscribe());
 
   return [];
 }

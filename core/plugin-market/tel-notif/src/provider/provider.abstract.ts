@@ -3,6 +3,7 @@ export type ProviderOptions = {
   channelId: string;
   providerName: string;
   providerApiKey?: string;
+  resolve: (key: string) => any;
 };
 export default abstract class Provider {
   constructor(protected opts: ProviderOptions) {}
