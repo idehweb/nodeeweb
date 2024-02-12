@@ -320,6 +320,7 @@ const customFarsiMessages = {
       userLastName: 'نام خانوادگی کاربر',
       before: 'پیش از تغییر',
       after: 'پس از تغییر',
+      undo: 'برگرداندن تغییرات',
     },
 
     dashboard: {
