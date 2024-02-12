@@ -8,11 +8,14 @@ import {
 } from '../handlers/singleJob.handler';
 
 export function handleUncaughtException() {
-  process.once('uncaughtException', (err) => {
+  process.removeAllListeners('uncaughtException');
+  process.removeAllListeners('unhandledRejection');
+
+  process.on('uncaughtException', (err) => {
     logger.error('#uncaughtException:', err);
     shutdown(1);
   });
-  process.once('unhandledRejection', (err) => {
+  process.on('unhandledRejection', (err) => {
     logger.error('#unhandledRejection:', err);
     shutdown(1);
   });
@@ -27,17 +30,32 @@ export function gracefullyShutdown() {
   });
 }
 
-export function shutdown(code = 0) {
-  store.server?.close(async () => {
+export async function shutdown(code = 0) {
+  const finalStep = async () => {
     try {
       await onSignal();
-    } catch (err) {}
+    } catch (err) {
+      logger.error('onSignal error', err);
+    }
     process.exit(code);
-  });
+  };
+
+  if (!store.server) return await finalStep();
+  store.server.close(finalStep);
 }
+
 async function onSignal() {
-  await Promise.all(mongoose.connections.map((c) => c.close()));
-  await waitForLockFiles(10);
+  try {
+    await Promise.all(mongoose.connections.map((c) => c.close()));
+  } catch (err) {
+    logger.error('mongoose connection close error', err);
+  }
+
+  try {
+    await waitForLockFiles(5);
+  } catch (err) {
+    logger.error('wait for lock files error', err);
+  }
 }
 async function onHealthcheck() {
   const status = mongoose.connections.every((c) => c.readyState === 1);

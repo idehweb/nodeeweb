@@ -90,6 +90,7 @@ export default function AuthPortal(props) {
 
   // Remove unused variables
   const detectUserState = async (event) => {
+    console.log('detectUserState',event)
     if (!userAuthenticationInfo.captcha) {
       toast.error('Wrong Captcha!');
     } else {
@@ -111,6 +112,7 @@ export default function AuthPortal(props) {
               phone: userAuthenticationInfo.phoneNumber,
             },
           });
+          console.log('response',response)
           if (
             response.data.data.userExists &&
             response.data.data.isPasswordSet &&
@@ -126,16 +128,7 @@ export default function AuthPortal(props) {
             !response.data.data.isPasswordSet &&
             response.data.data.isPhoneSet
           ) {
-            // const sendOtpToken = await API.post('/auth/otp-pass', {
-            //   userType: 'customer',
-            //   login: true,
-            //   signup: false,
-            //   user: {
-            //     phone: userAuthenticationInfo.phoneNumber,
-            //   },
-            // });
-            // setOtpData(sendOtpToken.data);
-            // console.log('send otp to login traceback #iap1 ', sendOtpToken);
+
             setUserAuthenticationInfo((prevState) => ({
               ...prevState,
               authStatus: 'change-password',
@@ -143,7 +136,7 @@ export default function AuthPortal(props) {
           } else if (
             !response.data.data.userExists &&
             !response.data.data.isPasswordSet &&
-            !response.data.data.isPhoneSet
+            (!response.data.data.isPhoneSet || response.data.data.isPhoneSet)
           ) {
             const sendOtpToken = await API.post('/auth/otp-pass', {
               userType: 'customer',
@@ -187,14 +180,12 @@ export default function AuthPortal(props) {
     { value: '98', label: 'IR ( +98 )' },
     // { value: '33', label: 'IDK ( +33 )' },
   ];
-
-  // if (JSON.parse(localStorage.getItem('user'))) navigate('/profile');
-
+console.log('userAuthenticationInfo.authStatus',userAuthenticationInfo.authStatus)
   return userAuthenticationInfo.authStatus === 'detect' ? (
-    <div>
+    <div className={"login-wrapper"}>
       <form
         onSubmit={handleSubmit(detectUserState)}
-        className={`${styles.container} form-group ltr`}>
+        className={`${styles.container} form-group ltr login-container`}>
         <Box
           sx={{
             width: '100%',
@@ -207,10 +198,11 @@ export default function AuthPortal(props) {
           {countryCodes.length === 1 ? (
             <Input
               sx={{ textAlign: 'center' }}
+              className={"country-code"}
               type="text"
               defaultValue={countryCodes[0].label}
               disabled
-              style={{ width: '25%' }}
+
             />
           ) : (
             <Select
@@ -243,6 +235,7 @@ export default function AuthPortal(props) {
           <Input
             sx={{ direction: 'rtl' }}
             type="tel"
+            className={"phone-input"}
             id="phoneNumber"
             name="شماره تماس"
             placeholder="شماره تماس"
@@ -261,8 +254,8 @@ export default function AuthPortal(props) {
           />
         </Box>
         <>
-          <p>{t('enter captcha')}</p>
-          <Captcha onActionSubmit={captchaAction} />
+
+          <Captcha onActionSubmit={captchaAction} t={t} />
         </>
         <button disabled={loading} type="submit" className={styles.button}>
           {t('get enter code')}
@@ -270,29 +263,30 @@ export default function AuthPortal(props) {
       </form>
     </div>
   ) : userAuthenticationInfo.authStatus === 'signup' ? (
-    <SignupForm
+    <div className={"login-wrapper"}><SignupForm
       changes={userAuthenticationInfo}
       setChanges={setUserAuthenticationInfo}
-    />
-  ) : userAuthenticationInfo.authStatus === 'change-password:active' ? (
-    <OtpCodePortal
+
+    /></div>
+      ) : userAuthenticationInfo.authStatus === 'change-password' ? (
+    <div className={"login-wrapper"}><OtpCodePortal
       timer={userAuthenticationInfo.timer || 120}
       changes={userAuthenticationInfo}
       setChanges={setUserAuthenticationInfo}
-    />
-  ) : userAuthenticationInfo.authStatus === 'login' ? (
-    <SigninForm
+    /></div>
+      ) : userAuthenticationInfo.authStatus === 'login' ? (
+    <div className={"login-wrapper"}><SigninForm
       changes={userAuthenticationInfo}
       setChanges={setUserAuthenticationInfo}
-    />
-  ) : userAuthenticationInfo.authStatus === 'success' ? (
+    /></div>
+      ) : userAuthenticationInfo.authStatus === 'success' ? (
     <Navigate to={'/'} replace />
-  ) : userAuthenticationInfo.authStatus === 'change-password' ? (
-    <ForgotPasswordForm
+  ) : userAuthenticationInfo.authStatus === 'change-password:active' ? (
+    <div className={"login-wrapper"}><ForgotPasswordForm
       changes={userAuthenticationInfo}
       setChanges={setUserAuthenticationInfo}
-    />
-  ) : (
-    <div>unexpected error</div>
+    /></div>
+      ) : (
+      <div>unexpected error</div>
   );
 }

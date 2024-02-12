@@ -61,12 +61,14 @@ export class UserPassUserSignup {
   password: string;
 
   @Expose()
+  @IsOptional()
   @IsString()
-  firstName: string;
+  firstName?: string;
 
   @Expose()
+  @IsOptional()
   @IsString()
-  lastName: string;
+  lastName?: string;
 
   @Expose()
   @IsOptional()

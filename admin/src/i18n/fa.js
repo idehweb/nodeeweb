@@ -320,7 +320,7 @@ const customFarsiMessages = {
       userLastName: 'نام خانوادگی کاربر',
       before: 'پیش از تغییر',
       after: 'پس از تغییر',
-      undo: 'برگرداندن تغییرات',
+      undo: 'برگرداندن تغییرات'
     },
 
     dashboard: {
@@ -559,6 +559,8 @@ const customFarsiMessages = {
       viewsCount: 'تعداد بازدید ها',
       updated: 'بروزرسانی',
       created: 'ساخته شده',
+      creat: 'پست ساخته شد',
+      duplicateKey: 'اطلاعات تکراری وارده شده است',
       categories: 'دسته بندی ها',
       post: 'نوشته',
       page: 'برگه',
@@ -719,6 +721,7 @@ const customFarsiMessages = {
     reviews: {},
 
     settings: {
+      otp: 'رمز یکبار مصرف',
       meta_title: 'عنوان متا',
       meta_description: 'توضیحات متا',
       metaTags: 'تگ های متا',

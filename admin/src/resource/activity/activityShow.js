@@ -8,6 +8,7 @@ import {
 
 import { dateFormat } from '@/functions';
 import { JsonDiffer, List, SimpleForm, UploaderField } from '@/components';
+
 import Undo from '@/components/Undo';
 import { Val } from '@/Utils';
 import { display } from '@mui/system';
@@ -15,10 +16,11 @@ import { display } from '@mui/system';
 export const activityShow = (props) => {
   const translate = useTranslate();
   return (
+
     <>
       <Show {...props}>
         <Undo record={props} />
-        {/* todo ------> data coming from back are not complete - no user or customer data  */}
+
         <SimpleShowLayout>
           <TextField
             source="type"
@@ -61,13 +63,13 @@ export const activityShow = (props) => {
                   object1={record.target.before}
                   object2={record.target.after}
                 />
-                // <JsonDiffer object1={record.data} object2={record.history} />
               );
             }}
           />
         </SimpleShowLayout>
       </Show>
     </>
+
   );
 };
 export default activityShow;

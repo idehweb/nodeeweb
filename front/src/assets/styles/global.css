@@ -5,14 +5,60 @@
   font-weight: 400;
   src: url(fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2) format('woff2');
 }
-
+.country-code{
+  width: 73px;
+  min-width: 73px;
+}
+.captcha-area{
+  display: flex;
+}
+.captcha-wrapper{
+  background-color: #eee;
+  border-radius: 5px;
+  padding: 15px;
+}
+.captcha-wrapper label{
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.width-100{
+  width:100%;
+}
+.login-container{
+  width:290px;
+  max-width: 100%;
+  margin: auto;
+}
+.signup-wrapper{
+  max-width: 300px;
+}
+.signup-field{
+  width: 100%;
+}
+.captcha-image{
+  width: 110px;
+  min-width: 110px;
+}
+.captcha-input{
+  width: calc(100% - 110px) !important;
+  padding-left: 10px;
+}
+.captcha-input input{
+  height: 35px;
+}
+.phone-input{
+  width: calc(100% - 73px) !important;
+}
 /* ChatContentStyle */
 .fadeInUp {
   animation-name: fadeInUp;
   animation-duration: 0.4s;
   animation-fill-mode: both;
 }
-
+.login-wrapper{
+  padding: 15px;
+}
 .inside-pop-up-bg {
   position: fixed;
   top: 0;

@@ -102,18 +102,26 @@ export class EntityCreator {
         Object.entries(req.query).filter(
           ([k, v]) =>
             !['sort', 'filter', 'limit', 'offset', 'skip'].includes(k) &&
-            !k.startsWith('_') &&
+            (k === '_id' || !k.startsWith('_')) &&
             !hasSpecialSign(k)
         )
       );
+
+      // regex
+      const regexFilter = { ...directFilters, ...extraFilter };
+      for (const key in regexFilter) {
+        const value = regexFilter[key];
+        regexFilter[key] =
+          typeof value === 'string' ? { $regex: value } : value;
+      }
+
       return {
+        ...regexFilter,
         ...specialFilter,
-        ...directFilters,
-        ...extraFilter,
         _id:
-          pf?.id &&
-          req.params[pf.id] &&
-          new mongoose.Types.ObjectId(req.params[pf.id]),
+          pf?.id && req.params[pf.id]
+            ? new mongoose.Types.ObjectId(req.params[pf.id])
+            : regexFilter._id,
         slug: req.params[pf?.slug],
         $expr: {
           $or: [
