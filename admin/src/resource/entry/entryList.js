@@ -40,8 +40,6 @@ import {
   UploaderField,
 } from '@/components';
 
-
-
 const PostPagination = (props) => (
   <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />
 );
@@ -58,12 +56,25 @@ const PostFilter = (props) => {
   const { data, total, isLoading, error } = useGetList('form', {
     pagination: { page: 1, perPage: 100 },
   });
+
   React.useEffect(() => {
-    API.get('/settings/formStatus').then((response = {}) => {
-      const { data } = response;
-      setStatus(data);
-    });
-  }, []);
+    (async () => {
+      try {
+        const response = await API.get('/post');
+        const { data } = await response;
+        await setStatus(data.data);
+        // console.log('status................', data);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, [status]);
+  // React.useEffect(() => {
+  //   API.get('/settings/formStatus').then((response = {}) => {
+  //     const { data } = response;
+  //     setStatus(data);
+  //   });
+  // }, []);
 
   return (
     <Filter {...props}>
@@ -79,6 +90,7 @@ const PostFilter = (props) => {
       )}
 
       {status ? (
+        // (console.log('status in component', status),
         <SelectInput
           label="انتخاب وضعیت"
           source="status"
@@ -88,7 +100,8 @@ const PostFilter = (props) => {
           alwaysOn
         />
       ) : (
-        <span>Loadding...</span>
+        // )
+        <span>Loading...</span>
       )}
       {/* <SearchInput source="title" reference="form.title" placeholder={translate("resources.post.category")} alwaysOn/> */}
       {/* <SelectArrayInput source="entry" choices={foorm} alwaysOn/> */}

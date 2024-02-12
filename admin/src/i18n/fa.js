@@ -552,6 +552,8 @@ const customFarsiMessages = {
       viewsCount: 'تعداد بازدید ها',
       updated: 'بروزرسانی',
       created: 'ساخته شده',
+      creat: 'پست ساخته شد',
+      duplicateKey: 'اطلاعات تکراری وارده شده است',
       categories: 'دسته بندی ها',
       post: 'نوشته',
       page: 'برگه',
