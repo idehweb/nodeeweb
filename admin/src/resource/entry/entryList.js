@@ -63,7 +63,7 @@ const PostFilter = (props) => {
         const response = await API.get('/post');
         const { data } = await response;
         await setStatus(data.data);
-        console.log('status................', data);
+        // console.log('status................', data);
       } catch (error) {
         console.log(error);
       }
@@ -90,18 +90,17 @@ const PostFilter = (props) => {
       )}
 
       {status ? (
-        (console.log('status in component', status),
-        (
-          <SelectInput
-            label="انتخاب وضعیت"
-            source="status"
-            choices={status}
-            optionText="title"
-            optionValue="slug"
-            alwaysOn
-          />
-        ))
+        // (console.log('status in component', status),
+        <SelectInput
+          label="انتخاب وضعیت"
+          source="status"
+          choices={status}
+          optionText="title"
+          optionValue="slug"
+          alwaysOn
+        />
       ) : (
+        // )
         <span>Loading...</span>
       )}
       {/* <SearchInput source="title" reference="form.title" placeholder={translate("resources.post.category")} alwaysOn/> */}
