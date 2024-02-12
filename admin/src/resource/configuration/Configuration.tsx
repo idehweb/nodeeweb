@@ -664,6 +664,12 @@ export default function SystemConfigs(props) {
             <TextInput
               fullWidth
               multiline
+              source={'sms_message_on.otp'}
+              label={translate('resources.settings.otp')}
+            />
+            <TextInput
+              fullWidth
+              multiline
               minRows={3}
               source={'sms_message_on.approach_transaction_expiration'}
               label={translate(
