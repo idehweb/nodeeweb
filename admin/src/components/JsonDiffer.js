@@ -2,19 +2,40 @@ import { useTranslate } from 'react-admin';
 
 import { ShowObject } from '@/components';
 
+import { color } from '@mui/system';
+
 export default (props) => {
-  console.log('props', props);
+  // console.log('props', props);
   const translate = useTranslate();
 
   if (!props.object1) return;
 
   let valuesArray = Object.keys(props.object1);
 
+  {
+    /* todo ------> change inline styles to globals  */
+  }
+
   return (
-    <table className={'thisIsdiffer'}>
-      <thead>
+    <table className={'thisIsdiffer'} style={{ border: '1px solid white' }}>
+      <caption
+        style={{
+          captionSide: 'top',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: '1.5rem',
+        }}>
+        {translate('resources.action.difference')}
+      </caption>
+      <thead
+        style={{
+          border: '1px solid white',
+          padding: 10,
+        }}>
         <tr>
-          <th>{translate('components.JsonDiffer.fieldName')}</th>
+          <th style={{ padding: 5 }}>
+            {translate('components.JsonDiffer.fieldName')}
+          </th>
 
           <th>{translate('components.JsonDiffer.new')}</th>
           <th>{translate('components.JsonDiffer.old')}</th>
@@ -24,7 +45,7 @@ export default (props) => {
         {valuesArray.map((item, key) => {
           // console.log('item',item);
 
-          let trClass = '';
+          let trClass = {};
           if (
             typeof props.object1[item] === 'object' &&
             props.object2 &&
@@ -34,15 +55,23 @@ export default (props) => {
               JSON.stringify(props.object1[item]) !==
               JSON.stringify(props.object2[item])
             ) {
-              trClass = 'makeRed';
+              trClass = { color: 'red' };
+              // trClass = 'makeRed';
             }
           }
 
           return (
-            <tr className={trClass} key={key}>
-              <td>{item}</td>
+            //todo------------------------>>>>check style below for error in case of no differ
+            <tr style={trClass} key={key}>
+              {/* <tr className={trClass} key={key}> */}
+              <td style={{ padding: 5 }}>{item}</td>
               {/*<td className={'rtl-right'}>{typeof props.object1[item]} - {typeof props.object2[item]}</td>*/}
-              <td>
+              <td
+                style={{
+                  padding: 5,
+                  borderLeft: '1px solid white',
+                  borderRight: '1px solid white',
+                }}>
                 {props.object1 && (
                   <div>
                     {props.object1[item] &&

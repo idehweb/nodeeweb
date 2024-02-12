@@ -318,6 +318,8 @@ const customFarsiMessages = {
       customerLastName: 'نام خانوادگی مشتری',
       userFirstName: 'نام کاربر',
       userLastName: 'نام خانوادگی کاربر',
+      before: 'پیش از تغییر',
+      after: 'پس از تغییر',
     },
 
     dashboard: {
