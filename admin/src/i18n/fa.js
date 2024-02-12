@@ -712,6 +712,7 @@ const customFarsiMessages = {
     reviews: {},
 
     settings: {
+      otp: 'رمز یکبار مصرف',
       meta_title: 'عنوان متا',
       meta_description: 'توضیحات متا',
       metaTags: 'تگ های متا',
