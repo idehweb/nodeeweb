@@ -253,7 +253,7 @@ export default function App() {
         {...Settings}
       /> */}
       <Resource
-        name="action"
+        name="activity"
         options={{ label: translate('pos.menu.actions') }}
         {...Action}
       />

@@ -314,6 +314,10 @@ const customFarsiMessages = {
       username: 'نام کاربری',
       difference: 'تفاوت داده ها',
       createdAt: 'در تاریخ',
+      customerFirstName: 'نام مشتری',
+      customerLastName: 'نام خانوادگی مشتری',
+      userFirstName: 'نام کاربر',
+      userLastName: 'نام خانوادگی کاربر',
     },
 
     dashboard: {

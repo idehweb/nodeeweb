@@ -24,7 +24,6 @@ import Menu from './Menu';
 // };
 
 const MainLayout = (props) => {
-  console.log('props', props);
   const translate = useTranslate();
   return (
     <>

@@ -1,5 +1,5 @@
 import Automation from './automation/index';
-import Action from './action/index';
+import Action from './activity/index';
 import Attributes from './attributes/index';
 import ProductCategory from './productCategory/index';
 import Customer from './customer/index';

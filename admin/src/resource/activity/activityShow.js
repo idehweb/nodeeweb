@@ -10,32 +10,33 @@ import { dateFormat } from '@/functions';
 import { JsonDiffer, List, SimpleForm, UploaderField } from '@/components';
 import { Val } from '@/Utils';
 
-export const actionShow = (props) => {
+export const activityShow = (props) => {
   const translate = useTranslate();
-
   return (
     <Show {...props}>
+      {/* todo ------> data coming from back are not complete - no user or customer data  */}
       <SimpleShowLayout>
-        <TextField source="title" label={translate('resources.action.title')} />
+        <TextField source="type" label={translate('resources.action.title')} />
         <TextField
           source="customer.phoneNumber"
           label={translate('resources.action.phoneNumber')}
         />
+
         <TextField
           source="customer.firstName"
-          label={translate('resources.action.firstName')}
+          label={translate('resources.action.customerFirstName')}
         />
         <TextField
           source="customer.lastName"
-          label={translate('resources.action.lastName')}
+          label={translate('resources.action.customerLastName')}
         />
         <TextField
           source="user.firstName"
-          label={translate('resources.action.firstName')}
+          label={translate('resources.action.userFirstName')}
         />
         <TextField
           source="user.lastName"
-          label={translate('resources.action.lastName')}
+          label={translate('resources.action.userLastName')}
         />
         <TextField
           source="user.username"
@@ -57,4 +58,4 @@ export const actionShow = (props) => {
     </Show>
   );
 };
-export default actionShow;
+export default activityShow;

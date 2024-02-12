@@ -123,7 +123,7 @@ export const upgradeSystem = () => {
   });
 };
 export const changeThemeData = (payload) => {
-  console.log('changeThemeData');
+  // console.log('changeThemeData');
   return {
     type: CHANGE_THEMEDATA,
     payload: payload,

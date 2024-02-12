@@ -144,7 +144,7 @@ const LogoutMenu = forwardRef((props, ref) => {
 });
 
 const CustomUserMenu = (props) => {
-  console.log('props', props);
+  // console.log('props', props);
   return (
     <UserMenu {...props} icon={<MoreHorizIcon />}>
       <UserProfileMenu />
