@@ -13,7 +13,7 @@ export default (props) => {
   let valuesArray = Object.keys(props.object1);
 
   {
-    /* todo ------> change inline styles to globals  */
+    /* todo ------> change inline styles to globals or reusable sheet */
   }
 
   return (
