@@ -15,7 +15,7 @@ export default class {
   @IsOptional()
   @IsString()
   @IsIn(['local', 'nodeeweb'])
-  provider: 'local' | 'nodeeweb';
+  providerType: 'local' | 'nodeeweb';
 
   @Expose()
   @IsOptional()

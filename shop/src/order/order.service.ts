@@ -96,7 +96,8 @@ class OrderService {
 
     const newOrder = await this.orderModel.findOneAndUpdate(
       { _id: order._id },
-      merge({}, { $set: body }, extraUpdate)
+      merge({}, { $set: body }, extraUpdate),
+      { new: true }
     );
 
     // sms

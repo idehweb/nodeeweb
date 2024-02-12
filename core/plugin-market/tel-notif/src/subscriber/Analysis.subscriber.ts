@@ -19,7 +19,7 @@ export default class AnalysisSubscriber extends Subscriber {
         })
         .countDocuments();
 
-      const [{ saleAmount }] =
+      const [agg] =
         (await db.model('transaction').aggregate([
           {
             $match: {
@@ -34,8 +34,8 @@ export default class AnalysisSubscriber extends Subscriber {
               saleAmount: { $sum: '$amount' },
             },
           },
-        ])) || [];
-
+        ])) ?? [];
+      const saleAmount = agg?.saleAmount ?? 0;
       const smsSentCount = await db
         .model('notification')
         .find({
