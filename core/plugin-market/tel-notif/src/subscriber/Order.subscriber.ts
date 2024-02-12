@@ -79,7 +79,7 @@ export default class OrderSubscriber extends Subscriber {
       // send
       await this.opts.provider.send(msg);
     } catch (err) {
-      console.error('error in order other status change', err);
+      this.opts.logger.error('[order-subscriber] error in onOtherChange', err);
     }
   };
   onNeedToPay = async (order: any) => {
@@ -135,7 +135,7 @@ export default class OrderSubscriber extends Subscriber {
       // send
       await this.opts.provider.send(msg);
     } catch (err) {
-      console.error('error in order need to pay', err);
+      this.opts.logger.error('[order-subscriber] error in onNeedToPay', err);
     }
   };
   subscribe(): void {

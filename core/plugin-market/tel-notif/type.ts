@@ -1,3 +1,7 @@
+export interface Logger {
+  log(...args: any[]): void;
+  error(...args: any[]): void;
+}
 export enum ProviderType {
   Local = 'local',
   Nodeeweb = 'nodeeweb',

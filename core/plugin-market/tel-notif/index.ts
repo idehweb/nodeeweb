@@ -1,3 +1,4 @@
+import { NotifLogger } from './src/logger';
 import Provider from './src/provider/provider.abstract';
 import ProviderBuilder from './src/provider/provider.builder';
 import Subscriber from './src/subscriber/subscriber.abstract';
@@ -5,12 +6,6 @@ import SubscriberBuilder from './src/subscriber/subscriber.builder';
 import { IConfig, PluginContent } from './type';
 
 let config: IConfig & { provider: Provider; subscribers?: Subscriber[] };
-
-function errorLog(from: string, err: any) {
-  const logger = config.resolve('logger');
-  const parser = config.resolve('axiosError2String');
-  logger.error(`${from} error:`, parser(err));
-}
 
 function register(arg: any): PluginContent['stack'] {
   const subscribers = config?.subscribers;
@@ -20,6 +15,8 @@ function register(arg: any): PluginContent['stack'] {
 
   config = arg;
 
+  const logger = new NotifLogger(config.resolve);
+
   // init provider
   config.provider = ProviderBuilder.build(config.providerType, {
     botToken: config.botToken,
@@ -27,6 +24,7 @@ function register(arg: any): PluginContent['stack'] {
     providerName: config.providerType,
     providerApiKey: config.apiKey,
     resolve: config.resolve,
+    logger,
   });
 
   // init subscribers
@@ -36,6 +34,7 @@ function register(arg: any): PluginContent['stack'] {
     config.subscribers = SubscriberBuilder.build({
       provider: config.provider,
       resolve: config.resolve,
+      logger,
     });
   }
   config.subscribers.forEach((sub) => sub.subscribe());
