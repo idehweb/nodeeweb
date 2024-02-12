@@ -2,31 +2,37 @@ import React from 'react';
 import { Button } from '@mui/material';
 import axios from 'axios/index';
 
+import { useParams } from 'react-router';
 import { BASE_URL } from '@/functions/API';
 
 export default (props) => {
+  const { id } = useParams();
+
   return (
     <Button
       color="primary"
       size="small"
       onClick={() => {
-        console.log('data', props.record._id, BASE_URL);
-        let option = {
-          headers: {
-            lan: 'fa',
-          },
+        const headers = {
+          Authorization: 'Bearer ' + (localStorage.getItem('token') || ''),
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         };
-        option['headers']['token'] = localStorage.getItem('token');
 
+        const config = {
+          headers,
+        };
+
+        const data = { id, status: 'undo' };
         axios
-          .post(BASE_URL + '/product/telegram/' + props.record._id, {}, option)
-          .then(function (response) {
-            // console.log('fetched!');
+          .post(BASE_URL + '/activity', data, config)
+          .then((response) => {
+            console.log(response);
             // resolve(response);
             // response.json();
           })
-          .catch(function (error) {
-            // console.log(error);
+          .catch((error) => {
+            console.log('error', error);
             // reject(error);
           });
         // fetch(`/comments/${data.id}`, { method: 'POST'})
@@ -39,7 +45,7 @@ export default (props) => {
         //         // showNotification('Error: comment not approved', 'warning')
         //     });
       }}>
-      برگرداندن تغییرات{' '}
+      برگرداندن تغییرات
     </Button>
   );
 };

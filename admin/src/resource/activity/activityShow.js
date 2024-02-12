@@ -16,7 +16,7 @@ export const activityShow = (props) => {
   const translate = useTranslate();
   return (
     <>
-      <Undo record={props.record} />
+      <Undo record={props} />
       <Show {...props}>
         {/* todo ------> data coming from back are not complete - no user or customer data  */}
         <SimpleShowLayout>
@@ -65,6 +65,7 @@ export const activityShow = (props) => {
               );
             }}
           />
+          {/* <Undo record={props} /> */}
         </SimpleShowLayout>
       </Show>
     </>
