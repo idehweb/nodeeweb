@@ -29,10 +29,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-import { color } from '@mui/system';
-
 export default (props) => {
-
   const translate = useTranslate();
   const cls = useStyles();
 
@@ -40,20 +37,14 @@ export default (props) => {
 
   let valuesArray = Object.keys(props.object1);
 
-  {
-    /* todo ------> change inline styles to globals or reusable sheet */
-  }
-
   return (
     <table className={'thisIsdiffer'} style={{ border: '1px solid white' }}>
-
       <caption className={cls.caption}>
         {translate('resources.action.difference')}
       </caption>
       <thead className={cls.headMain}>
         <tr>
           <th className={cls.head}>
-
             {translate('components.JsonDiffer.fieldName')}
           </th>
 
@@ -81,13 +72,11 @@ export default (props) => {
           }
 
           return (
-
             <tr style={trClass} key={key}>
               {/* <tr className={trClass} key={key}> */}
               <td className={cls.head}>{item}</td>
               {/*<td className={'rtl-right'}>{typeof props.object1[item]} - {typeof props.object2[item]}</td>*/}
               <td className={cls.data}>
-
                 {props.object1 && (
                   <div>
                     {props.object1[item] &&
