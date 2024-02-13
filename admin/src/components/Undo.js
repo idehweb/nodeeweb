@@ -8,6 +8,8 @@ import { BASE_URL } from '@/functions/API';
 
 import { toast } from 'react-toastify';
 
+import RestoreIcon from '@mui/icons-material/Restore';
+
 export default () => {
   const translate = useTranslate();
   const { id } = useParams();
@@ -15,6 +17,9 @@ export default () => {
   return (
     <Button
       color="primary"
+      variant="outlined"
+      style={{ margin: 4 }}
+      startIcon={<RestoreIcon />}
       size="small"
       onClick={async () => {
         try {

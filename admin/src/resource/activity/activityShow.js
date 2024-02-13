@@ -11,21 +11,23 @@ import { JsonDiffer, List, SimpleForm, UploaderField } from '@/components';
 import Undo from '@/components/Undo';
 import { Val } from '@/Utils';
 import { display } from '@mui/system';
+import { useEffect } from 'react';
 
 export const activityShow = (props) => {
   const translate = useTranslate();
+
   return (
     <>
       <Show {...props}>
-        {/* todo ------> data coming from back are not complete - no user or customer data  */}
+        <Undo />
+
         <SimpleShowLayout>
-          <Undo />
           <TextField
             source="type"
             label={translate('resources.action.title')}
           />
           <TextField
-            source="customer.phoneNumber"
+            source="query.update.phone"
             label={translate('resources.action.phoneNumber')}
           />
 
@@ -38,11 +40,11 @@ export const activityShow = (props) => {
             label={translate('resources.action.customerLastName')}
           />
           <TextField
-            source="user.firstName"
+            source="doer.firstName"
             label={translate('resources.action.userFirstName')}
           />
           <TextField
-            source="user.lastName"
+            source="doer.lastName"
             label={translate('resources.action.userLastName')}
           />
           <TextField
@@ -54,7 +56,7 @@ export const activityShow = (props) => {
             label={translate('resources.action.product')}
           />
           <FunctionField
-            label={translate('resources.action.difference')}
+            // label={translate('resources.action.difference')}
             render={(record) => {
               return (
                 <JsonDiffer
