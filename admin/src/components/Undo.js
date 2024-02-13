@@ -6,11 +6,14 @@ import axios from 'axios/index';
 import { useParams } from 'react-router';
 import { BASE_URL } from '@/functions/API';
 
+
 import { toast } from 'react-toastify';
 
 import RestoreIcon from '@mui/icons-material/Restore';
 
-export default () => {
+
+export default (props) => {
+
   const translate = useTranslate();
   const { id } = useParams();
 
@@ -21,6 +24,7 @@ export default () => {
       style={{ margin: 4 }}
       startIcon={<RestoreIcon />}
       size="small"
+
       onClick={async () => {
         try {
           const headers = {
@@ -38,6 +42,7 @@ export default () => {
             data,
             config
           );
+
           toast.success(translate('resources.action.undoDone'), {
             autoClose: 2000,
           });
@@ -49,6 +54,7 @@ export default () => {
         }
       }}>
       {translate('resources.action.undo')}
+
     </Button>
   );
 };

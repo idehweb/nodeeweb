@@ -8,6 +8,7 @@ import {
 
 import { dateFormat } from '@/functions';
 import { JsonDiffer, List, SimpleForm, UploaderField } from '@/components';
+
 import Undo from '@/components/Undo';
 import { Val } from '@/Utils';
 import { display } from '@mui/system';
@@ -21,6 +22,7 @@ export const activityShow = (props) => {
       <Show {...props}>
         <Undo />
 
+
         <SimpleShowLayout>
           <TextField
             source="type"
@@ -28,6 +30,7 @@ export const activityShow = (props) => {
           />
           <TextField
             source="query.update.phone"
+
             label={translate('resources.action.phoneNumber')}
           />
 
@@ -45,6 +48,7 @@ export const activityShow = (props) => {
           />
           <TextField
             source="doer.lastName"
+
             label={translate('resources.action.userLastName')}
           />
           <TextField
@@ -56,20 +60,23 @@ export const activityShow = (props) => {
             label={translate('resources.action.product')}
           />
           <FunctionField
+
             // label={translate('resources.action.difference')}
+
             render={(record) => {
               return (
                 <JsonDiffer
                   object1={record.target.before}
                   object2={record.target.after}
                 />
-                // <JsonDiffer object1={record.data} object2={record.history} />
+
               );
             }}
           />
         </SimpleShowLayout>
       </Show>
     </>
+
   );
 };
 export default activityShow;

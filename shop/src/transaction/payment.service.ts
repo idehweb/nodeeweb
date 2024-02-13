@@ -35,6 +35,7 @@ import { UserDocument } from '@nodeeweb/core/types/user';
 import orderUtils from '../order/utils.service';
 import utilsService from './utils.service';
 import { HandlePaymentArgs } from '../../types/transaction';
+import { catchFn } from '@nodeeweb/core/utils/catchAsync';
 
 class PaymentService {
   transactionSupervisors = new Map<string, NodeJS.Timer>();
@@ -133,7 +134,6 @@ class PaymentService {
     // handle payment
     const transaction = await this.transactionModel.findOne({
       _id: req.params.transactionId,
-      active: true,
     });
 
     const { status } = await this.handlePayment({
@@ -178,11 +178,12 @@ class PaymentService {
     ) as BankGatewayPluginContent;
 
     if (!bankPlugin)
-      return {
-        authority: new Date().toISOString(),
-        provider: TransactionProvider.Manual,
-        payment_method: 'get',
-      };
+      // return {
+      //   authority: new Date().toISOString(),
+      //   provider: TransactionProvider.Manual,
+      //   payment_method: 'get',
+      // };
+      throw new BadRequestError('there is not any active bank plugin');
 
     // env
     // if (envAllowed([Environment.Local])) {
@@ -251,7 +252,7 @@ class PaymentService {
       };
 
       const newT = await this.transactionModel.findOneAndUpdate(
-        { _id: transaction._id },
+        { _id: transaction._id, active: true },
         update,
         { new: true }
       );
@@ -388,6 +389,7 @@ class PaymentService {
           const td = await this.transactionModel.findOne({
             _id: transaction._id,
             status: TransactionStatus.NeedToPay,
+            active: true,
           });
           if (!td) return;
           await this.handlePayment({
@@ -505,10 +507,21 @@ class PaymentService {
         });
       };
       const promises = [
-        ...(await _unverified_authorities()),
-        ...(await _expired_transactions()),
-        ...(await _watcher_transactions()),
-      ];
+        _unverified_authorities,
+        _expired_transactions,
+        _watcher_transactions,
+      ]
+        // catch
+        .map((f) =>
+          catchFn(async () => await Promise.all(await f()), {
+            self: this,
+            onError(err) {
+              logger.error('synchronize payment error', err);
+            },
+          })
+        )
+        // call
+        .map((f) => f());
       // execute parallel
       await Promise.all(promises);
     } catch (err) {

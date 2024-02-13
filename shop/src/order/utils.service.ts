@@ -103,6 +103,7 @@ export class Utils {
           ORDER_ID: order._id,
           CUSTOMER_FIRST_NAME: order.customer.firstName,
           CUSTOMER_LAST_NAME: order.customer.lastName,
+          BASE_URL: store.config.host,
         },
       ],
       text: msg,
@@ -149,6 +150,39 @@ export class Utils {
     });
   }
 
+  private async rollbackOrder(id: string) {
+    // rollback
+    // disabled order
+    const order = await this.orderModel.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: { active: false, status: OrderStatus.Canceled },
+      },
+      { new: true }
+    );
+
+    // rollback products
+    await this.productModel.bulkWrite(
+      order.products.flatMap((p) =>
+        p.combinations.map((d) => ({
+          updateOne: {
+            filter: { _id: p._id, 'combinations._id': d._id },
+            update: { $inc: { 'combinations.$.quantity': d.quantity } },
+          },
+        }))
+      ),
+      { ordered: false }
+    );
+
+    // pull discount consumer
+    if (order.discount) {
+      await this.discountModel.updateOne(
+        { code: order.discount.code },
+        { $pull: { consumers: order.customer._id }, $inc: { usageLimit: 1 } }
+      );
+    }
+    return order;
+  }
   private async updateOrderStatus(
     order: OrderDocument,
     trsSts: TransactionDocument | TransactionStatus,
@@ -159,36 +193,7 @@ export class Utils {
 
     let isOrderPaid = false;
     const _rollback = async () => {
-      // rollback
-      // disabled order
-      order = await this.orderModel.findOneAndUpdate(
-        { _id: order._id },
-        {
-          $set: { active: false, status: OrderStatus.Canceled },
-        },
-        { new: true }
-      );
-
-      // rollback products
-      await this.productModel.bulkWrite(
-        order.products.flatMap((p) =>
-          p.combinations.map((d) => ({
-            updateOne: {
-              filter: { _id: p._id, 'combinations._id': d._id },
-              update: { $inc: { 'combinations.$.quantity': d.quantity } },
-            },
-          }))
-        ),
-        { ordered: false }
-      );
-
-      // pull discount consumer
-      if (order.discount) {
-        await this.discountModel.updateOne(
-          { code: order.discount.code },
-          { $pull: { consumers: order.customer._id }, $inc: { usageLimit: 1 } }
-        );
-      }
+      order = await this.rollbackOrder(order._id);
     };
     if (order.status === OrderStatus.NeedToPay && order.active) {
       switch (status) {
@@ -327,6 +332,21 @@ export class Utils {
 
     if (transaction) return await _updateWithTransaction();
     if (order && newStatus) return await _updateWithNewStatus();
+  }
+
+  async cancelOrder(order: IOrder) {
+    // 1. update transaction
+    await Promise.all(
+      order.transactions.map((t) => transactionUtils.cancel(t))
+    );
+
+    // 2. rollback order
+    if (
+      [OrderStatus.NeedToPay, OrderStatus.Paid, OrderStatus.Posting].includes(
+        order.status
+      )
+    )
+      await this.rollbackOrder(order._id);
   }
 
   getPrice(comb: Partial<IProduct['combinations'][0]>, effectQuantity = true) {

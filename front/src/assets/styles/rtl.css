@@ -805,14 +805,42 @@
     /* FF3.6+, IE9, Chrome6+, Saf5.1+*/ url(fonts/ttf/IRANSansWeb.ttf)
       format('truetype');
 }
+.card input,.card button{
+ font-family: IRANSans;
+}
 .navbar-brand,
 .web-share-fade header,
 .web-share-fade section > button {
   font-family: IRANSans;
 }
+body .rtl .MuiInputLabel-standard,body .rtl .MuiFormLabel-root{
+  right:0 !important;
+  left:auto;
+  transform-origin: top right !important;
+}
+body .rtl .MuiInputLabel-standard,body .rtl .MuiFormLabel-root{
+  font-family: IRANSans !important;
+
+}
+body .rtl .ltr-value input{
+  text-align: left;
+  direction: ltr;
+}
+body .rtl .ltr-value input::placeholder{
+  text-align: right;
+}
+body .rtl .MuiFormLabel-root.Mui-focused{
+  transform-origin: top right;
+}
 body .rtl .nav-link svg {
   margin-left: 5px;
   font-size: 20px;
+}
+body .rtl .MuiOutlinedInput-notchedOutline{
+text-align: right;
+}
+body .rtl .MuiInputLabel-outlined{
+
 }
 body .rtl .MuiChip-label,
 body .rtl .the-order-body-table *,

@@ -2,12 +2,17 @@ import { isEnum } from 'class-validator';
 import {
   ITransactionGrid,
   TransactionDocument,
+  TransactionModel,
   TransactionStatus,
 } from '../../schema/transaction.schema';
 import { PaymentVerifyStatus } from '../../types/order';
 import { OrderStatus } from '../../schema/order.schema';
+import store from '../../store';
 
 class TransactionUtils {
+  get model(): TransactionModel {
+    return store.db.model('transaction');
+  }
   convertTransaction2Grid(
     transaction: TransactionDocument | any
   ): ITransactionGrid {
@@ -70,6 +75,16 @@ class TransactionUtils {
       }
       return prev;
     }, null);
+  }
+  async cancel(transaction: ITransactionGrid) {
+    await this.model.findOneAndUpdate(
+      {
+        _id: transaction._id,
+        active: true,
+        status: TransactionStatus.NeedToPay,
+      },
+      { $set: { status: TransactionStatus.Canceled, active: false } }
+    );
   }
 }
 
