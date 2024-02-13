@@ -17,9 +17,9 @@ export const activityShow = (props) => {
   return (
     <>
       <Show {...props}>
-        <Undo record={props} />
         {/* todo ------> data coming from back are not complete - no user or customer data  */}
         <SimpleShowLayout>
+          <Undo />
           <TextField
             source="type"
             label={translate('resources.action.title')}

@@ -321,6 +321,7 @@ const customFarsiMessages = {
       before: 'پیش از تغییر',
       after: 'پس از تغییر',
       undo: 'برگرداندن تغییرات',
+      undoDone: 'تغییرات با موفقیت بازگردانی شد',
     },
 
     dashboard: {

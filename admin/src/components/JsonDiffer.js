@@ -61,7 +61,6 @@ export default (props) => {
           }
 
           return (
-            //todo------------------------>>>>check style below for error in case of no differ
             <tr style={trClass} key={key}>
               {/* <tr className={trClass} key={key}> */}
               <td style={{ padding: 5 }}>{item}</td>
