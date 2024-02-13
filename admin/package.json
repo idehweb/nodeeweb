@@ -47,6 +47,7 @@
     "react-redux": "^8.1.2",
     "react-scripts": "^5.0.1",
     "react-select": "^5.7.5",
+    "react-toastify": "^10.0.4",
     "recharts": "^2.8.0",
     "redux": "^4.2.1",
     "redux-logger": "^3.0.6",

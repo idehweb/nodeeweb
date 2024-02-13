@@ -320,7 +320,11 @@ const customFarsiMessages = {
       userLastName: 'نام خانوادگی کاربر',
       before: 'پیش از تغییر',
       after: 'پس از تغییر',
-      undo: 'برگرداندن تغییرات'
+        
+        
+      undo: 'برگرداندن تغییرات',
+      undoDone: 'تغییرات با موفقیت بازگردانی شد',
+
     },
 
     dashboard: {
@@ -333,6 +337,8 @@ const customFarsiMessages = {
       countAnnLast30Days: 'میزان درآمد ۳۰ روز گذشته',
       countPayedLast30Days: 'تعداد پرداخت های موفق ۳۰ روز گذشته',
       monthly_revenue: 'Monthly Revenue',
+        
+        
       month_history: '30 Day Revenue History',
       new_orders: 'New Orders',
       pending_reviews: 'Pending Reviews',

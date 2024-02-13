@@ -6,15 +6,25 @@ import axios from 'axios/index';
 import { useParams } from 'react-router';
 import { BASE_URL } from '@/functions/API';
 
+
+import { toast } from 'react-toastify';
+
+import RestoreIcon from '@mui/icons-material/Restore';
+
+
 export default (props) => {
+
   const translate = useTranslate();
   const { id } = useParams();
 
   return (
     <Button
       color="primary"
+      variant="outlined"
+      style={{ margin: 4 }}
+      startIcon={<RestoreIcon />}
       size="small"
-      //   onClick={() => {
+
       onClick={async () => {
         try {
           const headers = {
@@ -33,35 +43,18 @@ export default (props) => {
             config
           );
 
-          console.log(response);
-          // response.json()
+          toast.success(translate('resources.action.undoDone'), {
+            autoClose: 2000,
+          });
         } catch (err) {
           console.log('err', err);
+          toast.error('Something went wrong', {
+            autoClose: 2000,
+          });
         }
-
-        // const headers = {
-        //   Authorization: 'Bearer ' + (localStorage.getItem('token') || ''),
-        //   Accept: 'application/json',
-        //   'Content-Type': 'application/json',
-        // };
-
-        // const config = {
-        //   headers,
-        // };
-
-        // const data = { id, status: 'undo' };
-        // axios
-        //   .post(BASE_URL + '/activity', data, config)
-        //   .then((response) => {
-        //     console.log(response);
-        //     // response.json();
-        //   })
-        //   .catch((error) => {
-        //     console.log('error', error);
-        //   });
       }}>
       {translate('resources.action.undo')}
-      {/* برگرداندن تغییرات */}
+
     </Button>
   );
 };
