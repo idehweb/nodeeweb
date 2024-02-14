@@ -66,10 +66,11 @@ const list = (props) => {
       .catch((err) => notify(err.message, { type: 'error' }));
   };
   const changeActivationHandler = (slug, statusRow) => {
-    const excludeFromConfig = ['torob'];
+    // const excludeFromConfig = ['torob'];
     if (
-      statusRow === STATUS.needConfig &&
-      !(excludeFromConfig.indexOf(slug) > -1)
+      statusRow === STATUS.needConfig
+      // &&
+      // !(excludeFromConfig.indexOf(slug) > -1)
     ) {
       notify('Please Config plugin', { type: 'error' });
       return;
