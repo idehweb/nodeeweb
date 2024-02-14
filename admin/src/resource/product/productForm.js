@@ -52,6 +52,7 @@ import {
   SimpleImageField,
   StockStatus,
   UploaderField,
+  ChatGPTButton,
 } from '@/components';
 import { Val } from '@/Utils';
 import Transform from '@/functions/transform';
@@ -388,7 +389,7 @@ const Form = ({ children, ...props }) => {
       onSubmit={(v) => save(v)}
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
-
+      <ChatGPTButton />
       <TextInput
         source={'title.' + translate('lan')}
         label={translate('resources.product.title')}
