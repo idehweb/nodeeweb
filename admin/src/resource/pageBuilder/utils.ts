@@ -58,8 +58,8 @@ const getOptAction = (t: ActionTypes, index, value) => {
 export const makeAction = (path, opt: ActionTypes, value = undefined) => {
   const temp: string = path.split('.').pop();
   const index = Number(temp.replace(/\[|]/gi, ''));
-
   const arr = path.split('.');
+
   let newObj = {};
   const lastIndex = arr.length - 1;
   if (lastIndex === 0) newObj = getOptAction(opt, index, value);
@@ -67,10 +67,12 @@ export const makeAction = (path, opt: ActionTypes, value = undefined) => {
     arr.reduce((obj, i, idx) => {
       let key = i;
       // if we have index like [0] then get index => 0
-      if (/^\[\d\]$/i.test(key)) {
+
+      if (/^\[\d{1,2}\]$/i.test(key)) {
         key = key.replace(/\[|]/gi, '');
         key = Number(key);
       }
+
       obj[key] = {};
 
       if (opt === 'push' && idx === lastIndex)
@@ -89,6 +91,8 @@ export const makeAction = (path, opt: ActionTypes, value = undefined) => {
 export const AddNewItem = (id, arr, item) => {
   let address = FindNodeAddress(arr, id);
   if (address !== '') address += '.children';
+
+  // if (address !== '') address += '.children';
 
   const action = makeAction(address, 'push', {
     ...item,
