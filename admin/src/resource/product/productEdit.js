@@ -34,7 +34,7 @@ const edit = (props) => {
     resource: 'product',
     id,
   });
-  console.log('propsprops', props);
+  // console.log('propsprops', props);
   // transform={transform}
   return (
     <Edit
