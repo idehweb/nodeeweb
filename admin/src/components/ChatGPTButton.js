@@ -1,110 +1,69 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
-import Grow from '@mui/material/Grow';
-import Paper from '@mui/material/Paper';
-import Popper from '@mui/material/Popper';
+import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import MenuList from '@mui/material/MenuList';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { styled } from '@mui/material/styles';
 
-//TODO: translate below
-const options = ['metaTitle', 'excerpt', 'description'];
+const GPTButton = styled(Button)({
+  transition: '0.5s',
+  boxShadow: 'none',
+  color: '#fff',
+  letterSpacing: '0.1em',
+  fontSize: '0.8em',
+  padding: '5px 15px',
+  margin: ' 10px 1px',
+  border: '1px solid',
+  backgroundColor: '#27282c',
+  borderColor: '#0063cc',
+  fontFamily: ['sans-serif', 'Arial', 'Roboto'].join(','),
+  '&:hover': {
+    backgroundColor: '#27282c',
+    color: '#1e9bff',
+    borderColor: '#1e9bff',
+    letterSpacing: '0.25em',
+    boxShadow: '0 0 35px #1e9bff',
+  },
+  '&:active': {
+    backgroundColor: '#27282c',
+    color: '#1e9bff',
+    borderColor: '#1e9bff',
+    letterSpacing: '0.25em',
+    boxShadow: '0 0 35px #1e9bff',
+  },
+});
 
 export default (props) => {
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
-
-  const handleClick = () => {
-    console.info(`You clicked ${options[selectedIndex]}`);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
-
-  const handleMenuItemClick = (event, index) => {
-    setSelectedIndex(index);
-    setOpen(false);
-  };
-
-  const handleToggle = () => {
-    setOpen((prevOpen) => !prevOpen);
-  };
-
-  const handleClose = (event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target)) {
-      return;
-    }
-
-    setOpen(false);
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
-    <React.Fragment>
-      <ButtonGroup
-        variant="outlined"
-        ref={anchorRef}
-        style={{
-          border: '1px solid',
-          borderRadius: 10,
-          margin: 2,
+    <div>
+      <GPTButton startIcon={<ArrowDropDownIcon />} onClick={handleClick}>
+        ASK CHATGPT FOR
+      </GPTButton>
+      <Menu
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
         }}
-        aria-label="Button group with a nested menu">
-        <Button
-          onClick={handleClick}
-          style={{
-            borderRadius: 10,
-          }}>
-          ASK CHATGPT FOR
-        </Button>
-        {/* <Button onClick={handleClick}>{options[selectedIndex]}</Button> */}
-        <Button
-          style={{
-            borderRadius: 10,
-          }}
-          size="small"
-          aria-controls={open ? 'split-button-menu' : undefined}
-          aria-expanded={open ? 'true' : undefined}
-          aria-label="select merge strategy"
-          aria-haspopup="menu"
-          onClick={handleToggle}>
-          <ArrowDropDownIcon />
-        </Button>
-      </ButtonGroup>
-      <Popper
-        sx={{
-          zIndex: 1,
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
         }}
+        anchorEl={anchorEl}
         open={open}
-        anchorEl={anchorRef.current}
-        role={undefined}
-        transition
-        disablePortal>
-        {({ TransitionProps, placement }) => (
-          <Grow
-            {...TransitionProps}
-            style={{
-              transformOrigin:
-                placement === 'bottom' ? 'center top' : 'center bottom',
-            }}>
-            <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
-                <MenuList id="split-button-menu" autoFocusItem>
-                  {options.map((option, index) => (
-                    <MenuItem
-                      key={option}
-                      //todo --> disabled if loading(fetching data for proccessing request)
-                      //   disabled={index === 2}
-                      selected={index === selectedIndex}
-                      onClick={(event) => handleMenuItemClick(event, index)}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
-          </Grow>
-        )}
-      </Popper>
-    </React.Fragment>
+        onClose={handleClose}>
+        <MenuItem onClick={handleClose}>Excerpt</MenuItem>
+        <MenuItem onClick={handleClose}>Met title</MenuItem>
+        <MenuItem onClick={handleClose}>Description</MenuItem>
+      </Menu>
+    </div>
   );
 };
