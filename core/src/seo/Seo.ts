@@ -327,7 +327,7 @@ export class SeoCore implements Seo {
     const customEntity = /^\/([^\/]+)\/([^\/]+)$/;
     let entity = 'page';
     if (pageEntityTest.test(req.path)) entity = 'page';
-    else [entity = 'page'] = customEntity.exec(req.path) ?? [];
+    else [, entity = 'page'] = customEntity.exec(req.path) ?? [];
 
     const customEventName = getSeoEventName({ post: true, entity });
     const allEventName = getSeoEventName({ post: true });
