@@ -1,5 +1,6 @@
 //@ts-check
 
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ArrayInput,
   BooleanInput,
@@ -21,6 +22,13 @@ import {
   Button,
 } from 'react-admin';
 
+// import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { styled } from '@mui/material/styles';
+import { StyledMenu, GPTButton } from './ChatGPTButtonStyle';
+
 import {
   useFormContext,
   useForm,
@@ -28,7 +36,6 @@ import {
   useFormState,
 } from 'react-hook-form';
 import Input from '@mui/material/Input';
-import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 
 import { RichTextInput } from 'ra-input-rich-text';
@@ -52,7 +59,6 @@ import {
   SimpleImageField,
   StockStatus,
   UploaderField,
-  ChatGPTButton,
 } from '@/components';
 import { Val } from '@/Utils';
 import Transform from '@/functions/transform';
@@ -382,6 +388,15 @@ const Form = ({ children, ...props }) => {
     return <TextInput {...props} />;
   };
 
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <SimpleForm
       {...props}
@@ -389,7 +404,22 @@ const Form = ({ children, ...props }) => {
       onSubmit={(v) => save(v)}
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
-      <ChatGPTButton />
+      <div>
+        <GPTButton startIcon={<ArrowDropDownIcon />} onClick={handleClick}>
+          ASK CHATGPT FOR
+        </GPTButton>
+        <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
+          <MenuItem onClick={handleClose}>
+            {translate('resources.product.excerpt')}
+          </MenuItem>
+          <MenuItem onClick={handleClose}>
+            {translate('resources.product.metatitle')}
+          </MenuItem>
+          <MenuItem onClick={handleClose}>
+            {translate('resources.product.description')}
+          </MenuItem>
+        </StyledMenu>
+      </div>
       <TextInput
         source={'title.' + translate('lan')}
         label={translate('resources.product.title')}
