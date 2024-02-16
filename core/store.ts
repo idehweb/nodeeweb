@@ -14,6 +14,7 @@ import { PluginCore } from './src/plugin/plugin';
 import { StoreTemplate } from './types/template';
 import { StoreRoute } from './types/route';
 import { SystemNotif } from './types/systemNotif';
+import { CoreEventEmitter } from './src/event/CoreEventEmitter.abstract';
 export class Store {
   env: StoreEnv;
   db: typeof mongoose;
@@ -34,7 +35,7 @@ export class Store {
   strategies = new Map<string, AuthStrategy>();
   plugins = new PluginCore();
   config: ConfigType;
-  event: EventEmitter;
+  event: CoreEventEmitter;
   fixedHandlers: any[] = [];
   sysNotifs: SystemNotif[] = [];
 
