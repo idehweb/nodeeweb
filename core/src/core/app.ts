@@ -10,13 +10,13 @@ import { registerDefaultControllers } from './controller';
 import { activeAuthControllers } from './auth';
 import { registerValidationPipe } from '../handlers/validate.handler';
 import { registerDefaultConfig } from '../config/config';
-import { registerDefaultEvent } from './event';
 import { initPlugins } from '../plugin';
 import { initRoutes } from './view';
 import initSupervisor from '../supervisor';
 import initSeo from '../seo';
 import { registerCoreSystemNotifs } from '../SystemNotif';
 import registerFile from '../file';
+import { registerDefaultEvent } from '../event';
 
 const app = express();
 
