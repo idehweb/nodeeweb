@@ -10,11 +10,11 @@ export default class CustomCoreEventEmitter extends CoreEventEmitter {
 
   [captureRejectionSymbol](err: any, event: any, ...args: any) {
     logger.error(
-      '[CoreEvent] rejection happened for',
+      '[CustomCoreEventEmitter] rejection happened for',
       event,
       'with',
       err,
-      ...args
+      args.map((a) => String(a))
     );
   }
   async emitWithWait(
@@ -25,6 +25,13 @@ export default class CustomCoreEventEmitter extends CoreEventEmitter {
       const listeners = this.listeners(eventName) ?? [];
       for (const listener of listeners) await call(listener as any, ...args);
     } catch (err) {
+      logger.error(
+        '[CustomCoreEventEmitter] rejection happened for',
+        eventName,
+        'with',
+        err,
+        args.map((a) => String(a))
+      );
       return false;
     }
 

@@ -337,15 +337,29 @@ export class SeoCore implements Seo {
   }
 
   private async getPageDoc(path: string) {
-    let slug: string;
+    let slug: string, other: string;
 
     if (path === '/') slug = 'home';
-    else [, slug] = /^\/([^/]+)$/.exec(path) ?? [];
-
+    else [, slug, other] = /^\/([^/]+)(.*)$/.exec(path) ?? [];
     if (slug) {
       const page = await this.pageModel.findOne(
         {
-          slug,
+          ...(other
+            ? {
+                $or: [
+                  { slug },
+                  {
+                    slug: [
+                      slug,
+                      ...other
+                        .split('/')
+                        .filter((v) => v)
+                        .map(() => 'param'),
+                    ].join(':'),
+                  },
+                ],
+              }
+            : { slug }),
           active: true,
           status: PublishStatus.Published,
         },
