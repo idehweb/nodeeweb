@@ -8,7 +8,7 @@ import {
   SitemapIndexStream,
   ErrorLevel,
 } from 'sitemap';
-import { CRUD, MiddleWare, Res, Seo } from '../../types/global';
+import { CRUD, MiddleWare, Req, Res, Seo } from '../../types/global';
 import { createGzip } from 'zlib';
 import { capitalize, merge } from 'lodash';
 import store from '../../store';
@@ -33,6 +33,7 @@ import isbot from 'isbot';
 import { getPublicDir } from '../../utils/path';
 import { join } from 'path';
 import parse, { HTMLElement } from 'node-html-parser';
+import { getSeoEventName } from './utils';
 
 type Conf = { logger: Logger };
 const defaultConf: Conf = { logger };
@@ -321,6 +322,19 @@ export class SeoCore implements Seo {
         );
     }
   }
+  private async effectEvents(root: HTMLElement, req: Req) {
+    const pageEntityTest = /^\/[^\/]+$/;
+    const customEntity = /^\/([^\/]+)\/([^\/]+)$/;
+    let entity = 'page';
+    if (pageEntityTest.test(req.path)) entity = 'page';
+    else [entity = 'page'] = customEntity.exec(req.path) ?? [];
+
+    const customEventName = getSeoEventName({ post: true, entity });
+    const allEventName = getSeoEventName({ post: true });
+
+    await store.event.emitWithWait(customEventName, root, req);
+    await store.event.emitWithWait(allEventName, root, req);
+  }
 
   private async getPageDoc(path: string) {
     let slug: string;
@@ -375,6 +389,7 @@ export class SeoCore implements Seo {
 
     this.effectPreConfig(html);
     this.effectPage(html, pageDoc);
+    await this.effectEvents(html, req);
     this.effectPostConfig(html);
 
     res.setHeader('content-type', 'text/html');
