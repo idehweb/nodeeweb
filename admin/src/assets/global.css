@@ -57,9 +57,8 @@ body {
   left: 0 !important;
   top: 0 !important;
   position: absolute !important;
-  width: 20px;
-  height: 20px;
-  display: flex;
+  width: 15px;
+  height: 15px;
 }
 
 .gpt-button:hover {

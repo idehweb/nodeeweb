@@ -38,7 +38,7 @@ export const GPTButton = styled(Button)({
   color: '#fff',
   letterSpacing: '0.1em',
   fontSize: '0.8em',
-  padding: '5px 15px',
+  padding: '5px 10px',
   margin: ' 10px 1px',
   border: '1px solid',
   backgroundColor: '#27282c',
