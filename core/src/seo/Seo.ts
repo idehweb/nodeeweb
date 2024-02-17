@@ -324,7 +324,7 @@ export class SeoCore implements Seo {
   }
   private async effectEvents(root: HTMLElement, req: Req) {
     const pageEntityTest = /^\/[^\/]+$/;
-    const customEntity = /^\/([^\/]+)\/([^\/]+)$/;
+    const customEntity = /^\/([^\/]+)\/([^\/]+)\/?$/;
     let entity = 'page';
     if (pageEntityTest.test(req.path)) entity = 'page';
     else [, entity = 'page'] = customEntity.exec(req.path) ?? [];
