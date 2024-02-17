@@ -1,4 +1,5 @@
 import { isMongoId } from 'class-validator';
+import EventEmitter from 'events';
 import { NextFunction, Request, Response } from 'express';
 
 let config: {
@@ -126,8 +127,10 @@ function register(arg: any) {
   );
 
   // register event listener
-  const event = config.resolve('store').event;
-  event.on('post-product-seo', onGetProduct);
+  const event = config.resolve('store').event as EventEmitter;
+  const en = 'post-product-seo';
+  event.removeListener(en, onGetProduct);
+  event.on(en, onGetProduct);
 
   return [];
 }
