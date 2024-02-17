@@ -300,7 +300,7 @@ const Form = ({ children, ...props }) => {
 
   const [waitings, setWaitings] = useState(false);
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  // const [anchorEl, setAnchorEl] = React.useState(null);
 
   const { setValue, getValues } = useForm({
     defaultValues: {
@@ -310,13 +310,13 @@ const Form = ({ children, ...props }) => {
       chatGPTanswerForMetadescription: props?.record?.metadescription?.fa,
     },
   });
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  // const open = Boolean(anchorEl);
+  // const handleClick = (event) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
+  // const handleClose = () => {
+  //   setAnchorEl(null);
+  // };
 
   const handleChange = (t, value) => {
     setValue(t, value);
@@ -324,10 +324,9 @@ const Form = ({ children, ...props }) => {
 
   const chatGptHandler = async (e) => {
     // e.preventDefault();
-    handleClose();
+    // handleClose();
     try {
       let question;
-
       const expr = e.target.id;
       switch (expr) {
         case 'excerpt':
