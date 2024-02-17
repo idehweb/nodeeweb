@@ -297,50 +297,61 @@ const Form = ({ children, ...props }) => {
 
   const totals = 0;
 
+  //TODO : refactor below with useForm to prevent rerender in every character
   const [mainWord, setMainWord] = useState('');
-  // const [answer, setAnswer] = useState('');
 
   const [waitings, setWaitings] = useState(false);
 
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
   const { setValue, getValues } = useForm({
     defaultValues: {
-      chatGPTanswer: props?.record?.excerpt?.fa,
-      // chatGPTanswer: '',
+      mainWord: props?.record?.title?.fa,
+      chatGPTanswerForExcerpt: props?.record?.excerpt?.fa,
+      chatGPTanswerForDescription: props?.record?.description?.fa,
+      chatGPTanswerForMetadescription: props?.record?.metadescription?.fa,
     },
   });
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleChange = (t, value) => {
     setValue(t, value);
   };
 
-  // const isEmpty = (props) => {
-  //   for (const prop in props) {
-  //     if (Object.hasOwn(props, prop)) {
-  //       return false;
-  //     }
-  //   }
-
-  //   return true;
-  // };
-
-  // if (!isEmpty) {
-  //   setAnswer({
-  //     id: props.record._id,
-  //     answer: props.record.chatGPT.answer,
-  //   });
-  // }
-
   const chatGptHandler = async (e) => {
     // e.preventDefault();
+    handleClose();
     try {
-      const question = mainWord
-        ? `tell me about ${mainWord.trim()} in 40 words`
-        : props.record?.title.fa
-        ? `tell me about ${props.record.title.fa} in 40 words`
-        : null;
+      //TODO: refacor below with switch statement
+      let question;
 
-      // console.log(question);
-
+      if (e.target.id === 'excerpt') {
+        question = mainWord
+          ? `tell me about ${mainWord.trim()} in 40 words`
+          : props.record?.title.fa
+          ? `tell me about ${props.record.title.fa} in 40 words`
+          : null;
+      }
+      if (e.target.id === 'metadescription') {
+        question = mainWord
+          ? `give me a meta description about ${mainWord.trim()} in 60 words`
+          : props.record?.title.fa
+          ? `give me a meta description about ${props.record.title.fa} in 60 words `
+          : null;
+      }
+      if (e.target.id === 'description') {
+        question = mainWord
+          ? `tell me about ${mainWord.trim()} in 100 words in order to introduce it to the customer for sale purposes`
+          : props.record?.title.fa
+          ? `tell me about ${props.record.title.fa} in 100 words in order to introduce it to the customer for sale purposes`
+          : null;
+      }
       if (!question) {
         notify('Please enter a title');
         return;
@@ -369,9 +380,16 @@ const Form = ({ children, ...props }) => {
       const response = await data.json();
       const formatedData = await response.choices[0].message.content;
       setWaitings(false);
-      handleChange('chatGPTanswer', formatedData);
-      // console.log('chatGPTanswerbyGetValue....', getValues('chatGPTanswer'));
-      // setAnswer(formatedData);
+      //TODO : refactor below statement with switch statement
+      if (e.target.id === 'excerpt') {
+        handleChange('chatGPTanswerForExcerpt', formatedData);
+      }
+      if (e.target.id === 'description') {
+        handleChange('chatGPTanswerForDescription', formatedData);
+      }
+      if (e.target.id === 'metadescription') {
+        handleChange('chatGPTanswerForMetadescription', formatedData);
+      }
     } catch (err) {
       console.log('err', err);
     }
@@ -388,14 +406,17 @@ const Form = ({ children, ...props }) => {
     return <TextInput {...props} />;
   };
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+  const ControlledRichTextInput = ({ value, ...props }) => {
+    const { setValue } = useFormContext();
+
+    React.useEffect(() => {
+      setValue(props.source, value);
+      //eslint-disable-next-line
+    }, [value]);
+
+    return <RichTextInput {...props} />;
   };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  console.log(props);
 
   return (
     <SimpleForm
@@ -405,17 +426,26 @@ const Form = ({ children, ...props }) => {
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
       <div>
-        <GPTButton startIcon={<ArrowDropDownIcon />} onClick={handleClick}>
+        <GPTButton
+          disabled={waitings}
+          startIcon={
+            waitings ? (
+              <CircularProgress style={{ width: '20px', height: '20px' }} />
+            ) : (
+              <ArrowDropDownIcon />
+            )
+          }
+          onClick={handleClick}>
           ASK CHATGPT FOR
         </GPTButton>
         <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
-          <MenuItem onClick={handleClose}>
+          <MenuItem id="excerpt" onClick={(e) => chatGptHandler(e)}>
             {translate('resources.product.excerpt')}
           </MenuItem>
-          <MenuItem onClick={handleClose}>
-            {translate('resources.product.metatitle')}
+          <MenuItem id="metadescription" onClick={(e) => chatGptHandler(e)}>
+            {translate('resources.product.metadescription')}
           </MenuItem>
-          <MenuItem onClick={handleClose}>
+          <MenuItem id="description" onClick={(e) => chatGptHandler(e)}>
             {translate('resources.product.description')}
           </MenuItem>
         </StyledMenu>
@@ -443,22 +473,29 @@ const Form = ({ children, ...props }) => {
         source={'metatitle.' + translate('lan')}
         label={translate('resources.product.metatitle')}
       />
-      <TextInput
+      <ControlledTextInput
+        fullWidth
+        multiline
+        source={'metadescription.' + translate('lan')}
+        value={getValues('chatGPTanswerForMetadescription')}
+        label={translate('resources.product.metadescription')}
+      />
+      {/* <TextInput
         multiline
         fullWidth
         source={'metadescription.' + translate('lan')}
         label={translate('resources.product.metadescription')}
-      />
+      /> */}
 
       <ControlledTextInput
         fullWidth
         multiline
         source={'excerpt.' + translate('lan')}
-        value={getValues('chatGPTanswer')}
+        value={getValues('chatGPTanswerForExcerpt')}
         label={translate('resources.product.excerpt')}
       />
 
-      <Button
+      {/* <Button
         label="Ask chatGPT"
         type="button"
         onClick={(e) => {
@@ -475,7 +512,7 @@ const Form = ({ children, ...props }) => {
           }}>
           <CircularProgress />
         </Box>
-      )}
+      )} */}
       {/* {answer != '' && !waitings && (
                 <TextField
                   label="chatGPT answer"
@@ -486,11 +523,18 @@ const Form = ({ children, ...props }) => {
                 />
               )} */}
 
-      <RichTextInput
+      <ControlledRichTextInput
+        fullWidth
+        source={'description.' + translate('lan')}
+        value={getValues('chatGPTanswerForDescription')}
+        label={translate('resources.product.description')}
+      />
+
+      {/* <RichTextInput
         fullWidth
         source={'description.' + translate('lan')}
         label={translate('resources.product.description')}
-      />
+      /> */}
 
       <div className={'mb-20'} />
       {/* <BooleanInput
