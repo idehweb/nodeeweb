@@ -2,6 +2,8 @@ import { isMongoId } from 'class-validator';
 import EventEmitter from 'events';
 import { NextFunction, Request, Response } from 'express';
 
+const SERIAL = 'torob-plugin';
+
 let config: {
   resolve: (key: string) => any;
 };
@@ -93,7 +95,7 @@ export function insertMeta(root: any, obj: { [key in string]: string }) {
 
 const onGetProduct = async (root: any, req: Request) => {
   const productModel = config.resolve('store').db.model('product');
-  const entityRegex = /^\/([^\/]+)\/([^\/]+)$/;
+  const entityRegex = /^\/([^\/]+)\/([^\/]+)\/?$/;
   const [, , slug = null] = entityRegex.exec(req.path) ?? [];
   if (!slug) return;
   const product = await productModel.findOne({
@@ -105,6 +107,8 @@ const onGetProduct = async (root: any, req: Request) => {
   const manifest = transformProductV1(product);
   insertMeta(root, manifest);
 };
+
+onGetProduct['serial'] = SERIAL;
 
 function errorLog(from: string, err: any) {
   const logger = config.resolve('logger');
@@ -129,7 +133,10 @@ function register(arg: any) {
   // register event listener
   const event = config.resolve('store').event as EventEmitter;
   const en = 'post-product-seo';
-  event.removeListener(en, onGetProduct);
+  event
+    .listeners(en)
+    .filter((fn) => fn['serial'] === SERIAL)
+    .forEach((fn) => event.removeListener(en, fn as any));
   event.on(en, onGetProduct);
 
   return [];
