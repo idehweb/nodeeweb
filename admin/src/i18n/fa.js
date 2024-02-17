@@ -314,6 +314,17 @@ const customFarsiMessages = {
       username: 'نام کاربری',
       difference: 'تفاوت داده ها',
       createdAt: 'در تاریخ',
+      customerFirstName: 'نام مشتری',
+      customerLastName: 'نام خانوادگی مشتری',
+      userFirstName: 'نام کاربر',
+      userLastName: 'نام خانوادگی کاربر',
+      before: 'پیش از تغییر',
+      after: 'پس از تغییر',
+        
+        
+      undo: 'برگرداندن تغییرات',
+      undoDone: 'تغییرات با موفقیت بازگردانی شد',
+
     },
 
     dashboard: {
@@ -326,6 +337,8 @@ const customFarsiMessages = {
       countAnnLast30Days: 'میزان درآمد ۳۰ روز گذشته',
       countPayedLast30Days: 'تعداد پرداخت های موفق ۳۰ روز گذشته',
       monthly_revenue: 'Monthly Revenue',
+        
+        
       month_history: '30 Day Revenue History',
       new_orders: 'New Orders',
       pending_reviews: 'Pending Reviews',
@@ -552,6 +565,8 @@ const customFarsiMessages = {
       viewsCount: 'تعداد بازدید ها',
       updated: 'بروزرسانی',
       created: 'ساخته شده',
+      creat: 'پست ساخته شد',
+      duplicateKey: 'اطلاعات تکراری وارده شده است',
       categories: 'دسته بندی ها',
       post: 'نوشته',
       page: 'برگه',
@@ -712,6 +727,7 @@ const customFarsiMessages = {
     reviews: {},
 
     settings: {
+      otp: 'رمز یکبار مصرف',
       meta_title: 'عنوان متا',
       meta_description: 'توضیحات متا',
       metaTags: 'تگ های متا',

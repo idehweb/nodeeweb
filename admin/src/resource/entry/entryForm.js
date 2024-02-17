@@ -262,6 +262,7 @@ const Form = ({ children, ...props }) => {
       API.post('/post/', JSON.stringify({ ...values }))
         .then(({ data = {} }) => {
           // showNotification(translate('post.created'));
+          notify(translate('resources.post.creat'));
           if (data._id) {
             _The_ID = data._id;
             window.location.href = '/#/post/' + _The_ID;
@@ -273,6 +274,11 @@ const Form = ({ children, ...props }) => {
         })
         .catch((err) => {
           console.log('error', err);
+          notify(
+            err.response?.data?.message?.includes('duplicate')
+              ? translate('resources.post.duplicateKey')
+              : 'Something went wrong'
+          );
         });
     }
   }

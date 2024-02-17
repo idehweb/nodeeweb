@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "react-hook-form": "^7.50.0"
+    "react-hook-form": "^7.50.0",
+    "react-toastify": "^10.0.4"
   }
 }

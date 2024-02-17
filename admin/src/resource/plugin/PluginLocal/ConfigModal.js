@@ -47,7 +47,8 @@ export default function ConfigModal({ open, onClose, data, loading, reFetch }) {
           ))}
         </div>
         <div>
-          <SaveButton label="Config" disabled={isLoading} />
+          <SaveButton label="Config" alwaysEnable />
+          {/* <SaveButton label="Config" disabled={isLoading} /> */}
         </div>
       </Form>
     </Modal>

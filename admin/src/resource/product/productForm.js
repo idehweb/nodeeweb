@@ -1,3 +1,6 @@
+//@ts-check
+
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ArrayInput,
   BooleanInput,
@@ -16,10 +19,24 @@ import {
   useRedirect,
   useTranslate,
   useGetList,
+  Button,
 } from 'react-admin';
-import { useFormContext } from 'react-hook-form';
 
-import React, { useCallback, useEffect, useState } from 'react';
+// import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { styled } from '@mui/material/styles';
+import { StyledMenu, GPTButton } from './ChatGPTButtonStyle';
+
+import {
+  useFormContext,
+  useForm,
+  useController,
+  useFormState,
+} from 'react-hook-form';
+import Input from '@mui/material/Input';
+import axios from 'axios';
 
 import { RichTextInput } from 'ra-input-rich-text';
 
@@ -46,6 +63,12 @@ import {
 import { Val } from '@/Utils';
 import Transform from '@/functions/transform';
 import { convertError } from '@/functions/utils';
+
+import { FunctionField } from 'react-admin';
+
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // import { RichTextInput } from 'ra-input-rich-text';
 // import {ImportButton} from "react-admin-import-csv";
@@ -274,6 +297,137 @@ const Form = ({ children, ...props }) => {
 
   const totals = 0;
 
+  const [waitings, setWaitings] = useState(false);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const { setValue, getValues } = useForm({
+    defaultValues: {
+      mainWord: props?.record?.title?.fa,
+      chatGPTanswerForExcerpt: props?.record?.excerpt?.fa,
+      chatGPTanswerForDescription: props?.record?.description?.fa,
+      chatGPTanswerForMetadescription: props?.record?.metadescription?.fa,
+    },
+  });
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleChange = (t, value) => {
+    setValue(t, value);
+  };
+
+  const chatGptHandler = async (e) => {
+    // e.preventDefault();
+    handleClose();
+    try {
+      let question;
+
+      const expr = e.target.id;
+      switch (expr) {
+        case 'excerpt':
+          question = getValues('mainWord')
+            ? `tell me about ${getValues('mainWord').trim()} in 40 words`
+            : props.record?.title.fa
+            ? `tell me about ${props.record.title.fa} in 40 words`
+            : null;
+          break;
+        case 'metadescription':
+          question = getValues('mainWord')
+            ? `give me a meta description about ${getValues(
+                'mainWord'
+              ).trim()} in 60 words`
+            : props.record?.title.fa
+            ? `give me a meta description about ${props.record.title.fa} in 60 words `
+            : null;
+          break;
+        case 'description':
+          question = getValues('mainWord')
+            ? `tell me about ${getValues(
+                'mainWord'
+              ).trim()} in 100 words in order to introduce it to the customer for sale purposes`
+            : props.record?.title.fa
+            ? `tell me about ${props.record.title.fa} in 100 words in order to introduce it to the customer for sale purposes`
+            : null;
+          break;
+        default:
+          console.log(`Sorry, There is no question`);
+      }
+
+      if (!question) {
+        notify('Please enter a title');
+        return;
+      }
+
+      var myHeaders = new Headers();
+
+      myHeaders.append(
+        'content-type',
+        'application/x-www-form-urlencoded; charset=UTF-8'
+      );
+      var raw = `content=${question}`;
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow',
+      };
+      setWaitings(true);
+      const data = await fetch(
+        'https://idehweb.com/chatgpt/gpt.php',
+        requestOptions
+      );
+
+      const response = await data.json();
+      const formatedData = await response.choices[0].message.content;
+      setWaitings(false);
+
+      switch (expr) {
+        case 'excerpt':
+          handleChange('chatGPTanswerForExcerpt', formatedData);
+          break;
+        case 'metadescription':
+          handleChange('chatGPTanswerForMetadescription', formatedData);
+          break;
+        case 'description':
+          handleChange('chatGPTanswerForDescription', formatedData);
+          break;
+
+        default:
+          console.log(`there is no response.`);
+      }
+    } catch (err) {
+      console.log('err', err);
+    }
+  };
+
+  const ControlledTextInput = ({ value, ...props }) => {
+    const { setValue } = useFormContext();
+
+    React.useEffect(() => {
+      setValue(props.source, value);
+      //eslint-disable-next-line
+    }, [value]);
+
+    return <TextInput {...props} />;
+  };
+
+  const ControlledRichTextInput = ({ value, ...props }) => {
+    const { setValue } = useFormContext();
+
+    React.useEffect(() => {
+      setValue(props.source, value);
+      //eslint-disable-next-line
+    }, [value]);
+
+    return <RichTextInput {...props} />;
+  };
+
   return (
     <SimpleForm
       {...props}
@@ -282,10 +436,39 @@ const Form = ({ children, ...props }) => {
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
 
+      <div>
+        <GPTButton
+          disabled={waitings}
+          startIcon={
+            waitings ? (
+              <CircularProgress style={{ width: '20px', height: '20px' }} />
+            ) : (
+              <ArrowDropDownIcon />
+            )
+          }
+          onClick={handleClick}>
+          ASK CHATGPT FOR
+        </GPTButton>
+        <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
+          <MenuItem id="metadescription" onClick={(e) => chatGptHandler(e)}>
+            {translate('resources.product.metadescription')}
+          </MenuItem>
+          <MenuItem id="excerpt" onClick={(e) => chatGptHandler(e)}>
+            {translate('resources.product.excerpt')}
+          </MenuItem>
+          <MenuItem id="description" onClick={(e) => chatGptHandler(e)}>
+            {translate('resources.product.description')}
+          </MenuItem>
+        </StyledMenu>
+      </div>
+
       <TextInput
         source={'title.' + translate('lan')}
         label={translate('resources.product.title')}
         className={'width100 mb-20'}
+        onChange={(e) => {
+          setValue('mainWord', e.target.value);
+        }}
         validate={Val.req}
         fullWidth
       />
@@ -302,22 +485,54 @@ const Form = ({ children, ...props }) => {
         source={'metatitle.' + translate('lan')}
         label={translate('resources.product.metatitle')}
       />
-      <TextInput
-        multiline
+      <ControlledTextInput
         fullWidth
+        multiline
         source={'metadescription.' + translate('lan')}
+        value={getValues('chatGPTanswerForMetadescription')}
         label={translate('resources.product.metadescription')}
       />
 
-      <TextInput
-        multiline
+      <ControlledTextInput
         fullWidth
+        multiline
         source={'excerpt.' + translate('lan')}
+        value={getValues('chatGPTanswerForExcerpt')}
         label={translate('resources.product.excerpt')}
       />
-      <RichTextInput
+
+      {/* <Button
+        label="Ask chatGPT"
+        type="button"
+        onClick={(e) => {
+          chatGptHandler(e);
+        }}
+        style={{ border: '1px solid', borderRadius: 10, margin: 2 }}
+      />
+      {waitings && (
+        <Box
+          sx={{
+            display: 'flex',
+            padding: '10px',
+            margin: '10px',
+          }}>
+          <CircularProgress />
+        </Box>
+      )} */}
+      {/* {answer != '' && !waitings && (
+                <TextField
+                  label="chatGPT answer"
+                  color="secondary"
+                  style={{ width: '100%', padding: '5px', margin: '5px' }}
+                  multiline
+                  value={answer}
+                />
+              )} */}
+
+      <ControlledRichTextInput
         fullWidth
         source={'description.' + translate('lan')}
+        value={getValues('chatGPTanswerForDescription')}
         label={translate('resources.product.description')}
       />
 
