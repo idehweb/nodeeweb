@@ -297,9 +297,6 @@ const Form = ({ children, ...props }) => {
 
   const totals = 0;
 
-  //TODO : refactor below with useForm to prevent rerender in every character
-  const [mainWord, setMainWord] = useState('');
-
   const [waitings, setWaitings] = useState(false);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -328,30 +325,39 @@ const Form = ({ children, ...props }) => {
     // e.preventDefault();
     handleClose();
     try {
-      //TODO: refacor below with switch statement
       let question;
 
-      if (e.target.id === 'excerpt') {
-        question = mainWord
-          ? `tell me about ${mainWord.trim()} in 40 words`
-          : props.record?.title.fa
-          ? `tell me about ${props.record.title.fa} in 40 words`
-          : null;
+      const expr = e.target.id;
+      switch (expr) {
+        case 'excerpt':
+          question = getValues('mainWord')
+            ? `tell me about ${getValues('mainWord').trim()} in 40 words`
+            : props.record?.title.fa
+            ? `tell me about ${props.record.title.fa} in 40 words`
+            : null;
+          break;
+        case 'metadescription':
+          question = getValues('mainWord')
+            ? `give me a meta description about ${getValues(
+                'mainWord'
+              ).trim()} in 60 words`
+            : props.record?.title.fa
+            ? `give me a meta description about ${props.record.title.fa} in 60 words `
+            : null;
+          break;
+        case 'description':
+          question = getValues('mainWord')
+            ? `tell me about ${getValues(
+                'mainWord'
+              ).trim()} in 100 words in order to introduce it to the customer for sale purposes`
+            : props.record?.title.fa
+            ? `tell me about ${props.record.title.fa} in 100 words in order to introduce it to the customer for sale purposes`
+            : null;
+          break;
+        default:
+          console.log(`Sorry, There is no question`);
       }
-      if (e.target.id === 'metadescription') {
-        question = mainWord
-          ? `give me a meta description about ${mainWord.trim()} in 60 words`
-          : props.record?.title.fa
-          ? `give me a meta description about ${props.record.title.fa} in 60 words `
-          : null;
-      }
-      if (e.target.id === 'description') {
-        question = mainWord
-          ? `tell me about ${mainWord.trim()} in 100 words in order to introduce it to the customer for sale purposes`
-          : props.record?.title.fa
-          ? `tell me about ${props.record.title.fa} in 100 words in order to introduce it to the customer for sale purposes`
-          : null;
-      }
+
       if (!question) {
         notify('Please enter a title');
         return;
@@ -380,15 +386,20 @@ const Form = ({ children, ...props }) => {
       const response = await data.json();
       const formatedData = await response.choices[0].message.content;
       setWaitings(false);
-      //TODO : refactor below statement with switch statement
-      if (e.target.id === 'excerpt') {
-        handleChange('chatGPTanswerForExcerpt', formatedData);
-      }
-      if (e.target.id === 'description') {
-        handleChange('chatGPTanswerForDescription', formatedData);
-      }
-      if (e.target.id === 'metadescription') {
-        handleChange('chatGPTanswerForMetadescription', formatedData);
+
+      switch (expr) {
+        case 'excerpt':
+          handleChange('chatGPTanswerForExcerpt', formatedData);
+          break;
+        case 'metadescription':
+          handleChange('chatGPTanswerForMetadescription', formatedData);
+          break;
+        case 'description':
+          handleChange('chatGPTanswerForDescription', formatedData);
+          break;
+
+        default:
+          console.log(`there is no response.`);
       }
     } catch (err) {
       console.log('err', err);
@@ -416,7 +427,6 @@ const Form = ({ children, ...props }) => {
 
     return <RichTextInput {...props} />;
   };
-  console.log(props);
 
   return (
     <SimpleForm
@@ -425,6 +435,7 @@ const Form = ({ children, ...props }) => {
       onSubmit={(v) => save(v)}
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
+
       <div>
         <GPTButton
           disabled={waitings}
@@ -439,23 +450,24 @@ const Form = ({ children, ...props }) => {
           ASK CHATGPT FOR
         </GPTButton>
         <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
-          <MenuItem id="excerpt" onClick={(e) => chatGptHandler(e)}>
-            {translate('resources.product.excerpt')}
-          </MenuItem>
           <MenuItem id="metadescription" onClick={(e) => chatGptHandler(e)}>
             {translate('resources.product.metadescription')}
+          </MenuItem>
+          <MenuItem id="excerpt" onClick={(e) => chatGptHandler(e)}>
+            {translate('resources.product.excerpt')}
           </MenuItem>
           <MenuItem id="description" onClick={(e) => chatGptHandler(e)}>
             {translate('resources.product.description')}
           </MenuItem>
         </StyledMenu>
       </div>
+
       <TextInput
         source={'title.' + translate('lan')}
         label={translate('resources.product.title')}
         className={'width100 mb-20'}
         onChange={(e) => {
-          setMainWord(e.target.value);
+          setValue('mainWord', e.target.value);
         }}
         validate={Val.req}
         fullWidth
@@ -480,12 +492,6 @@ const Form = ({ children, ...props }) => {
         value={getValues('chatGPTanswerForMetadescription')}
         label={translate('resources.product.metadescription')}
       />
-      {/* <TextInput
-        multiline
-        fullWidth
-        source={'metadescription.' + translate('lan')}
-        label={translate('resources.product.metadescription')}
-      /> */}
 
       <ControlledTextInput
         fullWidth
@@ -529,12 +535,6 @@ const Form = ({ children, ...props }) => {
         value={getValues('chatGPTanswerForDescription')}
         label={translate('resources.product.description')}
       />
-
-      {/* <RichTextInput
-        fullWidth
-        source={'description.' + translate('lan')}
-        label={translate('resources.product.description')}
-      /> */}
 
       <div className={'mb-20'} />
       {/* <BooleanInput
