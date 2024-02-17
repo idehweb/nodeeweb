@@ -36,6 +36,78 @@ body {
 #header_last {
   direction: ltr;
 }
+
+.gpt-button-wrap {
+  width: 100%;
+  position: relative;
+}
+
+.gpt-button {
+  left: 0 !important;
+  top: 0 !important;
+  position: absolute !important;
+  width: 25px;
+  height: 25px;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+.gpt-btn-circular {
+  left: 0 !important;
+  top: 0 !important;
+  position: absolute !important;
+  width: 20px;
+  height: 20px;
+  display: flex;
+}
+
+.gpt-button:hover {
+  width: 200px;
+  height: 35px;
+  transition-delay: 0.2s;
+}
+
+.gpt-button::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  right: 25px;
+  border-top: 3px solid #1e9bff;
+  border-right: 3px solid #1e9bff;
+  transform: rotate(45deg);
+}
+.gpt-button:hover::before {
+  transform: rotate(45deg);
+}
+.gpt-button::after {
+  content: '';
+  left: -50px;
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  border-top: 3px solid #1e9bff;
+  border-right: 3px solid #1e9bff;
+  transform: rotate(45deg);
+}
+.gpt-button:hover::after {
+  transform: rotate(45deg);
+  transition-delay: 1s;
+}
+
+.gpt-button span {
+  visibility: hidden;
+  opacity: 0;
+  white-space: nowrap;
+  transition: 0.5s;
+}
+.gpt-button:hover span {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0.5s;
+}
+
 .grid-box {
   display: grid;
   grid-template-columns: repeat(5, 1fr);

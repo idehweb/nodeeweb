@@ -29,6 +29,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { styled } from '@mui/material/styles';
 import { StyledMenu, GPTButton } from './ChatGPTButtonStyle';
 
+import NotListedLocationIcon from '@mui/icons-material/NotListedLocation';
 import {
   useFormContext,
   useForm,
@@ -436,7 +437,7 @@ const Form = ({ children, ...props }) => {
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
 
-      <div>
+      {/* <div>
         <GPTButton
           disabled={waitings}
           startIcon={
@@ -460,7 +461,7 @@ const Form = ({ children, ...props }) => {
             {translate('resources.product.description')}
           </MenuItem>
         </StyledMenu>
-      </div>
+      </div> */}
 
       <TextInput
         source={'title.' + translate('lan')}
@@ -485,21 +486,47 @@ const Form = ({ children, ...props }) => {
         source={'metatitle.' + translate('lan')}
         label={translate('resources.product.metatitle')}
       />
-      <ControlledTextInput
-        fullWidth
-        multiline
-        source={'metadescription.' + translate('lan')}
-        value={getValues('chatGPTanswerForMetadescription')}
-        label={translate('resources.product.metadescription')}
-      />
+      <div className={'gpt-button-wrap'}>
+        <ControlledTextInput
+          fullWidth
+          multiline
+          source={'metadescription.' + translate('lan')}
+          value={getValues('chatGPTanswerForMetadescription')}
+          label={translate('resources.product.metadescription')}
+        />
+        {waitings ? (
+          <CircularProgress className={'gpt-btn-circular'} />
+        ) : (
+          <GPTButton
+            className={'gpt-button'}
+            disabled={waitings}
+            id="metadescription"
+            onClick={(e) => chatGptHandler(e)}>
+            <span>ASK CHATGPT</span>
+          </GPTButton>
+        )}
+      </div>
 
-      <ControlledTextInput
-        fullWidth
-        multiline
-        source={'excerpt.' + translate('lan')}
-        value={getValues('chatGPTanswerForExcerpt')}
-        label={translate('resources.product.excerpt')}
-      />
+      <div className={'gpt-button-wrap'}>
+        <ControlledTextInput
+          fullWidth
+          multiline
+          source={'excerpt.' + translate('lan')}
+          value={getValues('chatGPTanswerForExcerpt')}
+          label={translate('resources.product.excerpt')}
+        />
+        {waitings ? (
+          <CircularProgress className={'gpt-btn-circular'} />
+        ) : (
+          <GPTButton
+            className={'gpt-button'}
+            disabled={waitings}
+            id="excerpt"
+            onClick={(e) => chatGptHandler(e)}>
+            <span>ASK CHATGPT</span>
+          </GPTButton>
+        )}
+      </div>
 
       {/* <Button
         label="Ask chatGPT"
@@ -529,13 +556,25 @@ const Form = ({ children, ...props }) => {
                 />
               )} */}
 
-      <ControlledRichTextInput
-        fullWidth
-        source={'description.' + translate('lan')}
-        value={getValues('chatGPTanswerForDescription')}
-        label={translate('resources.product.description')}
-      />
-
+      <div className={'gpt-button-wrap'}>
+        <ControlledRichTextInput
+          fullWidth
+          source={'description.' + translate('lan')}
+          value={getValues('chatGPTanswerForDescription')}
+          label={translate('resources.product.description')}
+        />
+        {waitings ? (
+          <CircularProgress className={'gpt-btn-circular'} />
+        ) : (
+          <GPTButton
+            className={'gpt-button'}
+            disabled={waitings}
+            id="description"
+            onClick={(e) => chatGptHandler(e)}>
+            <span>ASK CHATGPT</span>
+          </GPTButton>
+        )}
+      </div>
       <div className={'mb-20'} />
       {/* <BooleanInput
         source="story"
