@@ -1,5 +1,6 @@
 //@ts-check
 
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ArrayInput,
   BooleanInput,
@@ -21,6 +22,13 @@ import {
   Button,
 } from 'react-admin';
 
+// import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { styled } from '@mui/material/styles';
+import { StyledMenu, GPTButton } from './ChatGPTButtonStyle';
+
 import {
   useFormContext,
   useForm,
@@ -28,7 +36,6 @@ import {
   useFormState,
 } from 'react-hook-form';
 import Input from '@mui/material/Input';
-import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 
 import { RichTextInput } from 'ra-input-rich-text';
@@ -290,49 +297,66 @@ const Form = ({ children, ...props }) => {
 
   const totals = 0;
 
-  const [mainWord, setMainWord] = useState('');
-  // const [answer, setAnswer] = useState('');
-
   const [waitings, setWaitings] = useState(false);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
 
   const { setValue, getValues } = useForm({
     defaultValues: {
-      chatGPTanswer: props?.record?.excerpt?.fa,
-      // chatGPTanswer: '',
+      mainWord: props?.record?.title?.fa,
+      chatGPTanswerForExcerpt: props?.record?.excerpt?.fa,
+      chatGPTanswerForDescription: props?.record?.description?.fa,
+      chatGPTanswerForMetadescription: props?.record?.metadescription?.fa,
     },
   });
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleChange = (t, value) => {
     setValue(t, value);
   };
 
-  // const isEmpty = (props) => {
-  //   for (const prop in props) {
-  //     if (Object.hasOwn(props, prop)) {
-  //       return false;
-  //     }
-  //   }
-
-  //   return true;
-  // };
-
-  // if (!isEmpty) {
-  //   setAnswer({
-  //     id: props.record._id,
-  //     answer: props.record.chatGPT.answer,
-  //   });
-  // }
-
   const chatGptHandler = async (e) => {
     // e.preventDefault();
+    handleClose();
     try {
-      const question = mainWord
-        ? `tell me about ${mainWord.trim()} in 40 words`
-        : props.record?.title.fa
-        ? `tell me about ${props.record.title.fa} in 40 words`
-        : null;
+      let question;
 
-      // console.log(question);
+      const expr = e.target.id;
+      switch (expr) {
+        case 'excerpt':
+          question = getValues('mainWord')
+            ? `tell me about ${getValues('mainWord').trim()} in 40 words`
+            : props.record?.title.fa
+            ? `tell me about ${props.record.title.fa} in 40 words`
+            : null;
+          break;
+        case 'metadescription':
+          question = getValues('mainWord')
+            ? `give me a meta description about ${getValues(
+                'mainWord'
+              ).trim()} in 60 words`
+            : props.record?.title.fa
+            ? `give me a meta description about ${props.record.title.fa} in 60 words `
+            : null;
+          break;
+        case 'description':
+          question = getValues('mainWord')
+            ? `tell me about ${getValues(
+                'mainWord'
+              ).trim()} in 100 words in order to introduce it to the customer for sale purposes`
+            : props.record?.title.fa
+            ? `tell me about ${props.record.title.fa} in 100 words in order to introduce it to the customer for sale purposes`
+            : null;
+          break;
+        default:
+          console.log(`Sorry, There is no question`);
+      }
 
       if (!question) {
         notify('Please enter a title');
@@ -362,9 +386,21 @@ const Form = ({ children, ...props }) => {
       const response = await data.json();
       const formatedData = await response.choices[0].message.content;
       setWaitings(false);
-      handleChange('chatGPTanswer', formatedData);
-      // console.log('chatGPTanswerbyGetValue....', getValues('chatGPTanswer'));
-      // setAnswer(formatedData);
+
+      switch (expr) {
+        case 'excerpt':
+          handleChange('chatGPTanswerForExcerpt', formatedData);
+          break;
+        case 'metadescription':
+          handleChange('chatGPTanswerForMetadescription', formatedData);
+          break;
+        case 'description':
+          handleChange('chatGPTanswerForDescription', formatedData);
+          break;
+
+        default:
+          console.log(`there is no response.`);
+      }
     } catch (err) {
       console.log('err', err);
     }
@@ -381,6 +417,17 @@ const Form = ({ children, ...props }) => {
     return <TextInput {...props} />;
   };
 
+  const ControlledRichTextInput = ({ value, ...props }) => {
+    const { setValue } = useFormContext();
+
+    React.useEffect(() => {
+      setValue(props.source, value);
+      //eslint-disable-next-line
+    }, [value]);
+
+    return <RichTextInput {...props} />;
+  };
+
   return (
     <SimpleForm
       {...props}
@@ -389,12 +436,38 @@ const Form = ({ children, ...props }) => {
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
 
+      <div>
+        <GPTButton
+          disabled={waitings}
+          startIcon={
+            waitings ? (
+              <CircularProgress style={{ width: '20px', height: '20px' }} />
+            ) : (
+              <ArrowDropDownIcon />
+            )
+          }
+          onClick={handleClick}>
+          ASK CHATGPT FOR
+        </GPTButton>
+        <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
+          <MenuItem id="metadescription" onClick={(e) => chatGptHandler(e)}>
+            {translate('resources.product.metadescription')}
+          </MenuItem>
+          <MenuItem id="excerpt" onClick={(e) => chatGptHandler(e)}>
+            {translate('resources.product.excerpt')}
+          </MenuItem>
+          <MenuItem id="description" onClick={(e) => chatGptHandler(e)}>
+            {translate('resources.product.description')}
+          </MenuItem>
+        </StyledMenu>
+      </div>
+
       <TextInput
         source={'title.' + translate('lan')}
         label={translate('resources.product.title')}
         className={'width100 mb-20'}
         onChange={(e) => {
-          setMainWord(e.target.value);
+          setValue('mainWord', e.target.value);
         }}
         validate={Val.req}
         fullWidth
@@ -412,10 +485,11 @@ const Form = ({ children, ...props }) => {
         source={'metatitle.' + translate('lan')}
         label={translate('resources.product.metatitle')}
       />
-      <TextInput
-        multiline
+      <ControlledTextInput
         fullWidth
+        multiline
         source={'metadescription.' + translate('lan')}
+        value={getValues('chatGPTanswerForMetadescription')}
         label={translate('resources.product.metadescription')}
       />
 
@@ -423,11 +497,11 @@ const Form = ({ children, ...props }) => {
         fullWidth
         multiline
         source={'excerpt.' + translate('lan')}
-        value={getValues('chatGPTanswer')}
+        value={getValues('chatGPTanswerForExcerpt')}
         label={translate('resources.product.excerpt')}
       />
 
-      <Button
+      {/* <Button
         label="Ask chatGPT"
         type="button"
         onClick={(e) => {
@@ -444,7 +518,7 @@ const Form = ({ children, ...props }) => {
           }}>
           <CircularProgress />
         </Box>
-      )}
+      )} */}
       {/* {answer != '' && !waitings && (
                 <TextField
                   label="chatGPT answer"
@@ -455,9 +529,10 @@ const Form = ({ children, ...props }) => {
                 />
               )} */}
 
-      <RichTextInput
+      <ControlledRichTextInput
         fullWidth
         source={'description.' + translate('lan')}
+        value={getValues('chatGPTanswerForDescription')}
         label={translate('resources.product.description')}
       />
 
