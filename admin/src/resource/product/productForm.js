@@ -27,11 +27,13 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { styled } from '@mui/material/styles';
+
 import { StyledMenu, GPTButton, LightTooltip } from './ChatGPTButtonStyle';
 
 import Fab from '@mui/material/Fab';
 import AndroidIcon from '@mui/icons-material/Android';
 import NotListedLocationIcon from '@mui/icons-material/NotListedLocation';
+
 import {
   useFormContext,
   useForm,
@@ -302,7 +304,9 @@ const Form = ({ children, ...props }) => {
 
   const [waitings, setWaitings] = useState(false);
 
-  // const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
 
   const { setValue, getValues } = useForm({
     defaultValues: {
@@ -312,13 +316,7 @@ const Form = ({ children, ...props }) => {
       chatGPTanswerForMetadescription: props?.record?.metadescription?.fa,
     },
   });
-  // const open = Boolean(anchorEl);
-  // const handleClick = (event) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
-  // const handleClose = () => {
-  //   setAnchorEl(null);
-  // };
+
 
   const handleChange = (t, value) => {
     setValue(t, value);
@@ -326,9 +324,11 @@ const Form = ({ children, ...props }) => {
 
   const chatGptHandler = async (e) => {
     // e.preventDefault();
+
     // handleClose();
     try {
       let question;
+
       const expr = e.target.id;
       switch (expr) {
         case 'excerpt':
@@ -438,31 +438,7 @@ const Form = ({ children, ...props }) => {
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
 
-      {/* <div>
-        <GPTButton
-          disabled={waitings}
-          startIcon={
-            waitings ? (
-              <CircularProgress style={{ width: '20px', height: '20px' }} />
-            ) : (
-              <ArrowDropDownIcon />
-            )
-          }
-          onClick={handleClick}>
-          ASK CHATGPT FOR
-        </GPTButton>
-        <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
-          <MenuItem id="metadescription" onClick={(e) => chatGptHandler(e)}>
-            {translate('resources.product.metadescription')}
-          </MenuItem>
-          <MenuItem id="excerpt" onClick={(e) => chatGptHandler(e)}>
-            {translate('resources.product.excerpt')}
-          </MenuItem>
-          <MenuItem id="description" onClick={(e) => chatGptHandler(e)}>
-            {translate('resources.product.description')}
-          </MenuItem>
-        </StyledMenu>
-      </div> */}
+
 
       <TextInput
         source={'title.' + translate('lan')}
@@ -579,6 +555,7 @@ const Form = ({ children, ...props }) => {
                 />
               )} */}
 
+
       <div className={'gpt-button-wrap-fab'}>
         <ControlledRichTextInput
           fullWidth
@@ -605,6 +582,7 @@ const Form = ({ children, ...props }) => {
           </LightTooltip>
         )}
       </div>
+
       <div className={'mb-20'} />
       {/* <BooleanInput
         source="story"
