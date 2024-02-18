@@ -27,7 +27,12 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { styled } from '@mui/material/styles';
-import { StyledMenu, GPTButton } from './ChatGPTButtonStyle';
+
+import { StyledMenu, GPTButton, LightTooltip } from './ChatGPTButtonStyle';
+
+import Fab from '@mui/material/Fab';
+import AndroidIcon from '@mui/icons-material/Android';
+import NotListedLocationIcon from '@mui/icons-material/NotListedLocation';
 
 import {
   useFormContext,
@@ -299,7 +304,9 @@ const Form = ({ children, ...props }) => {
 
   const [waitings, setWaitings] = useState(false);
 
+
   const [anchorEl, setAnchorEl] = React.useState(null);
+
 
   const { setValue, getValues } = useForm({
     defaultValues: {
@@ -309,13 +316,7 @@ const Form = ({ children, ...props }) => {
       chatGPTanswerForMetadescription: props?.record?.metadescription?.fa,
     },
   });
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+
 
   const handleChange = (t, value) => {
     setValue(t, value);
@@ -323,7 +324,8 @@ const Form = ({ children, ...props }) => {
 
   const chatGptHandler = async (e) => {
     // e.preventDefault();
-    handleClose();
+
+    // handleClose();
     try {
       let question;
 
@@ -436,31 +438,7 @@ const Form = ({ children, ...props }) => {
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
 
-      <div>
-        <GPTButton
-          disabled={waitings}
-          startIcon={
-            waitings ? (
-              <CircularProgress style={{ width: '20px', height: '20px' }} />
-            ) : (
-              <ArrowDropDownIcon />
-            )
-          }
-          onClick={handleClick}>
-          ASK CHATGPT FOR
-        </GPTButton>
-        <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
-          <MenuItem id="metadescription" onClick={(e) => chatGptHandler(e)}>
-            {translate('resources.product.metadescription')}
-          </MenuItem>
-          <MenuItem id="excerpt" onClick={(e) => chatGptHandler(e)}>
-            {translate('resources.product.excerpt')}
-          </MenuItem>
-          <MenuItem id="description" onClick={(e) => chatGptHandler(e)}>
-            {translate('resources.product.description')}
-          </MenuItem>
-        </StyledMenu>
-      </div>
+
 
       <TextInput
         source={'title.' + translate('lan')}
@@ -480,26 +458,74 @@ const Form = ({ children, ...props }) => {
         fullWidth
         validate={Val.req}
       />
+
       <TextInput
         fullWidth
         source={'metatitle.' + translate('lan')}
         label={translate('resources.product.metatitle')}
       />
-      <ControlledTextInput
-        fullWidth
-        multiline
-        source={'metadescription.' + translate('lan')}
-        value={getValues('chatGPTanswerForMetadescription')}
-        label={translate('resources.product.metadescription')}
-      />
+      <div className={'gpt-button-wrap-fab'}>
+        <ControlledTextInput
+          fullWidth
+          multiline
+          source={'metadescription.' + translate('lan')}
+          value={getValues('chatGPTanswerForMetadescription')}
+          label={translate('resources.product.metadescription')}
+        />
+        {waitings ? (
+          <CircularProgress className={'gpt-btn-circular'} />
+        ) : (
+          <LightTooltip title="ASK CHATGPT" placement="top" arrow>
+            <Fab
+              disabled={waitings}
+              // id="metadescription"
+              // onClick={(e) => chatGptHandler(e)}
+              size="small"
+              className={'gpt-button-fab'}>
+              <AndroidIcon
+                id="metadescription"
+                onClick={(e) => chatGptHandler(e)}
+                style={{ color: '#27282c' }}
+              />
+            </Fab>
+          </LightTooltip>
+        )}
+      </div>
 
-      <ControlledTextInput
-        fullWidth
-        multiline
-        source={'excerpt.' + translate('lan')}
-        value={getValues('chatGPTanswerForExcerpt')}
-        label={translate('resources.product.excerpt')}
-      />
+      <div className={'gpt-button-wrap-fab'}>
+        <ControlledTextInput
+          fullWidth
+          multiline
+          source={'excerpt.' + translate('lan')}
+          value={getValues('chatGPTanswerForExcerpt')}
+          label={translate('resources.product.excerpt')}
+        />
+        {waitings ? (
+          <CircularProgress className={'gpt-btn-circular'} />
+        ) : (
+          <LightTooltip title="ASK CHATGPT" placement="top" arrow>
+            <Fab
+              disabled={waitings}
+              // id="excerpt"
+              // onClick={(e) => chatGptHandler(e)}
+              size="small"
+              className={'gpt-button-fab'}>
+              <AndroidIcon
+                id="excerpt"
+                onClick={(e) => chatGptHandler(e)}
+                style={{ color: '#27282c' }}
+              />
+            </Fab>
+          </LightTooltip>
+          // <GPTButton
+          //   className={'gpt-button'}
+          //   disabled={waitings}
+          //   id="excerpt"
+          //   onClick={(e) => chatGptHandler(e)}>
+          //   <span>ASK CHATGPT</span>
+          // </GPTButton>
+        )}
+      </div>
 
       {/* <Button
         label="Ask chatGPT"
@@ -529,12 +555,33 @@ const Form = ({ children, ...props }) => {
                 />
               )} */}
 
-      <ControlledRichTextInput
-        fullWidth
-        source={'description.' + translate('lan')}
-        value={getValues('chatGPTanswerForDescription')}
-        label={translate('resources.product.description')}
-      />
+
+      <div className={'gpt-button-wrap-fab'}>
+        <ControlledRichTextInput
+          fullWidth
+          source={'description.' + translate('lan')}
+          value={getValues('chatGPTanswerForDescription')}
+          label={translate('resources.product.description')}
+        />
+        {waitings ? (
+          <CircularProgress className={'gpt-btn-circular'} />
+        ) : (
+          <LightTooltip title="ASK CHATGPT" placement="top" arrow>
+            <Fab
+              disabled={waitings}
+              // id="description"
+              // onClick={(e) => chatGptHandler(e)}
+              size="small"
+              className={'gpt-button-fab'}>
+              <AndroidIcon
+                id="description"
+                onClick={(e) => chatGptHandler(e)}
+                style={{ color: '#27282c' }}
+              />
+            </Fab>
+          </LightTooltip>
+        )}
+      </div>
 
       <div className={'mb-20'} />
       {/* <BooleanInput
