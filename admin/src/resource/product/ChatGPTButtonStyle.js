@@ -2,6 +2,9 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import { styled } from '@mui/material/styles';
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import Fade from '@mui/material/Fade';
 
 export const StyledMenu = styled((props) => (
   <Menu
@@ -59,3 +62,19 @@ export const GPTButton = styled(Button)({
     boxShadow: '0 0 35px #1e9bff',
   },
 });
+
+export const LightTooltip = styled(({ className, ...props }) => (
+  <Tooltip
+    {...props}
+    classes={{ popper: className }}
+    TransitionComponent={Fade}
+    TransitionProps={{ timeout: 600 }}
+  />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: '#1e9bff',
+    color: '#fff',
+    boxShadow: '0 0 35px #1e9bff',
+    fontSize: 12,
+  },
+}));

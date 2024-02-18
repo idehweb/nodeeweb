@@ -27,8 +27,10 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { styled } from '@mui/material/styles';
-import { StyledMenu, GPTButton } from './ChatGPTButtonStyle';
+import { StyledMenu, GPTButton, LightTooltip } from './ChatGPTButtonStyle';
 
+import Fab from '@mui/material/Fab';
+import AndroidIcon from '@mui/icons-material/Android';
 import NotListedLocationIcon from '@mui/icons-material/NotListedLocation';
 import {
   useFormContext,
@@ -480,12 +482,13 @@ const Form = ({ children, ...props }) => {
         fullWidth
         validate={Val.req}
       />
+
       <TextInput
         fullWidth
         source={'metatitle.' + translate('lan')}
         label={translate('resources.product.metatitle')}
       />
-      <div className={'gpt-button-wrap'}>
+      <div className={'gpt-button-wrap-fab'}>
         <ControlledTextInput
           fullWidth
           multiline
@@ -496,17 +499,24 @@ const Form = ({ children, ...props }) => {
         {waitings ? (
           <CircularProgress className={'gpt-btn-circular'} />
         ) : (
-          <GPTButton
-            className={'gpt-button'}
-            disabled={waitings}
-            id="metadescription"
-            onClick={(e) => chatGptHandler(e)}>
-            <span>ASK CHATGPT</span>
-          </GPTButton>
+          <LightTooltip title="ASK CHATGPT" placement="top" arrow>
+            <Fab
+              disabled={waitings}
+              // id="metadescription"
+              // onClick={(e) => chatGptHandler(e)}
+              size="small"
+              className={'gpt-button-fab'}>
+              <AndroidIcon
+                id="metadescription"
+                onClick={(e) => chatGptHandler(e)}
+                style={{ color: '#27282c' }}
+              />
+            </Fab>
+          </LightTooltip>
         )}
       </div>
 
-      <div className={'gpt-button-wrap'}>
+      <div className={'gpt-button-wrap-fab'}>
         <ControlledTextInput
           fullWidth
           multiline
@@ -517,13 +527,27 @@ const Form = ({ children, ...props }) => {
         {waitings ? (
           <CircularProgress className={'gpt-btn-circular'} />
         ) : (
-          <GPTButton
-            className={'gpt-button'}
-            disabled={waitings}
-            id="excerpt"
-            onClick={(e) => chatGptHandler(e)}>
-            <span>ASK CHATGPT</span>
-          </GPTButton>
+          <LightTooltip title="ASK CHATGPT" placement="top" arrow>
+            <Fab
+              disabled={waitings}
+              // id="excerpt"
+              // onClick={(e) => chatGptHandler(e)}
+              size="small"
+              className={'gpt-button-fab'}>
+              <AndroidIcon
+                id="excerpt"
+                onClick={(e) => chatGptHandler(e)}
+                style={{ color: '#27282c' }}
+              />
+            </Fab>
+          </LightTooltip>
+          // <GPTButton
+          //   className={'gpt-button'}
+          //   disabled={waitings}
+          //   id="excerpt"
+          //   onClick={(e) => chatGptHandler(e)}>
+          //   <span>ASK CHATGPT</span>
+          // </GPTButton>
         )}
       </div>
 
@@ -555,7 +579,7 @@ const Form = ({ children, ...props }) => {
                 />
               )} */}
 
-      <div className={'gpt-button-wrap'}>
+      <div className={'gpt-button-wrap-fab'}>
         <ControlledRichTextInput
           fullWidth
           source={'description.' + translate('lan')}
@@ -565,13 +589,20 @@ const Form = ({ children, ...props }) => {
         {waitings ? (
           <CircularProgress className={'gpt-btn-circular'} />
         ) : (
-          <GPTButton
-            className={'gpt-button'}
-            disabled={waitings}
-            id="description"
-            onClick={(e) => chatGptHandler(e)}>
-            <span>ASK CHATGPT</span>
-          </GPTButton>
+          <LightTooltip title="ASK CHATGPT" placement="top" arrow>
+            <Fab
+              disabled={waitings}
+              // id="description"
+              // onClick={(e) => chatGptHandler(e)}
+              size="small"
+              className={'gpt-button-fab'}>
+              <AndroidIcon
+                id="description"
+                onClick={(e) => chatGptHandler(e)}
+                style={{ color: '#27282c' }}
+              />
+            </Fab>
+          </LightTooltip>
         )}
       </div>
       <div className={'mb-20'} />
