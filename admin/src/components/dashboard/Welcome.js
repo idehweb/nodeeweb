@@ -39,6 +39,9 @@ const useStyles = makeStyles((theme) => ({
 const Welcome = () => {
   const translate = useTranslate();
   const classes = useStyles();
+
+  const str = localStorage.getItem('url');
+  const [url, ...rest] = str.split('api');
   return (
     <Card className={classes.root}>
       <Box display="flex">
@@ -54,6 +57,9 @@ const Welcome = () => {
             </Typography>
             <Typography variant="body1" component="p" gutterBottom>
               {localStorage.getItem('email')}
+            </Typography>
+            <Typography variant="body1" component="p" gutterBottom>
+              {url ?? ''}
             </Typography>
           </Box>
           <CardActions className={classes.actions}>
