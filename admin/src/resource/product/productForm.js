@@ -304,9 +304,7 @@ const Form = ({ children, ...props }) => {
 
   const [waitings, setWaitings] = useState(false);
 
-
   const [anchorEl, setAnchorEl] = React.useState(null);
-
 
   const { setValue, getValues } = useForm({
     defaultValues: {
@@ -317,43 +315,56 @@ const Form = ({ children, ...props }) => {
     },
   });
 
-
   const handleChange = (t, value) => {
     setValue(t, value);
   };
 
   const chatGptHandler = async (e) => {
     // e.preventDefault();
-
     // handleClose();
     try {
+      let lang = localStorage.getItem('RaStore.locale');
       let question;
 
       const expr = e.target.id;
       switch (expr) {
         case 'excerpt':
           question = getValues('mainWord')
-            ? `tell me about ${getValues('mainWord').trim()} in 40 words`
+            ? `tell me about ${getValues('mainWord').trim()} in 40 words in ${
+                lang.includes('fa') ? 'persian' : 'english'
+              }`
             : props.record?.title.fa
-            ? `tell me about ${props.record.title.fa} in 40 words`
+            ? `tell me about ${props.record.title.fa} in 40 words in ${
+                lang.includes('fa') ? 'persian' : 'english'
+              }`
             : null;
           break;
         case 'metadescription':
           question = getValues('mainWord')
             ? `give me a meta description about ${getValues(
                 'mainWord'
-              ).trim()} in 60 words`
+              ).trim()} in 60 words in ${
+                lang.includes('fa') ? 'persian' : 'english'
+              }`
             : props.record?.title.fa
-            ? `give me a meta description about ${props.record.title.fa} in 60 words `
+            ? `give me a meta description about ${
+                props.record.title.fa
+              } in 60 words in ${lang.includes('fa') ? 'persian' : 'english'}`
             : null;
           break;
         case 'description':
           question = getValues('mainWord')
             ? `tell me about ${getValues(
                 'mainWord'
-              ).trim()} in 100 words in order to introduce it to the customer for sale purposes`
+              ).trim()} in 1000 words in order to introduce it to the customer for sale purposes in ${
+                lang.includes('fa') ? 'persian' : 'english'
+              }`
             : props.record?.title.fa
-            ? `tell me about ${props.record.title.fa} in 100 words in order to introduce it to the customer for sale purposes`
+            ? `tell me about ${
+                props.record.title.fa
+              } in 1000 words in order to introduce it to the customer for sale purposes in ${
+                lang.includes('fa') ? 'persian' : 'english'
+              }`
             : null;
           break;
         default:
@@ -437,8 +448,6 @@ const Form = ({ children, ...props }) => {
       onSubmit={(v) => save(v)}
       toolbar={<CustomToolbar record={props.record} />}>
       {children}
-
-
 
       <TextInput
         source={'title.' + translate('lan')}
@@ -554,7 +563,6 @@ const Form = ({ children, ...props }) => {
                   value={answer}
                 />
               )} */}
-
 
       <div className={'gpt-button-wrap-fab'}>
         <ControlledRichTextInput
