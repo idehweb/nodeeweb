@@ -9,7 +9,8 @@ export default class ProviderBuilder {
     switch (type) {
       case ProviderType.Local:
         return new LocalProvider(providerOpts);
-      case ProviderType.Nodeeweb:
+      case ProviderType.NodeewebCom:
+      case ProviderType.NodeewebIr:
         return new NodeewebProvider(providerOpts);
       default:
         throw new Error(`invalid provider type, received: ${type}`);

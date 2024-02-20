@@ -1,8 +1,22 @@
-import Provider from './provider.abstract';
+import { Telegraf } from 'telegraf';
+import Provider, { ProviderOptions } from './provider.abstract';
 
 export default class LocalProvider extends Provider {
-  send(message: string): boolean | Promise<boolean> {
-    this.opts.logger.log('we got', message);
-    return true;
+  private bot: Telegraf;
+  constructor(opt: ProviderOptions) {
+    super(opt);
+    this.bot = new Telegraf(opt.botToken);
+  }
+
+  async send(message: string): Promise<boolean> {
+    try {
+      await this.bot.telegram.sendMessage(this.opts.channelId, message, {
+        parse_mode: 'MarkdownV2',
+      });
+      return true;
+    } catch (err) {
+      this.opts.logger.error('local provider error', err.message);
+      return false;
+    }
   }
 }

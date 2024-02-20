@@ -4,7 +4,8 @@ export interface Logger {
 }
 export enum ProviderType {
   Local = 'local',
-  Nodeeweb = 'nodeeweb',
+  NodeewebCom = 'nodeeweb.com',
+  NodeewebIr = 'nodeeweb.ir',
 }
 
 export interface IConfig {
