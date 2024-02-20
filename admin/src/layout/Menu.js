@@ -51,8 +51,6 @@ const {
 const Menu = ({ onMenuClick, dense = false }) => {
   const themeData = useSelector((st) => st.themeData);
 
-  console.log('MenusThemeData', themeData);
-
   const [state, setState] = useState({
     menuProduct: false,
     menuSection: false,
@@ -189,7 +187,8 @@ const Menu = ({ onMenuClick, dense = false }) => {
         />
         <MenuItemLink
           to={{
-            pathname: '/entry',
+            pathname: '/post',
+            // pathname: '/entry',
             state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.allEntries`)}
@@ -585,7 +584,8 @@ const Menu = ({ onMenuClick, dense = false }) => {
         />
         <MenuItemLink
           to={{
-            pathname: '/action',
+            pathname: '/activity',
+            // pathname: '/action',
             state: { _scrollToTop: true },
           }}
           primaryText={translate(`pos.menu.siteActions`)}

@@ -25,6 +25,7 @@ export interface ComponentProps {
   onDrop: OnDropType;
   animationKey?: React.Key;
   content?: string;
+  title?: string;
 }
 
 //display text preview if there is
@@ -45,85 +46,90 @@ const Component = ({
   onDrop,
   onDuplicate,
   content,
+  title,
 }: ComponentProps) => {
   const cls = useStyles();
 
   return (
-    <DraggableCard
-      className={`cp-${item.name}`}
-      canDrag
-      item={item}
-      onDropEnd={onDrop}>
-      <Header>
-        <Actions>
-          {/* <IconButton title="Duplicate" onClick={() => onDuplicate(item)}>
+    <>
+      {title && <h6 className={cls.title}>{title}</h6>}
+      <DraggableCard
+        className={`cp-${item.name}`}
+        canDrag
+        item={item}
+        onDropEnd={onDrop}>
+        <Header>
+          <Actions>
+            {/* <IconButton title="Duplicate" onClick={() => onDuplicate(item)}>
             <ContentCopyRounded />
           </IconButton> */}
-          <IconButton title="Delete" onClick={() => onDelete(item.id)}>
-            <CloseRounded />
-          </IconButton>
-
-          <p>{`${item.name} ${index + 1}: ${item.id}`}</p>
-          <IconButton title="Edit" onClick={() => onEdit(item)}>
-            <EditRounded />
-          </IconButton>
-          {item.addable && (
-            <IconButton
-              title="Add"
-              onClick={(e) => {
-                let address = item.id + '_';
-                let mainAddress = address.split('_');
-                let update = { sourceAddress: item.id };
-                if (mainAddress[4]) {
-                  update['excludeArray'] = ['row'];
-                } else {
-                  update['excludeArray'] = [];
-                }
-                onAdd(update);
-              }}>
-              <AddRounded />
+            <IconButton title="Delete" onClick={() => onDelete(item.id)}>
+              <CloseRounded />
             </IconButton>
-          )}
-        </Actions>
-      </Header>
 
-      <Content className="content">
-        {content && <h6 className={cls.textPreview}>{content}</h6>}
-        {item.addable && (
-          <AnimatePresence presenceAffectsLayout>
-            {item.children?.map((i, idx) => (
-              <Fragment key={i.id}>
-                <AnimatedEmptyDropSlot
-                  item={i}
-                  onDropEnd={onDrop}
-                  order="middle"
-                />
+            <p>{`${item.name} ${index + 1}: ${item.id}`}</p>
 
-                <AnimatedComponent
-                  animationKey={`${i.id}`}
-                  index={idx}
-                  item={i}
-                  onEdit={(v) => onEdit(v)}
-                  onDelete={onDelete}
-                  onAdd={onAdd}
-                  onDrop={onDrop}
-                  onDuplicate={onDuplicate}
-                  content={contentDisplay(i)}
-                />
+            <IconButton title="Edit" onClick={() => onEdit(item)}>
+              <EditRounded />
+            </IconButton>
+            {item.addable && (
+              <IconButton
+                title="Add"
+                onClick={(e) => {
+                  let address = item.id + '_';
+                  let mainAddress = address.split('_');
+                  let update = { sourceAddress: item.id };
+                  if (mainAddress[4]) {
+                    update['excludeArray'] = ['row'];
+                  } else {
+                    update['excludeArray'] = [];
+                  }
+                  onAdd(update);
+                }}>
+                <AddRounded />
+              </IconButton>
+            )}
+          </Actions>
+        </Header>
 
-                {idx === item.children.length - 1 ? (
+        <Content className="content">
+          {content && <h6 className={cls.textPreview}>{content}</h6>}
+          {item.addable && (
+            <AnimatePresence presenceAffectsLayout>
+              {item.children?.map((i, idx) => (
+                <Fragment key={i.id}>
                   <AnimatedEmptyDropSlot
                     item={i}
                     onDropEnd={onDrop}
-                    order="last"
+                    order="middle"
                   />
-                ) : null}
-              </Fragment>
-            ))}
-          </AnimatePresence>
-        )}
-      </Content>
-    </DraggableCard>
+
+                  <AnimatedComponent
+                    animationKey={`${i.id}`}
+                    index={idx}
+                    item={i}
+                    onEdit={(v) => onEdit(v)}
+                    onDelete={onDelete}
+                    onAdd={onAdd}
+                    onDrop={onDrop}
+                    onDuplicate={onDuplicate}
+                    content={contentDisplay(i)}
+                  />
+
+                  {idx === item.children.length - 1 ? (
+                    <AnimatedEmptyDropSlot
+                      item={i}
+                      onDropEnd={onDrop}
+                      order="last"
+                    />
+                  ) : null}
+                </Fragment>
+              ))}
+            </AnimatePresence>
+          )}
+        </Content>
+      </DraggableCard>
+    </>
   );
 };
 export default memo(Component);

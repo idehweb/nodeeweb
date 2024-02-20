@@ -50,6 +50,8 @@ const Core = (props) => {
   const [tabValue, setTabValue] = useState(0);
   const [editItem, setEditItem] = useState<ItemType | null>();
 
+  const [titlee, setTitlee] = useState('');
+
   const [state, setState] = useState<StateType>({
     components: [],
     optionBox: false,
@@ -65,6 +67,8 @@ const Core = (props) => {
 
     GetBuilder(model, _id)
       .then((r) => {
+        const pageTitle = r?.data?.title?.fa;
+        setTitlee(pageTitle);
         const elements = _get(r, 'data.elements', []) ?? [];
         setState((s) => ({ ...s, components: elements }));
       })
@@ -264,6 +268,7 @@ const Core = (props) => {
                   onDrop={handleDrop}
                   onDuplicate={handleDuplicate}
                   content={contentDisplay(i)}
+                  title={titlee ?? ''}
                 />
 
                 {idx === components.length - 1 ? (

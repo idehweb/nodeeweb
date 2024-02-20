@@ -34,7 +34,6 @@ import {
   isClient,
   loadProduct,
   loveIt,
-  MainUrl,
   savePost,
   getThemeData,
 } from '#c/functions/index';
@@ -63,7 +62,9 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import EditAttributesIcon from '@mui/icons-material/EditAttributes';
 import ReviewsIcon from '@mui/icons-material/Reviews';
 import Transform from '../functions/transform';
-
+import {
+  MainUrl
+} from '#c/functions/constants';
 const Product = (props) => {
   let { match, location, history, t, url } = props;
 
@@ -118,6 +119,7 @@ const Product = (props) => {
     description,
     photos,
     redirect,
+    slug,
     price,
     salePrice,
     _id,
@@ -178,11 +180,9 @@ const Product = (props) => {
                 data={{
                   text: excerpt,
                   url:
-                    CONFIG.SHOP_URL +
-                    'p/' +
-                    _id +
-                    '/' +
-                    encodeURIComponent(title[lan]),
+                  MainUrl +
+                    '/product/' +
+                    slug,
                   title: title[lan],
                 }}
                 sites={['whatsapp', 'telegram', 'linkedin', 'copy']}

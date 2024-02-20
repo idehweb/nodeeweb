@@ -54,6 +54,7 @@ export default function EditModal({ open, onClose, data, loading, reFetch }) {
           ))}
         </div>
         <div>
+          {/* <SaveButton label="Update" alwaysEnable /> */}
           <SaveButton label="Update" disabled={isLoading} />
         </div>
       </Form>
