@@ -93,6 +93,9 @@ const customEnglishMessages = {
       siteSettings: 'site settings',
       settings: 'settings',
       actions: 'actions',
+      campaign: 'campaign',
+      createCampaign: 'create campaign',
+      allCampaigns: 'all campaigns',
     },
     currency: {
       toman: 'toman',

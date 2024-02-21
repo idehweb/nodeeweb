@@ -116,6 +116,7 @@ export default function App() {
     Notification,
     Transaction,
     User,
+    campaign,
   } = ResourceList;
 
   const ModelList = _get(themeData, 'models', []) || [];
@@ -135,6 +136,11 @@ export default function App() {
         name="attributes"
         {...Attributes}
         options={{ label: translate('pos.menu.attributes') }}
+      />
+      <Resource
+        name="campaign"
+        {...campaign}
+        options={{ label: translate('pos.menu.campaign') }}
       />
       <Resource
         name="productCategory"
