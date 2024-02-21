@@ -3,7 +3,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { Button, ButtonBase } from '@mui/material';
 import { styled } from '@mui/material';
 import clsx from 'clsx';
-import { Tabs, Component, NewTabs, NewButton } from './Styles';
+import { Tabs, Component, NewTabs, NewButton, NewFab } from './Styles';
 import Fab from '@mui/material/Fab';
 import SaveIcon from '@mui/icons-material/Save';
 

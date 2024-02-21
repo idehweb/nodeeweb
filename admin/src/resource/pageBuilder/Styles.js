@@ -2,6 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { Button, ButtonBase } from '@mui/material';
 import { styled } from '@mui/material';
 import Fab from '@mui/material/Fab';
+import { red, green, blue } from '@mui/material/colors';
 
 export const Tabs = styled('nav')({
   position: 'absolute',
@@ -42,11 +43,25 @@ export const NewTabs = styled('nav')({
   left: '50%',
   top: '50%',
   transform: 'translate(-50%, -50%)',
-
   overflow: 'hidden',
 });
 
-export const NewButton = styled(Button)({
+export const NewFab = styled(Fab)(({ theme }) => ({
+  [theme.breakpoints.down('md')]: {
+    size: 'small',
+  },
+  background: '#00aced',
+  color: '#fff',
+}));
+
+// export const NewButton = styled(Button)({
+export const NewButton = styled(Button)(({ theme }) => ({
+  [theme.breakpoints.down('md')]: {
+    width: 80,
+    height: 35,
+    fontSize: 11,
+    padding: 1,
+  },
   color: '#00aced',
   border: '1px solid #00aced',
   boxShadow: '0 0 5px #00aced, 0 0 5px #00aced inset',
@@ -87,4 +102,4 @@ export const NewButton = styled(Button)({
   '&:focus': {
     boxShadow: '0 0 0 0.2rem rgba(0,123,255,.5)',
   },
-});
+}));
