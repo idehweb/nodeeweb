@@ -340,6 +340,12 @@ const customFarsiMessages = {
       link: 'link',
       help: 'کمک',
       WEBSITE: 'ادرس سایت اینترنتی',
+      updatedAt: 'تاریخ بروزرسانی ',
+      createdAt: 'تاریخ ساخت ',
+      viewsCount: 'تعداد بازدید',
+      participantCount: 'تعداد مشارکت کنندگان',
+      status: 'وضعیت',
+      type: 'نوع',
     },
     dashboard: {
       yourActions: 'فعالیت های شما',

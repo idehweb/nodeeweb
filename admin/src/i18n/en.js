@@ -35,6 +35,7 @@ const customEnglishMessages = {
       startDate: 'startDate',
     },
     menu: {
+      upgrade: 'upgrade',
       category: 'category',
       discount: 'discount',
       addDiscount: 'add discount',
@@ -145,6 +146,29 @@ const customEnglishMessages = {
     },
   },
   resources: {
+    messages: {
+      help: 'help',
+    },
+    campaign: {
+      updatedAt: 'updatedAt',
+      createdAt: 'createdAt',
+      viewsCount: 'viewsCount',
+      participantCount: 'participantCount',
+      status: 'status',
+      type: 'type',
+      title: 'title',
+      link: 'link',
+      offset: 'offset',
+      limit: 'limit',
+      phoneNumber: 'phoneNumber',
+      WEBSITE: 'WEBSITE',
+      CRM: 'CRM',
+      source: 'source',
+      customerGroup: 'customerGroup',
+      help: 'help',
+      message: 'message',
+      slug: 'slug',
+    },
     menu: {
       name: 'name',
       slug: 'slug',
