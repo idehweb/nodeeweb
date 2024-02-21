@@ -35,6 +35,7 @@ import Dynamic from './dynamic/index';
 import Gateway from './gateway/index';
 import Template from './template/index';
 import Logout from './logout';
+import Campaign from './campaign/index';
 
 const resources = {
   Attributes,
@@ -71,6 +72,7 @@ const resources = {
   Notification,
   Transaction,
   User,
+  Campaign,
 };
 
 export default resources;

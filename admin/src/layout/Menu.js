@@ -48,7 +48,7 @@ const {
   Transaction,
   User,
   Plugin,
-  campaign,
+  Campaign,
 } = resources;
 const Menu = ({ onMenuClick, dense = false }) => {
   const themeData = useSelector((st) => st.themeData);

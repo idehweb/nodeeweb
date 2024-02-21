@@ -68,6 +68,7 @@ const exclude = [
   'productcategory',
   'transaction',
   'plugin',
+  'campaign',
 ];
 
 export default function App() {
