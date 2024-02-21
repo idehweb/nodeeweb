@@ -13,6 +13,10 @@ const customEnglishMessages = {
   sign_out: 'yes, sign out',
 
   undefined: 'undefined',
+  entryForm: 'entryForm',
+  orders: 'orders',
+  topProductOrders: 'topProductOrders',
+  total: 'total',
   pos: {
     profile: 'profile',
     logout: 'logout',
@@ -26,7 +30,10 @@ const customEnglishMessages = {
       light: 'light',
       dark: 'dark',
     },
-
+    filter: {
+      endDate: 'endDate',
+      startDate: 'startDate',
+    },
     menu: {
       category: 'category',
       discount: 'discount',
@@ -96,6 +103,12 @@ const customEnglishMessages = {
       campaign: 'campaign',
       createCampaign: 'create campaign',
       allCampaigns: 'all campaigns',
+      notes: 'notes',
+      tasks: 'tasks',
+      messagesSettings: 'messagesSettings',
+      automation: 'automation',
+      endDate: 'endDate',
+      startDate: 'startDate',
     },
     currency: {
       toman: 'toman',
@@ -128,6 +141,7 @@ const customEnglishMessages = {
       inpeyk: 'inpeyk',
       complete: 'complete',
       cancel: 'cancel',
+      paid: 'paid',
     },
   },
   resources: {
