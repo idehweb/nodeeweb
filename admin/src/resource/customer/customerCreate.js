@@ -98,7 +98,7 @@ export const customerCreate = (props) => {
           <SelectArrayInput
             fullWidth
             label={translate('resources.customers.customerGroup')}
-            optionText="name.en"
+            optionText={'name.' + translate('lan')}
           />
         </ReferenceArrayInput>
         <BooleanInput
