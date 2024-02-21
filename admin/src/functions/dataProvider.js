@@ -133,7 +133,7 @@ export default (apiUrl) => ({
       params.ids.map((id) => httpClient(`${apiUrl}/${resource}/${id}`))
     ).then((res) => {
       return {
-        data: res.map(({ json }) => ({ ...json, id: json._id })),
+        data: res.map(({ json }) => ({ ...json?.data, id: json?.data?._id })),
       };
     });
   },

@@ -63,7 +63,7 @@ const PostFilter = (props) => {
         perPage={1000}
         label={translate('resources.product.category')}
         source="category"
-        reference="category"
+        reference="productCategory"
         alwaysOn>
         <AutocompleteInput optionText={'name.' + translate('lan')} />
       </ReferenceInput>
