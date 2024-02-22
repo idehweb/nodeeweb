@@ -453,9 +453,9 @@ class PaymentService {
     try {
       const taskId = [];
       const _unverified_authorities = async () => {
-        const unverified = await this.unverifiedPayments();
+        const unverified = (await this.unverifiedPayments()) ?? [];
         // unverified authorities
-        return unverified.map(async ({ authority, ...props }) => {
+        return unverified?.map(async ({ authority, ...props }) => {
           if (taskId.includes(authority)) return;
           taskId.push(authority);
           const transaction = await this.getNeedToPayTransactions(
@@ -474,13 +474,14 @@ class PaymentService {
         });
       };
       const _expired_transactions = async () => {
-        const expiredTransactions = await this.transactionModel.find({
-          expiredAt: { $lt: new Date() },
-          status: TransactionStatus.NeedToPay,
-          active: true,
-        });
+        const expiredTransactions =
+          (await this.transactionModel.find({
+            expiredAt: { $lt: new Date() },
+            status: TransactionStatus.NeedToPay,
+            active: true,
+          })) ?? [];
         // expired transactions
-        return expiredTransactions.map((transaction) => {
+        return expiredTransactions?.map((transaction) => {
           if (taskId.includes(transaction.authority)) return;
           taskId.push(transaction.authority);
           return this.handlePayment({
@@ -492,12 +493,13 @@ class PaymentService {
         });
       };
       const _watcher_transactions = async () => {
-        const openTransactions = await this.transactionModel.find({
-          active: true,
-          status: TransactionStatus.NeedToPay,
-          expiredAt: { $gt: new Date() },
-        });
-        return openTransactions.map((transaction) => {
+        const openTransactions =
+          (await this.transactionModel.find({
+            active: true,
+            status: TransactionStatus.NeedToPay,
+            expiredAt: { $gt: new Date() },
+          })) ?? [];
+        return openTransactions?.map((transaction) => {
           if (taskId.includes(transaction.authority)) return;
           taskId.push(transaction.authority);
           return this.transactionSupervisor(transaction, null, {
