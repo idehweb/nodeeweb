@@ -149,7 +149,7 @@ export default function registerController() {
     {
       method: 'put',
       service: orderService.update,
-      url: '/',
+      url: '/:order',
       access: AdminAccess,
       validate: [
         {

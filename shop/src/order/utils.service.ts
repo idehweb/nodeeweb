@@ -24,6 +24,8 @@ import { DiscountModel } from '../../schema/discount.schema';
 import { merge } from 'lodash';
 import { UpdateQuery } from 'mongoose';
 import transactionUtils from '../transaction/utils.service';
+import { getEntityEventName } from '@nodeeweb/core/src/handlers/entity.handler';
+import { CRUD } from '@nodeeweb/core';
 
 export type UpdateOrderOpt = {
   sendSuccessSMS?: boolean;
@@ -159,6 +161,12 @@ export class Utils {
         $set: { active: false, status: OrderStatus.Canceled },
       },
       { new: true }
+    );
+
+    // emit event
+    store.event.emit(
+      getEntityEventName('order', { post: true, type: CRUD.UPDATE_ONE }),
+      order
     );
 
     // rollback products
@@ -305,7 +313,16 @@ export class Utils {
 
       // execute
       if (options.exec) {
-        await this.orderModel.updateOne({ _id: order._id }, update);
+        const newOrder = await this.orderModel.findOneAndUpdate(
+          { _id: order._id },
+          update,
+          { new: true }
+        );
+        // emit event
+        store.event.emit(
+          getEntityEventName('order', { post: true, type: CRUD.UPDATE_ONE }),
+          newOrder
+        );
       }
 
       return update;
@@ -324,8 +341,18 @@ export class Utils {
       }
 
       // execute
-      if (options.exec)
-        await this.orderModel.updateOne({ _id: order._id }, update);
+      if (options.exec) {
+        const newOrder = await this.orderModel.findOneAndUpdate(
+          { _id: order._id },
+          update,
+          { new: true }
+        );
+        // emit event
+        store.event.emit(
+          getEntityEventName('order', { post: true, type: CRUD.UPDATE_ONE }),
+          newOrder
+        );
+      }
 
       return update;
     };

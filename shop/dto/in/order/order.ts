@@ -4,12 +4,7 @@ import { IsIn, IsString } from 'class-validator';
 
 export class UpdateOrderBody {
   @Expose()
-  @IsIn([
-    OrderStatus.Paid,
-    OrderStatus.Posting,
-    OrderStatus.Completed,
-    OrderStatus.Canceled,
-  ])
+  @IsIn([OrderStatus.Paid, OrderStatus.Posting, OrderStatus.Completed])
   status: OrderStatus;
 }
 

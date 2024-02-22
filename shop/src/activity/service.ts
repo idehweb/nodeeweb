@@ -334,7 +334,7 @@ class Service {
     }
   };
   post = async (data: any, opt: CRUDCreatorOpt, req: Req) => {
-    if (req.modelName !== 'admin') return;
+    if (req?.modelName !== 'admin') return;
     const depend_on = req.target_before?._id ?? data?._id;
     const entity = new EntityCreator(opt.model);
     const activity: Partial<IActivity> = {

@@ -1,6 +1,7 @@
 import { isNil } from 'lodash';
 import {
   BadRequestError,
+  CRUD,
   ErrorType,
   GeneralError,
   LimitError,
@@ -25,6 +26,7 @@ import postService from './post.service';
 import { CreateTransactionBody } from '../../dto/in/order/transaction';
 import paymentService from '../transaction/payment.service';
 import transactionUtils from '../transaction/utils.service';
+import { getEntityEventName } from '@nodeeweb/core/src/handlers/entity.handler';
 
 class TransactionService {
   transactionSupervisors = new Map<string, NodeJS.Timer>();
@@ -146,6 +148,12 @@ class TransactionService {
       // send change state sms
       utils.sendOnStateChange(newOrder)?.then();
     }
+
+    // emit event
+    store.event.emit(
+      getEntityEventName('order', { post: true, type: CRUD.UPDATE_ONE }),
+      newOrder
+    );
 
     return res.status(201).json({ data: newOrder });
   };

@@ -1,0 +1,96 @@
+{
+  "name": "Telegram Notification",
+  "version": "1.0.0",
+  "description": {
+    "en": "collect data from shop and send them via telegram bot",
+    "fa": "دیتا ها را از فروشگاه شما جمع آوری  و آنالیز میکند و نتایج را در کانال تگرامی داده شده منتشر میکند"
+  },
+  "type": "general",
+  "author": "Nodeeweb",
+  "main": "dist/bundle.js",
+  "slug": "tel-notif",
+  "config": {
+    "inputs": [
+      {
+        "key": "botToken",
+        "title": {
+          "en": "telegram bot token",
+          "fa": "توکن بات تلگرامی ایجاد شده"
+        },
+        "type": "string"
+      },
+      {
+        "key": "channelId",
+        "title": {
+          "en": "telegram channel id",
+          "fa": "آیدی کانال ایجاد شده برای ارسال نوتیفیکیشن ها"
+        },
+        "type": "number"
+      },
+      {
+        "key": "providerType",
+        "title": {
+          "en": "network provider",
+          "fa": "سرور ارسال کننده پیام"
+        },
+        "type": "string",
+        "in": ["nodeeweb", "local"]
+      },
+      {
+        "key": "apiKey",
+        "title": {
+          "en": "API Key for provider if it is'nt local",
+          "fa": "کلید API برای سرور ارسال کننده اگر لوکال نیست"
+        },
+        "type": "string",
+        "required": false
+      }
+    ],
+    "dto": "dto/index",
+    "run": "config"
+  },
+  "active": {
+    "dto": "dto/index",
+    "run": "active"
+  },
+  "edit": {
+    "inputs": [
+      {
+        "key": "botToken",
+        "title": {
+          "en": "telegram bot token",
+          "fa": "توکن بات تلگرامی ایجاد شده"
+        },
+        "type": "string"
+      },
+      {
+        "key": "channelId",
+        "title": {
+          "en": "telegram channel id",
+          "fa": "آیدی کانال ایجاد شده برای ارسال نوتیفیکیشن ها"
+        },
+        "type": "number"
+      },
+      {
+        "key": "providerType",
+        "title": {
+          "en": "network provider",
+          "fa": "سرور ارسال کننده پیام"
+        },
+        "type": "string",
+        "in": ["nodeeweb", "local"]
+      },
+      {
+        "key": "apiKey",
+        "title": {
+          "en": "API Key for provider if it is'nt local",
+          "fa": "کلید API برای سرور ارسال کننده اگر لوکال نیست"
+        },
+        "type": "string",
+        "required": false
+      }
+    ],
+    "dto": "dto/index",
+    "run": "edit"
+  }
+}

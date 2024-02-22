@@ -5,6 +5,7 @@ import {
   DuplicateError,
   LimitError,
   ValidationError,
+  CRUD,
 } from '@nodeeweb/core';
 import store from '../../store';
 import {
@@ -21,6 +22,7 @@ import {
 } from '../../dto/in/order/cart';
 import { UserDocument } from '@nodeeweb/core/types/user';
 import utils from './utils.service';
+import { getEntityEventName } from '@nodeeweb/core/src/handlers/entity.handler';
 
 export default class CartService {
   static get orderModel() {
@@ -231,6 +233,11 @@ export default class CartService {
         customer: req.user.toObject(),
         products,
       });
+      // emit event
+      store.event.emit(
+        getEntityEventName('order', { post: true, type: CRUD.CREATE }),
+        order
+      );
       return res.status(201).json({
         data: order,
       });
@@ -244,6 +251,12 @@ export default class CartService {
           },
         },
         { new: true }
+      );
+
+      // emit event
+      store.event.emit(
+        getEntityEventName('order', { post: true, type: CRUD.UPDATE_ONE }),
+        newOrder
       );
 
       return res.status(201).json({ data: newOrder });
@@ -280,6 +293,12 @@ export default class CartService {
         customer: req.user.toObject(),
         products,
       });
+      // emit event
+      store.event.emit(
+        getEntityEventName('order', { post: true, type: CRUD.CREATE }),
+        order
+      );
+
       return res.status(201).json({
         data: order,
       });
@@ -289,11 +308,17 @@ export default class CartService {
         { products },
         { new: true }
       );
+      // emit event
+      store.event.emit(
+        getEntityEventName('order', { post: true, type: CRUD.UPDATE_ONE }),
+        newOrder
+      );
+
       return res.json({ data: newOrder });
     }
   };
   static removeFromCart: MiddleWare = async (req, res) => {
-    const order = await CartService.orderModel.updateOne(
+    const order = await CartService.orderModel.findOneAndUpdate(
       {
         'customer._id': req.user._id,
         status: OrderStatus.Cart,
@@ -306,8 +331,13 @@ export default class CartService {
       },
       { new: true }
     );
-    if (!order?.modifiedCount)
-      throw new NotFound('not found any order with that product id');
+    if (!order) throw new NotFound('not found any order with that product id');
+
+    // emit event
+    store.event.emit(
+      getEntityEventName('order', { post: true, type: CRUD.UPDATE_ONE }),
+      order
+    );
 
     return res.status(204).send('success');
   };
@@ -357,6 +387,12 @@ export default class CartService {
         customer: req.user.toObject(),
         products: [productCart],
       });
+      // emit event
+      store.event.emit(
+        getEntityEventName('order', { post: true, type: CRUD.CREATE }),
+        order
+      );
+
       return res.status(201).json({
         data: order,
       });
@@ -387,6 +423,12 @@ export default class CartService {
       },
       { new: true }
     );
+    // emit event
+    store.event.emit(
+      getEntityEventName('order', { post: true, type: CRUD.UPDATE_ONE }),
+      newCart
+    );
+
     return res.status(200).json({
       data: newCart,
     });
@@ -422,28 +464,50 @@ export default class CartService {
     const myProduct = cart.products.find((p) => p._id.equals(productId));
 
     const rmCart = async () => {
+      // emit event
+      store.event.emit(
+        getEntityEventName('order', { pre: true, type: CRUD.DELETE_ONE }),
+        cart
+      );
       await this.orderModel.deleteOne({ _id: cart._id });
+      // emit event
+      store.event.emit(
+        getEntityEventName('order', { post: true, type: CRUD.DELETE_ONE }),
+        cart
+      );
     };
 
     const popProduct = async () => {
-      await this.orderModel.updateOne(
+      const order = await this.orderModel.findOneAndUpdate(
         { _id: cart._id },
         {
           $pull: {
             products: { _id: productId },
           },
-        }
+        },
+        { new: true }
+      );
+      // emit event
+      store.event.emit(
+        getEntityEventName('order', { post: true, type: CRUD.UPDATE_ONE }),
+        order
       );
     };
 
     const popComb = async () => {
-      await this.orderModel.updateOne(
+      const order = await this.orderModel.findOneAndUpdate(
         { _id: cart._id, 'products._id': productId },
         {
           $pull: {
             'products.$.combinations': { _id: combId },
           },
-        }
+        },
+        { new: true }
+      );
+      // emit event
+      store.event.emit(
+        getEntityEventName('order', { post: true, type: CRUD.UPDATE_ONE }),
+        order
       );
     };
 
@@ -468,6 +532,12 @@ export default class CartService {
     );
 
     if (!order) throw new NotFound('there is not any active cart');
+
+    // emit event
+    store.event.emit(
+      getEntityEventName('order', { post: true, type: CRUD.UPDATE_ONE }),
+      order
+    );
 
     return res.status(200).json({ data: order });
   };
