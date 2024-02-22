@@ -5,8 +5,8 @@ import { MultiLang } from './_base.schema';
 export interface IPost {
 
     message: String,
-    createdAt: {type: Date, default: Date.now},
-    updatedAt: {type: Date, default: Date.now},
+    createdAt: Date,
+    updatedAt: Date,
     active: {type: Boolean, default: true},
     views: any[],
     title: {},
