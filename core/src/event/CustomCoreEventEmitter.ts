@@ -6,7 +6,7 @@ import logger from '../handlers/log.handler';
 export default class CustomCoreEventEmitter extends CoreEventEmitter {
   constructor() {
     super({ captureRejections: true });
-    // this.setMaxListeners(Number.MAX_SAFE_INTEGER);
+    this.setMaxListeners(Number.MAX_SAFE_INTEGER);
   }
 
   [captureRejectionSymbol](err: any, event: any, ...args: any) {
@@ -43,7 +43,6 @@ export default class CustomCoreEventEmitter extends CoreEventEmitter {
     listener: (...args: any[]) => void
   ): this {
     const serial = listener['serial'];
-    console.log('remove call with serial', serial);
     if (serial) {
       this.listeners(eventName)
         .filter((l) => l['serial'] === serial)
