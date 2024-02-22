@@ -98,8 +98,13 @@ const onGetProduct = async (root: any, req: Request) => {
   const entityRegex = /^\/([^\/]+)\/([^\/]+)\/?$/;
   const [, , slug = null] = entityRegex.exec(req.path) ?? [];
   if (!slug) return;
+  const convertedSlug = decodeURIComponent(slug);
   const product = await productModel.findOne({
-    $or: [{ slug }, isMongoId(slug) ? { _id: slug } : null].filter((v) => v),
+    $or: [
+      { slug },
+      { slug: convertedSlug },
+      isMongoId(slug) ? { _id: slug } : null,
+    ].filter((v) => v),
     active: true,
   });
   if (!product) return;

@@ -22,11 +22,11 @@ export function convertToString(a: any, pretty = true) {
   const cache = [];
 
   const replacer = (key, value) => {
-    // if (typeof value === 'object' && value !== null) {
-    //   if (cache.includes(value)) return;
+    if (typeof value === 'object' && value !== null) {
+      if (cache.includes(value)) return;
 
-    //   cache.push(value);
-    // }
+      cache.push(value);
+    }
     return value;
   };
 
@@ -34,13 +34,18 @@ export function convertToString(a: any, pretty = true) {
     const newA = {};
     Object.getOwnPropertyNames(a).forEach((key) => {
       newA[key] = a[key];
-      // const temp = a[key];
-      // delete a[key];
-      // a[key] = temp;
     });
-    return !pretty
-      ? JSON.stringify(newA, replacer)
-      : JSON.stringify(newA, replacer, '  ');
+    const fallback = () =>
+      !pretty
+        ? JSON.stringify(newA, replacer)
+        : JSON.stringify(newA, replacer, '  ');
+    try {
+      return !pretty
+        ? safeJsonStringify(newA, null, undefined, fallback)
+        : safeJsonStringify(newA, null, '  ', fallback);
+    } catch (err) {
+      return newA?.['message'] ?? String(newA);
+    }
   }
   return a?.toString() ?? String(a);
   // const msgs: string[] = [];
@@ -368,6 +373,18 @@ export function safeJsonParse(obj: any) {
     return JSON.parse(obj);
   } catch (err) {
     return {};
+  }
+}
+export function safeJsonStringify(
+  value: any,
+  replacer?: (this: any, key: string, value: any) => any,
+  space?: string | number,
+  fallback?: (value: any, err: any) => string
+) {
+  try {
+    return JSON.stringify(value, replacer, space);
+  } catch (err) {
+    return fallback ? fallback(value, err) : value?.message ?? String(value);
   }
 }
 
