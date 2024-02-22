@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import Subscriber from './subscriber.abstract';
+import Subscriber, { SubscriberOptions } from './subscriber.abstract';
 
 const orderStatus = {
   cart: 'سبد خرید',
@@ -16,6 +16,13 @@ function translateOrderStatus(key: string) {
   return orderStatus[key];
 }
 export default class OrderSubscriber extends Subscriber {
+  constructor(opts: SubscriberOptions) {
+    super(opts);
+
+    // add serial
+    this.onNeedToPay['serial'] = 'tel-notif-subscriber-onNeedToPay';
+    this.onOtherChanges['serial'] = 'tel-notif-subscriber-onOtherChanges';
+  }
   onOtherChanges = async (order: any) => {
     try {
       if (
@@ -31,7 +38,7 @@ export default class OrderSubscriber extends Subscriber {
         return;
       const store = this.opts.resolve('store');
 
-      const title = '**تغییر وضعیت سفارش**';
+      const title = '<b>تغییر وضعیت سفارش</b>';
 
       const tuples: [string, string][] = [];
 
@@ -69,7 +76,7 @@ export default class OrderSubscriber extends Subscriber {
       }
 
       // footer
-      const footer = `[پنل ادمین](${store.config.host}/admin/#/order/${order._id})`;
+      const footer = `<a href="${store.config.host}/admin/#/order/${order._id}">پنل ادمین</a>`;
 
       // combine
       const msg = `${title}\n${tuples
@@ -88,7 +95,7 @@ export default class OrderSubscriber extends Subscriber {
 
       const store = this.opts.resolve('store');
 
-      const title = '**ثبت سفارش**';
+      const title = '<b>ثبت سفارش</b>';
 
       const tuples: [string, string][] = [];
 
@@ -125,7 +132,7 @@ export default class OrderSubscriber extends Subscriber {
       ]);
 
       // footer
-      const footer = `[پنل ادمین](${store.config.host}/admin/#/order/${order._id})`;
+      const footer = `<a href="${store.config.host}/admin/#/order/${order._id}">پنل ادمین</a>`;
 
       // combine
       const msg = `${title}\n${tuples

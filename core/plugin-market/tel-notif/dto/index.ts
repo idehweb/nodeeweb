@@ -14,8 +14,8 @@ export default class {
   @Transform(({ value }) => (value ? value : 'local'))
   @IsOptional()
   @IsString()
-  @IsIn(['local', 'nodeeweb'])
-  providerType: 'local' | 'nodeeweb';
+  @IsIn(['local', 'nodeeweb.com', 'nodeeweb.ir'])
+  providerType: 'local' | 'nodeeweb.com' | 'nodeeweb.ir';
 
   @Expose()
   @IsOptional()

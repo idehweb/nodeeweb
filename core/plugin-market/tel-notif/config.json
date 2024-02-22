@@ -7,7 +7,7 @@
   },
   "type": "general",
   "author": "Nodeeweb",
-  "main": "index.ts",
+  "main": "dist/bundle.js",
   "slug": "tel-notif",
   "config": {
     "inputs": [

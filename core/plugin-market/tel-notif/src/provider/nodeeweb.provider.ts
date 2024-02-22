@@ -15,7 +15,7 @@ export default class NodeewebProvider extends Provider {
   }
   async send(message: string): Promise<boolean> {
     try {
-      await this.api.post('/message', { message, parse_mode: 'MarkdownV2' });
+      await this.api.post('/message', { message, parse_mode: 'HTML' });
     } catch (err) {
       this.opts.logger.error(
         'nodeeweb provider error',

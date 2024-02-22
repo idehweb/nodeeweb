@@ -5,15 +5,23 @@ import Subscriber from './src/subscriber/subscriber.abstract';
 import SubscriberBuilder from './src/subscriber/subscriber.builder';
 import { IConfig, PluginContent } from './type';
 
-let config: IConfig & { provider: Provider; subscribers?: Subscriber[] };
+let config: IConfig & { provider: Provider };
+const staticConf = {
+  get subscribers(): Subscriber[] {
+    return config.resolve('store')['tel-notif-subscribers'];
+  },
+  set subscribers(value: Subscriber[]) {
+    config.resolve('store')['tel-notif-subscribers'] = value;
+  },
+};
 
 function register(arg: any): PluginContent['stack'] {
-  const subscribers = config?.subscribers;
+  config = arg;
+
+  const subscribers = staticConf.subscribers;
 
   // unsubscribe
   if (subscribers) subscribers.forEach((sub) => sub.unSubscribe());
-
-  config = arg;
 
   const logger = new NotifLogger(config.resolve);
 
@@ -29,15 +37,15 @@ function register(arg: any): PluginContent['stack'] {
 
   // init subscribers
   if (subscribers) {
-    config.subscribers = subscribers;
+    staticConf.subscribers = subscribers;
   } else {
-    config.subscribers = SubscriberBuilder.build({
+    staticConf.subscribers = SubscriberBuilder.build({
       provider: config.provider,
       resolve: config.resolve,
       logger,
     });
   }
-  config.subscribers.forEach((sub) => sub.subscribe());
+  staticConf.subscribers.forEach((sub) => sub.subscribe());
 
   return [];
 }

@@ -80,7 +80,7 @@ export default class AnalysisSubscriber extends Subscriber {
         })
         .countDocuments();
 
-      let msg = `**آنالیز روزانه**    ${new Intl.DateTimeFormat('fa-IR', {
+      let msg = `<b>آنالیز روزانه</b>    ${new Intl.DateTimeFormat('fa-IR', {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
@@ -92,9 +92,9 @@ export default class AnalysisSubscriber extends Subscriber {
       )}\n`;
       msg += `تعداد پیامک های ارسال شده موفق: ${smsSentCount}\n`;
       msg += `تعداد مشتریان جدید: ${newCustomerCount}\n`;
-      msg += `تعداد محصولات اصافه شده: ${newProductCount}\n`;
+      msg += `تعداد محصولات اضافه شده: ${newProductCount}\n`;
       msg += `تعداد محصولات ویرایش شده: ${newProductEditCount}\n`;
-      msg += `تعداد مقاله های اصافه شده: ${newPostCount}\n`;
+      msg += `تعداد مقاله های اضافه شده: ${newPostCount}\n`;
       msg += `تعداد مقاله های ویرایش شده: ${newPostEditCount}\n`;
 
       await call(this.opts.provider.send.bind(this.opts.provider), msg);
@@ -102,21 +102,35 @@ export default class AnalysisSubscriber extends Subscriber {
       console.error('analysis daily error', err);
     }
   };
+  private getDailyCron() {
+    const store = this.opts.resolve('resolve');
+    const key = 'tel-notif-dailyCron';
+    return store[key] ?? this.dailyCron;
+  }
+  private setDailyCron() {
+    const store = this.opts.resolve('resolve');
+    const key = 'tel-notif-dailyCron';
+    store[key] = this.dailyCron;
+  }
   subscribe(): void {
-    this.dailyCron = new CronJob(
-      '0 0 * * *',
-      this.dailyAnalysis,
-      null,
-      true,
-      'Asia/Tehran'
-      // ,
-      // null,
-      // true
-    );
+    this.dailyCron =
+      this.getDailyCron() ??
+      new CronJob(
+        '0 0 * * *',
+        this.dailyAnalysis,
+        null,
+        true,
+        'Asia/Tehran'
+        // ,
+        // null,
+        // true
+      );
     this.dailyCron.start();
+    this.setDailyCron();
   }
   unSubscribe(): void {
-    if (!this.dailyCron) return;
-    this.dailyCron.stop();
+    const dailyCron = this.getDailyCron();
+    if (!dailyCron) return;
+    dailyCron.stop();
   }
 }

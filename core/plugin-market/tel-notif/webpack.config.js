@@ -1,5 +1,4 @@
 const { join } = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const distPath = join(__dirname, 'dist');
 
 module.exports = {
@@ -47,14 +46,5 @@ module.exports = {
   optimization: {
     // minimize: false,
   },
-  plugins: [
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: 'node_modules/**/templates/*.ejs',
-          to: join(distPath, 'templates', '[name][ext]'),
-        },
-      ],
-    }),
-  ],
+  plugins: [],
 };

@@ -11,7 +11,7 @@ export default class LocalProvider extends Provider {
   async send(message: string): Promise<boolean> {
     try {
       await this.bot.telegram.sendMessage(this.opts.channelId, message, {
-        parse_mode: 'MarkdownV2',
+        parse_mode: 'HTML',
       });
       return true;
     } catch (err) {
