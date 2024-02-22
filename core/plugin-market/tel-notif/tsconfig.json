@@ -24,6 +24,6 @@
       "resolveJsonModule": true
     },
     "include": ["**/*.ts"],
-    "exclude": ["node_modules", "**/node_modules/*", "dist","dto/*"]
+    "exclude": ["node_modules2", "**/node_modules/*", "dist","dto/*"]
   }
   
