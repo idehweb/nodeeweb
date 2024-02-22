@@ -15,7 +15,12 @@ export default class NodeewebProvider extends Provider {
   }
   async send(message: string): Promise<boolean> {
     try {
-      await this.api.post('/message', { message, parse_mode: 'HTML' });
+      await this.api.post('/message', {
+        message,
+        botToken: this.opts.botToken,
+        channelId: this.opts.channelId,
+        parse_mode: 'HTML',
+      });
     } catch (err) {
       this.opts.logger.error(
         'nodeeweb provider error',
