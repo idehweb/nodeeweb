@@ -36,5 +36,8 @@
     "plugin-market/chat-gpt/dist",
     "plugin-market/chat-gpt/src",
     "plugin-market/chat-gpt/index.ts",
+    "plugin-market/tel-notif/dist",
+    "plugin-market/tel-notif/src",
+    "plugin-market/tel-notif/index.ts"
 ]
 }
