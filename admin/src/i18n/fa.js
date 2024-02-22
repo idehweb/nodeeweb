@@ -183,6 +183,9 @@ const customFarsiMessages = {
       localPlugin: 'داخلی',
       siteActions: 'فعالیت های سایت',
       siteSettings: 'تنظیمات سایت',
+      campaign: 'کمپین ها',
+      allCampaigns: 'همه کمپین ها',
+      createCampaign: 'ساخت کمپین',
     },
     currency: {
       toman: 'تومان',
@@ -320,13 +323,30 @@ const customFarsiMessages = {
       userLastName: 'نام خانوادگی کاربر',
       before: 'پیش از تغییر',
       after: 'پس از تغییر',
-        
-        
+
       undo: 'برگرداندن تغییرات',
       undoDone: 'تغییرات با موفقیت بازگردانی شد',
-
     },
-
+    campaign: {
+      title: 'عنوان',
+      slug: 'نامک ',
+      message: 'پیام',
+      source: 'منبع',
+      customerGroup: 'گروه مشتری',
+      CRM: 'CRM',
+      phoneNumber: 'شماره تماس',
+      limit: 'محدودیت',
+      offset: 'offset',
+      link: 'link',
+      help: 'کمک',
+      WEBSITE: 'ادرس سایت اینترنتی',
+      updatedAt: 'تاریخ بروزرسانی ',
+      createdAt: 'تاریخ ساخت ',
+      viewsCount: 'تعداد بازدید',
+      participantCount: 'تعداد مشارکت کنندگان',
+      status: 'وضعیت',
+      type: 'نوع',
+    },
     dashboard: {
       yourActions: 'فعالیت های شما',
       priceAnnLast30Days: 'میزان درآمد ۳۰ روز گذشته',
@@ -337,8 +357,7 @@ const customFarsiMessages = {
       countAnnLast30Days: 'میزان درآمد ۳۰ روز گذشته',
       countPayedLast30Days: 'تعداد پرداخت های موفق ۳۰ روز گذشته',
       monthly_revenue: 'Monthly Revenue',
-        
-        
+
       month_history: '30 Day Revenue History',
       new_orders: 'New Orders',
       pending_reviews: 'Pending Reviews',

@@ -7,6 +7,7 @@ import {
   useTranslate,
 } from 'react-admin';
 import { Dashboard, MoreHoriz } from '@mui/icons-material';
+import CampaignIcon from '@mui/icons-material/Campaign';
 
 import { useSelector } from 'react-redux';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
@@ -47,6 +48,7 @@ const {
   Transaction,
   User,
   Plugin,
+  Campaign,
 } = resources;
 const Menu = ({ onMenuClick, dense = false }) => {
   const themeData = useSelector((st) => st.themeData);
@@ -68,6 +70,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
     menuNotification: false,
     menuPost: false,
     menuMore: false,
+    menuCampaign: false,
   });
   const isXSmall = useMediaQuery((theme) => theme.breakpoints.down('xs'));
   const [open] = useSidebarState();
@@ -103,6 +106,7 @@ const Menu = ({ onMenuClick, dense = false }) => {
     'productcategory',
     'transaction',
     'plugin',
+    'campaign',
   ];
 
   return (
@@ -115,6 +119,27 @@ const Menu = ({ onMenuClick, dense = false }) => {
         dense={dense}
         className={'vas'}
       />
+
+      <SubMenu
+        handleToggle={() => handleToggle('menuCampaign')}
+        isOpen={state.menuCampaign}
+        name="campaign"
+        label={translate('pos.menu.campaign')}
+        icon={<CampaignIcon />}
+        dense={dense}>
+        <MenuItemLink
+          to={{ pathname: '/campaign/create', state: { _scrollToTop: true } }}
+          primaryText={translate('pos.menu.createCampaign')}
+          leftIcon={<CampaignIcon />}
+          dense={dense}
+        />
+        <MenuItemLink
+          to={{ pathname: '/campaign', state: { _scrollToTop: true } }}
+          primaryText={translate('pos.menu.allCampaigns')}
+          leftIcon={<CampaignIcon />}
+          dense={dense}
+        />
+      </SubMenu>
 
       <SubMenu
         handleToggle={() => handleToggle('menuMedia')}

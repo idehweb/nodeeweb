@@ -68,6 +68,7 @@ const exclude = [
   'productcategory',
   'transaction',
   'plugin',
+  'campaign',
 ];
 
 export default function App() {
@@ -116,6 +117,7 @@ export default function App() {
     Notification,
     Transaction,
     User,
+    Campaign,
   } = ResourceList;
 
   const ModelList = _get(themeData, 'models', []) || [];
@@ -135,6 +137,11 @@ export default function App() {
         name="attributes"
         {...Attributes}
         options={{ label: translate('pos.menu.attributes') }}
+      />
+      <Resource
+        name="campaign"
+        {...Campaign}
+        options={{ label: translate('pos.menu.campaign') }}
       />
       <Resource
         name="productCategory"
