@@ -120,26 +120,6 @@ const Menu = ({ onMenuClick, dense = false }) => {
         className={'vas'}
       />
 
-      <SubMenu
-        handleToggle={() => handleToggle('menuCampaign')}
-        isOpen={state.menuCampaign}
-        name="campaign"
-        label={translate('pos.menu.campaign')}
-        icon={<CampaignIcon />}
-        dense={dense}>
-        <MenuItemLink
-          to={{ pathname: '/campaign/create', state: { _scrollToTop: true } }}
-          primaryText={translate('pos.menu.createCampaign')}
-          leftIcon={<CampaignIcon />}
-          dense={dense}
-        />
-        <MenuItemLink
-          to={{ pathname: '/campaign', state: { _scrollToTop: true } }}
-          primaryText={translate('pos.menu.allCampaigns')}
-          leftIcon={<CampaignIcon />}
-          dense={dense}
-        />
-      </SubMenu>
 
       <SubMenu
         handleToggle={() => handleToggle('menuMedia')}
@@ -404,7 +384,28 @@ const Menu = ({ onMenuClick, dense = false }) => {
           />
         </SubMenu>
       </SubMenu>
-      <SubMenu
+        <SubMenu
+            handleToggle={() => handleToggle('menuCampaign')}
+            isOpen={state.menuCampaign}
+            name="campaign"
+            label={translate('pos.menu.campaign')}
+            icon={<CampaignIcon />}
+            dense={dense}>
+            <MenuItemLink
+                to={{ pathname: '/campaign/create', state: { _scrollToTop: true } }}
+                primaryText={translate('pos.menu.createCampaign')}
+                leftIcon={<CampaignIcon />}
+                dense={dense}
+            />
+            <MenuItemLink
+                to={{ pathname: '/campaign', state: { _scrollToTop: true } }}
+                primaryText={translate('pos.menu.allCampaigns')}
+                leftIcon={<CampaignIcon />}
+                dense={dense}
+            />
+        </SubMenu>
+
+        <SubMenu
         handleToggle={() => handleToggle('menuCustomer')}
         isOpen={state.menuCustomer}
         name="customer"
