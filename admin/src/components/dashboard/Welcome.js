@@ -39,8 +39,10 @@ const useStyles = makeStyles((theme) => ({
 const Welcome = () => {
   const translate = useTranslate();
   const classes = useStyles();
-
-  const str = process.env.REACT_APP_API_BASE_URL_DEV;
+  const str =
+        process.env.NODE_ENV === 'development'
+            ? process.env.REACT_APP_API_BASE_URL_DEV
+            : window.origin;
   const [url, ...rest] = str.split('api');
   return (
     <Card className={classes.root}>

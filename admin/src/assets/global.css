@@ -833,6 +833,17 @@ li[data-value='unsuccessful'],
 }
 
 @media only screen and (max-width: 768px) {
+  .the-main-layout,#main-content,.RaList-main{
+    min-width: 100% !important;
+    max-width: 100% !important;
+  }
+  .mobile-res-buttons a{
+    padding: 0 !important;
+  }
+  .mobile-res-buttons{
+    justify-content: space-between;
+    margin-top: 20px;
+  }
   .col-md-2,
   .col-md-3,
   .col-md-4,

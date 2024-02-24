@@ -78,6 +78,10 @@ body .rtl .MuiPaper-root {
   text-align: right;
   direction: rtl;
 }
+body .rtl .RaSidebar-paperAnchorLeft{
+  right:0;
+  left: auto !important;
+}
 body .layout.rtl a,
 .MuiMenuItem-root.MuiMenuItem-gutters.MuiButtonBase-root {
   font-family: IRANSans, 'Roboto', sans-serif !important;

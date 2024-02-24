@@ -29,7 +29,7 @@ const MainLayout = (props) => {
     <>
       <Layout
         {...props}
-        className={translate('dir')}
+        className={' the-main-layout '+translate('dir')}
         menu={Menu}
         appBar={AppBar}
       />

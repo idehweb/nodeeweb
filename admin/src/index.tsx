@@ -14,7 +14,7 @@ const root = createRoot(container);
 const Store = store();
 
 root.render(
-  <Provider store={Store}>
+  <Provider store={Store} >
     <Suspense fallback="Loading...">
       <App />
       <ToastContainer

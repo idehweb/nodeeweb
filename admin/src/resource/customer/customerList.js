@@ -80,6 +80,7 @@ const PostFilter = (props) => {
     )
   );
 };
+import { useMediaQuery } from '@mui/material';
 
 const PostPagination = (props) => (
   <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />
@@ -267,7 +268,10 @@ export const customerList = (props) => {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const translate = useTranslate();
-
+    const isSmall = useMediaQuery(
+        theme => theme.breakpoints.down('768'),
+        { noSsr: true }
+    );
   return (
     <List
       exporter={exporter}
@@ -280,6 +284,88 @@ export const customerList = (props) => {
       //   />
       // }
       actions={<ListActions />}>
+        {isSmall ? (
+            <Datagrid
+                optimized
+                bulkActionButtons={false}
+                // rowStyle={postRowStyle}
+            >
+                <FunctionField
+                    label="resources.customers.customerData"
+                    render={(record) => {
+
+                        return (<>
+                            <div className="ph">
+                                <div className={'wh'}><span>{translate('resources.customers.phone')}: </span><TextField
+                                    source="phone"
+                                    label="resources.customers.phone"
+                                /></div>
+                                <div className={'wh'}>
+                                    <span>{translate('resources.customers.companyTelNumber')}: </span>
+                                    <TextField
+                                        source="companyTelNumber"
+                                        label="resources.customers.companyTelNumber"
+                                    /></div>
+                                <div className={'wh'}>
+                                    <span>{translate('resources.customers.email')}: </span>
+                                    <EmailField source="email" label="resources.customers.email" />
+
+                                </div>
+                                <div className={'wh'}>
+                                    <span>{translate('resources.customers.activationCode')}: </span>
+                                    <TextField
+                                        source="activationCode"
+                                        label="resources.customers.activationCode"
+                                    />
+                                </div>
+                            </div>
+                                <div className="ph">
+                                    <div className={'wh'}>
+                                        <span>{translate('resources.customers.firstName')}: </span><TextField
+                                        source="firstName"
+                                        label="resources.customers.firstName"
+                                    /></div>
+                                    <div className={'wh'}>
+                                        <span>{translate('resources.customers.lastName')}: </span><TextField
+                                        source="lastName"
+                                        label="resources.customers.lastName"
+                                    /></div>
+                                    <div className={'wh'}>
+                                        <span>{translate('resources.customers.companyName')}: </span>
+                                        <TextField
+                                            source="companyName"
+                                            label="resources.customers.companyName"
+                                        /></div>
+                                </div>
+                                <div className="theDate">
+                                    <div>
+                                        {translate('resources.customers.createdAt')}:
+                                        <span dir="ltr"> {dateFormat(record.createdAt)}</span>
+                                    </div>
+                                    <div>
+                                        {translate('resources.customers.updatedAt')}:
+                                        <span dir="ltr"> {dateFormat(record.updatedAt)}</span>
+                                    </div>
+
+                                    {Boolean(record.orderCount) && (
+                                        <div>
+                                            {translate('resources.customers.orderCount') +
+                                            ': ' +
+                                            `${record.orderCount}`}
+                                        </div>
+                                    )}
+                                </div>
+                                <>
+                                    <EditButton />
+                                    <ShowButton />
+                                </>
+                            </>
+                        );
+                    }}
+                />
+
+            </Datagrid>
+        ) : (
         <Datagrid>
             <FunctionField
                 label="resources.customers.contactData"
@@ -401,7 +487,7 @@ export const customerList = (props) => {
                     </>
                 )}
             />
-        </Datagrid>
+        </Datagrid>)}
     </List>
   );
 };

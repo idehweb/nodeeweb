@@ -493,6 +493,7 @@ const customFarsiMessages = {
       order: 'ترتیب',
     },
     user: {
+        actions: 'اقدامات',
       _id: 'شناسه',
       phoneNumber: 'شماره تماس',
       activationCode: 'کد فعال سازی',
@@ -905,6 +906,9 @@ const customFarsiMessages = {
     },
     notification: {
       'user-notifications': 'پیام ها کاربر',
+      phone: 'شماره موبایل',
+      date: 'تاریخ',
+      actions: 'اقدامات',
       user: 'کاربر',
       message: 'پیام',
       status: 'وضعیت',

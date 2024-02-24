@@ -7,8 +7,12 @@ import {
   EditButton,
   useTranslate,
   Pagination,
+    FunctionField,
   downloadCSV,
 } from 'react-admin';
+import {dateFormat} from '@/functions';
+
+import {useMediaQuery} from '@mui/material';
 
 import jsonExport from 'jsonexport/dist';
 
@@ -59,9 +63,70 @@ const exporter = (users) => {
 };
 export const userList = (props) => {
   const translate = useTranslate();
+    const isSmall = useMediaQuery(
+        theme => theme.breakpoints.down('768'),
+        {noSsr: true}
+    );
   return (
     <List {...props} exporter={exporter} pagination={<PostPagination />}>
-      <Datagrid>
+        {isSmall ? (
+            <Datagrid
+                optimized
+                bulkActionButtons={false}
+                // rowStyle={postRowStyle}
+            >
+
+                <FunctionField
+                    label={translate('resources.user.actions')}
+                    render={(record) => (
+                        <>
+                          <div>
+                              <EmailField source="email" label={translate('resources.user.email')} />
+                          </div>
+                        <div>
+                            <span>{translate('resources.user.username')}:</span><TextField
+                                  source="username"
+                                  label={translate('resources.user.username')}
+                              />
+                        </div>
+                        <div>
+                            <span>{translate('resources.user.firstName')}:</span><TextField
+                                  source="firstName"
+                                  label={translate('resources.user.firstName')}
+                              />
+                        </div>
+                        <div>
+                            <span>{translate('resources.user.lastName')}:</span><TextField
+                                  source="lastName"
+                                  label={translate('resources.user.lastName')}
+                              />
+                        </div>
+                        <div className="theDate">
+                            <div>
+                                {translate('resources.page.createdAt') +
+                                ': ' +
+                                `${dateFormat(record.createdAt)}`}
+                            </div>
+                            <div>
+                                {translate('resources.page.updatedAt') +
+                                ': ' +
+                                `${dateFormat(record.updatedAt)}`}
+                            </div>
+
+                        </div>
+                        <div>
+                              <BooleanField
+                                  source="active"
+                                  label={translate('resources.user.active')}
+                              />
+                        </div>
+                        <div>
+                              <EditButton />
+                          </div>
+                        </>
+                    )}/>
+            </Datagrid>) :
+            (<Datagrid>
         {/*<TextField source="id"/>*/}
         <EmailField source="email" label={translate('resources.user.email')} />
         <TextField
@@ -76,22 +141,31 @@ export const userList = (props) => {
           source="lastName"
           label={translate('resources.user.lastName')}
         />
-        <DateField
-          source="createdAt"
-          showTime
-          label={translate('resources.user.createdAt')}
-        />
-        <DateField
-          source="updatedAt"
-          showTime
-          label={translate('resources.user.updatedAt')}
-        />
-        <BooleanField
+                <FunctionField
+                    label="resources.user.date"
+                    render={(record) => {
+                        return (
+                            <div className="theDate">
+                                <div>
+                                    {translate('resources.user.createdAt')}:
+                                    <span dir="ltr"> {dateFormat(record.createdAt)}</span>
+                                </div>
+                                <div>
+                                    {translate('resources.user.updatedAt')}:
+                                    <span dir="ltr"> {dateFormat(record.updatedAt)}</span>
+                                </div>
+
+                            </div>
+                        );
+                    }}
+                />
+
+              <BooleanField
           source="active"
           label={translate('resources.user.active')}
         />
         <EditButton />
-      </Datagrid>
+      </Datagrid>)}
     </List>
   );
 };

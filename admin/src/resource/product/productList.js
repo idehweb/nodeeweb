@@ -3,7 +3,9 @@ import {
   ChipField,
   CreateButton,
   Datagrid,
+
   downloadCSV,
+    SimpleList,
   EditButton,
   ExportButton,
   Filter,
@@ -17,7 +19,7 @@ import {
   useTranslate,
 } from 'react-admin';
 import { ImportButton } from 'react-admin-import-csv';
-
+import { useMediaQuery } from '@mui/material';
 import jsonExport from 'jsonexport/dist';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
@@ -250,7 +252,7 @@ const ListActions = (props) => {
       <ExportButton maxResults={3000} />
       {/*<CreateButton basePath={basePath} />*/}
       <ImportButton {...props} {...config} />
-      <ProductRewriteButton record={data} />
+      {/*<ProductRewriteButton record={data} />*/}
       {/* Add your custom actions */}
 
       {/*<Button*/}
@@ -314,6 +316,10 @@ const TabbedDatagrid = (props) => {
   if (!filterValues.status) {
     filterValues.status = 'published';
   }
+    const isSmall = useMediaQuery(
+        theme => theme.breakpoints.down('768'),
+        { noSsr: true }
+    );
   return (
     <Fragment>
       <Tabs
@@ -338,8 +344,83 @@ const TabbedDatagrid = (props) => {
 
       <div>
         {/*{filterValues.status === 'cart' && (*/}
-        <ListContextProvider value={{ ...listContext, ids: cart }}>
-          <Datagrid
+        <ListContextProvider
+            value={{ ...listContext, ids: cart }}>
+            {isSmall ? (
+                <Datagrid
+                    optimized
+                    bulkActionButtons={false}
+                    // rowStyle={postRowStyle}
+                >
+                    <SimpleImageField label={translate('resources.product.image')} />
+                    <FunctionField
+                        label={translate('resources.product.title')}
+                        render={(record) => {
+                            return (
+                                <>
+                                    <ShowLink
+                                        source={'title.' + translate('lan')}
+                                        label={translate('resources.product.title')}
+                                        sortable={false}
+                                    />
+                                    <br />
+                                    <TextField source={'slug'} />
+                                  <>
+                                      <div>
+                                          <EditButton
+                                              label={translate('resources.product.edit')}
+                                              key={'00'}
+                                          />
+                                      </div>
+                                      <div>
+                                          <Button
+                                              color="primary"
+                                              size="small"
+                                              key={'33'}
+                                              onClick={() => {
+                                                  // console.log('data', record._id);
+                                                  API.post('/product/copy/' + record._id, null)
+                                                      .then(({ data = {} }) => {
+                                                          // console.log('data', data._id);
+                                                          props.history.push('/product/' + data._id);
+                                                          // ale/rt('done');
+                                                      })
+                                                      .catch((err) => {
+                                                          console.log('error', err);
+                                                      });
+                                              }}>
+                                              <ContentCopyIcon />
+                                              <span className={'ml-2 mr-2'}>
+                        {translate('resources.product.copy')}
+                      </span>
+                                          </Button>
+                                      </div>
+                                      <div>
+                                          <a
+                                              href={
+                                                  '/#/action?filter=%7B%22product"%3A"' +
+                                                  record._id +
+                                                  '"%7D&order=ASC&page=1&perPage=10&sort=id/'
+                                              }
+                                              target={'_blank'}
+                                              color="primary"
+                                              onClick={() => {}}
+                                              rel="noreferrer">
+                                              <PendingActionsIcon />
+                                              <span className={'ml-2 mr-2'}>
+                        {translate('resources.product.activities')}
+                      </span>
+                                          </a>
+                                      </div>
+                                  </>
+
+                                </>
+                            );
+                        }}
+                    />
+
+                </Datagrid>
+            ) : (<Datagrid
             optimized
             // rowStyle={postRowStyle}
           >
@@ -585,8 +666,6 @@ const TabbedDatagrid = (props) => {
                       key={'00'}
                     />
                   </div>
-                  {/*<EditButton label={"resources.product.content"} key={'11'}/>,*/}
-                  {/*<ShowButton label={"resources.product.analytics"} key={'22'}/>,*/}
                   <div>
                     <Button
                       color="primary"
@@ -630,7 +709,7 @@ const TabbedDatagrid = (props) => {
                 </>
               )}
             />
-          </Datagrid>
+          </Datagrid>)}
         </ListContextProvider>
       </div>
     </Fragment>
