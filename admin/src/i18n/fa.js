@@ -435,6 +435,13 @@ const customFarsiMessages = {
     },
 
     customers: {
+        customerData: 'اطلاعات مشتری',
+        contactData: 'اطلاعات تماس',
+        personalData: 'اطلاعات شخصی',
+        companyData: 'اطلاعات شرکت',
+        grouping: 'گروه بندی',
+        extraData: 'اطلاعات بیخود',
+        status: 'وضعیت',
       companyName: 'نام شرکت',
       companyTelNumber: ' تلفن شرکت',
       data: 'data',

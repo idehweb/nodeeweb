@@ -6,6 +6,18 @@ body {
 .mtop-10 {
   margin-top: 10px !important;
 }
+.wh{
+  white-space: nowrap;
+}
+
+.box{
+  border: 1px solid #eee;
+  width: 100%;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
 .rtl .the-dev-menu li + div {
   padding-right: 30px;
 }

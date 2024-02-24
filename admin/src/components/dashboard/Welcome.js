@@ -40,7 +40,7 @@ const Welcome = () => {
   const translate = useTranslate();
   const classes = useStyles();
 
-  const str = localStorage.getItem('url');
+  const str = process.env.REACT_APP_API_BASE_URL_DEV;
   const [url, ...rest] = str.split('api');
   return (
     <Card className={classes.root}>

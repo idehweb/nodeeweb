@@ -280,98 +280,128 @@ export const customerList = (props) => {
       //   />
       // }
       actions={<ListActions />}>
-      <Datagrid>
-        <TextField
-          source="phone"
-          label={translate('resources.customers.phone')}
-        />
-        <TextField
-          source="activationCode"
-          label={translate('resources.customers.activationCode')}
-        />
-        <TextField
-          source="firstName"
-          label={translate('resources.customers.firstName')}
-        />
-        <TextField
-          source="lastName"
-          label={translate('resources.customers.lastName')}
-        />
-        <EmailField
-          source="email"
-          label={translate('resources.customers.email')}
-        />
-        <TextField
-          source="internationalCode"
-          label={translate('resources.customers.internationalCode')}
-        />
-        <TextField
-          source="source"
-          label={translate('resources.customers.source')}
-        />
-        <ReferenceArrayField
-          label={translate('resources.customers.customerGroup')}
-          reference="customerGroup"
-          source="customerGroup">
-          <SingleFieldList>
-            <ChipField source="slug" />
-          </SingleFieldList>
-        </ReferenceArrayField>
-        {/*<FunctionField label={translate("resources.customer.customerGroup")}*/}
-        {/*render={record => {*/}
+        <Datagrid>
+            <FunctionField
+                label="resources.customers.contactData"
+                render={(record) => {
 
-        {/*return (*/}
-        {/*<div className={"categories"}>*/}
-        {/*{record.customerGroup && record.customerGroup.map((item, it) => <div>*/}
-        {/*<ChipField source={"customerGroup[" + it + "].slug"} label={item.slug}*/}
-        {/*sortable={false}/>*/}
-        {/*</div>)}*/}
+                    return (
+                        <div className="ph">
+                            <div className={'wh'}><span>{translate('resources.customers.phone')}: </span><TextField
+                                source="phone"
+                                label="resources.customers.phone"
+                            /></div>
+                            <div className={'wh'}>
+                                <span>{translate('resources.customers.companyTelNumber')}: </span>
+                                <TextField
+                                    source="companyTelNumber"
+                                    label="resources.customers.companyTelNumber"
+                                /></div>
+                            <div className={'wh'}>
+                                <span>{translate('resources.customers.email')}: </span>
+                                <EmailField source="email" label="resources.customers.email" />
 
-        {/*</div>*/}
-        {/*);*/}
-        {/*}}/>*/}
-        <FunctionField
-          label={translate('resources.customers.date')}
-          render={(record) => {
-            return (
-              <div className="theDate">
-                <div>
-                  {translate('resources.customers.createdAt') +
-                    ': ' +
-                    `${dateFormat(record.createdAt)}`}
-                </div>
-                <div>
-                  {translate('resources.customers.updatedAt') +
-                    ': ' +
-                    `${dateFormat(record.updatedAt)}`}
-                </div>
+                            </div>
+                            <div className={'wh'}>
+                                <span>{translate('resources.customers.activationCode')}: </span>
+                                <TextField
+                                    source="activationCode"
+                                    label="resources.customers.activationCode"
+                                />
+                            </div>
+                        </div>
+                    );
+                }}
+            />
 
-                {Boolean(record.orderCount) && (
-                  <div>
-                    {translate('resources.customers.orderCount') +
-                      ': ' +
-                      `${record.orderCount}`}
-                  </div>
+
+            <FunctionField
+                label="resources.customers.customerData"
+                render={(record) => {
+
+                    return (
+                        <div className="ph">
+                            <div className={'wh'}>
+                                <span>{translate('resources.customers.firstName')}: </span><TextField
+                                source="firstName"
+                                label="resources.customers.firstName"
+                            /></div>
+                            <div className={'wh'}>
+                                <span>{translate('resources.customers.lastName')}: </span><TextField
+                                source="lastName"
+                                label="resources.customers.lastName"
+                            /></div>
+                            <div className={'wh'}>
+                                <span>{translate('resources.customers.companyName')}: </span>
+                                <TextField
+                                    source="companyName"
+                                    label="resources.customers.companyName"
+                                /></div>
+                        </div>
+                    );
+                }}
+            />
+
+            <TextField source="source" label="resources.customers.source" />
+            <ReferenceArrayField
+                label="resources.customers.customerGroup"
+                reference="customerGroup"
+                source="customerGroup">
+                <SingleFieldList>
+                    <ChipField source="slug" />
+                </SingleFieldList>
+            </ReferenceArrayField>
+
+            <FunctionField
+                label="resources.customers.status"
+                render={(record) => {
+                    const arr = record.status || [];
+                    const len = arr.length || 0;
+                    const item = arr[len - 1] || {};
+                    return (
+                        <div className="theDate">
+                            {item.status && returnStatus(item.status)}
+                        </div>
+                    );
+                }}
+            />
+            <FunctionField
+                label="resources.customers.date"
+                render={(record) => {
+                    return (
+                        <div className="theDate">
+                            <div>
+                                {translate('resources.customers.createdAt')}:
+                                <span dir="ltr"> {dateFormat(record.createdAt)}</span>
+                            </div>
+                            <div>
+                                {translate('resources.customers.updatedAt')}:
+                                <span dir="ltr"> {dateFormat(record.updatedAt)}</span>
+                            </div>
+
+                            {Boolean(record.orderCount) && (
+                                <div>
+                                    {translate('resources.customers.orderCount') +
+                                    ': ' +
+                                    `${record.orderCount}`}
+                                </div>
+                            )}
+                        </div>
+                    );
+                }}
+            />
+
+            <BooleanField source="active" label="resources.customers.active" />
+            <FunctionField
+                label="resources.product.edit"
+                render={(record) => (
+                    <>
+                        <EditButton />
+                        <ShowButton />
+                    </>
                 )}
-              </div>
-            );
-          }}
-        />
-
-        <BooleanField
-          source="active"
-          label={translate('resources.customers.active')}
-        />
-        <FunctionField
-          label={translate('resources.product.edit')}
-          render={(record) => (
-            <>
-              <EditButton />
-              <ShowButton />
-            </>
-          )}
-        />
-      </Datagrid>
+            />
+        </Datagrid>
     </List>
   );
 };
