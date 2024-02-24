@@ -103,12 +103,12 @@ export default class AnalysisSubscriber extends Subscriber {
     }
   };
   private getDailyCron() {
-    const store = this.opts.resolve('resolve');
+    const store = this.opts.resolve('store');
     const key = 'tel-notif-dailyCron';
     return store[key] ?? this.dailyCron;
   }
   private setDailyCron() {
-    const store = this.opts.resolve('resolve');
+    const store = this.opts.resolve('store');
     const key = 'tel-notif-dailyCron';
     store[key] = this.dailyCron;
   }
