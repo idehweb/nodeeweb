@@ -24,7 +24,7 @@ file_env(){
 
 _main(){
   echo "####### PRODUCTION ENTRYPOINT START #######"
-  echo "####### PRODUCTION ENTRYPOINT END #######"
+  # echo "####### PRODUCTION ENTRYPOINT END #######"
 }
 
 _main
