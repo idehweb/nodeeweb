@@ -480,7 +480,9 @@ export const customerList = (props) => {
                 <div className="theDate">
                   {record.status &&
                     record.status.map((elem, i) => (
-                      <div key={i}>{elem.status}</div>
+                      <div key={Math.floor(Math.random() * i)}>
+                        {elem.status}
+                      </div>
                     ))}
 
                   {/* {item.status && returnStatus(item.status)} */}
