@@ -18,7 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "#c/*": ["./src/*"]
+      "#c/*": ["./src/*"],
+      "react": ["./node_modules/@types/react"]
     },
     "incremental": true,
     "checkJs": true

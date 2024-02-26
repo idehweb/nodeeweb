@@ -26,7 +26,6 @@ import API from '@/functions/API';
 import { Val } from '@/Utils';
 import useStyles from '@/styles';
 
-
 const typeChoices3 = [
   {
     id: 'is',
