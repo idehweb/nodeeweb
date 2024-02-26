@@ -448,13 +448,7 @@ const TabbedDatagrid = (props) => {
                     <div className={'categories'}>
                       {record.productCategory &&
                         record.productCategory.map((item, it) => (
-                          // <div key={item.slug}>
                           <div key={Math.floor(Math.random() * it)}>
-                            {/* <ChipField
-                              source={'productCategory[' + it + '].slug'}
-                              label={item.slug}
-                              sortable={false}
-                            /> */}
                             <ReferenceField
                               label={translate(
                                 'resources.category.productCategory'
