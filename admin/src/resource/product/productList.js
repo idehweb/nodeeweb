@@ -3,9 +3,8 @@ import {
   ChipField,
   CreateButton,
   Datagrid,
-
   downloadCSV,
-    SimpleList,
+  SimpleList,
   EditButton,
   ExportButton,
   Filter,
@@ -17,6 +16,7 @@ import {
   TopToolbar,
   TextField,
   useTranslate,
+  ReferenceField,
 } from 'react-admin';
 import { ImportButton } from 'react-admin-import-csv';
 import { useMediaQuery } from '@mui/material';
@@ -316,10 +316,9 @@ const TabbedDatagrid = (props) => {
   if (!filterValues.status) {
     filterValues.status = 'published';
   }
-    const isSmall = useMediaQuery(
-        theme => theme.breakpoints.down('768'),
-        { noSsr: true }
-    );
+  const isSmall = useMediaQuery((theme) => theme.breakpoints.down('768'), {
+    noSsr: true,
+  });
   return (
     <Fragment>
       <Tabs
@@ -344,372 +343,377 @@ const TabbedDatagrid = (props) => {
 
       <div>
         {/*{filterValues.status === 'cart' && (*/}
-        <ListContextProvider
-            value={{ ...listContext, ids: cart }}>
-            {isSmall ? (
-                <Datagrid
-                    optimized
-                    bulkActionButtons={false}
-                    // rowStyle={postRowStyle}
-                >
-                    <SimpleImageField label={translate('resources.product.image')} />
-                    <FunctionField
+        <ListContextProvider value={{ ...listContext, ids: cart }}>
+          {isSmall ? (
+            <Datagrid
+              optimized
+              bulkActionButtons={false}
+              // rowStyle={postRowStyle}
+            >
+              <SimpleImageField label={translate('resources.product.image')} />
+              <FunctionField
+                label={translate('resources.product.title')}
+                render={(record) => {
+                  return (
+                    <>
+                      <ShowLink
+                        source={'title.' + translate('lan')}
                         label={translate('resources.product.title')}
-                        render={(record) => {
-                            return (
-                                <>
-                                    <ShowLink
-                                        source={'title.' + translate('lan')}
-                                        label={translate('resources.product.title')}
-                                        sortable={false}
-                                    />
-                                    <br />
-                                    <TextField source={'slug'} />
-                                  <>
-                                      <div>
-                                          <EditButton
-                                              label={translate('resources.product.edit')}
-                                              key={'00'}
-                                          />
-                                      </div>
-                                      <div>
-                                          <Button
-                                              color="primary"
-                                              size="small"
-                                              key={'33'}
-                                              onClick={() => {
-                                                  // console.log('data', record._id);
-                                                  API.post('/product/copy/' + record._id, null)
-                                                      .then(({ data = {} }) => {
-                                                          // console.log('data', data._id);
-                                                          props.history.push('/product/' + data._id);
-                                                          // ale/rt('done');
-                                                      })
-                                                      .catch((err) => {
-                                                          console.log('error', err);
-                                                      });
-                                              }}>
-                                              <ContentCopyIcon />
-                                              <span className={'ml-2 mr-2'}>
-                        {translate('resources.product.copy')}
-                      </span>
-                                          </Button>
-                                      </div>
-                                      <div>
-                                          <a
-                                              href={
-                                                  '/#/action?filter=%7B%22product"%3A"' +
-                                                  record._id +
-                                                  '"%7D&order=ASC&page=1&perPage=10&sort=id/'
-                                              }
-                                              target={'_blank'}
-                                              color="primary"
-                                              onClick={() => {}}
-                                              rel="noreferrer">
-                                              <PendingActionsIcon />
-                                              <span className={'ml-2 mr-2'}>
-                        {translate('resources.product.activities')}
-                      </span>
-                                          </a>
-                                      </div>
-                                  </>
-
-                                </>
-                            );
-                        }}
-                    />
-
-                </Datagrid>
-            ) : (<Datagrid
-            optimized
-            // rowStyle={postRowStyle}
-          >
-            <SimpleImageField label={translate('resources.product.image')} />
-            <FunctionField
-              label={translate('resources.product.categories')}
-              render={(record) => {
-                return (
-                  <>
-                    <ShowLink
-                      source={'title.' + translate('lan')}
-                      label={translate('resources.product.title')}
-                      sortable={false}
-                    />
-                    <br />
-                    <TextField source={'slug'} />
-                  </>
-                );
-              }}
-            />
-            {/*<CustomTextInput source="description.fa" label="description" sortable={false}/>*/}
-
-            <FunctionField
-              label={translate('resources.product.categories')}
-              render={(record) => {
-                return (
-                  <div className={'categories'}>
-                    {record.productCategory &&
-                      record.productCategory.map((item, it) => (
-                        <div key={item.slug}>
-                          <ChipField
-                            source={'productCategory[' + it + '].slug'}
-                            label={item.slug}
-                            sortable={false}
+                        sortable={false}
+                      />
+                      <br />
+                      <TextField source={'slug'} />
+                      <>
+                        <div>
+                          <EditButton
+                            label={translate('resources.product.edit')}
+                            key={'00'}
                           />
                         </div>
-                      ))}
-                  </div>
-                );
-              }}
-            />
+                        <div>
+                          <Button
+                            color="primary"
+                            size="small"
+                            key={'33'}
+                            onClick={() => {
+                              // console.log('data', record._id);
+                              API.post('/product/copy/' + record._id, null)
+                                .then(({ data = {} }) => {
+                                  // console.log('data', data._id);
+                                  props.history.push('/product/' + data._id);
+                                  // ale/rt('done');
+                                })
+                                .catch((err) => {
+                                  console.log('error', err);
+                                });
+                            }}>
+                            <ContentCopyIcon />
+                            <span className={'ml-2 mr-2'}>
+                              {translate('resources.product.copy')}
+                            </span>
+                          </Button>
+                        </div>
+                        <div>
+                          <a
+                            href={
+                              '/#/action?filter=%7B%22product"%3A"' +
+                              record._id +
+                              '"%7D&order=ASC&page=1&perPage=10&sort=id/'
+                            }
+                            target={'_blank'}
+                            color="primary"
+                            onClick={() => {}}
+                            rel="noreferrer">
+                            <PendingActionsIcon />
+                            <span className={'ml-2 mr-2'}>
+                              {translate('resources.product.activities')}
+                            </span>
+                          </a>
+                        </div>
+                      </>
+                    </>
+                  );
+                }}
+              />
+            </Datagrid>
+          ) : (
+            <Datagrid
+              optimized
+              // rowStyle={postRowStyle}
+            >
+              <SimpleImageField label={translate('resources.product.image')} />
+              <FunctionField
+                // label={translate('resources.product.categories')}
+                label={translate('resources.product.title')}
+                render={(record) => {
+                  return (
+                    <>
+                      <ShowLink
+                        source={'title.' + translate('lan')}
+                        label={translate('resources.product.title')}
+                        sortable={false}
+                      />
+                      <br />
+                      <TextField source={'slug'} />
+                    </>
+                  );
+                }}
+              />
+              {/*<CustomTextInput source="description.fa" label="description" sortable={false}/>*/}
 
-            {/*<NumberField source="price" label="قیمت" sortable={false}/>*/}
-            {/*<TextInput source="title.fa" label="Title" value="title.fa"/>*/}
-            {/*<NumberField source="salePrice" label="قیمت تخفیف خورده" sortable={false}/>*/}
-            {/*<BooleanField source="in_stock" label="موجودی"/>*/}
-            {/*<NumberField source="quantity" label="مقدار" sortable={false}/>*/}
-            {/*<FunctionField label="نوع"*/}
-            {/*render={record => `${record.combinations && record.combinations.length ? 'مادر' : 'ساده'}`}/>*/}
-            {/*<FileChips source="photos" sortable={false}/>*/}
-            <FunctionField
-              label={translate('resources.product.prices')}
-              render={(record) => {
-                let tt = translate('resources.product.outOfStock'),
-                  thecl = 'erro';
+              <FunctionField
+                label={translate('resources.product.categories')}
+                render={(record) => {
+                  return (
+                    <div className={'categories'}>
+                      {record.productCategory &&
+                        record.productCategory.map((item, it) => (
+                          <div key={Math.floor(Math.random() * it)}>
+                            <ReferenceField
+                              label={translate(
+                                'resources.category.productCategory'
+                              )}
+                              source={'productCategory[' + it + ']'}
+                              reference="productCategory">
+                              <ChipField source={'name.' + translate('lan')} />
+                            </ReferenceField>
+                          </div>
+                        ))}
+                    </div>
+                  );
+                }}
+              />
 
-                if (record.type == 'variable') {
-                  if (record.combinations && record.combinations.length > 0) {
-                    record.combinations.map((comb, key) => {
-                      if (comb.in_stock === true) {
-                        tt = translate('resources.product.stock');
-                        thecl = 'succ';
-                      }
-                    });
-                    return (
-                      <div className={'stockandprice ' + thecl}>
-                        <div className="theDate hoverparent">
-                          <Chip className={thecl} label={tt} />
-                          <div className="theDate thehover">
-                            {record.combinations &&
-                              record.combinations.map((comb, key) => {
-                                return (
-                                  <div
-                                    className={'cobm flex-d cobm' + key}
-                                    key={key}>
-                                    <div className={'flex-1'}>
-                                      {comb.options && (
-                                        <div className={''}>
-                                          {Object.keys(comb.options).map(
-                                            (item, index) => {
-                                              return (
-                                                <div key={index}>
-                                                  {item +
-                                                    ' : ' +
-                                                    comb.options[item] +
-                                                    '\n'}
-                                                </div>
-                                              );
-                                            }
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
-                                    <div className={'flex-1'}>
-                                      {comb.price && (
-                                        <div className={'FDFD'}>
-                                          <span>
-                                            {translate(
-                                              'resources.product.price'
+              {/*<NumberField source="price" label="قیمت" sortable={false}/>*/}
+              {/*<TextInput source="title.fa" label="Title" value="title.fa"/>*/}
+              {/*<NumberField source="salePrice" label="قیمت تخفیف خورده" sortable={false}/>*/}
+              {/*<BooleanField source="in_stock" label="موجودی"/>*/}
+              {/*<NumberField source="quantity" label="مقدار" sortable={false}/>*/}
+              {/*<FunctionField label="نوع"*/}
+              {/*render={record => `${record.combinations && record.combinations.length ? 'مادر' : 'ساده'}`}/>*/}
+              {/*<FileChips source="photos" sortable={false}/>*/}
+              <FunctionField
+                label={translate('resources.product.prices')}
+                render={(record) => {
+                  let tt = translate('resources.product.outOfStock'),
+                    thecl = 'erro';
+
+                  if (record.type == 'variable') {
+                    if (record.combinations && record.combinations.length > 0) {
+                      record.combinations.map((comb, key) => {
+                        if (comb.in_stock === true) {
+                          tt = translate('resources.product.stock');
+                          thecl = 'succ';
+                        }
+                      });
+                      return (
+                        <div className={'stockandprice ' + thecl}>
+                          <div className="theDate hoverparent">
+                            <Chip className={thecl} label={tt} />
+                            <div className="theDate thehover">
+                              {record.combinations &&
+                                record.combinations.map((comb, key) => {
+                                  return (
+                                    <div
+                                      className={'cobm flex-d cobm' + key}
+                                      key={key}>
+                                      <div className={'flex-1'}>
+                                        {comb.options && (
+                                          <div className={''}>
+                                            {Object.keys(comb.options).map(
+                                              (item, index) => {
+                                                return (
+                                                  <div key={index}>
+                                                    {item +
+                                                      ' : ' +
+                                                      comb.options[item] +
+                                                      '\n'}
+                                                  </div>
+                                                );
+                                              }
                                             )}
-                                          </span>
-                                          <span>
-                                            {comb.price
-                                              .toString()
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ','
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className={'flex-1'}>
+                                        {comb.price && (
+                                          <div className={'FDFD'}>
+                                            <span>
+                                              {translate(
+                                                'resources.product.price'
                                               )}
-                                          </span>
-                                        </div>
-                                      )}
-                                    </div>
-                                    <div className={'flex-1'}>
-                                      {comb.salePrice && (
-                                        <div className={'vfdsf'}>
-                                          <span>
-                                            {translate(
-                                              'resources.product.salePrice'
-                                            )}
-                                          </span>
-                                          <span>
-                                            {comb.salePrice
-                                              .toString()
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ','
-                                              )}
-                                          </span>
-                                        </div>
-                                      )}
-                                    </div>
-                                    <div className={'flex-1'}>
-                                      {comb.in_stock && (
-                                        <div className={''}>
-                                          <span>
-                                            {comb.in_stock === true
-                                              ? translate(
-                                                  'resources.product.inStock'
-                                                )
-                                              : translate(
-                                                  'resources.product.outOfStock'
+                                            </span>
+                                            <span>
+                                              {comb.price
+                                                .toString()
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ','
                                                 )}
-                                          </span>
-                                        </div>
-                                      )}
+                                            </span>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className={'flex-1'}>
+                                        {comb.salePrice && (
+                                          <div className={'vfdsf'}>
+                                            <span>
+                                              {translate(
+                                                'resources.product.salePrice'
+                                              )}
+                                            </span>
+                                            <span>
+                                              {comb.salePrice
+                                                .toString()
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ','
+                                                )}
+                                            </span>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className={'flex-1'}>
+                                        {comb.in_stock && (
+                                          <div className={''}>
+                                            <span>
+                                              {comb.in_stock === true
+                                                ? translate(
+                                                    'resources.product.inStock'
+                                                  )
+                                                : translate(
+                                                    'resources.product.outOfStock'
+                                                  )}
+                                            </span>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className={'flex-1'}>
+                                        {comb.quantity && (
+                                          <div className={''}>
+                                            <span>{comb.quantity}</span>
+                                          </div>
+                                        )}
+                                      </div>
                                     </div>
-                                    <div className={'flex-1'}>
-                                      {comb.quantity && (
-                                        <div className={''}>
-                                          <span>{comb.quantity}</span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                })}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                  } else {
+                    if (record.in_stock === true) {
+                      tt = translate('resources.product.inStock');
+                      thecl = 'succ';
+                    }
+                    return (
+                      <div className={'cobm flex-d cobm'}>
+                        <div>
+                          {record.price && (
+                            <div className={'flex-1'}>
+                              <span>
+                                {translate('resources.product.price')}:
+                              </span>
+                              <span>
+                                {record.price
+                                  .toString()
+                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                              </span>
+                            </div>
+                          )}
+                          {record.salePrice && (
+                            <div className={'flex-1'}>
+                              <span>
+                                {translate('resources.product.salePrice')}:
+                              </span>
+                              <span>
+                                {record.salePrice
+                                  .toString()
+                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <div className={'flex-1'}>
+                            <span>{translate('resources.product.stock')}:</span>
+                            <Chip className={thecl} label={tt}></Chip>
+                            <span></span>
+                          </div>
+                          <div className={'flex-1'}>
+                            <span>{translate('resources.product.count')}:</span>
+                            <span>{record.quantity}</span>
                           </div>
                         </div>
                       </div>
                     );
                   }
-                } else {
-                  if (record.in_stock === true) {
-                    tt = translate('resources.product.inStock');
-                    thecl = 'succ';
-                  }
-                  return (
-                    <div className={'cobm flex-d cobm'}>
-                      <div>
-                        {record.price && (
-                          <div className={'flex-1'}>
-                            <span>{translate('resources.product.price')}:</span>
-                            <span>
-                              {record.price
-                                .toString()
-                                .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            </span>
-                          </div>
-                        )}
-                        {record.salePrice && (
-                          <div className={'flex-1'}>
-                            <span>
-                              {translate('resources.product.salePrice')}:
-                            </span>
-                            <span>
-                              {record.salePrice
-                                .toString()
-                                .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <div className={'flex-1'}>
-                          <span>{translate('resources.product.stock')}:</span>
-                          <Chip className={thecl} label={tt}></Chip>
-                          <span></span>
-                        </div>
-                        <div className={'flex-1'}>
-                          <span>{translate('resources.product.count')}:</span>
-                          <span>{record.quantity}</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-              }}
-            />
+                }}
+              />
 
-            <FunctionField
-              label={translate('resources.product.date')}
-              render={(record) => (
-                <div className="theDate">
-                  <div>
-                    {translate('resources.product.createdAt') +
-                      ': ' +
-                      `${dateFormat(record.createdAt)}`}
-                  </div>
-                  <div>
-                    {translate('resources.product.updatedAt') +
-                      ': ' +
-                      `${dateFormat(record.updatedAt)}`}
-                  </div>
-
-                  {record.views && (
+              <FunctionField
+                label={translate('resources.product.date')}
+                render={(record) => (
+                  <div className="theDate">
                     <div>
-                      {translate('resources.product.viewsCount') +
+                      {translate('resources.product.createdAt') +
                         ': ' +
-                        `${record.views.length}`}
+                        `${dateFormat(record.createdAt)}`}
                     </div>
-                  )}
-                </div>
-              )}
-            />
+                    <div>
+                      {translate('resources.product.updatedAt') +
+                        ': ' +
+                        `${dateFormat(record.updatedAt)}`}
+                    </div>
 
-            <FunctionField
-              label={translate('resources.product.edit')}
-              render={(record) => (
-                <>
-                  <div>
-                    <EditButton
-                      label={translate('resources.product.edit')}
-                      key={'00'}
-                    />
+                    {record.views && (
+                      <div>
+                        {translate('resources.product.viewsCount') +
+                          ': ' +
+                          `${record.views.length}`}
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <Button
-                      color="primary"
-                      size="small"
-                      key={'33'}
-                      onClick={() => {
-                        // console.log('data', record._id);
-                        API.post('/product/copy/' + record._id, null)
-                          .then(({ data = {} }) => {
-                            // console.log('data', data._id);
-                            props.history.push('/product/' + data._id);
-                            // ale/rt('done');
-                          })
-                          .catch((err) => {
-                            console.log('error', err);
-                          });
-                      }}>
-                      <ContentCopyIcon />
-                      <span className={'ml-2 mr-2'}>
-                        {translate('resources.product.copy')}
-                      </span>
-                    </Button>
-                  </div>
-                  <div>
-                    <a
-                      href={
-                        '/#/action?filter=%7B%22product"%3A"' +
-                        record._id +
-                        '"%7D&order=ASC&page=1&perPage=10&sort=id/'
-                      }
-                      target={'_blank'}
-                      color="primary"
-                      onClick={() => {}}
-                      rel="noreferrer">
-                      <PendingActionsIcon />
-                      <span className={'ml-2 mr-2'}>
-                        {translate('resources.product.activities')}
-                      </span>
-                    </a>
-                  </div>
-                </>
-              )}
-            />
-          </Datagrid>)}
+                )}
+              />
+
+              <FunctionField
+                label={translate('resources.product.edit')}
+                render={(record) => (
+                  <>
+                    <div>
+                      <EditButton
+                        label={translate('resources.product.edit')}
+                        key={'00'}
+                      />
+                    </div>
+                    <div>
+                      <Button
+                        color="primary"
+                        size="small"
+                        key={'33'}
+                        onClick={() => {
+                          // console.log('data', record._id);
+                          API.post('/product/copy/' + record._id, null)
+                            .then(({ data = {} }) => {
+                              // console.log('data', data._id);
+                              props.history.push('/product/' + data._id);
+                              // ale/rt('done');
+                            })
+                            .catch((err) => {
+                              console.log('error', err);
+                            });
+                        }}>
+                        <ContentCopyIcon />
+                        <span className={'ml-2 mr-2'}>
+                          {translate('resources.product.copy')}
+                        </span>
+                      </Button>
+                    </div>
+                    <div>
+                      <a
+                        href={
+                          '/#/action?filter=%7B%22product"%3A"' +
+                          record._id +
+                          '"%7D&order=ASC&page=1&perPage=10&sort=id/'
+                        }
+                        target={'_blank'}
+                        color="primary"
+                        onClick={() => {}}
+                        rel="noreferrer">
+                        <PendingActionsIcon />
+                        <span className={'ml-2 mr-2'}>
+                          {translate('resources.product.activities')}
+                        </span>
+                      </a>
+                    </div>
+                  </>
+                )}
+              />
+            </Datagrid>
+          )}
         </ListContextProvider>
       </div>
     </Fragment>
