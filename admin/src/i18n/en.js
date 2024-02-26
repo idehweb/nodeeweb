@@ -246,6 +246,12 @@ const customEnglishMessages = {
       customerGroup: 'customer group',
       message: 'message',
       actions: 'actions',
+      grouping: 'grouping',
+      data: 'data',
+      extraData: 'extra data',
+      companyData: 'company data',
+      phone: 'phone',
+      personalData: 'personal data',
     },
     user: {
       _id: '_id',
