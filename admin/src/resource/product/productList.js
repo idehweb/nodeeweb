@@ -17,6 +17,7 @@ import {
   TextField,
   useTranslate,
   ReferenceField,
+  SimpleShowLayout,
 } from 'react-admin';
 import { ImportButton } from 'react-admin-import-csv';
 import { useMediaQuery } from '@mui/material';
@@ -364,6 +365,221 @@ const TabbedDatagrid = (props) => {
                       <br />
                       <TextField source={'slug'} />
                       <>
+                        <div>
+                          <SimpleShowLayout>
+                            {/* <TextField
+                              source={'price_type'}
+                              label={translate('resources.product.prices')}
+                            /> */}
+                            {/* </SimpleShowLayout> */}
+                            <FunctionField
+                              label={translate('resources.product.prices')}
+                              render={(record) => {
+                                let tt = translate(
+                                    'resources.product.outOfStock'
+                                  ),
+                                  thecl = 'erro';
+
+                                if (record.type == 'variable') {
+                                  if (
+                                    record.combinations &&
+                                    record.combinations.length > 0
+                                  ) {
+                                    record.combinations.map((comb, key) => {
+                                      if (comb.in_stock === true) {
+                                        tt = translate(
+                                          'resources.product.stock'
+                                        );
+                                        thecl = 'succ';
+                                      }
+                                    });
+                                    return (
+                                      <div className={'stockandprice ' + thecl}>
+                                        <div className="theDate hoverparent">
+                                          <Chip className={thecl} label={tt} />
+                                          <div className="theDate thehover">
+                                            {record.combinations &&
+                                              record.combinations.map(
+                                                (comb, key) => {
+                                                  return (
+                                                    <div
+                                                      className={
+                                                        'cobm flex-d cobm' + key
+                                                      }
+                                                      key={key}>
+                                                      <div className={'flex-1'}>
+                                                        {comb.options && (
+                                                          <div className={''}>
+                                                            {Object.keys(
+                                                              comb.options
+                                                            ).map(
+                                                              (item, index) => {
+                                                                return (
+                                                                  <div
+                                                                    key={index}>
+                                                                    {item +
+                                                                      ' : ' +
+                                                                      comb
+                                                                        .options[
+                                                                        item
+                                                                      ] +
+                                                                      '\n'}
+                                                                  </div>
+                                                                );
+                                                              }
+                                                            )}
+                                                          </div>
+                                                        )}
+                                                      </div>
+                                                      <div className={'flex-1'}>
+                                                        {comb.price && (
+                                                          <div
+                                                            className={'FDFD'}>
+                                                            <span>
+                                                              {translate(
+                                                                'resources.product.price'
+                                                              )}
+                                                            </span>
+                                                            <span>
+                                                              {comb.price
+                                                                .toString()
+                                                                .replace(
+                                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                                  ','
+                                                                )}
+                                                            </span>
+                                                          </div>
+                                                        )}
+                                                      </div>
+                                                      <div className={'flex-1'}>
+                                                        {comb.salePrice && (
+                                                          <div
+                                                            className={'vfdsf'}>
+                                                            <span>
+                                                              {translate(
+                                                                'resources.product.salePrice'
+                                                              )}
+                                                            </span>
+                                                            <span>
+                                                              {comb.salePrice
+                                                                .toString()
+                                                                .replace(
+                                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                                  ','
+                                                                )}
+                                                            </span>
+                                                          </div>
+                                                        )}
+                                                      </div>
+                                                      <div className={'flex-1'}>
+                                                        {comb.in_stock && (
+                                                          <div className={''}>
+                                                            <span>
+                                                              {comb.in_stock ===
+                                                              true
+                                                                ? translate(
+                                                                    'resources.product.inStock'
+                                                                  )
+                                                                : translate(
+                                                                    'resources.product.outOfStock'
+                                                                  )}
+                                                            </span>
+                                                          </div>
+                                                        )}
+                                                      </div>
+                                                      <div className={'flex-1'}>
+                                                        {comb.quantity && (
+                                                          <div className={''}>
+                                                            <span>
+                                                              {comb.quantity}
+                                                            </span>
+                                                          </div>
+                                                        )}
+                                                      </div>
+                                                    </div>
+                                                  );
+                                                }
+                                              )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  }
+                                } else {
+                                  if (record.in_stock === true) {
+                                    tt = translate('resources.product.inStock');
+                                    thecl = 'succ';
+                                  }
+                                  return (
+                                    <div className={'cobm flex-d cobm'}>
+                                      <div>
+                                        {record.price && (
+                                          <div className={'flex-1'}>
+                                            <span>
+                                              {translate(
+                                                'resources.product.price'
+                                              )}
+                                              :
+                                            </span>
+                                            <span>
+                                              {record.price
+                                                .toString()
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ','
+                                                )}
+                                            </span>
+                                          </div>
+                                        )}
+                                        {record.salePrice && (
+                                          <div className={'flex-1'}>
+                                            <span>
+                                              {translate(
+                                                'resources.product.salePrice'
+                                              )}
+                                              :
+                                            </span>
+                                            <span>
+                                              {record.salePrice
+                                                .toString()
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ','
+                                                )}
+                                            </span>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div>
+                                        <div className={'flex-1'}>
+                                          <span>
+                                            {translate(
+                                              'resources.product.stock'
+                                            )}
+                                            :
+                                          </span>
+                                          <Chip
+                                            className={thecl}
+                                            label={tt}></Chip>
+                                          <span></span>
+                                        </div>
+                                        <div className={'flex-1'}>
+                                          <span>
+                                            {translate(
+                                              'resources.product.count'
+                                            )}
+                                            :
+                                          </span>
+                                          <span>{record.quantity}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                              }}
+                            />
+                          </SimpleShowLayout>
+                        </div>
                         <div>
                           <EditButton
                             label={translate('resources.product.edit')}
