@@ -17,6 +17,7 @@ import {
   TextField,
   useTranslate,
   ReferenceField,
+  SimpleShowLayout,
 } from 'react-admin';
 import { ImportButton } from 'react-admin-import-csv';
 import { useMediaQuery } from '@mui/material';
@@ -364,6 +365,230 @@ const TabbedDatagrid = (props) => {
                       <br />
                       <TextField source={'slug'} />
                       <>
+                        <div>
+                          <FunctionField
+                            label={translate('resources.product.prices')}
+                            render={(record) => {
+                              let tt = translate(
+                                  'resources.product.outOfStock'
+                                ),
+                                thecl = 'erro';
+
+                              if (record.type == 'variable') {
+                                if (
+                                  record.combinations &&
+                                  record.combinations.length > 0
+                                ) {
+                                  record.combinations.map((comb, key) => {
+                                    if (comb.in_stock === true) {
+                                      tt = translate('resources.product.stock');
+                                      thecl = 'succ';
+                                    }
+                                  });
+                                  return (
+                                    <div>
+                                      <div>
+                                        <span>
+                                          {translate('resources.product.stock')}
+                                        </span>
+                                        <div>
+                                          {record.combinations &&
+                                            record.combinations.map(
+                                              (comb, key) => {
+                                                return (
+                                                  <div key={key}>
+                                                    <div>
+                                                      {comb.options && (
+                                                        <div>
+                                                          {Object.keys(
+                                                            comb.options
+                                                          ).map(
+                                                            (item, index) => {
+                                                              return (
+                                                                <div
+                                                                  key={index}>
+                                                                  {item +
+                                                                    ' : ' +
+                                                                    comb
+                                                                      .options[
+                                                                      item
+                                                                    ] +
+                                                                    '\n'}
+                                                                </div>
+                                                              );
+                                                            }
+                                                          )}
+                                                        </div>
+                                                      )}
+                                                    </div>
+                                                    <div>
+                                                      {comb.price && (
+                                                        <div>
+                                                          <span>
+                                                            {translate(
+                                                              'resources.product.price'
+                                                            )}{' '}
+                                                            {/* {translate('toman')} */}
+                                                          </span>
+                                                          <span>
+                                                            {comb.price
+                                                              .toString()
+                                                              .replace(
+                                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                                ','
+                                                              )}{' '}
+                                                            {/* {translate('toman')} */}
+                                                          </span>
+                                                        </div>
+                                                      )}
+                                                    </div>
+                                                    <div>
+                                                      {comb.salePrice && (
+                                                        <div>
+                                                          <span>
+                                                            {translate(
+                                                              'resources.product.salePrice'
+                                                            )}{' '}
+                                                          </span>
+                                                          <span>
+                                                            {comb.salePrice
+                                                              .toString()
+                                                              .replace(
+                                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                                ','
+                                                              )}{' '}
+                                                            {/* {translate('toman')} */}
+                                                          </span>
+                                                        </div>
+                                                      )}
+                                                    </div>
+                                                    <div>
+                                                      {comb.in_stock && (
+                                                        <div>
+                                                          <span>
+                                                            {comb.in_stock ===
+                                                            true ? (
+                                                              <Chip
+                                                                style={{
+                                                                  backgroundColor:
+                                                                    '#33b551',
+                                                                }}
+                                                                label={translate(
+                                                                  'resources.product.inStock'
+                                                                )}></Chip>
+                                                            ) : (
+                                                              <Chip
+                                                                style={{
+                                                                  backgroundColor:
+                                                                    '#d41313',
+                                                                }}
+                                                                label={translate(
+                                                                  'resources.product.outOfStock'
+                                                                )}></Chip>
+                                                            )}
+                                                          </span>
+                                                        </div>
+                                                      )}
+                                                    </div>
+                                                    <div>
+                                                      {comb.quantity && (
+                                                        <div>
+                                                          <span>
+                                                            {translate(
+                                                              'resources.product.count'
+                                                            )}
+                                                            :
+                                                          </span>
+                                                          <span>
+                                                            {comb.quantity}
+                                                          </span>
+                                                        </div>
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                );
+                                              }
+                                            )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                              } else {
+                                if (record.in_stock === true) {
+                                  tt = translate('resources.product.inStock');
+                                  thecl = 'succ';
+                                }
+                                return (
+                                  <div>
+                                    <div>
+                                      {record.price && (
+                                        <div>
+                                          <span>
+                                            {translate(
+                                              'resources.product.price'
+                                            )}
+                                            :
+                                          </span>
+                                          <span>
+                                            {record.price
+                                              .toString()
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ','
+                                              )}{' '}
+                                            {/* {translate('toman')} */}
+                                          </span>
+                                        </div>
+                                      )}
+                                      {record.salePrice && (
+                                        <div>
+                                          <span>
+                                            {translate(
+                                              'resources.product.salePrice'
+                                            )}
+                                            :
+                                          </span>
+                                          <span>
+                                            {record.salePrice
+                                              .toString()
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ','
+                                              )}{' '}
+                                            {/* {translate('toman')} */}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div>
+                                      <div>
+                                        <span>
+                                          {translate('resources.product.stock')}
+                                          :
+                                        </span>
+                                        <Chip
+                                          style={{
+                                            backgroundColor: '#33b551',
+                                          }}
+                                          label={translate(
+                                            'resources.product.inStock'
+                                          )}></Chip>
+                                      </div>
+                                      <div>
+                                        <span>
+                                          {translate('resources.product.count')}
+                                          :
+                                        </span>
+                                        <span>{record.quantity}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                            }}
+                          />
+                        </div>
                         <div>
                           <EditButton
                             label={translate('resources.product.edit')}
