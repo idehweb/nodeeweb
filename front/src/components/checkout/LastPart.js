@@ -317,7 +317,7 @@ const LastPart = (props) => {
                 </div>,
                 <div className={'flex-1 textAlignRight'} key={'xo3'}>
                   {price.data?.productsPrice && (
-                    <div className={'attl-11 '}>
+                    <div className={'ttl '}>
                       {returnPrice(price.data?.productsPrice)}
                     </div>
                   )}
@@ -345,8 +345,8 @@ const LastPart = (props) => {
                 </div>
                 <div className={'flex-1'}>
                   <div key={'xo5'} className={'flex-1 textAlignRight'}>
-                    {/* <div className={'ttl '}> */}
-                    <div className={'attl-11 '}>
+                    <div className={'ttl '}>
+                      {/* <div className={'attl-11 '}> */}
                       {price?.data?.discount
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
@@ -365,8 +365,8 @@ const LastPart = (props) => {
                 <div key={'xo5'} className={'flex-1 textAlignRight'}>
                   <div className={'ttl '}>
                     {price.data?.postPrice > 0 && (
-                      // <div className={'ttl'}>
-                      <div className={'attl-11'}>
+                      <div className={'ttl'}>
+                        {/* <div className={'attl-11'}> */}
                         {price.data?.postPrice
                           .toString()
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
@@ -406,8 +406,8 @@ const LastPart = (props) => {
                   <div className={'ttl'}>{t('finalprice') + ': '}</div>
                 </div>,
                 <div key={'xo7'} className={'flex-1 textAlignRight'}>
-                  {/* <div className={'ttl '}> */}
-                  <div className={'attl-11 '}>
+                  <div className={'ttl '}>
+                    {/* <div className={'attl-11 '}> */}
                     {price.data?.totalPrice &&
                       returnAmount(price.data?.totalPrice, 0) +
                         ' ' +
