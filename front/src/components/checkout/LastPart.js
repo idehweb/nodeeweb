@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import React, { useCallback, useEffect, useState,useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import {
   Button,
   ButtonGroup,
@@ -13,11 +13,13 @@ import {
 } from 'shards-react';
 import { RadioGroup } from '@mui/material';
 import style from '#c/assets/styles/Checkout.module.css';
+import { combineUrl } from '@/functions/utils';
 
 import store from '#c/functions/store';
 import PriceChunker from './PriceChunker';
-import { withTranslation } from 'react-i18next';
+import { withTranslation, useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
+import { MainUrl } from '#c/functions/index';
 
 import GetDiscount from './GetDiscount';
 import GetGateways from './GetGateways';
@@ -30,7 +32,7 @@ import { CartService } from '@/functions/order/cart';
 
 const LastPart = (props) => {
   const { t, theParams } = props;
-  const {setPaymentMethod}=theParams;
+  const { setPaymentMethod } = theParams;
   const navigate = useNavigate();
   const address = OrderUtils.getAddressChose();
   const post = OrderUtils.getPostChose();
@@ -41,6 +43,7 @@ const LastPart = (props) => {
   const [gatewaySlug, setGatewaySlug] = useState(null);
   let [Transaction, setTransaction] = useState({});
   let [card, setCard] = useState({ data: [], state: 'none' });
+  console.log('card,..................', card);
 
   let [themeData, setThemeData] = useState(
     store.getState().store.themeData || []
@@ -75,54 +78,67 @@ const LastPart = (props) => {
     }
   }, []);
 
-  const setGateway = useCallback(async (g) => {
-    console.log('setGateway',g)
- setGatewaySlug(g);
-  }, [setGatewaySlug]);
+  const setGateway = useCallback(
+    async (g) => {
+      console.log('setGateway', g);
+      setGatewaySlug(g);
+    },
+    [setGatewaySlug]
+  );
 
-  const onCreateTransaction = useCallback(async (theGatewaySlug) => {
-    setCard((data) => ({ ...data, state: 'loading' }));
- 
-    try {
-      let obj={
-        post: { id: post.id },
-        address,
-        gatewaySlug:theGatewaySlug || gatewaySlug,
-        discount: discountCode ?? undefined,
-      };
-      console.log('obj',obj )
-      const { transactions } = await OrderService.createTransaction(obj);
+  const onCreateTransaction = useCallback(
+    async (theGatewaySlug) => {
+      setCard((data) => ({ ...data, state: 'loading' }));
 
-      // clear cart
-      CartService.clear();
+      try {
+        let obj = {
+          post: { id: post.id },
+          address,
+          gatewaySlug: theGatewaySlug || gatewaySlug,
+          discount: discountCode ?? undefined,
+        };
+        console.log('obj', obj);
+        const { transactions } = await OrderService.createTransaction(obj);
 
-      toast.success(t('Place Order'), {
-        autoClose: 1000,
-      });
-      setTimeout(() => {
-        const transaction = transactions.pop();
-        if (transaction.payment_method=='post'){
-          setTransaction(transaction);
-          setFormEnable(true);
-return;
-        }
-        if ((!transaction.payment_method || (transaction.payment_method && transaction.payment_method!='post'))
-          && transaction.payment_link){
-            if (transaction.payment_link.indexOf("http://") == 0 || transaction.payment_link.indexOf("https://") == 0) {
+        // clear cart
+        CartService.clear();
+
+        toast.success(t('Place Order'), {
+          autoClose: 1000,
+        });
+        setTimeout(() => {
+          const transaction = transactions.pop();
+          if (transaction.payment_method == 'post') {
+            setTransaction(transaction);
+            setFormEnable(true);
+            return;
+          }
+          if (
+            (!transaction.payment_method ||
+              (transaction.payment_method &&
+                transaction.payment_method != 'post')) &&
+            transaction.payment_link
+          ) {
+            if (
+              transaction.payment_link.indexOf('http://') == 0 ||
+              transaction.payment_link.indexOf('https://') == 0
+            ) {
               // do something here
               window.location.replace(transaction.payment_link);
-            }else{
+            } else {
               return navigate(transaction.payment_link, { replace: true });
             }
-              return navigate('/profile', { replace: true });
+            return navigate('/profile', { replace: true });
           }
-      }, 1000);
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setCard((data) => ({ ...data, state: 'none' }));
-    }
-  }, [discountCode]);
+        }, 1000);
+      } catch (err) {
+        toast.error(err.message);
+      } finally {
+        setCard((data) => ({ ...data, state: 'none' }));
+      }
+    },
+    [discountCode]
+  );
 
   const returnAmount = (amount) => {
     return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -193,25 +209,32 @@ return;
     getCart();
   }, []);
 
-//   useEffect(() => {
-//     console.log('gatewaySlug',gatewaySlug);
-// setGatewaySlug(gatewaySlug);
-//   }, [gatewaySlug]);
+  //   useEffect(() => {
+  //     console.log('gatewaySlug',gatewaySlug);
+  // setGatewaySlug(gatewaySlug);
+  //   }, [gatewaySlug]);
   useEffect(() => {
-    if(isFormEnable && Transaction)
-    formRef.current.submit();
-  }, [isFormEnable,Transaction]);
+    if (isFormEnable && Transaction) formRef.current.submit();
+  }, [isFormEnable, Transaction]);
 
   useEffect(() => {
     updatePrice(discountCode);
   }, [discountCode]);
-  if(isFormEnable){
-    return <><div style={{textAlign:"center"}}>{Transaction.payment_message}</div><form style={{display:'none'}} ref={formRef}  method={'post'} action={Transaction.payment_link}>
-      <input name={"RefId"} value={Transaction.payment_body.RefId}/>
-      <input name={"amount"} value={Transaction.amount}/>
-      <input type={"submit"}/>
-
-    </form></>
+  if (isFormEnable) {
+    return (
+      <>
+        <div style={{ textAlign: 'center' }}>{Transaction.payment_message}</div>
+        <form
+          style={{ display: 'none' }}
+          ref={formRef}
+          method={'post'}
+          action={Transaction.payment_link}>
+          <input name={'RefId'} value={Transaction.payment_body.RefId} />
+          <input name={'amount'} value={Transaction.amount} />
+          <input type={'submit'} />
+        </form>
+      </>
+    );
   }
   return (
     <Card className="mb-3 pd-1">
@@ -239,6 +262,11 @@ return;
                   <ListGroupItem
                     key={idx2}
                     className="d-flex px-3 border-0 wedkuhg">
+                    <img
+                      className={'img-final'}
+                      src={combineUrl(MainUrl, item.image)}
+                      alt={item.title?.fa}
+                    />
                     <div className={'flex-1 txc pt-1'}>
                       <div className={'bge'}>{item.count}</div>
                     </div>
@@ -262,10 +290,10 @@ return;
               {'روش ارسال: '}
               {post && post.title}
             </ListGroupItem>
-            <ListGroupItem className={'d-flex px-3 border-0 '}>
+            {/* <ListGroupItem className={'d-flex px-3 border-0 '}>
               {'درگاه پرداخت: '}
               {gatewaySlug}
-            </ListGroupItem>
+            </ListGroupItem> */}
             {
               <ListGroupItem className={'d-flex px-3 border-0 '}>
                 <div className={'flex-1'}>
@@ -285,11 +313,11 @@ return;
             <ListGroupItem className={'d-flex px-3 border-0 '}>
               {[
                 <div className={'flex-1'} key={'xo2'}>
-                  <div className={'ttl'}>{t('sum') + ': '}</div>
+                  <div className={'ttl'}>{t('goodprice') + ': '}</div>
                 </div>,
                 <div className={'flex-1 textAlignRight'} key={'xo3'}>
                   {price.data?.productsPrice && (
-                    <div className={'ttl '}>
+                    <div className={'attl-11 '}>
                       {returnPrice(price.data?.productsPrice)}
                     </div>
                   )}
@@ -317,7 +345,8 @@ return;
                 </div>
                 <div className={'flex-1'}>
                   <div key={'xo5'} className={'flex-1 textAlignRight'}>
-                    <div className={'ttl '}>
+                    {/* <div className={'ttl '}> */}
+                    <div className={'attl-11 '}>
                       {price?.data?.discount
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
@@ -336,7 +365,8 @@ return;
                 <div key={'xo5'} className={'flex-1 textAlignRight'}>
                   <div className={'ttl '}>
                     {price.data?.postPrice > 0 && (
-                      <div className={'ttl '}>
+                      // <div className={'ttl'}>
+                      <div className={'attl-11'}>
                         {price.data?.postPrice
                           .toString()
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
@@ -373,10 +403,11 @@ return;
             <ListGroupItem className={'d-flex px-3 border-0 '}>
               {[
                 <div className={'flex-1'} key={'xo6'}>
-                  <div className={'ttl'}>{t('amount') + ': '}</div>
+                  <div className={'ttl'}>{t('finalprice') + ': '}</div>
                 </div>,
                 <div key={'xo7'} className={'flex-1 textAlignRight'}>
-                  <div className={'ttl '}>
+                  {/* <div className={'ttl '}> */}
+                  <div className={'attl-11 '}>
                     {price.data?.totalPrice &&
                       returnAmount(price.data?.totalPrice, 0) +
                         ' ' +
@@ -386,7 +417,15 @@ return;
               ]}
             </ListGroupItem>
             <ListGroupItem className={'d-flex px-3 border-0 '}></ListGroupItem>
-            <GetGateways setGateway={(e)=>setGateway(e)} />
+            <ListGroupItem className={'d-flex px-3 border-0 '}>
+              {/* {'درگاه پرداخت: '} */}
+              {'روش پرداخت: '}
+              {gatewaySlug?.includes('mellat')
+                ? 'درگاه پرداخت بانک ملت'
+                : 'پرداخت در محل'}
+              {/* {gatewaySlug} */}
+            </ListGroupItem>
+            <GetGateways setGateway={(e) => setGateway(e)} />
           </ListGroup>
           <Col className={'empty ' + 'height50'} sm={12} lg={12}></Col>
           <ListGroup>

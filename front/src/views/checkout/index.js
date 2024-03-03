@@ -123,7 +123,16 @@ function Checkout({ t }) {
       case CheckoutState.Address:
         return <CheckoutAddress onNext={onNext} onPrev={onPrev} />;
       case CheckoutState.Post:
-        return <CheckoutPost       onSetData={onSetData} onNext={onNext} onPrev={onPrev} setSum={setSum} setdeliveryPrice={(e)=>setdeliveryPrice(e)} setTotal={setTotal}/>;
+        return (
+          <CheckoutPost
+            onSetData={onSetData}
+            onNext={onNext}
+            onPrev={onPrev}
+            setSum={setSum}
+            setdeliveryPrice={(e) => setdeliveryPrice(e)}
+            setTotal={setTotal}
+          />
+        );
       case CheckoutState.Factor:
         return (
           <CheckoutFactor

@@ -17,16 +17,15 @@ import { SaveData, getTheSettings } from '#c/functions/index';
 import { OrderService } from '@/functions/order';
 import { toast } from 'react-toastify';
 
-function GetDelivery(props) { 
-  console.log('props',props)
-  let {card,setdeliveryPrice,setTotal,setSum,onChooseDelivery}=props;
+function GetDelivery(props) {
+  console.log('props', props);
+  let { card, setdeliveryPrice, setTotal, setSum, onChooseDelivery } = props;
 
-  console.log('card',card)
-  console.log('setdeliveryPrice',setdeliveryPrice)
+  console.log('card', card);
+  console.log('setdeliveryPrice', setdeliveryPrice);
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
-
 
   const [postProviders, setPostProviders] = useState([]);
   const [hoverD, setHoverD] = useState(0);
@@ -96,7 +95,7 @@ function GetDelivery(props) {
 
   const chooseDelivery = (obj) => {
     let { onChooseDelivery } = props;
-
+    // console.log('obj..................', obj);
     return new Promise(function (resolve, reject) {
       onChooseDelivery(obj);
       resolve(obj);
@@ -208,9 +207,14 @@ function GetDelivery(props) {
                       }}>
                       <div className={'radio-button ' + hoverS}></div>
                       <div className={'theadds uytghui87 ' + hoverS}>
-                        <div className={'ttl'}>{adr.title}</div>
+                        {/* <div className={'ttl'}>{adr.title}</div> */}
+                        <div className={'ttl'}>
+                          {adr.id?.includes('pishtaz')
+                            ? ` ارسال با ${adr.title}`
+                            : adr.title}
+                        </div>
                         <div className={'desc'}>{adr.description}</div>
-                        <div className={'price'}>{adr.price}</div>
+                        <div className={'price'}>{`${adr.price} تومان `}</div>
                       </div>
                     </Col>
                   );
