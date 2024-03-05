@@ -36,18 +36,28 @@ export default (props) => {
   const changePriceAmount = (e) => {
     return q(totalp + e);
   };
-
+  var tempItems = [];
+  const doSomething = (e) => {
+    console.log('dosomethingData', e);
+    tempItems.push(e);
+    console.log('tempitems', tempItems);
+    // if (tempItems.length > 0) {
+    // let totalPrice = tempItems.map((item) => item.price * item.count);
+    // console.log('totalPriceIs', totalPrice);
+    // }
+  };
   const translate = useTranslate();
   // const record = useRecordContext();
   // const { setFilters, displayedFilters,selectedChoices,allChoices,availableChoices,total } = useChoicesContext();
 
   //TODO: beacuse of pushing data and updating state , the getDate(in useEffect) is calling as the same number of times as the data is in fetcehed data
   const { field } = useInput(props);
+  // console.log('field', field);
   const getData = () => {
     API.get('' + props.url, {}).then(({ data: { data = [] } }) => {
       var cds = [];
       data.forEach((uf, s) => {
-        console.log('rowdata', data);
+        // console.log('rowdata', data);
         cds.push({
           type: uf.type,
           salePrice: uf.combinations[0]?.salePrice,
@@ -93,11 +103,10 @@ export default (props) => {
         <SimpleFormIterator {...props}>
           <FormDataConsumer>
             {({ scopedFormData = {}, getSource, ...rest }) => {
-              {
-                scopedFormData.product_id &&
-                  changePriceAmount(scopedFormData.price);
-                // setTotalp(totalp + scopedFormData.price);
-              }
+              scopedFormData.product_id && doSomething(scopedFormData);
+              // changePriceAmount(scopedFormData.price);
+              // setTotalp(totalp + scopedFormData.price);
+
               console.log('scopedformdata...', scopedFormData);
               return (
                 <div className={'row mb-20'}>
@@ -215,9 +224,9 @@ export default (props) => {
                               )
                             : 0
                         }
-                        onChange={(e) =>
-                          console.log('e....................', e.target.value)
-                        }
+                        // onChange={(e) =>
+                        //   console.log('e....................', e.target.value)
+                        // }
                         label={translate('resources.order.price')}
                         placeholder={translate('resources.order.price')}
                         format={(v) => {
