@@ -81,11 +81,15 @@ const CardSidebar = ({ t }) => {
     });
   }, []);
   const onMinus = useCallback(async (combId, product) => {
-    await CartService.modify(product, {
-      ...product,
-      _id: combId,
-      quantity: product.quantity - 1,
-    });
+    if (product.quantity == 1) {
+      await CartService.delete(product._id, combId);
+    } else {
+      await CartService.modify(product, {
+        ...product,
+        _id: combId,
+        quantity: product.quantity - 1,
+      });
+    }
   }, []);
   const onDelete = useCallback(async (combId, product) => {
     await CartService.delete(product._id, combId);
