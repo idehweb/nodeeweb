@@ -11,6 +11,7 @@ import {
   TextInput,
   useInput,
   useTranslate,
+  TextField,
 } from 'react-admin';
 
 import API from '@/functions/API';
@@ -34,10 +35,11 @@ export default (props) => {
     API.get('' + props.url, {}).then(({ data: { data = [] } }) => {
       var cds = [];
       data.forEach((uf, s) => {
+        console.log('rowdata', data);
         cds.push({
           type: uf.type,
-          salePrice: uf.salePrice,
-          price: uf.price,
+          salePrice: uf.combinations[0]?.salePrice,
+          price: uf.combinations[0]?.price,
           _id: uf._id,
           title: uf.title && uf.title.fa ? uf.title.fa : uf.title,
           key: s,
@@ -50,14 +52,13 @@ export default (props) => {
   };
   // const [progress, setProgress] = React.useState(0);
   const returnDefaultValue = (product_id, x = 'price') => {
-    console.log('product_id', product_id);
-    console.log('x', x);
+    // console.log('product_id', product_id);
+    // console.log('x', x);
 
     let ddd = [];
     v.forEach((f) => {
       if (f._id == product_id) {
         console.log('f', f);
-
         ddd = f[x];
       }
     });
@@ -89,7 +90,7 @@ export default (props) => {
                   {/*{JSON.stringify(scopedFormData)}*/}
                   {/*{JSON.stringify(selectedChoices)}*/}
                   <div className={'col-md-3'}>
-                    {scopedFormData.product_id && (
+                    {/* {scopedFormData.product_id && (
                       <TextInput
                         disabled
                         source={getSource('_id')}
@@ -105,10 +106,12 @@ export default (props) => {
                         className={'width100 mb-20 ltr'}
                         fullWidth
                       />
-                    )}
+                    )} */}
                     {scopedFormData.product_id && (
                       <TextInput
                         disabled
+                        fullWidth
+                        multiline
                         source={getSource('title')}
                         defaultValue={
                           scopedFormData
@@ -119,8 +122,7 @@ export default (props) => {
                             : 0
                         }
                         label={translate('resources.order.title')}
-                        className={'width100 mb-20 ltr'}
-                        fullWidth
+                        className={'width100 mb-20 rtl'}
                       />
                     )}
 
@@ -157,18 +159,36 @@ export default (props) => {
                         defaultValue={1}
                         source={getSource('count')}
                         label={translate('resources.order.count')}
-                        className={'width100 mb-20 ltr'}
+                        className={'width100 mb-20 rtl'}
                         fullWidth
                       />
                     )}
                   </div>
                   <div className={'col-md-3'}>
+                    {/* {scopedFormData.product_id && (
+                      <TextInput
+                        disabled
+                        fullWidth
+                        multiline
+                        source={getSource('title')}
+                        defaultValue={
+                          scopedFormData
+                            ? returnDefaultValue(
+                                scopedFormData.product_id,
+                                'title'
+                              )
+                            : 0
+                        }
+                        label={translate('resources.order.title')}
+                        className={'width100 mb-20 rtl'}
+                      />
+                    )} */}
                     {scopedFormData.product_id && (
                       <TextInput
                         fullWidth
                         // record={scopedFormData}
                         source={getSource('price')}
-                        className={'ltr'}
+                        className={'rtl'}
                         defaultValue={
                           scopedFormData
                             ? returnDefaultValue(
@@ -209,7 +229,7 @@ export default (props) => {
                             : 0
                         }
                         source={getSource('salePrice')}
-                        className={'ltr'}
+                        className={'rtl'}
                         label={translate('resources.order.saleprice')}
                         placeholder={translate('resources.order.saleprice')}
                         format={(v) => {
