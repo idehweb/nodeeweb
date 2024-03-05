@@ -77,7 +77,7 @@
   dependencies:
     sparse-bitfield "^3.0.3"
 
-"@nodeeweb/admin-build@^0.1.0":
+"@nodeeweb/admin-build@^0.1.0", "@nodeeweb/admin-build@^0.1.2":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@nodeeweb/admin-build/-/admin-build-0.1.2.tgz#8b0063f798ab41d3e7dfc06b30ef5ebf397d530e"
   integrity sha512-+a5oGn63jhbQTCvvTcAyZEJAZ59LJr6o3qO4VnlJLTaCgW3Sfdx9SN8+NMny0/mL7QkWRMrExt1BXL/4C1ZjQA==
@@ -86,7 +86,7 @@
   version "0.0.0"
   uid ""
 
-"@nodeeweb/front-build@^0.1.0":
+"@nodeeweb/front-build@^0.1.0", "@nodeeweb/front-build@^0.1.7":
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/@nodeeweb/front-build/-/front-build-0.1.7.tgz#e8bc088eb16059a7cdecd660d6c0ce273a5a9334"
   integrity sha512-5913ZoEN+cxuv5WnNyqrdrHzZ6A/0CUzBQoV8DkjtePuQLCYUWXqcu/oNmQABK0Qw2TkZoIuWzjnF36yyKZ/7w==

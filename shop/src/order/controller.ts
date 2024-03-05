@@ -33,6 +33,12 @@ export default function registerController() {
     },
     {
       method: 'post',
+      url: '/',
+      service: orderService.submitOrder,
+      access: AdminAccess,
+    },
+    {
+      method: 'post',
       url: '/cart',
       service: CartService.addToCart,
       access: AuthUserAccess,

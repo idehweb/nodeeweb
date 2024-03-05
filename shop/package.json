@@ -13,14 +13,13 @@
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "publish:pre": "node prepublish.js",
     "publish": "./publish.sh"
-    
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@nodeeweb/admin-build": "^0.1.0",
+    "@nodeeweb/admin-build": "^0.1.2",
     "@nodeeweb/core": "link:../core",
-    "@nodeeweb/front-build": "^0.1.0",
+    "@nodeeweb/front-build": "^0.1.7",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.1",
     "class-transformer": "link:./node_modules\\@nodeeweb\\core\\node_modules\\class-transformer",
