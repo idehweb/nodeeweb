@@ -33,7 +33,6 @@ import {
 import { dateFormat } from '@/functions';
 import { BASE_URL } from '@/functions/API';
 
-
 const PostPagination = (props) => (
   <Pagination rowsPerPageOptions={[10, 25, 50, 100]} {...props} />
 );
@@ -220,7 +219,7 @@ const orderList = (props) => {
           <SelectInput
             source="status"
             label={translate('resources.order.orderNumber')}
-            emptyValue={null}
+            // emptyValue={null}
             choices={OrderStatus()}
             alwaysOn
           />
