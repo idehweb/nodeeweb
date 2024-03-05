@@ -79,7 +79,7 @@ function GetAddress(props) {
           readValue: 'no',
           returnEverything: true,
           onChange: (text) => {
-            checkOutBillingAddress.add.data['city'] = text.name;
+            checkOutBillingAddress.add.data['city'] = text?.name;
           },
           selectOptionText: t('choose city...'),
           className: 'rtl',
@@ -176,9 +176,9 @@ function GetAddress(props) {
               });
               return;
             }
-            checkOutBillingAddress.add.fields.forEach((m, x) => {
-              checkOutBillingAddress.add.fields[x].value = '';
-            });
+            // checkOutBillingAddress.add.fields.forEach((m, x) => {
+            //   checkOutBillingAddress.add.fields[x].value = '';
+            // });
 
             try {
               const response = await updateAddress(
@@ -186,6 +186,9 @@ function GetAddress(props) {
               );
               setAddress(response.address);
               setModals(false);
+              checkOutBillingAddress.add.fields.forEach((m, x) => {
+                checkOutBillingAddress.add.fields[x].value = '';
+              });
             } catch (err) {
               toast.error(err.response?.data?.message || err.message);
             }
