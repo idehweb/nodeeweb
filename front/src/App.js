@@ -36,7 +36,7 @@ const APP = (props) => {
       }
     }
     // console.log(newRoutes);
-    routes = createRoutes(newRoutes);
+    routes = createRoutes( newRoutes );
   }
   // if (!themeData || (themeData && !themeData.models)) {
   //   return <></>;
