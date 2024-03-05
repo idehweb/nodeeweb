@@ -27,9 +27,21 @@ export default (props) => {
   const [c, setC] = React.useState(0);
 
   let { scopedFormData, getSource, source } = props;
+
+  const [totalp, setTotalp] = React.useState(0);
+  let q = props.totalPrice;
+  let qq = props.totalAmount;
+  // console.log('q............', q(11));
+
+  const changePriceAmount = (e) => {
+    return q(totalp + e);
+  };
+
   const translate = useTranslate();
   // const record = useRecordContext();
   // const { setFilters, displayedFilters,selectedChoices,allChoices,availableChoices,total } = useChoicesContext();
+
+  //TODO: beacuse of pushing data and updating state , the getDate(in useEffect) is calling as the same number of times as the data is in fetcehed data
   const { field } = useInput(props);
   const getData = () => {
     API.get('' + props.url, {}).then(({ data: { data = [] } }) => {
@@ -62,7 +74,7 @@ export default (props) => {
         ddd = f[x];
       }
     });
-    console.log('ddd', ddd);
+    // console.log('ddd', ddd);
     // setC(c+1)
     return ddd;
   };
@@ -81,6 +93,12 @@ export default (props) => {
         <SimpleFormIterator {...props}>
           <FormDataConsumer>
             {({ scopedFormData = {}, getSource, ...rest }) => {
+              {
+                scopedFormData.product_id &&
+                  changePriceAmount(scopedFormData.price);
+                // setTotalp(totalp + scopedFormData.price);
+              }
+              console.log('scopedformdata...', scopedFormData);
               return (
                 <div className={'row mb-20'}>
                   {/*{JSON.stringify(scopedFormData)}*/}
@@ -196,6 +214,9 @@ export default (props) => {
                                 'price'
                               )
                             : 0
+                        }
+                        onChange={(e) =>
+                          console.log('e....................', e.target.value)
                         }
                         label={translate('resources.order.price')}
                         placeholder={translate('resources.order.price')}

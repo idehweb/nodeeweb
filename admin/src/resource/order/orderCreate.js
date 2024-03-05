@@ -28,13 +28,24 @@ const Form = ({ children, ...props }) => {
   const translate = useTranslate();
   const [url, setUrl] = useState(['']);
 
+  const [totalPrice, SetTotalPrice] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
+  console.log('totalAmount', totalAmount);
+  console.log('totalPrice', totalPrice);
+
   return (
     <SimpleForm
       fullWidth
       {...props}
       // onSubmit={(e) => save(e)}
       className={'d-flex0'}>
-      <AddProductsField source="card" url={'/product/0/1000'} />
+      {/* <AddProductsField source="card" url={'/product/0/1000'} /> */}
+      <AddProductsField
+        source="card"
+        url={'/product/0/1000'}
+        totalPrice={SetTotalPrice}
+        totalAmount={setTotalAmount}
+      />
 
       <ReferenceInput fullWidth source="customer" reference="customer">
         <AutocompleteInput
