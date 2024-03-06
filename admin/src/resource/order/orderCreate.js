@@ -52,9 +52,22 @@ const Form = ({ children, ...props }) => {
         <AutocompleteInput
           fullWidth
           label={translate('resources.order.customer')}
-          optionText={'phone'}
+          // optionText={'phone'}
+          optionText={(record) =>
+            `${record.firstName ? record.firstName : ''} ${
+              record.lastName ? record.lastName : ''
+            } ${record.phone ? record.phone : ''} `
+          }
           optionValue={'_id'}
+          // isLoading={true}
+          // suggestionLimit={4}
         />
+        {/* <AutocompleteInput
+          fullWidth
+          label={translate('resources.order.customer')}
+          optionText={'firstName'}
+          optionValue={'_id'}
+        /> */}
       </ReferenceInput>
       <SelectInput
         label={translate('resources.order.paymentStatus')}
