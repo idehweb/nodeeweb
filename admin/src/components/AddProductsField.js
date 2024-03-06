@@ -28,38 +28,55 @@ export default (props) => {
 
   let { scopedFormData, getSource, source } = props;
 
-  const [totalp, setTotalp] = React.useState(0);
-  let q = props.totalPrice;
-  let qq = props.totalAmount;
+  // const [totalp, setTotalp] = React.useState(0);
+  let calcTotalPrice = props.totalPrice;
+  let calcTotalAmount = props.totalAmount;
   // console.log('q............', q(11));
 
-  const changePriceAmount = (e) => {
-    return q(totalp + e);
-  };
-  var tempItems = [];
+  // const changePriceAmount = (e) => {
+  //   return q(e);
+  // };
+
+  let tempItems = [];
   const doSomething = (e) => {
     console.log('dosomethingData', e);
-    tempItems.push(e);
-    console.log('tempitems', tempItems);
-    // if (tempItems.length > 0) {
-    // let totalPrice = tempItems.map((item) => item.price * item.count);
-    // console.log('totalPriceIs', totalPrice);
-    // }
+    if (tempItems.length == 0) {
+      tempItems.push(e);
+    } else {
+      let CheckItem = tempItems.find((elem) => elem.product_id == e.product_id);
+      CheckItem
+        ? tempItems.map((elem) =>
+            elem.product_id == e.product_id ? (elem = e) : elem
+          )
+        : tempItems.push(e);
+    }
+
+    // console.log('tempItems', tempItems);
+    let tPrice = tempItems
+      .map((elem) => elem.price * elem.count)
+      .reduce((a, b) => a + b, 0);
+    let tAmount = tempItems
+      .map((elem) => elem.count)
+      .reduce((a, b) => a + b, 0);
+
+    console.log('totalPriceIs', tPrice);
+    console.log('totalAmountIs', tAmount);
+    calcTotalPrice(tPrice);
+    calcTotalAmount(tAmount);
   };
   const translate = useTranslate();
   // const record = useRecordContext();
   // const { setFilters, displayedFilters,selectedChoices,allChoices,availableChoices,total } = useChoicesContext();
 
-  //TODO: beacuse of pushing data and updating state , the getDate(in useEffect) is calling as the same number of times as the data is in fetcehed data
+  //TODO: beacuse of pushing data and updating state , the getDate(in useEffect) is calling as the same number of times as the data is in fetcehed data -check rowData console.log line 91
   const { field } = useInput(props);
-  // console.log('field', field);
   const getData = () => {
     API.get('' + props.url, {}).then(({ data: { data = [] } }) => {
       var cds = [];
       data.forEach((uf, s) => {
         // console.log('rowdata', data);
         cds.push({
-          type: uf.type,
+          // type: uf.type,
           salePrice: uf.combinations[0]?.salePrice,
           price: uf.combinations[0]?.price,
           _id: uf._id,
@@ -83,6 +100,10 @@ export default (props) => {
         console.log('f', f);
         ddd = f[x];
       }
+      //show pirce for salePrice also, if there is no salePrice
+      if ((x == 'salePrice' && ddd == undefined) || null) {
+        ddd = f['price'];
+      }
     });
     // console.log('ddd', ddd);
     // setC(c+1)
@@ -104,10 +125,7 @@ export default (props) => {
           <FormDataConsumer>
             {({ scopedFormData = {}, getSource, ...rest }) => {
               scopedFormData.product_id && doSomething(scopedFormData);
-              // changePriceAmount(scopedFormData.price);
-              // setTotalp(totalp + scopedFormData.price);
-
-              console.log('scopedformdata...', scopedFormData);
+              // console.log('scopedformdata...', scopedFormData);
               return (
                 <div className={'row mb-20'}>
                   {/*{JSON.stringify(scopedFormData)}*/}
@@ -224,9 +242,6 @@ export default (props) => {
                               )
                             : 0
                         }
-                        // onChange={(e) =>
-                        //   console.log('e....................', e.target.value)
-                        // }
                         label={translate('resources.order.price')}
                         placeholder={translate('resources.order.price')}
                         format={(v) => {
