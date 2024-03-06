@@ -435,13 +435,13 @@ const customFarsiMessages = {
     },
 
     customers: {
-        customerData: 'اطلاعات مشتری',
-        contactData: 'اطلاعات تماس',
-        personalData: 'اطلاعات شخصی',
-        companyData: 'اطلاعات شرکت',
-        grouping: 'گروه بندی',
-        extraData: 'اطلاعات بیخود',
-        status: 'وضعیت',
+      customerData: 'اطلاعات مشتری',
+      contactData: 'اطلاعات تماس',
+      personalData: 'اطلاعات شخصی',
+      companyData: 'اطلاعات شرکت',
+      grouping: 'گروه بندی',
+      extraData: 'اطلاعات بیخود',
+      status: 'وضعیت',
       companyName: 'نام شرکت',
       companyTelNumber: ' تلفن شرکت',
       data: 'data',
@@ -493,7 +493,7 @@ const customFarsiMessages = {
       order: 'ترتیب',
     },
     user: {
-        actions: 'اقدامات',
+      actions: 'اقدامات',
       _id: 'شناسه',
       phoneNumber: 'شماره تماس',
       activationCode: 'کد فعال سازی',
@@ -559,6 +559,7 @@ const customFarsiMessages = {
       complete: 'تکمیل شده',
       canceled: 'لغو شده',
       actions: 'اقدامات',
+      itemSum: 'تعداد کل موارد',
       orderNumberOrMobileNumber: 'order number or mobile number',
     },
     post: {

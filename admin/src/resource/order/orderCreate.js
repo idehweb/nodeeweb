@@ -7,6 +7,7 @@ import {
   ReferenceInput,
   useTranslate,
 } from 'react-admin';
+import TextField from '@mui/material/TextField';
 
 import React, { useState } from 'react';
 
@@ -30,8 +31,8 @@ const Form = ({ children, ...props }) => {
 
   const [totalPrice, SetTotalPrice] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
-  console.log('totalAmount', totalAmount);
-  console.log('totalPrice', totalPrice);
+  // console.log('totalAmount', totalAmount);
+  // console.log('totalPrice', totalPrice);
 
   return (
     <SimpleForm
@@ -80,8 +81,17 @@ const Form = ({ children, ...props }) => {
 
       {/*<NumberInput source="amount" label={translate("resources.order.amount")}*/}
       {/*className={"width100 mb-20 ltr"} fullWidth/>*/}
-
-      <TextInput
+      <TextField
+        label={translate('resources.order.itemSum')}
+        style={{ width: '100%', padding: '5px', margin: '5px' }}
+        value={totalAmount}
+      />
+      <TextField
+        label={translate('resources.order.amount')}
+        style={{ width: '100%', padding: '5px', margin: '5px' }}
+        value={totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+      />
+      {/* <TextInput
         fullWidth
         // record={scopedFormData}
 
@@ -98,8 +108,8 @@ const Form = ({ children, ...props }) => {
 
           return v.toString().replace(/,/g, '');
         }}
-      />
-      <TextInput
+      /> */}
+      {/* <TextInput
         fullWidth
         // record={scopedFormData}
 
@@ -116,7 +126,7 @@ const Form = ({ children, ...props }) => {
 
           return v.toString().replace(/,/g, '');
         }}
-      />
+      /> */}
 
       {children}
     </SimpleForm>

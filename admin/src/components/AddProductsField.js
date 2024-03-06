@@ -28,18 +28,11 @@ export default (props) => {
 
   let { scopedFormData, getSource, source } = props;
 
-  // const [totalp, setTotalp] = React.useState(0);
   let calcTotalPrice = props.totalPrice;
   let calcTotalAmount = props.totalAmount;
-  // console.log('q............', q(11));
-
-  // const changePriceAmount = (e) => {
-  //   return q(e);
-  // };
 
   let tempItems = [];
   const doSomething = (e) => {
-    console.log('dosomethingData', e);
     if (tempItems.length == 0) {
       tempItems.push(e);
     } else {
@@ -59,8 +52,6 @@ export default (props) => {
       .map((elem) => elem.count)
       .reduce((a, b) => a + b, 0);
 
-    console.log('totalPriceIs', tPrice);
-    console.log('totalAmountIs', tAmount);
     calcTotalPrice(tPrice);
     calcTotalAmount(tAmount);
   };
@@ -90,10 +81,8 @@ export default (props) => {
     });
   };
   // const [progress, setProgress] = React.useState(0);
+  //TODO: below function is making too many renders
   const returnDefaultValue = (product_id, x = 'price') => {
-    // console.log('product_id', product_id);
-    // console.log('x', x);
-
     let ddd = [];
     v.forEach((f) => {
       if (f._id == product_id) {
@@ -125,7 +114,7 @@ export default (props) => {
           <FormDataConsumer>
             {({ scopedFormData = {}, getSource, ...rest }) => {
               scopedFormData.product_id && doSomething(scopedFormData);
-              // console.log('scopedformdata...', scopedFormData);
+              console.log('scopedformdata...', scopedFormData);
               return (
                 <div className={'row mb-20'}>
                   {/*{JSON.stringify(scopedFormData)}*/}
