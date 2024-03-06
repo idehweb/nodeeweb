@@ -21,13 +21,12 @@ let ckjhg = {};
 let hasTriggered = false;
 
 export default (props) => {
-  // console.log('props',props);
-  // console.log('CatRefField...',props);
+  // console.log('props', props);
+  // console.log('CatRefField...', props);
   const [v, setV] = React.useState([]);
   const [c, setC] = React.useState(0);
 
   let { scopedFormData, getSource, source } = props;
-
   let calcTotalPrice = props.totalPrice;
   let calcTotalAmount = props.totalAmount;
 
@@ -61,6 +60,7 @@ export default (props) => {
 
   //TODO: beacuse of pushing data and updating state , the getDate(in useEffect) is calling as the same number of times as the data is in fetcehed data -check rowData console.log line 91
   const { field } = useInput(props);
+  // console.log('field', field);
   const getData = () => {
     API.get('' + props.url, {}).then(({ data: { data = [] } }) => {
       var cds = [];
@@ -86,7 +86,7 @@ export default (props) => {
     let ddd = [];
     v.forEach((f) => {
       if (f._id == product_id) {
-        console.log('f', f);
+        // console.log('f', f);
         ddd = f[x];
       }
       //show pirce for salePrice also, if there is no salePrice
@@ -104,17 +104,20 @@ export default (props) => {
   }, []);
   // console.log('allChoices',allChoices)
   // console.log('selectedChoices',selectedChoices)
+
   return (
     <>
       <ArrayInput
         fullWidth
+        // onClick={(e) => console.log('first', e)}
         source={source}
         label={translate('resources.order.card')}>
         <SimpleFormIterator {...props}>
           <FormDataConsumer>
             {({ scopedFormData = {}, getSource, ...rest }) => {
               scopedFormData.product_id && doSomething(scopedFormData);
-              console.log('scopedformdata...', scopedFormData);
+              // console.log('rest.....', rest);
+              // console.log('scopedformdata...', scopedFormData);
               return (
                 <div className={'row mb-20'}>
                   {/*{JSON.stringify(scopedFormData)}*/}
@@ -194,6 +197,7 @@ export default (props) => {
                         source={getSource('count')}
                         label={translate('resources.order.count')}
                         className={'width100 mb-20 rtl'}
+                        min={0}
                         fullWidth
                       />
                     )}
