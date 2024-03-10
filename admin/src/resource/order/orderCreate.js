@@ -42,13 +42,13 @@ const Form = ({ children, ...props }) => {
       className={'d-flex0'}>
       {/* <AddProductsField source="card" url={'/product/0/1000'} /> */}
       <AddProductsField
-        source="card"
+        source="products"
         url={'/product/0/1000'}
         totalPrice={SetTotalPrice}
         totalAmount={setTotalAmount}
       />
 
-      <ReferenceInput fullWidth source="customer" reference="customer">
+      <ReferenceInput fullWidth source="customer._id" reference="customer">
         <AutocompleteInput
           fullWidth
           label={translate('resources.order.customer')}

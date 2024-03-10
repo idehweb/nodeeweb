@@ -35,10 +35,10 @@ export default (props) => {
     if (tempItems.length == 0) {
       tempItems.push(e);
     } else {
-      let CheckItem = tempItems.find((elem) => elem.product_id == e.product_id);
+      let CheckItem = tempItems.find((elem) => elem._id == e._id);
       CheckItem
         ? tempItems.map((elem) =>
-            elem.product_id == e.product_id ? (elem = e) : elem
+            elem._id == e._id ? (elem = e) : elem
           )
         : tempItems.push(e);
     }
@@ -82,10 +82,10 @@ export default (props) => {
   };
   // const [progress, setProgress] = React.useState(0);
   //TODO: below function is making too many renders
-  const returnDefaultValue = (product_id, x = 'price') => {
+  const returnDefaultValue = (_id, x = 'price') => {
     let ddd = [];
     v.forEach((f) => {
-      if (f._id == product_id) {
+      if (f._id == _id) {
         // console.log('f', f);
         ddd = f[x];
       }
@@ -115,7 +115,7 @@ export default (props) => {
         <SimpleFormIterator {...props}>
           <FormDataConsumer>
             {({ scopedFormData = {}, getSource, ...rest }) => {
-              scopedFormData.product_id && doSomething(scopedFormData);
+              scopedFormData._id && doSomething(scopedFormData);
               // console.log('rest.....', rest);
               // console.log('scopedformdata...', scopedFormData);
               return (
@@ -127,14 +127,14 @@ export default (props) => {
                   {/*{JSON.stringify(scopedFormData)}*/}
                   {/*{JSON.stringify(selectedChoices)}*/}
                   <div className={'col-md-3'}>
-                    {/* {scopedFormData.product_id && (
+                    {/* {scopedFormData._id && (
                       <TextInput
                         disabled
                         source={getSource('_id')}
                         defaultValue={
                           scopedFormData
                             ? returnDefaultValue(
-                                scopedFormData.product_id,
+                                scopedFormData._id,
                                 '_id'
                               )
                             : 0
@@ -144,7 +144,7 @@ export default (props) => {
                         fullWidth
                       />
                     )} */}
-                    {scopedFormData.product_id && (
+                    {scopedFormData._id && (
                       <TextInput
                         disabled
                         fullWidth
@@ -153,7 +153,7 @@ export default (props) => {
                         defaultValue={
                           scopedFormData
                             ? returnDefaultValue(
-                                scopedFormData.product_id,
+                                scopedFormData._id,
                                 'title'
                               )
                             : 0
@@ -163,9 +163,9 @@ export default (props) => {
                       />
                     )}
 
-                    {!scopedFormData.product_id && (
+                    {!scopedFormData._id && (
                       <AutocompleteInput
-                        source={getSource('product_id')}
+                        source={getSource('_id')}
                         choices={v}
                         label={translate('resources.order.product')}
                         optionValue="_id"
@@ -174,7 +174,7 @@ export default (props) => {
                     )}
                   </div>
                   {/* <div className={'col-md-3'}>
-                    {scopedFormData.product_id && (
+                    {scopedFormData._id && (
                       <ReferenceInput
                         source="combinations"
                         reference={getSource('combinations')}
@@ -191,7 +191,7 @@ export default (props) => {
                     )}
                   </div> */}
                   <div className={'col-md-3'}>
-                    {scopedFormData.product_id && (
+                    {scopedFormData._id && (
                       <NumberInput
                         defaultValue={1}
                         source={getSource('count')}
@@ -203,7 +203,7 @@ export default (props) => {
                     )}
                   </div>
                   <div className={'col-md-3'}>
-                    {/* {scopedFormData.product_id && (
+                    {/* {scopedFormData._id && (
                       <TextInput
                         disabled
                         fullWidth
@@ -212,7 +212,7 @@ export default (props) => {
                         defaultValue={
                           scopedFormData
                             ? returnDefaultValue(
-                                scopedFormData.product_id,
+                                scopedFormData._id,
                                 'title'
                               )
                             : 0
@@ -221,7 +221,7 @@ export default (props) => {
                         className={'width100 mb-20 rtl'}
                       />
                     )} */}
-                    {scopedFormData.product_id && (
+                    {scopedFormData._id && (
                       <TextInput
                         fullWidth
                         // record={scopedFormData}
@@ -230,7 +230,7 @@ export default (props) => {
                         defaultValue={
                           scopedFormData
                             ? returnDefaultValue(
-                                scopedFormData.product_id,
+                                scopedFormData._id,
                                 'price'
                               )
                             : 0
@@ -254,14 +254,14 @@ export default (props) => {
                     )}
                   </div>
                   <div className={'col-md-3'}>
-                    {scopedFormData.product_id && (
+                    {scopedFormData._id && (
                       <TextInput
                         fullWidth
                         // record={scopedFormData}
                         defaultValue={
                           scopedFormData
                             ? returnDefaultValue(
-                                scopedFormData.product_id,
+                                scopedFormData._id,
                                 'salePrice'
                               )
                             : 0

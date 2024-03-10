@@ -50,16 +50,15 @@ class OrderService {
     return base;
   }
   async submitOrder(req: Req,res: Res){
+    console.log('submitOrder');
     const {body}=req;
     const Order = store.db.model('order');
     try{
       let order=await Order.create(body);
       return res.json({ data: order });
     }catch (e){
-      console.log('e',e);
-      return res.json({ error: e });
+      return res.status(400).json({ error: e });
     }
-    console.log('req');
   }
 
   update: MiddleWare = async (req, res) => {
