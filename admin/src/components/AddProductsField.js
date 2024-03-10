@@ -11,6 +11,7 @@ import {
   TextInput,
   useInput,
   useTranslate,
+  TextField,
 } from 'react-admin';
 
 import API from '@/functions/API';
@@ -20,24 +21,55 @@ let ckjhg = {};
 let hasTriggered = false;
 
 export default (props) => {
-  // console.log('props',props);
-  // console.log('CatRefField...',props);
+  // console.log('props', props);
+  // console.log('CatRefField...', props);
   const [v, setV] = React.useState([]);
   const [c, setC] = React.useState(0);
 
   let { scopedFormData, getSource, source } = props;
+  let calcTotalPrice = props.totalPrice;
+  let calcTotalAmount = props.totalAmount;
+
+  let tempItems = [];
+  const doSomething = (e) => {
+    if (tempItems.length == 0) {
+      tempItems.push(e);
+    } else {
+      let CheckItem = tempItems.find((elem) => elem.product_id == e.product_id);
+      CheckItem
+        ? tempItems.map((elem) =>
+            elem.product_id == e.product_id ? (elem = e) : elem
+          )
+        : tempItems.push(e);
+    }
+
+    // console.log('tempItems', tempItems);
+    let tPrice = tempItems
+      .map((elem) => elem.price * elem.count)
+      .reduce((a, b) => a + b, 0);
+    let tAmount = tempItems
+      .map((elem) => elem.count)
+      .reduce((a, b) => a + b, 0);
+
+    calcTotalPrice(tPrice);
+    calcTotalAmount(tAmount);
+  };
   const translate = useTranslate();
   // const record = useRecordContext();
   // const { setFilters, displayedFilters,selectedChoices,allChoices,availableChoices,total } = useChoicesContext();
+
+  //TODO: beacuse of pushing data and updating state , the getDate(in useEffect) is calling as the same number of times as the data is in fetcehed data -check rowData console.log line 91
   const { field } = useInput(props);
+  // console.log('field', field);
   const getData = () => {
     API.get('' + props.url, {}).then(({ data: { data = [] } }) => {
       var cds = [];
       data.forEach((uf, s) => {
+        // console.log('rowdata', data);
         cds.push({
-          type: uf.type,
-          salePrice: uf.salePrice,
-          price: uf.price,
+          // type: uf.type,
+          salePrice: uf.combinations[0]?.salePrice,
+          price: uf.combinations[0]?.price,
           _id: uf._id,
           title: uf.title && uf.title.fa ? uf.title.fa : uf.title,
           key: s,
@@ -49,19 +81,20 @@ export default (props) => {
     });
   };
   // const [progress, setProgress] = React.useState(0);
+  //TODO: below function is making too many renders
   const returnDefaultValue = (product_id, x = 'price') => {
-    console.log('product_id', product_id);
-    console.log('x', x);
-
     let ddd = [];
     v.forEach((f) => {
       if (f._id == product_id) {
-        console.log('f', f);
-
+        // console.log('f', f);
         ddd = f[x];
       }
+      //show pirce for salePrice also, if there is no salePrice
+      if ((x == 'salePrice' && ddd == undefined) || null) {
+        ddd = f['price'];
+      }
     });
-    console.log('ddd', ddd);
+    // console.log('ddd', ddd);
     // setC(c+1)
     return ddd;
   };
@@ -71,15 +104,20 @@ export default (props) => {
   }, []);
   // console.log('allChoices',allChoices)
   // console.log('selectedChoices',selectedChoices)
+
   return (
     <>
       <ArrayInput
         fullWidth
+        // onClick={(e) => console.log('first', e)}
         source={source}
         label={translate('resources.order.card')}>
         <SimpleFormIterator {...props}>
           <FormDataConsumer>
             {({ scopedFormData = {}, getSource, ...rest }) => {
+              scopedFormData.product_id && doSomething(scopedFormData);
+              // console.log('rest.....', rest);
+              // console.log('scopedformdata...', scopedFormData);
               return (
                 <div className={'row mb-20'}>
                   {/*{JSON.stringify(scopedFormData)}*/}
@@ -89,7 +127,7 @@ export default (props) => {
                   {/*{JSON.stringify(scopedFormData)}*/}
                   {/*{JSON.stringify(selectedChoices)}*/}
                   <div className={'col-md-3'}>
-                    {scopedFormData.product_id && (
+                    {/* {scopedFormData.product_id && (
                       <TextInput
                         disabled
                         source={getSource('_id')}
@@ -105,10 +143,12 @@ export default (props) => {
                         className={'width100 mb-20 ltr'}
                         fullWidth
                       />
-                    )}
+                    )} */}
                     {scopedFormData.product_id && (
                       <TextInput
                         disabled
+                        fullWidth
+                        multiline
                         source={getSource('title')}
                         defaultValue={
                           scopedFormData
@@ -119,8 +159,7 @@ export default (props) => {
                             : 0
                         }
                         label={translate('resources.order.title')}
-                        className={'width100 mb-20 ltr'}
-                        fullWidth
+                        className={'width100 mb-20 rtl'}
                       />
                     )}
 
@@ -157,18 +196,37 @@ export default (props) => {
                         defaultValue={1}
                         source={getSource('count')}
                         label={translate('resources.order.count')}
-                        className={'width100 mb-20 ltr'}
+                        className={'width100 mb-20 rtl'}
+                        min={0}
                         fullWidth
                       />
                     )}
                   </div>
                   <div className={'col-md-3'}>
+                    {/* {scopedFormData.product_id && (
+                      <TextInput
+                        disabled
+                        fullWidth
+                        multiline
+                        source={getSource('title')}
+                        defaultValue={
+                          scopedFormData
+                            ? returnDefaultValue(
+                                scopedFormData.product_id,
+                                'title'
+                              )
+                            : 0
+                        }
+                        label={translate('resources.order.title')}
+                        className={'width100 mb-20 rtl'}
+                      />
+                    )} */}
                     {scopedFormData.product_id && (
                       <TextInput
                         fullWidth
                         // record={scopedFormData}
                         source={getSource('price')}
-                        className={'ltr'}
+                        className={'rtl'}
                         defaultValue={
                           scopedFormData
                             ? returnDefaultValue(
@@ -209,7 +267,7 @@ export default (props) => {
                             : 0
                         }
                         source={getSource('salePrice')}
-                        className={'ltr'}
+                        className={'rtl'}
                         label={translate('resources.order.saleprice')}
                         placeholder={translate('resources.order.saleprice')}
                         format={(v) => {

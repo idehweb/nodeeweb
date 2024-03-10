@@ -7,6 +7,7 @@ import {
   ReferenceInput,
   useTranslate,
 } from 'react-admin';
+import TextField from '@mui/material/TextField';
 
 import React, { useState } from 'react';
 
@@ -28,21 +29,45 @@ const Form = ({ children, ...props }) => {
   const translate = useTranslate();
   const [url, setUrl] = useState(['']);
 
+  const [totalPrice, SetTotalPrice] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
+  // console.log('totalAmount', totalAmount);
+  // console.log('totalPrice', totalPrice);
+
   return (
     <SimpleForm
       fullWidth
       {...props}
       // onSubmit={(e) => save(e)}
       className={'d-flex0'}>
-      <AddProductsField source="card" url={'/product/0/1000'} />
+      {/* <AddProductsField source="card" url={'/product/0/1000'} /> */}
+      <AddProductsField
+        source="card"
+        url={'/product/0/1000'}
+        totalPrice={SetTotalPrice}
+        totalAmount={setTotalAmount}
+      />
 
       <ReferenceInput fullWidth source="customer" reference="customer">
         <AutocompleteInput
           fullWidth
           label={translate('resources.order.customer')}
-          optionText={'phone'}
+          // optionText={'phone'}
+          optionText={(record) =>
+            `${record.firstName ? record.firstName : ''} ${
+              record.lastName ? record.lastName : ''
+            } ${record.phone ? record.phone : ''} `
+          }
           optionValue={'_id'}
+          // isLoading={true}
+          // suggestionLimit={4}
         />
+        {/* <AutocompleteInput
+          fullWidth
+          label={translate('resources.order.customer')}
+          optionText={'firstName'}
+          optionValue={'_id'}
+        /> */}
       </ReferenceInput>
       <SelectInput
         label={translate('resources.order.paymentStatus')}
@@ -69,8 +94,17 @@ const Form = ({ children, ...props }) => {
 
       {/*<NumberInput source="amount" label={translate("resources.order.amount")}*/}
       {/*className={"width100 mb-20 ltr"} fullWidth/>*/}
-
-      <TextInput
+      <TextField
+        label={translate('resources.order.itemSum')}
+        style={{ width: '100%', padding: '5px', margin: '5px' }}
+        value={totalAmount}
+      />
+      <TextField
+        label={translate('resources.order.amount')}
+        style={{ width: '100%', padding: '5px', margin: '5px' }}
+        value={totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+      />
+      {/* <TextInput
         fullWidth
         // record={scopedFormData}
 
@@ -87,8 +121,8 @@ const Form = ({ children, ...props }) => {
 
           return v.toString().replace(/,/g, '');
         }}
-      />
-      <TextInput
+      /> */}
+      {/* <TextInput
         fullWidth
         // record={scopedFormData}
 
@@ -105,7 +139,7 @@ const Form = ({ children, ...props }) => {
 
           return v.toString().replace(/,/g, '');
         }}
-      />
+      /> */}
 
       {children}
     </SimpleForm>
